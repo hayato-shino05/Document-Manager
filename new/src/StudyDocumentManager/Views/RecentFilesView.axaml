@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.ViewModels"
+             x:Class="StudyDocumentManager.Views.RecentFilesView"
+             x:DataType="vm:RecentFilesViewModel">
+
+  <Grid RowDefinitions="Auto,*,Auto" Margin="32">
+
+    <!-- Header -->
+    <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,20">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Button Command="{Binding GoBackCommand}"
+                Content="← Quay lại"
+                Classes="ghost"/>
+        <TextBlock Text="Lịch sử file đã mở"
+                   FontSize="24" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+      </StackPanel>
+      <TextBlock Text="{Binding RecentFiles.Count, StringFormat='Tổng: {0} file gần đây'}"
+                 Foreground="{DynamicResource TextSecondaryBrush}" FontSize="14"/>
+    </StackPanel>
+
+    <!-- File list -->
+    <Border Grid.Row="1" CornerRadius="12"
+            Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+            Padding="0">
+
+      <DataGrid ItemsSource="{Binding RecentFiles}"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                CanUserResizeColumns="True"
+                GridLinesVisibility="Horizontal"
+                Margin="0">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding DocumentName}" Width="2*"/>
+          <DataGridTextColumn Header="Danh mục" Binding="{Binding Subject}" Width="*"/>
+          <DataGridTextColumn Header="Loại" Binding="{Binding FileType}" Width="80"/>
+          <DataGridTextColumn Header="Mở lúc" Binding="{Binding OpenedAtDisplay}" Width="130"/>
+          <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusDisplay}" Width="100"/>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+
+    <!-- Bottom actions -->
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" Margin="0,16,0,0"
+                HorizontalAlignment="Right">
+      <Button Content="Làm mới" Command="{Binding RefreshCommand}"/>
+      <Button Content="Xóa lịch sử" Command="{Binding ClearHistoryCommand}"
+              Foreground="White" Background="#dc2626"/>
+    </StackPanel>
+  </Grid>
+</UserControl>

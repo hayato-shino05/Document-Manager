@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.ViewModels"
+             x:Class="StudyDocumentManager.Views.FileIntegrityCheckView"
+             x:DataType="vm:FileIntegrityCheckViewModel">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="20">
+        <DockPanel>
+            <!-- Header -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Image Source="{StaticResource IconWrench}" Width="18" Height="18"/>
+                    <TextBlock Text="Kiểm tra tính toàn vẹn file" FontSize="18" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
+                            HorizontalAlignment="Right">
+                    <Button Classes="primary" Command="{Binding CheckIntegrityCommand}" Padding="14,6"
+                            IsEnabled="{Binding !IsChecking}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconScan}" Width="13" Height="13"/>
+                            <TextBlock Text="Kiểm tra" FontSize="12" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Padding="14,6" Command="{Binding RemoveMissingCommand}"
+                            Background="#DC2626" Foreground="White" CornerRadius="4"
+                            IsVisible="{Binding !!MissingCount}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
+                            <TextBlock Text="Xóa file bị thiếu" FontSize="12" Foreground="White"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Stats -->
+            <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}" CornerRadius="6"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                    Padding="12,8" Margin="0,0,0,12"
+                    IsVisible="{Binding !!TotalChecked}">
+                <StackPanel Orientation="Horizontal" Spacing="20">
+                    <TextBlock FontSize="12" Foreground="{StaticResource TextSecondary}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="Đã kiểm tra: {0} tài liệu">
+                                <Binding Path="TotalChecked"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock FontSize="12" Foreground="#DC2626">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="File bị mất: {0}">
+                                <Binding Path="MissingCount"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <!-- Results DataGrid -->
+            <Border Background="{StaticResource CardBackground}" CornerRadius="6"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1" ClipToBounds="True">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusText}" FontSize="10"
+                               Foreground="{StaticResource TextMuted}" Margin="8,4"/>
+                    <Panel>
+                        <DataGrid Name="dgvMissingFiles"
+                                  ItemsSource="{Binding Results}"
+                                  AutoGenerateColumns="False" IsReadOnly="True"
+                                  CanUserSortColumns="True"
+                                  GridLinesVisibility="Horizontal" HeadersVisibility="Column">
+
+                            <!-- Per-item context menu -->
+                            <DataGrid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Chọn file mới..."
+                                              Command="{Binding SelectNewFileCommand}"
+                                              CommandParameter="{Binding #dgvMissingFiles.SelectedItem}"/>
+                                    <MenuItem Header="Xóa đường dẫn (giữ metadata)"
+                                              Command="{Binding ClearFilePathCommand}"
+                                              CommandParameter="{Binding #dgvMissingFiles.SelectedItem}"/>
+                                    <Separator/>
+                                    <MenuItem Header="Xóa tài liệu"
+                                              Command="{Binding DeleteDocumentCommand}"
+                                              CommandParameter="{Binding #dgvMissingFiles.SelectedItem}"/>
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Trạng thái" Binding="{Binding Status}" Width="160"/>
+                                <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding Document.Ten}" Width="*" MinWidth="200"/>
+                                <DataGridTextColumn Header="Đường dẫn" Binding="{Binding FilePath}" Width="350"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <StackPanel IsVisible="{Binding !Results.Count}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                            <Image Source="{StaticResource IconWrench}" Width="36" Height="36"
+                                   HorizontalAlignment="Center" Opacity="0.4"/>
+                            <TextBlock Text="Nhấn &quot;Kiểm tra&quot; để quét toàn bộ tài liệu" FontSize="13"
+                                       Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Panel>
+                </DockPanel>
+            </Border>
+        </DockPanel>
+    </Border>
+
+</UserControl>

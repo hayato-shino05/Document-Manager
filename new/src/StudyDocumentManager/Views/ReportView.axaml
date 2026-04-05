@@ -1,0 +1,181 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.ViewModels"
+             x:Class="StudyDocumentManager.Views.ReportView"
+             x:DataType="vm:ReportViewModel">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="20">
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Image Source="{StaticResource IconReport}" Width="18" Height="18"/>
+                    <TextBlock Text="Thống kê &amp; Báo cáo" FontSize="18" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+                <Button DockPanel.Dock="Right" Classes="secondary"
+                        Command="{Binding LoadAllDataCommand}" Padding="10,5"
+                        HorizontalAlignment="Right">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconRefresh}" Width="12" Height="12"/>
+                        <TextBlock Text="Làm mới" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+            </DockPanel>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="20">
+
+                    <!-- ═══ Theo Danh mục ═══ -->
+                    <Border Background="{StaticResource CardBackground}" CornerRadius="6"
+                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                            Padding="16">
+                        <StackPanel Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Source="{StaticResource IconCategory}" Width="14" Height="14"/>
+                                <TextBlock Text="Theo Danh mục" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                            </StackPanel>
+                            <ItemsControl ItemsSource="{Binding BySubjectData}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:ChartDataItem}">
+                                        <Grid ColumnDefinitions="140,*,60" Margin="0,2">
+                                            <TextBlock Text="{Binding Label}" FontSize="11"
+                                                       Foreground="{StaticResource TextPrimary}"
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                            <Border Grid.Column="1" Height="18" CornerRadius="3"
+                                                    Background="{StaticResource SidebarBackground}" Margin="8,0">
+                                                <Border Height="18" CornerRadius="3"
+                                                        Background="{StaticResource AccentColor}"
+                                                        HorizontalAlignment="Left"
+                                                        MinWidth="4"
+                                                        Width="{Binding BarWidth}"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="2" FontSize="11" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource AccentColor}"
+                                                       HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                       Text="{Binding Value}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="Chưa có dữ liệu" FontSize="11" Foreground="{StaticResource TextMuted}"
+                                       IsVisible="{Binding !BySubjectData.Count}" Margin="0,8"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ═══ Theo Loại ═══ -->
+                    <Border Background="{StaticResource CardBackground}" CornerRadius="6"
+                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                            Padding="16">
+                        <StackPanel Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Source="{StaticResource IconDocPage}" Width="14" Height="14"/>
+                                <TextBlock Text="Theo Loại tài liệu" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                            </StackPanel>
+                            <ItemsControl ItemsSource="{Binding ByTypeData}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:ChartDataItem}">
+                                        <Grid ColumnDefinitions="140,*,60" Margin="0,2">
+                                            <TextBlock Text="{Binding Label}" FontSize="11"
+                                                       Foreground="{StaticResource TextPrimary}"
+                                                       VerticalAlignment="Center"/>
+                                            <Border Grid.Column="1" Height="18" CornerRadius="3"
+                                                    Background="{StaticResource SidebarBackground}" Margin="8,0">
+                                                <Border Height="18" CornerRadius="3"
+                                                        Background="#059669"
+                                                        HorizontalAlignment="Left"
+                                                        MinWidth="4"
+                                                        Width="{Binding BarWidth}"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="2" FontSize="11" FontWeight="SemiBold"
+                                                       Foreground="#059669"
+                                                       HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                       Text="{Binding Value}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="Chưa có dữ liệu" FontSize="11" Foreground="{StaticResource TextMuted}"
+                                       IsVisible="{Binding !ByTypeData.Count}" Margin="0,8"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ═══ 7 Ngày Gần Nhất ═══ -->
+                    <Border Background="{StaticResource CardBackground}" CornerRadius="6"
+                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                            Padding="16">
+                        <StackPanel Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Source="{StaticResource IconCalendar}" Width="14" Height="14"/>
+                                <TextBlock Text="7 Ngày gần nhất" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                            </StackPanel>
+                            <ItemsControl ItemsSource="{Binding ByDayData}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:ChartDataItem}">
+                                        <Grid ColumnDefinitions="100,*,60" Margin="0,2">
+                                            <TextBlock Text="{Binding Label}" FontSize="11"
+                                                       Foreground="{StaticResource TextPrimary}"
+                                                       VerticalAlignment="Center"/>
+                                            <Border Grid.Column="1" Height="18" CornerRadius="3"
+                                                    Background="{StaticResource SidebarBackground}" Margin="8,0">
+                                                <Border Height="18" CornerRadius="3"
+                                                        Background="#D97706"
+                                                        HorizontalAlignment="Left"
+                                                        MinWidth="4"
+                                                        Width="{Binding BarWidth}"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="2" FontSize="11" FontWeight="SemiBold"
+                                                       Foreground="#D97706"
+                                                       HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                       Text="{Binding Value}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ═══ 12 Tháng Gần Nhất ═══ -->
+                    <Border Background="{StaticResource CardBackground}" CornerRadius="6"
+                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                            Padding="16">
+                        <StackPanel Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Source="{StaticResource IconCalendar}" Width="14" Height="14"/>
+                                <TextBlock Text="12 Tháng gần nhất" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                            </StackPanel>
+                            <ItemsControl ItemsSource="{Binding ByMonthData}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:ChartDataItem}">
+                                        <Grid ColumnDefinitions="100,*,60" Margin="0,2">
+                                            <TextBlock Text="{Binding Label}" FontSize="11"
+                                                       Foreground="{StaticResource TextPrimary}"
+                                                       VerticalAlignment="Center"/>
+                                            <Border Grid.Column="1" Height="18" CornerRadius="3"
+                                                    Background="{StaticResource SidebarBackground}" Margin="8,0">
+                                                <Border Height="18" CornerRadius="3"
+                                                        Background="#7C3AED"
+                                                        HorizontalAlignment="Left"
+                                                        MinWidth="4"
+                                                        Width="{Binding BarWidth}"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="2" FontSize="11" FontWeight="SemiBold"
+                                                       Foreground="#7C3AED"
+                                                       HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                       Text="{Binding Value}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
+
+</UserControl>

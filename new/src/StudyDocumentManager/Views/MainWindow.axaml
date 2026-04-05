@@ -1,0 +1,250 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:StudyDocumentManager.ViewModels"
+        xmlns:v="using:StudyDocumentManager.Views"
+        x:Class="StudyDocumentManager.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Study Document Manager - Professional Edition"
+        Width="1280" Height="800"
+        MinWidth="960" MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource ContentBackground}">
+
+    <DockPanel>
+
+        <!-- ═══ MENU BAR ═══ -->
+        <Menu DockPanel.Dock="Top" Background="{StaticResource CardBackground}"
+              Padding="4,0" Height="30">
+            <MenuItem Header="Tệp tin">
+                <MenuItem Header="Thêm tài liệu mới" Command="{Binding NavigateCommand}" CommandParameter="add" InputGesture="Ctrl+N"/>
+                <MenuItem Header="Mở tài liệu" Command="{Binding OpenFileCommand}" InputGesture="Ctrl+O"/>
+                <Separator/>
+                <MenuItem Header="Xuất CSV" Command="{Binding ExportCsvCommand}" InputGesture="Ctrl+E"/>
+                <MenuItem Header="Sao lưu DB" Command="{Binding BackupDatabaseCommand}"/>
+                <MenuItem Header="Khôi phục DB" Command="{Binding RestoreDatabaseCommand}"/>
+                <Separator/>
+                <MenuItem Header="Thoát" Command="{Binding ExitAppCommand}" InputGesture="Alt+F4"/>
+            </MenuItem>
+            <MenuItem Header="Chỉnh sửa">
+                <MenuItem Header="Sửa tài liệu" Command="{Binding EditDocumentCommand}" InputGesture="Ctrl+U"/>
+                <MenuItem Header="Xóa tài liệu" Command="{Binding DeleteDocumentCommand}" InputGesture="Delete"/>
+                <Separator/>
+                <MenuItem Header="Làm mới danh sách" Command="{Binding RefreshCommand}" InputGesture="F5"/>
+            </MenuItem>
+            <MenuItem Header="Công cụ">
+                <MenuItem Header="Quản lý Danh mục" Command="{Binding NavigateCommand}" CommandParameter="categories" InputGesture="Ctrl+M"/>
+                <MenuItem Header="Bộ sưu tập" Command="{Binding NavigateCommand}" CommandParameter="collections"/>
+                <Separator/>
+                <MenuItem Header="Import hàng loạt" Command="{Binding NavigateCommand}" CommandParameter="batch-import"/>
+                <MenuItem Header="Xóa hàng loạt" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
+                <MenuItem Header="Tìm trùng lặp" Command="{Binding NavigateCommand}" CommandParameter="duplicates"/>
+                <MenuItem Header="Kiểm tra file" Command="{Binding NavigateCommand}" CommandParameter="integrity"/>
+                <Separator/>
+                <MenuItem Header="Thống kê" Command="{Binding NavigateCommand}" CommandParameter="report" InputGesture="Ctrl+S"/>
+                <Separator/>
+                <MenuItem Header="Thùng rác" Command="{Binding NavigateCommand}" CommandParameter="recycle"/>
+            </MenuItem>
+            <MenuItem Header="Trợ giúp">
+                <MenuItem Header="Kiểm tra cập nhật" Command="{Binding CheckForUpdateCommand}"/>
+                <Separator/>
+                <MenuItem Header="Giới thiệu" Command="{Binding ShowAboutCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- ═══ TOOLBAR (like WinForms ToolStrip with many icon buttons) ═══ -->
+        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
+                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
+                Padding="6,3">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" Spacing="1">
+                    <!-- CRUD -->
+                    <Button Classes="secondary" Command="{Binding NavigateCommand}" CommandParameter="add"
+                            FontWeight="SemiBold" Padding="10,5">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconAdd}" Width="16" Height="16"/>
+                            <TextBlock Text="Thêm" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" Padding="10,5" Command="{Binding EditDocumentCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconEdit}" Width="14" Height="14"/>
+                            <TextBlock Text="Sửa" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" Padding="10,5" Command="{Binding DeleteDocumentCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconDelete}" Width="14" Height="14"/>
+                            <TextBlock Text="Xóa" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Border Width="1" Background="{StaticResource CardBorder}" Margin="4,4"/>
+
+                    <!-- File operations -->
+                    <Button Classes="secondary" Padding="10,5" Command="{Binding OpenFileCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconOpenFile}" Width="14" Height="14"/>
+                            <TextBlock Text="Mở file" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" Padding="10,5" Command="{Binding ExportCsvCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconExport}" Width="14" Height="14"/>
+                            <TextBlock Text="Xuất" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Border Width="1" Background="{StaticResource CardBorder}" Margin="4,4"/>
+
+                    <!-- Refresh + Import -->
+                    <Button Classes="secondary" Padding="10,5" Command="{Binding RefreshCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconRefresh}" Width="14" Height="14"/>
+                            <TextBlock Text="Làm mới" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" Padding="10,5"
+                            Command="{Binding NavigateCommand}" CommandParameter="batch-import">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconImport}" Width="14" Height="14"/>
+                            <TextBlock Text="Import" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Border Width="1" Background="{StaticResource CardBorder}" Margin="4,4"/>
+
+                    <!-- Tools: Recycle, Bulk, Recent, Backup -->
+                    <Button Classes="secondary" Padding="10,5"
+                            Command="{Binding NavigateCommand}" CommandParameter="recycle">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconRecycle}" Width="14" Height="14"/>
+                            <TextBlock Text="Thùng rác" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" Padding="10,5"
+                            Command="{Binding NavigateCommand}" CommandParameter="bulk-delete">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconBulkDelete}" Width="14" Height="14"/>
+                            <TextBlock Text="Hàng loạt" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" Padding="10,5"
+                            Command="{Binding NavigateCommand}" CommandParameter="recentfiles">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconClock}" Width="14" Height="14"/>
+                            <TextBlock Text="Gần đây" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" Padding="10,5"
+                            Command="{Binding BackupDatabaseCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconSave}" Width="14" Height="14"/>
+                            <TextBlock Text="Sao lưu" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Border Width="1" Background="{StaticResource CardBorder}" Margin="4,4"/>
+
+                    <!-- Analytics -->
+                    <Button Classes="secondary" Padding="10,5"
+                            Command="{Binding NavigateCommand}" CommandParameter="duplicates">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconDuplicate}" Width="14" Height="14"/>
+                            <TextBlock Text="Trùng lặp" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" Padding="10,5"
+                            Command="{Binding NavigateCommand}" CommandParameter="report">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconReport}" Width="14" Height="14"/>
+                            <TextBlock Text="Thống kê" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" Padding="10,5"
+                            Command="{Binding NavigateCommand}" CommandParameter="treemap">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconDashboard}" Width="14" Height="14"/>
+                            <TextBlock Text="TreeMap" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Right side -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
+                            HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button Classes="secondary" Padding="10,5" Command="{Binding GoBackCommand}"
+                            IsVisible="{Binding CanGoBack}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconBack}" Width="12" Height="12"/>
+                            <TextBlock Text="Quay lại" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+                    <TextBlock Text="{Binding AppVersion, StringFormat='v{0}'}" FontSize="10"
+                               Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ═══ STATUS BAR (bottom) ═══ -->
+        <Border DockPanel.Dock="Bottom" Background="{StaticResource CardBackground}"
+                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
+                Padding="12,3" Height="26">
+            <DockPanel>
+                <TextBlock Text="Sẵn sàng" FontSize="11" Foreground="{StaticResource TextSecondary}"
+                           VerticalAlignment="Center"/>
+                <TextBlock DockPanel.Dock="Right" FontSize="11" Foreground="{StaticResource TextSecondary}"
+                           VerticalAlignment="Center" HorizontalAlignment="Right"
+                           Text="{Binding StatusText, FallbackValue='Tổng số: 0 tài liệu'}"/>
+            </DockPanel>
+        </Border>
+
+        <!-- ═══ MAIN CONTENT ═══ -->
+        <ContentControl Content="{Binding CurrentView}">
+            <ContentControl.DataTemplates>
+                <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+                    <v:DashboardView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:AddEditViewModel}">
+                    <v:AddEditView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:CategoryManagementViewModel}">
+                    <v:CategoryManagementView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:CollectionManagementViewModel}">
+                    <v:CollectionManagementView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:RecycleBinViewModel}">
+                    <v:RecycleBinView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:BatchImportViewModel}">
+                    <v:BatchImportView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:BulkDeleteViewModel}">
+                    <v:BulkDeleteView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:DuplicateDetectionViewModel}">
+                    <v:DuplicateDetectionView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:FileIntegrityCheckViewModel}">
+                    <v:FileIntegrityCheckView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:PersonalNoteViewModel}">
+                    <v:PersonalNoteView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:RelatedDocumentsViewModel}">
+                    <v:RelatedDocumentsView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:ReportViewModel}">
+                    <v:ReportView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:RecentFilesViewModel}">
+                    <v:RecentFilesView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:TreeMapViewModel}">
+                    <v:TreeMapView />
+                </DataTemplate>
+            </ContentControl.DataTemplates>
+        </ContentControl>
+    </DockPanel>
+
+</Window>

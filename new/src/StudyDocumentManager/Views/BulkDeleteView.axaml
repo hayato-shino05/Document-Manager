@@ -1,0 +1,130 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.ViewModels"
+             x:Class="StudyDocumentManager.Views.BulkDeleteView"
+             x:DataType="vm:BulkDeleteViewModel">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="20">
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,12">
+                <Image Source="{StaticResource IconBulkDelete}" Width="18" Height="18"/>
+                <TextBlock Text="Quản Lý Hàng Loạt" FontSize="18"
+                           FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+            </StackPanel>
+
+            <!-- Search + Filter row -->
+            <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}" CornerRadius="6"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                    Padding="12,8" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Tìm kiếm:" FontSize="12" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextPrimary}"/>
+                    <TextBox Text="{Binding SearchKeyword, Mode=TwoWay}" Width="220" FontSize="12"
+                             Watermark="Lọc tài liệu..." Height="28"/>
+                    <Button Classes="primary" Command="{Binding SearchCommand}" Padding="12,5">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconSearch}" Width="12" Height="12"/>
+                            <TextBlock Text="Tìm" FontSize="11"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Border Width="1" Height="20" Background="{StaticResource CardBorder}" Margin="4,0"/>
+
+                    <TextBlock Text="Danh mục:" FontSize="11" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondary}"/>
+                    <ComboBox Width="130" FontSize="11" Height="28" VerticalAlignment="Center"
+                              ItemsSource="{Binding Subjects}"
+                              SelectedItem="{Binding SelectedSubject}"/>
+
+                    <TextBlock Text="Loại:" FontSize="11" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondary}"/>
+                    <ComboBox Width="110" FontSize="11" Height="28" VerticalAlignment="Center"
+                              ItemsSource="{Binding Types}"
+                              SelectedItem="{Binding SelectedType}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Bottom buttons -->
+            <Border DockPanel.Dock="Bottom" Background="{StaticResource SidebarBackground}"
+                    CornerRadius="6" Padding="12,8" Margin="0,12,0,0">
+                <Grid ColumnDefinitions="*,Auto">
+                    <!-- Left: Bulk actions -->
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Classes="secondary" Command="{Binding SelectAllCommand}" Padding="10,5">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Image Source="{StaticResource IconCheck}" Width="11" Height="11"/>
+                                <TextBlock Text="Chọn tất cả" FontSize="11"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Classes="secondary" Command="{Binding DeselectAllCommand}" Padding="10,5">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Image Source="{StaticResource IconClose}" Width="11" Height="11"/>
+                                <TextBlock Text="Bỏ chọn" FontSize="11"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Border Width="1" Height="22" Background="{StaticResource CardBorder}" Margin="4,0"/>
+
+                        <!-- Mark Important button -->
+                        <Button Padding="10,5" Command="{Binding MarkImportantCommand}"
+                                Background="#F59E0B" Foreground="White" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Image Source="{StaticResource IconStar}" Width="12" Height="12"/>
+                                <TextBlock Text="Đánh dấu ★" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Change Subject -->
+                        <ComboBox Width="130" FontSize="11" Height="28" VerticalAlignment="Center"
+                                  ItemsSource="{Binding AvailableSubjects}"
+                                  SelectedItem="{Binding NewSubjectValue}"/>
+                        <Button Padding="10,5" Command="{Binding ChangeSubjectCommand}"
+                                Background="#3B82F6" Foreground="White" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Image Source="{StaticResource IconCategory}" Width="12" Height="12"/>
+                                <TextBlock Text="Đổi danh mục" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Right: Delete + Cancel -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <Button Padding="14,6" Command="{Binding DeleteSelectedCommand}"
+                                Background="#DC2626" Foreground="White" CornerRadius="4">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
+                                <TextBlock Text="Xóa đã chọn" FontSize="12" FontWeight="SemiBold" Foreground="White"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="12,6">
+                            <TextBlock Text="Quay lại" FontSize="12"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Document list with checkboxes -->
+            <Border Background="{StaticResource CardBackground}" CornerRadius="6"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1" ClipToBounds="True">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusText}" FontSize="10"
+                               Foreground="{StaticResource TextMuted}" Margin="8,4"/>
+                    <DataGrid ItemsSource="{Binding Documents}"
+                              AutoGenerateColumns="False"
+                              CanUserSortColumns="True"
+                              GridLinesVisibility="Horizontal" HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="✓" Binding="{Binding IsSelected}" Width="40"/>
+                            <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding Document.Ten}" Width="*" MinWidth="200" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Danh mục" Binding="{Binding Document.MonHoc}" Width="120" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Loại" Binding="{Binding Document.Loai}" Width="80" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Ngày thêm" Binding="{Binding Document.NgayThem, StringFormat=\{0:dd/MM/yyyy\}}" Width="100" IsReadOnly="True"/>
+                            <DataGridCheckBoxColumn Header="★" Binding="{Binding Document.QuanTrong}" Width="40" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </Border>
+        </DockPanel>
+    </Border>
+
+</UserControl>

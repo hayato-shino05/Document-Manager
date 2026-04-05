@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.ViewModels"
+             x:Class="StudyDocumentManager.Views.RecycleBinView"
+             x:DataType="vm:RecycleBinViewModel">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="20">
+        <DockPanel>
+            <!-- Header -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Image Source="{StaticResource IconRecycle}" Width="18" Height="18"/>
+                    <TextBlock Text="Thùng rác" FontSize="18" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
+                            HorizontalAlignment="Right">
+                    <Button Classes="primary" Command="{Binding RestoreCommand}" Padding="12,6">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconRestore}" Width="13" Height="13"/>
+                            <TextBlock Text="Khôi phục" FontSize="12"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" Command="{Binding PermanentDeleteCommand}" Padding="12,6">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
+                            <TextBlock Text="Xóa vĩnh viễn" FontSize="12"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Padding="12,6" Command="{Binding EmptyTrashCommand}"
+                            Background="#DC2626" Foreground="White" CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconRecycle}" Width="13" Height="13"/>
+                            <TextBlock Text="Xóa tất cả" FontSize="12" Foreground="White"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- DataGrid -->
+            <Border Background="{StaticResource CardBackground}" CornerRadius="6"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1" ClipToBounds="True">
+                <Panel>
+                    <DataGrid ItemsSource="{Binding DeletedDocuments}"
+                              SelectedItem="{Binding SelectedDocument}"
+                              AutoGenerateColumns="False" IsReadOnly="True"
+                              CanUserSortColumns="True"
+                              GridLinesVisibility="Horizontal" HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding Ten}" Width="*" MinWidth="200"/>
+                            <DataGridTextColumn Header="Danh mục" Binding="{Binding MonHoc}" Width="120"/>
+                            <DataGridTextColumn Header="Loại" Binding="{Binding Loai}" Width="80"/>
+                            <DataGridTextColumn Header="Ngày thêm" Binding="{Binding NgayThem, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel IsVisible="{Binding !DeletedDocuments.Count}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                        <Image Source="{StaticResource IconRecycle}" Width="36" Height="36"
+                               HorizontalAlignment="Center" Opacity="0.4"/>
+                        <TextBlock Text="Thùng rác trống" FontSize="14" FontWeight="Medium"
+                                   Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Panel>
+            </Border>
+        </DockPanel>
+    </Border>
+
+</UserControl>

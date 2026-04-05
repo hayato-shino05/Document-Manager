@@ -1,0 +1,119 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.ViewModels"
+             xmlns:m="using:StudyDocumentManager.Core.Entities"
+             x:Class="StudyDocumentManager.Views.DuplicateDetectionView"
+             x:DataType="vm:DuplicateDetectionViewModel"
+             x:Name="Root">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="20">
+        <DockPanel>
+            <!-- Header -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Image Source="{StaticResource IconDuplicate}" Width="18" Height="18"/>
+                    <TextBlock Text="Phát hiện Trùng lặp" FontSize="18" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
+                            HorizontalAlignment="Right">
+                    <Button Classes="primary" Command="{Binding ScanDuplicatesCommand}" Padding="14,6"
+                            IsEnabled="{Binding !IsScanning}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconScan}" Width="13" Height="13"/>
+                            <TextBlock Text="Quét trùng lặp" FontSize="12" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Stats -->
+            <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}" CornerRadius="6"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                    Padding="12,8" Margin="0,0,0,12"
+                    IsVisible="{Binding !!TotalGroups}">
+                <TextBlock FontSize="12" Foreground="{StaticResource TextSecondary}">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="Tìm thấy {0} nhóm trùng lặp">
+                            <Binding Path="TotalGroups"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </Border>
+
+            <!-- Duplicate groups list -->
+            <Border Background="{StaticResource CardBackground}" CornerRadius="6"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1" ClipToBounds="True">
+                <Panel>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  IsVisible="{Binding !!DuplicateGroups.Count}">
+                        <ItemsControl ItemsSource="{Binding DuplicateGroups}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:DuplicateGroup}">
+                                    <Border BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
+                                            Padding="12,8">
+                                        <StackPanel Spacing="6">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Image Source="{StaticResource IconWarning}" Width="14" Height="14"/>
+                                                <TextBlock FontSize="13" FontWeight="SemiBold"
+                                                           Foreground="{StaticResource TextPrimary}">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="{}{0} ({1} bản trùng)">
+                                                            <Binding Path="GroupName"/>
+                                                            <Binding Path="Count"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </StackPanel>
+
+                                            <ItemsControl ItemsSource="{Binding Documents}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate DataType="{x:Type m:StudyDocument}">
+                                                        <Border Background="{StaticResource SidebarBackground}"
+                                                                CornerRadius="4" Padding="10,5" Margin="20,2,0,2">
+                                                            <DockPanel>
+                                                                <Button DockPanel.Dock="Right" Classes="secondary" Padding="6,2"
+                                                                        Command="{Binding #Root.DataContext.DeleteDuplicateCommand}"
+                                                                        CommandParameter="{Binding}">
+                                                                    <StackPanel Orientation="Horizontal" Spacing="3">
+                                                                        <Image Source="{StaticResource IconDelete}" Width="10" Height="10"/>
+                                                                        <TextBlock Text="Xóa" FontSize="10"/>
+                                                                    </StackPanel>
+                                                                </Button>
+                                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                                    <TextBlock Text="{Binding Ten}" FontSize="11"
+                                                                               Foreground="{StaticResource TextPrimary}"/>
+                                                                    <TextBlock FontSize="10" Foreground="{StaticResource TextMuted}">
+                                                                        <TextBlock.Text>
+                                                                            <MultiBinding StringFormat="ID:{0} | {1}">
+                                                                                <Binding Path="Id"/>
+                                                                                <Binding Path="DuongDan"/>
+                                                                            </MultiBinding>
+                                                                        </TextBlock.Text>
+                                                                    </TextBlock>
+                                                                </StackPanel>
+                                                            </DockPanel>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <StackPanel IsVisible="{Binding !DuplicateGroups.Count}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                        <Image Source="{StaticResource IconSearch}" Width="36" Height="36"
+                               HorizontalAlignment="Center" Opacity="0.4"/>
+                        <TextBlock Text="Nhấn &quot;Quét trùng lặp&quot; để bắt đầu" FontSize="13"
+                                   Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Panel>
+            </Border>
+        </DockPanel>
+    </Border>
+
+</UserControl>

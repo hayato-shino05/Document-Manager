@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.ViewModels"
+             x:Class="StudyDocumentManager.Views.TreeMapView"
+             x:DataType="vm:TreeMapViewModel">
+
+  <Grid RowDefinitions="Auto,*" Margin="32">
+
+    <!-- Header -->
+    <StackPanel Grid.Row="0" Spacing="12" Margin="0,0,0,20">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Button Command="{Binding GoBackCommand}"
+                Content="← Quay lại"
+                Classes="ghost"/>
+        <TextBlock Text="TreeMap — Phân bố tài liệu"
+                   FontSize="24" FontWeight="Bold"
+                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+      </StackPanel>
+
+      <!-- Mode toggle -->
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBlock Text="Phân loại theo:" VerticalAlignment="Center"
+                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+        <Button Content="Danh mục" Command="{Binding ShowBySubjectCommand}"
+                Background="{DynamicResource AccentBrush}" Foreground="White"/>
+        <Button Content="Loại tài liệu" Command="{Binding ShowByTypeCommand}"/>
+        <TextBlock Text="{Binding TotalDocuments, StringFormat='Tổng: {0} tài liệu'}"
+                   VerticalAlignment="Center" Margin="20,0,0,0"
+                   Foreground="{DynamicResource TextSecondaryBrush}" FontWeight="SemiBold"/>
+      </StackPanel>
+    </StackPanel>
+
+    <!-- TreeMap grid — using WrapPanel with sized blocks -->
+    <Border Grid.Row="1" CornerRadius="12"
+            Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+            Padding="16">
+      <ScrollViewer>
+        <ItemsControl ItemsSource="{Binding Items}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:TreeMapItem">
+              <Border MinWidth="120" MinHeight="80"
+                      Margin="4" Padding="12" CornerRadius="8"
+                      Background="{Binding Color}">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                  <TextBlock Text="{Binding Label}"
+                             Foreground="White" FontWeight="Bold" FontSize="14"
+                             TextAlignment="Center" TextWrapping="Wrap"/>
+                  <TextBlock Text="{Binding Count, StringFormat='{}{0} tài liệu'}"
+                             Foreground="#ffffffcc" FontSize="12"
+                             TextAlignment="Center"/>
+                  <TextBlock Text="{Binding Percentage, StringFormat='{}{0:F1}%'}"
+                             Foreground="#ffffffaa" FontSize="11"
+                             TextAlignment="Center"/>
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+  </Grid>
+</UserControl>

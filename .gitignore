@@ -10,16 +10,20 @@
 *.env
 .claude/
 rule/
+.agent/
+gemini.md
 # User-specific files
 *.rsuser
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
-.kiro/
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 nul
+.serena/
+rule/
+.better-context
 # Mono auto generated files
 mono_crash.*
 AGENTS.md

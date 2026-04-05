@@ -1,0 +1,458 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.ViewModels"
+             xmlns:conv="using:StudyDocumentManager.Converters"
+             xmlns:core="using:StudyDocumentManager.Core.Entities"
+             x:Class="StudyDocumentManager.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+
+    <UserControl.Resources>
+        <conv:DeadlineBrushConverter x:Key="DeadlineBrushConverter"/>
+    </UserControl.Resources>
+
+    <DockPanel>
+
+        <!-- ═══ SEARCH BAR ═══ -->
+        <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}"
+                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
+                Padding="{StaticResource PaddingRow}">
+            <Grid ColumnDefinitions="*,Auto">
+
+                <!-- Left: Search + Dropdown filters -->
+                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}" VerticalAlignment="Center">
+                    <Image Source="{StaticResource IconSearch}" Width="13" Height="13"
+                           VerticalAlignment="Center" Opacity="0.5"/>
+                    <TextBox Width="260" Height="{StaticResource HeightControl}" FontSize="{StaticResource FontSizeMd}"
+                             Watermark="Nhập tên, ghi chú, tác giả, tags..."
+                             Text="{Binding SearchKeyword, Mode=TwoWay}"
+                             VerticalContentAlignment="Center"/>
+                    <Button Classes="primary" Command="{Binding SearchCommand}"
+                            Padding="14,4" Height="{StaticResource HeightControl}" VerticalAlignment="Center">
+                        <TextBlock Text="Tìm kiếm" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                    </Button>
+
+                    <Border Width="1" Height="18" Background="{StaticResource CardBorder}" Margin="4,0"/>
+
+                    <TextBlock Text="Danh mục:" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondary}"/>
+                    <ComboBox Name="cboSubject" Width="140" FontSize="{StaticResource FontSizeMd}"
+                              Height="{StaticResource HeightControl}" VerticalAlignment="Center"/>
+
+                    <TextBlock Text="Loại:" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondary}"/>
+                    <ComboBox Name="cboType" Width="120" FontSize="{StaticResource FontSizeMd}"
+                              Height="{StaticResource HeightControl}" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Right: Toggle advanced filter button -->
+                <Button Grid.Column="1" Classes="secondary"
+                        Padding="10,4" Height="{StaticResource HeightControl}" VerticalAlignment="Center"
+                        Command="{Binding ToggleAdvancedFilterCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
+                        <Image Source="{StaticResource IconFilter}" Width="12" Height="12"
+                               VerticalAlignment="Center"/>
+                        <TextBlock Text="Bộ lọc nâng cao" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                        <Image Width="9" Height="9" VerticalAlignment="Center"
+                               IsVisible="{Binding IsAdvancedFilterVisible}"
+                               Source="{StaticResource IconChevronUp}"/>
+                        <Image Width="9" Height="9" VerticalAlignment="Center"
+                               IsVisible="{Binding !IsAdvancedFilterVisible}"
+                               Source="{StaticResource IconChevronDown}"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- ═══ ADVANCED FILTER PANEL (Collapsible) ═══ -->
+        <Border DockPanel.Dock="Top"
+                IsVisible="{Binding IsAdvancedFilterVisible}"
+                Background="{StaticResource SidebarBackground}"
+                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
+                Padding="16,12">
+            <StackPanel Spacing="12">
+
+                <!-- Filter Groups Row -->
+                <Grid ColumnDefinitions="*,*,Auto">
+
+                    <!-- ── Group 1: Khoảng thời gian ── -->
+                    <Border CornerRadius="6" Background="{StaticResource CardBackground}"
+                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                            Padding="12,10" Margin="0,0,8,0">
+                        <StackPanel Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <CheckBox IsChecked="{Binding IsDateFilterEnabled}"
+                                          VerticalAlignment="Center"/>
+                                <Image Source="{StaticResource IconCalendar}" Width="14" Height="14"
+                                       VerticalAlignment="Center"/>
+                                <TextBlock Text="Khoảng thời gian" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" IsEnabled="{Binding IsDateFilterEnabled}">
+                                <TextBlock Text="Từ:" FontSize="11" VerticalAlignment="Center"
+                                           Foreground="{StaticResource TextSecondary}" Margin="0,0,6,0"/>
+                                <DatePicker Grid.Column="1" FontSize="11" Height="30"
+                                            SelectedDate="{Binding FilterFromDate}"
+                                            HorizontalAlignment="Stretch"/>
+                                <TextBlock Grid.Column="2" Text="Đến:" FontSize="11" VerticalAlignment="Center"
+                                           Foreground="{StaticResource TextSecondary}" Margin="10,0,6,0"/>
+                                <DatePicker Grid.Column="3" FontSize="11" Height="30"
+                                            SelectedDate="{Binding FilterToDate}"
+                                            HorizontalAlignment="Stretch"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ── Group 2: Dung lượng + Quan trọng ── -->
+                    <Border Grid.Column="1" CornerRadius="6" Background="{StaticResource CardBackground}"
+                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                            Padding="12,10" Margin="0,0,8,0">
+                        <StackPanel Spacing="8">
+                            <!-- Size Filter -->
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <CheckBox IsChecked="{Binding IsSizeFilterEnabled}"
+                                          VerticalAlignment="Center"/>
+                                <Image Source="{StaticResource IconSize}" Width="14" Height="14"
+                                       VerticalAlignment="Center"/>
+                                <TextBlock Text="Dung lượng file" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Spacing="6"
+                                        IsEnabled="{Binding IsSizeFilterEnabled}">
+                                <TextBlock Text="Từ" FontSize="11" VerticalAlignment="Center"
+                                           Foreground="{StaticResource TextSecondary}"/>
+                                <NumericUpDown Width="80" FontSize="11" Height="30"
+                                               Value="{Binding FilterMinSize}"
+                                               Minimum="0" FormatString="F1"/>
+                                <TextBlock Text="→" FontSize="11" VerticalAlignment="Center"
+                                           Foreground="{StaticResource TextMuted}"/>
+                                <NumericUpDown Width="80" FontSize="11" Height="30"
+                                               Value="{Binding FilterMaxSize}"
+                                               Minimum="0" FormatString="F1"/>
+                                <TextBlock Text="MB" FontSize="11" VerticalAlignment="Center"
+                                           Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold"/>
+                            </StackPanel>
+
+                            <!-- Important toggle -->
+                            <Border BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
+                                    Padding="0,6,0,0">
+                                <CheckBox IsChecked="{Binding IsImportantOnly}"
+                                          VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <Image Source="{StaticResource IconStar}" Width="13" Height="13"
+                                               VerticalAlignment="Center"/>
+                                        <TextBlock Text="Chỉ tài liệu quan trọng" FontSize="11"
+                                                   Foreground="{StaticResource TextPrimary}"/>
+                                    </StackPanel>
+                                </CheckBox>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ── Group 3: Action Buttons ── -->
+                    <StackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Center"
+                                MinWidth="110">
+                        <Button Classes="primary" Command="{Binding ApplyAdvancedFilterCommand}"
+                                Padding="16,7" HorizontalAlignment="Stretch">
+                            <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+                                <Image Source="{StaticResource IconCheck}" Width="12" Height="12"/>
+                                <TextBlock Text="Áp dụng" FontSize="12" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Classes="secondary" Command="{Binding ClearAdvancedFilterCommand}"
+                                Padding="16,7" HorizontalAlignment="Stretch">
+                            <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+                                <Image Source="{StaticResource IconClose}" Width="10" Height="10"/>
+                                <TextBlock Text="Xóa bộ lọc" FontSize="11"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+            </StackPanel>
+        </Border>
+
+        <!-- ═══ MAIN: TreeView (left) + DataGrid (right) ═══ -->
+        <Grid ColumnDefinitions="190,Auto,*">
+
+            <!-- ── LEFT: Category Tree ── -->
+            <Border Grid.Column="0" Background="{StaticResource CardBackground}"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
+                            Padding="10,7">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Image Source="{StaticResource IconCategory}" Width="14" Height="14"/>
+                            <TextBlock Text="Phân loại" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimary}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding CategoryTreeItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:CategoryTreeItem}">
+                                    <Button Classes="nav-item"
+                                            Padding="10,5"
+                                            Margin="{Binding IndentMargin}"
+                                            Command="{Binding $parent[ItemsControl].DataContext.FilterByCategoryCommand}"
+                                            CommandParameter="{Binding}">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <Image Source="{Binding IconSource}" Width="13" Height="13"
+                                                   VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding DisplayText}" FontSize="11"
+                                                       Foreground="{StaticResource TextPrimary}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <!-- ── Splitter ── -->
+            <GridSplitter Grid.Column="1" Width="3" Background="Transparent"
+                          ResizeBehavior="PreviousAndNext"/>
+
+            <!-- ── RIGHT: DataGrid + Preview ── -->
+            <Border Grid.Column="2" ClipToBounds="True">
+                <Grid RowDefinitions="Auto,*,Auto,Auto">
+
+                    <!-- ═══ STAT CARDS ═══ -->
+                    <Border Background="{StaticResource SidebarBackground}"
+                            Padding="{StaticResource PaddingStatCard}"
+                            BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1">
+                        <Grid ColumnDefinitions="*,*,*,*">
+
+                            <!-- Card 1: Total -->
+                            <Border CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource GradientStatBlue}"
+                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                                    Padding="10,7" Margin="0,0,5,0">
+                                <StackPanel Spacing="{StaticResource Space1}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
+                                        <Image Source="{StaticResource IconAllDocs}" Width="11" Height="11"/>
+                                        <TextBlock Text="Tổng tài liệu" FontSize="{StaticResource FontSizeXs}"
+                                                   Foreground="{StaticResource TextMuted}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding TotalCount}" FontSize="{StaticResource FontSizeXl}"
+                                               FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 2: Subjects -->
+                            <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource GradientStatTeal}"
+                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                                    Padding="10,7" Margin="0,0,5,0">
+                                <StackPanel Spacing="{StaticResource Space1}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
+                                        <Image Source="{StaticResource IconCategory}" Width="11" Height="11"/>
+                                        <TextBlock Text="Danh mục" FontSize="{StaticResource FontSizeXs}"
+                                                   Foreground="{StaticResource TextMuted}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding SubjectCount}" FontSize="{StaticResource FontSizeXl}"
+                                               FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 3: Important -->
+                            <Border Grid.Column="2" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource GradientStatAmber}"
+                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                                    Padding="10,7" Margin="0,0,5,0">
+                                <StackPanel Spacing="{StaticResource Space1}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
+                                        <Image Source="{StaticResource IconStar}" Width="11" Height="11"/>
+                                        <TextBlock Text="Quan trọng" FontSize="{StaticResource FontSizeXs}"
+                                                   Foreground="{StaticResource TextMuted}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding ImportantCount}" FontSize="{StaticResource FontSizeXl}"
+                                               FontWeight="Bold" Foreground="{StaticResource WarningBrush}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 4: Overdue -->
+                            <Border Grid.Column="3" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource GradientStatRed}"
+                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                                    Padding="10,7">
+                                <StackPanel Spacing="{StaticResource Space1}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
+                                        <Image Source="{StaticResource IconClock}" Width="11" Height="11"/>
+                                        <TextBlock Text="Quá hạn" FontSize="{StaticResource FontSizeXs}"
+                                                   Foreground="{StaticResource TextMuted}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding OverdueCount}" FontSize="{StaticResource FontSizeXl}"
+                                               FontWeight="Bold" Foreground="{StaticResource DangerBrush}"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- ═══ DATA GRID ═══ -->
+                    <Border Grid.Row="1" ClipToBounds="True">
+                        <DataGrid Name="dgvDocuments"
+                                  AutoGenerateColumns="False"
+                                  CanUserReorderColumns="True"
+                                  CanUserResizeColumns="True"
+                                  CanUserSortColumns="True"
+                                  GridLinesVisibility="Horizontal"
+                                  BorderThickness="0"
+                                  SelectionMode="Single"
+                                  IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding Ten, Mode=OneWay}" Width="*" MinWidth="200"/>
+                                <DataGridTextColumn Header="Danh mục" Binding="{Binding MonHoc, Mode=OneWay}" Width="120"/>
+                                <DataGridTextColumn Header="Loại" Binding="{Binding Loai, Mode=OneWay}" Width="80"/>
+                                <DataGridTextColumn Header="Ngày thêm"
+                                    Binding="{Binding NgayThem, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
+                                <DataGridTextColumn Header="KB (MB)"
+                                    Binding="{Binding KichThuoc, Mode=OneWay, StringFormat=\{0:F2\}}" Width="80"/>
+                                <DataGridTemplateColumn Header="★" Width="40">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate DataType="{x:Type core:StudyDocument}">
+                                            <Image Source="{StaticResource IconStar}" Width="14" Height="14"
+                                                   IsVisible="{Binding QuanTrong}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Hạn chót"
+                                    Binding="{Binding Deadline, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+
+                    <!-- ═══ DOCUMENT PREVIEW PANEL (collapsible, like WinForms) ═══ -->
+                    <Border Grid.Row="2"
+                            IsVisible="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
+                            Background="{StaticResource SidebarBackground}"
+                            BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
+                            Padding="16,10" MaxHeight="140">
+                        <Grid ColumnDefinitions="Auto,*">
+
+                            <!-- Image preview (show for image files) -->
+                            <Border CornerRadius="6" ClipToBounds="True"
+                                    Width="100" Height="100" Margin="0,0,16,0"
+                                    Background="{StaticResource CardBackground}"
+                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                                <Panel>
+                                    <!-- Document type icon -->
+                                    <Image Source="{StaticResource IconDocPage}" Width="40" Height="40"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                           Opacity="0.6"/>
+                                </Panel>
+                            </Border>
+
+                            <!-- Metadata -->
+                            <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding SelectedDocument.Ten}" FontSize="13" FontWeight="Bold"
+                                           Foreground="{StaticResource TextPrimary}"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <StackPanel Orientation="Horizontal" Spacing="3">
+                                        <Image Source="{StaticResource IconCategory}" Width="11" Height="11"/>
+                                        <TextBlock Text="{Binding SelectedDocument.MonHoc}" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="3">
+                                        <Image Source="{StaticResource IconDocPage}" Width="11" Height="11"/>
+                                        <TextBlock Text="{Binding SelectedDocument.Loai}" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="3"
+                                                IsVisible="{Binding SelectedDocument.QuanTrong}">
+                                        <Image Source="{StaticResource IconStar}" Width="11" Height="11"/>
+                                        <TextBlock Text="Quan trọng" FontSize="11" Foreground="{StaticResource WarningBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                    <Image Source="{StaticResource IconOpenFile}" Width="10" Height="10"/>
+                                    <TextBlock Text="{Binding SelectedDocument.DuongDan}" FontSize="10"
+                                               Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <StackPanel Orientation="Horizontal" Spacing="3">
+                                        <Image Source="{StaticResource IconCalendar}" Width="10" Height="10"/>
+                                        <TextBlock Text="{Binding SelectedDocument.NgayThem, StringFormat=\{0:dd/MM/yyyy HH:mm\}}"
+                                                   FontSize="10" Foreground="{StaticResource TextMuted}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="3"
+                                                IsVisible="{Binding SelectedDocument.KichThuoc, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <Image Source="{StaticResource IconHDD}" Width="10" Height="10"/>
+                                        <TextBlock Text="{Binding SelectedDocument.KichThuoc, StringFormat=\{0:F2\} MB}"
+                                                   FontSize="10" Foreground="{StaticResource TextMuted}"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="3"
+                                                IsVisible="{Binding SelectedDocument.Deadline, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <Image Source="{StaticResource IconClock}" Width="10" Height="10"/>
+                                        <TextBlock Text="{Binding SelectedDocument.Deadline, StringFormat=Hạn: \{0:dd/MM/yyyy\}}"
+                                                   FontSize="10" Foreground="{StaticResource DangerBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="3"
+                                            IsVisible="{Binding SelectedDocument.Tags, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                    <Image Source="{StaticResource IconTag}" Width="10" Height="10"/>
+                                    <TextBlock Text="{Binding SelectedDocument.Tags}" FontSize="10"
+                                               Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Status Bar -->
+                    <Border Grid.Row="3" Background="{StaticResource CardBackground}"
+                            BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
+                            Padding="12,6">
+                        <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto">
+                            <TextBlock Text="{Binding StatusText}" FontSize="11"
+                                       Foreground="{StaticResource TextSecondary}"
+                                       VerticalAlignment="Center"/>
+
+                            <!-- Quick action buttons -->
+                            <Button Grid.Column="1" Classes="secondary" Padding="8,3"
+                                    Command="{Binding ShowUpcomingDeadlinesCommand}"
+                                    Margin="4,0" Height="24" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                    <Image Source="{StaticResource IconClock}" Width="10" Height="10"/>
+                                    <TextBlock Text="Sắp đến hạn" FontSize="10"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="2" Classes="secondary" Padding="8,3"
+                                    Command="{Binding ShowOverdueCommand}"
+                                    Margin="4,0" Height="24" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                    <Image Source="{StaticResource IconWarning}" Width="10" Height="10"/>
+                                    <TextBlock Text="Quá hạn" FontSize="10"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="3" Classes="secondary" Padding="8,3"
+                                    Command="{Binding CopyPathCommand}"
+                                    Margin="4,0" Height="24" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                    <Image Source="{StaticResource IconClipboard}" Width="10" Height="10"/>
+                                    <TextBlock Text="Copy Path" FontSize="10"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="4" Classes="secondary" Padding="8,3"
+                                    Command="{Binding OpenFolderCommand}"
+                                    Margin="4,0" Height="24" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                    <Image Source="{StaticResource IconCategory}" Width="10" Height="10"/>
+                                    <TextBlock Text="Mở Folder" FontSize="10"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="5" Classes="secondary" Padding="8,3"
+                                    Command="{Binding ShowAboutCommand}"
+                                    Margin="4,0" Height="24" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                    <Image Source="{StaticResource IconInfo}" Width="10" Height="10"/>
+                                    <TextBlock Text="About" FontSize="10"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+    </DockPanel>
+
+</UserControl>
