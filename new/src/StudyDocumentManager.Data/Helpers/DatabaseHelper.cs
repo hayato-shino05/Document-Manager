@@ -43,6 +43,16 @@ public static class DatabaseHelper
         }
     }
 
+    /// <summary>
+    /// Override the database path (useful for testing with isolated temp files).
+    /// Must be called BEFORE InitializeDatabase().
+    /// </summary>
+    public static void SetDatabasePath(string path)
+    {
+        _databasePath = path;
+        _connectionString = $"Data Source={path}";
+    }
+
     // ═══════════════════════════════════════════════════
     // Initialization & Migration
     // ═══════════════════════════════════════════════════
@@ -146,6 +156,8 @@ public static class DatabaseHelper
             CREATE INDEX IF NOT EXISTS idx_tai_lieu_deadline ON tai_lieu(deadline);
             CREATE INDEX IF NOT EXISTS idx_collection_items_collection ON collection_items(collection_id);
             CREATE INDEX IF NOT EXISTS idx_collection_items_document ON collection_items(document_id);
+            CREATE INDEX IF NOT EXISTS idx_tai_lieu_deleted ON tai_lieu(is_deleted);
+            CREATE INDEX IF NOT EXISTS idx_tai_lieu_quan_trong ON tai_lieu(quan_trong);
             """;
 
         using var conn = new SqliteConnection(ConnectionString);
@@ -1292,5 +1304,18 @@ public static class DatabaseHelper
     public static bool ClearDocumentPath(int id)
     {
         return UpdateDocumentPath(id, "");
+    }
+
+    // ═══════════════════════════════════════════════════
+    // Test Helpers
+    // ═══════════════════════════════════════════════════
+
+    /// <summary>
+    /// Clears the SQLite connection pool for the current database path.
+    /// Required in unit tests to release file locks before deleting the temp DB file.
+    /// </summary>
+    public static void CloseAllConnections()
+    {
+        SqliteConnection.ClearAllPools();
     }
 }

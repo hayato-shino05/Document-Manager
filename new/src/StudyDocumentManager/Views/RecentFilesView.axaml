@@ -4,50 +4,57 @@
              x:Class="StudyDocumentManager.Views.RecentFilesView"
              x:DataType="vm:RecentFilesViewModel">
 
-  <Grid RowDefinitions="Auto,*,Auto" Margin="32">
+    <Border Classes="page-wrapper">
+        <DockPanel>
+            <!-- Header -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+                <StackPanel Classes="page-header-stack" Margin="0">
+                    <Image Source="{StaticResource IconCalendar}" Width="18" Height="18"/>
+                    <TextBlock Classes="page-title" Text="Lịch sử file đã mở"/>
+                </StackPanel>
+                <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center"
+                           Text="{Binding RecentFiles.Count, StringFormat='Tổng: {0} file gần đây'}"
+                           FontSize="12" Foreground="{StaticResource TextSecondary}"/>
+            </DockPanel>
 
-    <!-- Header -->
-    <StackPanel Grid.Row="0" Spacing="8" Margin="0,0,0,20">
-      <StackPanel Orientation="Horizontal" Spacing="12">
-        <Button Command="{Binding GoBackCommand}"
-                Content="← Quay lại"
-                Classes="ghost"/>
-        <TextBlock Text="Lịch sử file đã mở"
-                   FontSize="24" FontWeight="Bold"
-                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-      </StackPanel>
-      <TextBlock Text="{Binding RecentFiles.Count, StringFormat='Tổng: {0} file gần đây'}"
-                 Foreground="{DynamicResource TextSecondaryBrush}" FontSize="14"/>
-    </StackPanel>
+            <!-- Bottom actions -->
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8"
+                        HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button Classes="secondary" Command="{Binding RefreshCommand}" Padding="12,5">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconRefresh}" Width="12" Height="12"/>
+                        <TextBlock Text="Làm mới" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="danger" Command="{Binding ClearHistoryCommand}" Padding="12,5">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconDelete}" Width="12" Height="12"/>
+                        <TextBlock Text="Xóa lịch sử" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
 
-    <!-- File list -->
-    <Border Grid.Row="1" CornerRadius="12"
-            Background="{DynamicResource CardBackgroundBrush}"
-            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-            Padding="0">
-
-      <DataGrid ItemsSource="{Binding RecentFiles}"
-                AutoGenerateColumns="False"
-                IsReadOnly="True"
-                CanUserResizeColumns="True"
-                GridLinesVisibility="Horizontal"
-                Margin="0">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding DocumentName}" Width="2*"/>
-          <DataGridTextColumn Header="Danh mục" Binding="{Binding Subject}" Width="*"/>
-          <DataGridTextColumn Header="Loại" Binding="{Binding FileType}" Width="80"/>
-          <DataGridTextColumn Header="Mở lúc" Binding="{Binding OpenedAtDisplay}" Width="130"/>
-          <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusDisplay}" Width="100"/>
-        </DataGrid.Columns>
-      </DataGrid>
+            <!-- File list -->
+            <Border Classes="card" ClipToBounds="True">
+                <Panel>
+                    <DataGrid Classes="std"
+                              ItemsSource="{Binding RecentFiles}"
+                              CanUserResizeColumns="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding DocumentName}" Width="2*"/>
+                            <DataGridTextColumn Header="Danh mục" Binding="{Binding Subject}" Width="*"/>
+                            <DataGridTextColumn Header="Loại" Binding="{Binding FileType}" Width="80"/>
+                            <DataGridTextColumn Header="Mở lúc" Binding="{Binding OpenedAtDisplay}" Width="130"/>
+                            <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusDisplay}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel Classes="empty-state" IsVisible="{Binding !RecentFiles.Count}">
+                        <Image Classes="empty-state-icon" Source="{StaticResource IconCalendar}"/>
+                        <TextBlock Classes="empty-state-text" Text="Chưa có file nào được mở gần đây"/>
+                    </StackPanel>
+                </Panel>
+            </Border>
+        </DockPanel>
     </Border>
 
-    <!-- Bottom actions -->
-    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" Margin="0,16,0,0"
-                HorizontalAlignment="Right">
-      <Button Content="Làm mới" Command="{Binding RefreshCommand}"/>
-      <Button Content="Xóa lịch sử" Command="{Binding ClearHistoryCommand}"
-              Foreground="White" Background="#dc2626"/>
-    </StackPanel>
-  </Grid>
 </UserControl>

@@ -32,15 +32,12 @@
 
                     <TextBlock Text="Danh mục:" FontSize="11" VerticalAlignment="Center"
                                Foreground="{StaticResource TextSecondary}"/>
-                    <ComboBox Width="130" FontSize="11" Height="28" VerticalAlignment="Center"
-                              ItemsSource="{Binding Subjects}"
-                              SelectedItem="{Binding SelectedSubject}"/>
+                    <!-- ComboBox managed via code-behind — NO ItemsSource or SelectedItem binding -->
+                    <ComboBox Name="cboSubject" Width="130" FontSize="11" Height="28" VerticalAlignment="Center"/>
 
                     <TextBlock Text="Loại:" FontSize="11" VerticalAlignment="Center"
                                Foreground="{StaticResource TextSecondary}"/>
-                    <ComboBox Width="110" FontSize="11" Height="28" VerticalAlignment="Center"
-                              ItemsSource="{Binding Types}"
-                              SelectedItem="{Binding SelectedType}"/>
+                    <ComboBox Name="cboType" Width="110" FontSize="11" Height="28" VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
@@ -67,22 +64,22 @@
 
                         <!-- Mark Important button -->
                         <Button Padding="10,5" Command="{Binding MarkImportantCommand}"
-                                Background="#F59E0B" Foreground="White" CornerRadius="4">
+                                Classes="warning"
+                                ToolTip.Tip="Đánh dấu tất cả mục đã chọn là Quan trọng">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconStar}" Width="12" Height="12"/>
-                                <TextBlock Text="Đánh dấu ★" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                                <TextBlock Text="Đánh dấu ★" FontSize="11" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Button>
 
                         <!-- Change Subject -->
-                        <ComboBox Width="130" FontSize="11" Height="28" VerticalAlignment="Center"
-                                  ItemsSource="{Binding AvailableSubjects}"
-                                  SelectedItem="{Binding NewSubjectValue}"/>
+                        <ComboBox Name="cboNewSubject" Width="130" FontSize="11" Height="28" VerticalAlignment="Center"/>
                         <Button Padding="10,5" Command="{Binding ChangeSubjectCommand}"
-                                Background="#3B82F6" Foreground="White" CornerRadius="4">
+                                Classes="primary"
+                                ToolTip.Tip="Đổi danh mục cho tất cả mục đã chọn">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconCategory}" Width="12" Height="12"/>
-                                <TextBlock Text="Đổi danh mục" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                                <TextBlock Text="Đổi danh mục" FontSize="11" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -90,10 +87,11 @@
                     <!-- Right: Delete + Cancel -->
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                         <Button Padding="14,6" Command="{Binding DeleteSelectedCommand}"
-                                Background="#DC2626" Foreground="White" CornerRadius="4">
+                                Classes="danger"
+                                ToolTip.Tip="Xóa tất cả tài liệu đã chọn vào Thùng rác">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
-                                <TextBlock Text="Xóa đã chọn" FontSize="12" FontWeight="SemiBold" Foreground="White"/>
+                                <TextBlock Text="Xóa đã chọn" FontSize="12" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Button>
                         <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="12,6">
@@ -109,17 +107,18 @@
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusText}" FontSize="10"
                                Foreground="{StaticResource TextMuted}" Margin="8,4"/>
-                    <DataGrid ItemsSource="{Binding Documents}"
+                    <!-- DataGrid — NO ItemsSource binding, managed from code-behind -->
+                    <DataGrid Name="dgDocuments"
                               AutoGenerateColumns="False"
                               CanUserSortColumns="True"
                               GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                         <DataGrid.Columns>
                             <DataGridCheckBoxColumn Header="✓" Binding="{Binding IsSelected}" Width="40"/>
-                            <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding Document.Ten}" Width="*" MinWidth="200" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Danh mục" Binding="{Binding Document.MonHoc}" Width="120" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Loại" Binding="{Binding Document.Loai}" Width="80" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Ngày thêm" Binding="{Binding Document.NgayThem, StringFormat=\{0:dd/MM/yyyy\}}" Width="100" IsReadOnly="True"/>
-                            <DataGridCheckBoxColumn Header="★" Binding="{Binding Document.QuanTrong}" Width="40" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding Document.Ten, Mode=OneWay}" Width="*" MinWidth="200"/>
+                            <DataGridTextColumn Header="Danh mục" Binding="{Binding Document.MonHoc, Mode=OneWay}" Width="120"/>
+                            <DataGridTextColumn Header="Loại" Binding="{Binding Document.Loai, Mode=OneWay}" Width="80"/>
+                            <DataGridTextColumn Header="Ngày thêm" Binding="{Binding Document.NgayThem, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
+                            <DataGridCheckBoxColumn Header="★" Binding="{Binding Document.QuanTrong, Mode=OneWay}" Width="40" IsReadOnly="True"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>

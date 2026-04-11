@@ -22,12 +22,11 @@
                             <TextBlock Text="Kiểm tra" FontSize="12" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Button>
-                    <Button Padding="14,6" Command="{Binding RemoveMissingCommand}"
-                            Background="#DC2626" Foreground="White" CornerRadius="4"
+                    <Button Classes="danger" Command="{Binding RemoveMissingCommand}" Padding="14,6"
                             IsVisible="{Binding !!MissingCount}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
-                            <TextBlock Text="Xóa file bị thiếu" FontSize="12" Foreground="White"/>
+                            <TextBlock Text="Xóa file bị thiếu" FontSize="12"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -46,7 +45,7 @@
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
-                    <TextBlock FontSize="12" Foreground="#DC2626">
+                    <TextBlock FontSize="12" Foreground="{DynamicResource ColorDanger}">
                         <TextBlock.Text>
                             <MultiBinding StringFormat="File bị mất: {0}">
                                 <Binding Path="MissingCount"/>

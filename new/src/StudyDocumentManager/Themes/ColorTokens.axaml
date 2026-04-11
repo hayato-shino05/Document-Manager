@@ -99,6 +99,16 @@
         <SolidColorBrush x:Key="WarningBrush"        Color="{StaticResource StatusAmber}"/>
         <SolidColorBrush x:Key="DangerBrush"         Color="{StaticResource StatusRed}"/>
 
+        <!-- Button semantic color aliases (used by SharedStyles Button.danger/warning/success) -->
+        <SolidColorBrush x:Key="DangerColor"         Color="#DC2626"/>
+        <SolidColorBrush x:Key="WarningColor"        Color="#F59E0B"/>
+        <SolidColorBrush x:Key="SuccessColor"        Color="#059669"/>
+        <!-- DynamicResource aliases — TreeMapView / RecentFilesView still reference these -->
+        <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource TextDark}"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource TextMedium}"/>
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardWhite}"/>
+        <SolidColorBrush x:Key="BorderBrush"         Color="{StaticResource BorderSubtle}"/>
+
         <!-- Stat card backgrounds -->
         <SolidColorBrush x:Key="StatBlueBg"  Color="{StaticResource AccentBlueBg}"/>
         <SolidColorBrush x:Key="StatGreenBg" Color="#DCFCE7"/>

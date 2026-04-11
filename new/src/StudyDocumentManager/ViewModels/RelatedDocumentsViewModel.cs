@@ -19,6 +19,16 @@ public partial class RelatedDocumentsViewModel : ViewModelBase
     [ObservableProperty] private ObservableCollection<RelatedDocItem> _relatedDocuments = new();
     [ObservableProperty] private ObservableCollection<StudyDocument> _availableDocuments = new();
     [ObservableProperty] private StudyDocument? _selectedAvailableDoc;
+    [ObservableProperty] private string _selectedRelationType = "liên quan";
+
+    public List<string> RelationTypes { get; } = new()
+    {
+        "liên quan",
+        "tham khảo",
+        "bổ sung",
+        "tiền đề",
+        "kế tiếp"
+    };
 
     public RelatedDocumentsViewModel(IDocumentRepository repository, IDialogService dialogService, INavigationService navigationService)
     {
@@ -65,7 +75,7 @@ public partial class RelatedDocumentsViewModel : ViewModelBase
     {
         if (SelectedAvailableDoc == null) return;
 
-        DatabaseHelper.AddDocumentRelation(DocumentId, SelectedAvailableDoc.Id);
+        DatabaseHelper.AddDocumentRelation(DocumentId, SelectedAvailableDoc.Id, SelectedRelationType);
         RefreshRelated();
         LoadAvailable();
     }

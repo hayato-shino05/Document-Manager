@@ -90,6 +90,8 @@ public partial class DashboardViewModel : ViewModelBase
     public int SubjectCount => TotalCategories;
     public int ImportantCount => ImportantDocuments;
     public int OverdueCount => OverdueDocuments;
+    public int NoFileCount => NoFileDocuments;
+    public int RecycleBinCount => DeletedCount;
 
     // ═══ Category Tree Items ═══
     [ObservableProperty]
@@ -168,6 +170,8 @@ public partial class DashboardViewModel : ViewModelBase
         OnPropertyChanged(nameof(SubjectCount));
         OnPropertyChanged(nameof(ImportantCount));
         OnPropertyChanged(nameof(OverdueCount));
+        OnPropertyChanged(nameof(NoFileCount));
+        OnPropertyChanged(nameof(RecycleBinCount));
 
         _isLoadingData = false;
         System.Diagnostics.Debug.WriteLine($"[DEBUG] === LoadData END === Documents.Count={Documents.Count}");
@@ -230,6 +234,38 @@ public partial class DashboardViewModel : ViewModelBase
             FilterValue = ""
         });
 
+        // ═══ Collection nodes ═══
+        try
+        {
+            var collections = DatabaseHelper.GetCollections();
+            if (collections.Count > 0)
+            {
+                items.Add(new CategoryTreeItem
+                {
+                    Name = "── Bộ sưu tập ──",
+                    Count = collections.Count,
+                    IconKey = "IconCategory",
+                    FilterType = "collection-header",
+                    FilterValue = ""
+                });
+
+                foreach (var col in collections)
+                {
+                    int colCount = DatabaseHelper.GetDocumentsInCollection(col.Id)?.Count ?? 0;
+                    items.Add(new CategoryTreeItem
+                    {
+                        Name = col.Name,
+                        Count = colCount,
+                        IconKey = "IconStar",
+                        FilterType = "collection",
+                        FilterValue = col.Id.ToString(),
+                        IsIndented = true
+                    });
+                }
+            }
+        }
+        catch { /* Collections table may not exist yet */ }
+
         // Keep same reference — do NOT replace CategoryTreeItems
         CategoryTreeItems.Clear();
         foreach (var it in items) CategoryTreeItems.Add(it);
@@ -285,6 +321,27 @@ public partial class DashboardViewModel : ViewModelBase
                 SelectedType = "Tất cả";
                 IsImportantOnly = true;
                 break;
+            case "collection":
+                // Filter by collection — use special logic
+                if (int.TryParse(item.FilterValue, out int colId))
+                {
+                    var colDocs = DatabaseHelper.GetDocumentsInCollection(colId);
+                    if (colDocs != null)
+                    {
+                        _isApplyingFilters = true;
+                        try
+                        {
+                            Documents = colDocs;
+                            TotalDocuments = colDocs.Count;
+                            ImportantDocuments = colDocs.Count(d => d.QuanTrong);
+                        }
+                        finally { _isApplyingFilters = false; }
+                        return; // Skip normal ApplyFilters
+                    }
+                }
+                break;
+            case "collection-header":
+                return; // Header node, do nothing
         }
 
         ApplyFilters();
@@ -388,6 +445,18 @@ public partial class DashboardViewModel : ViewModelBase
 
         SelectedDocument.QuanTrong = !SelectedDocument.QuanTrong;
         _repository.Update(SelectedDocument);
+        LoadData();
+    }
+
+    /// <summary>
+    /// Toggle important flag directly from DataGrid row click (receives doc as parameter).
+    /// </summary>
+    [RelayCommand]
+    private void ToggleImportantInline(StudyDocument? doc)
+    {
+        if (doc == null) return;
+        doc.QuanTrong = !doc.QuanTrong;
+        _repository.Update(doc);
         LoadData();
     }
 

@@ -14,17 +14,18 @@ public partial class BulkDeleteViewModel : ViewModelBase
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
 
-    [ObservableProperty] private ObservableCollection<SelectableDocument> _documents = new();
+    // Use List<T> instead of ObservableCollection to prevent binding-engine re-render loops
+    [ObservableProperty] private List<SelectableDocument> _documents = new();
     [ObservableProperty] private string _searchKeyword = string.Empty;
 
-    // Filter dropdowns
-    [ObservableProperty] private ObservableCollection<string> _subjects = new();
-    [ObservableProperty] private ObservableCollection<string> _types = new();
+    // Filter dropdowns — List<string> to avoid Clear()+Add() loop
+    [ObservableProperty] private List<string> _subjects = new();
+    [ObservableProperty] private List<string> _types = new();
     [ObservableProperty] private string _selectedSubject = "Tất cả";
     [ObservableProperty] private string _selectedType = "Tất cả";
 
     // For ChangeSubject dialog
-    [ObservableProperty] private ObservableCollection<string> _availableSubjects = new();
+    [ObservableProperty] private List<string> _availableSubjects = new();
     [ObservableProperty] private string? _newSubjectValue;
 
     // Status
@@ -36,6 +37,13 @@ public partial class BulkDeleteViewModel : ViewModelBase
         _repository = repository;
         _dialogService = dialogService;
         _navigationService = navigationService;
+    }
+
+    /// <summary>
+    /// Called from code-behind after the view is fully loaded (deferred initialization).
+    /// </summary>
+    public void Initialize()
+    {
         LoadFilterData();
         LoadData();
     }
@@ -44,16 +52,17 @@ public partial class BulkDeleteViewModel : ViewModelBase
     {
         var subjects = DatabaseHelper.GetAllSubjects();
         var types = DatabaseHelper.GetAllTypes();
-        Subjects.Clear();
-        Subjects.Add("Tất cả");
-        foreach (var s in subjects) Subjects.Add(s);
 
-        Types.Clear();
-        Types.Add("Tất cả");
-        foreach (var t in types) Types.Add(t);
+        // Assign new List references instead of Clear()+Add()
+        var subjectList = new List<string> { "Tất cả" };
+        subjectList.AddRange(subjects);
+        Subjects = subjectList;
 
-        AvailableSubjects.Clear();
-        foreach (var s in subjects) AvailableSubjects.Add(s);
+        var typeList = new List<string> { "Tất cả" };
+        typeList.AddRange(types);
+        Types = typeList;
+
+        AvailableSubjects = new List<string>(subjects);
     }
 
     private void LoadData()
@@ -69,9 +78,8 @@ public partial class BulkDeleteViewModel : ViewModelBase
             docs = docs.Where(d => d.Ten.Contains(SearchKeyword, StringComparison.OrdinalIgnoreCase)
                 || (d.GhiChu ?? "").Contains(SearchKeyword, StringComparison.OrdinalIgnoreCase)).ToList();
 
-        Documents.Clear();
-        foreach (var d in docs)
-            Documents.Add(new SelectableDocument { Document = d, IsSelected = false });
+        // Assign new List reference (not Clear+Add on ObservableCollection)
+        Documents = docs.Select(d => new SelectableDocument { Document = d, IsSelected = false }).ToList();
         StatusText = $"Hiển thị {Documents.Count} tài liệu";
     }
 
@@ -153,12 +161,15 @@ public partial class BulkDeleteViewModel : ViewModelBase
     private void SelectAll()
     {
         foreach (var d in Documents) d.IsSelected = true;
+        // Force re-bind since List<T> doesn't notify
+        OnPropertyChanged(nameof(Documents));
     }
 
     [RelayCommand]
     private void DeselectAll()
     {
         foreach (var d in Documents) d.IsSelected = false;
+        OnPropertyChanged(nameof(Documents));
     }
 
     [RelayCommand]

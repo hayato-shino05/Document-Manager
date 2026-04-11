@@ -100,14 +100,23 @@
                                     <TextBlock Text="Tài liệu khả dụng" FontSize="13" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextPrimary}"/>
                                 </StackPanel>
-                                <Button DockPanel.Dock="Right" Classes="primary"
-                                        Command="{Binding AddRelationCommand}" Padding="10,4"
-                                        HorizontalAlignment="Right">
-                                    <StackPanel Orientation="Horizontal" Spacing="3">
-                                        <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
-                                        <TextBlock Text="Thêm liên kết" FontSize="11"/>
-                                    </StackPanel>
-                                </Button>
+
+                                <!-- Relation type selector + Add button -->
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock Text="Loại:" FontSize="11" VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondary}"/>
+                                    <ComboBox ItemsSource="{Binding RelationTypes}"
+                                              SelectedItem="{Binding SelectedRelationType}"
+                                              Width="110" Height="26" FontSize="11"/>
+                                    <Button Classes="primary"
+                                            Command="{Binding AddRelationCommand}" Padding="10,4">
+                                        <StackPanel Orientation="Horizontal" Spacing="3">
+                                            <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
+                                            <TextBlock Text="Thêm liên kết" FontSize="11"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
                             </DockPanel>
                         </Border>
 
