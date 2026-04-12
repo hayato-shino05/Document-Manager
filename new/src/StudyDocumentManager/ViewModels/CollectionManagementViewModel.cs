@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
@@ -13,10 +15,13 @@ public partial class CollectionManagementViewModel : ViewModelBase
     private readonly IDocumentRepository _repository;
     private readonly IDialogService _dialogService;
 
-    [ObservableProperty] private ObservableCollection<CollectionItem> _collections = new();
+    [ObservableProperty] private ObservableCollection<CollectionItem> _collections = [];
     [ObservableProperty] private CollectionItem? _selectedCollection;
-    [ObservableProperty] private ObservableCollection<StudyDocument> _documentsInCollection = new();
-    [ObservableProperty] private ObservableCollection<StudyDocument> _allDocuments = new();
+    [ObservableProperty] private ObservableCollection<StudyDocument> _documentsInCollection = [];
+    [ObservableProperty] private StudyDocument? _selectedDocumentInCollection;
+    [ObservableProperty] private ObservableCollection<StudyDocument> _allDocuments = [];
+    // Multi-select for batch removal
+    [ObservableProperty] private IList _selectedDocumentsInCollection = new List<StudyDocument>();
 
     public CollectionManagementViewModel(IDocumentRepository repository, IDialogService dialogService)
     {
@@ -27,15 +32,26 @@ public partial class CollectionManagementViewModel : ViewModelBase
 
     private void LoadCollections()
     {
-        var data = DatabaseHelper.GetCollections();
-        Collections = new ObservableCollection<CollectionItem>(
-            data.Select(c => new CollectionItem
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Description = c.Description,
-                ItemCount = c.ItemCount
-            }));
+        try
+        {
+            Debug.WriteLine("[CollectionVM] LoadCollections() called");
+            var data = DatabaseHelper.GetCollections();
+            Debug.WriteLine($"[CollectionVM] GetCollections() returned {data.Count} items");
+            Collections = new ObservableCollection<CollectionItem>(
+                data.Select(c => new CollectionItem
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description,
+                    ItemCount = c.ItemCount
+                }));
+            Debug.WriteLine($"[CollectionVM] Collections updated, Count={Collections.Count}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[CollectionVM] LoadCollections ERROR: {ex.GetType().Name}: {ex.Message}");
+            Debug.WriteLine(ex.StackTrace);
+        }
     }
 
     partial void OnSelectedCollectionChanged(CollectionItem? value)
@@ -54,13 +70,32 @@ public partial class CollectionManagementViewModel : ViewModelBase
     [RelayCommand]
     private async Task CreateCollectionAsync()
     {
-        var name = await _dialogService.ShowInputAsync("Tạo bộ sưu tập", "Tên bộ sưu tập:");
-        if (!string.IsNullOrWhiteSpace(name))
+        Debug.WriteLine("[CollectionVM] CreateCollectionAsync() STARTED");
+        try
         {
-            DatabaseHelper.CreateCollection(name);
-            LoadCollections();
-            await _dialogService.ShowMessageAsync("Thành công", $"Đã tạo bộ sưu tập '{name}'");
+            var name = await _dialogService.ShowInputAsync("Tạo bộ sưu tập", "Tên bộ sưu tập:");
+            Debug.WriteLine($"[CollectionVM] ShowInputAsync returned: '{name}' (IsNull={name is null}, IsEmpty={string.IsNullOrWhiteSpace(name)})");
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                Debug.WriteLine($"[CollectionVM] Calling DatabaseHelper.CreateCollection('{name}')");
+                var newId = DatabaseHelper.CreateCollection(name);
+                Debug.WriteLine($"[CollectionVM] CreateCollection returned id={newId}");
+                LoadCollections();
+                await _dialogService.ShowMessageAsync("Thành công", $"Đã tạo bộ sưu tập '{name}'");
+            }
+            else
+            {
+                Debug.WriteLine("[CollectionVM] Name is null/empty, skipping creation");
+            }
         }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[CollectionVM] CreateCollectionAsync ERROR: {ex.GetType().Name}: {ex.Message}");
+            Debug.WriteLine(ex.StackTrace);
+            await _dialogService.ShowErrorAsync("Lỗi", $"Không thể tạo bộ sưu tập: {ex.Message}");
+        }
+        Debug.WriteLine("[CollectionVM] CreateCollectionAsync() DONE");
     }
 
     [RelayCommand]
@@ -96,53 +131,65 @@ public partial class CollectionManagementViewModel : ViewModelBase
     {
         if (SelectedCollection == null) return;
 
-        // Search document by name (improved UX vs raw ID input)
-        var keyword = await _dialogService.ShowInputAsync(
-            "Thêm tài liệu vào bộ sưu tập",
-            "Nhập tên tài liệu (hoặc một phần tên) để tìm:");
-        if (string.IsNullOrWhiteSpace(keyword)) return;
+        Debug.WriteLine($"[CollectionVM] AddDocumentToCollectionAsync: collection='{SelectedCollection.Name}'");
 
-        // Search for matching documents
-        var allDocs = _repository.GetAll();
-        var matches = allDocs
-            .Where(d => d.Ten.Contains(keyword, StringComparison.OrdinalIgnoreCase))
-            .ToList();
+        try
+        {
+            // Load all documents and IDs already in collection
+            var allDocs = _repository.GetAll();
+            var alreadyIn = DatabaseHelper.GetDocumentsInCollection(SelectedCollection.Id)
+                                          .Select(d => d.Id)
+                                          .ToList();
 
-        if (matches.Count == 0)
-        {
-            await _dialogService.ShowMessageAsync("Không tìm thấy",
-                $"Không tìm thấy tài liệu nào khớp với '{keyword}'");
-            return;
-        }
+            Debug.WriteLine($"[CollectionVM] allDocs={allDocs.Count}, alreadyIn={alreadyIn.Count}");
 
-        // If multiple matches, let user pick by showing list
-        StudyDocument? selected;
-        if (matches.Count == 1)
-        {
-            selected = matches[0];
-        }
-        else
-        {
-            // Show numbered list for selection
-            var list = string.Join("\n", matches.Select((d, i) => $"  {i + 1}. {d.Ten} ({d.MonHoc})"));
-            var indexStr = await _dialogService.ShowInputAsync(
-                $"Tìm thấy {matches.Count} kết quả",
-                $"Chọn số thứ tự:\n{list}");
-            if (!int.TryParse(indexStr, out int idx) || idx < 1 || idx > matches.Count) return;
-            selected = matches[idx - 1];
-        }
+            if (allDocs.Count == alreadyIn.Count)
+            {
+                await _dialogService.ShowMessageAsync(
+                    "Thông báo",
+                    "Tất cả tài liệu đã có trong bộ sưu tập này.");
+                return;
+            }
 
-        bool added = DatabaseHelper.AddDocumentToCollection(SelectedCollection.Id, selected.Id);
-        if (added)
-        {
+            // Show visual document picker (search + checkbox list)
+            var selected = await _dialogService.ShowDocumentPickerAsync(
+                SelectedCollection.Name,
+                allDocs,
+                alreadyIn);
+
+            Debug.WriteLine($"[CollectionVM] Picker returned: {selected?.Count.ToString() ?? "null (cancelled)"}");
+
+            if (selected == null || selected.Count == 0) return;
+
+            // Snapshot before reload (LoadCollections resets SelectedCollection)
+            int selectedId = SelectedCollection.Id;
+            string collectionName = SelectedCollection.Name;
+
+            // Batch-add selected documents
+            int addedCount = 0;
+            foreach (var doc in selected)
+            {
+                bool ok = DatabaseHelper.AddDocumentToCollection(selectedId, doc.Id);
+                if (ok) addedCount++;
+                Debug.WriteLine($"[CollectionVM] AddDocumentToCollection({doc.Id}, '{doc.Ten}') = {ok}");
+            }
+
+            // Refresh document list before reload
             OnSelectedCollectionChanged(SelectedCollection);
+
+            // Reload collections list and restore selection
             LoadCollections();
-            await _dialogService.ShowMessageAsync("Thành công",
-                $"Đã thêm '{selected.Ten}' vào '{SelectedCollection.Name}'");
+            SelectedCollection = Collections.FirstOrDefault(c => c.Id == selectedId);
+
+            string msg = addedCount == 1
+                ? $"Đã thêm 1 tài liệu vào '{collectionName}'"
+                : $"Đã thêm {addedCount} tài liệu vào '{collectionName}'";
+            await _dialogService.ShowMessageAsync("Thành công", msg);
         }
-        else
+        catch (Exception ex)
         {
-            await _dialogService.ShowMessageAsync("Lưu ý", "Tài liệu đã có trong bộ sưu tập này");
+            Debug.WriteLine($"[CollectionVM] AddDocumentToCollectionAsync ERROR: {ex.GetType().Name}: {ex.Message}");
+            await _dialogService.ShowErrorAsync("Lỗi", $"Không thể thêm tài liệu: {ex.Message}");
         }
     }
 
@@ -155,10 +202,37 @@ public partial class CollectionManagementViewModel : ViewModelBase
             $"Gỡ '{doc.Ten}' khỏi bộ sưu tập?");
         if (confirmed)
         {
-            DatabaseHelper.RemoveDocumentFromCollection(SelectedCollection.Id, doc.Id);
+            int selectedId = SelectedCollection.Id;
+            DatabaseHelper.RemoveDocumentFromCollection(selectedId, doc.Id);
             OnSelectedCollectionChanged(SelectedCollection);
             LoadCollections();
+            SelectedCollection = Collections.FirstOrDefault(c => c.Id == selectedId);
         }
+    }
+
+    [RelayCommand]
+    private async Task RemoveSelectedDocumentsAsync()
+    {
+        if (SelectedCollection == null) return;
+
+        var targets = SelectedDocumentsInCollection.Cast<StudyDocument>().ToList();
+        if (targets.Count == 0) return;
+
+        string confirmMsg = targets.Count == 1
+            ? $"Gỡ '{targets[0].Ten}' khỏi bộ sưu tập?"
+            : $"Gỡ {targets.Count} tài liệu khỏi bộ sưu tập?";
+
+        bool confirmed = await _dialogService.ShowConfirmAsync("Xác nhận", confirmMsg);
+        if (!confirmed) return;
+
+        int selectedId = SelectedCollection.Id;
+        foreach (var d in targets)
+            DatabaseHelper.RemoveDocumentFromCollection(selectedId, d.Id);
+
+        OnSelectedCollectionChanged(SelectedCollection);
+        LoadCollections();
+        SelectedCollection = Collections.FirstOrDefault(c => c.Id == selectedId);
+        SelectedDocumentsInCollection = new List<StudyDocument>();
     }
 
     [RelayCommand]

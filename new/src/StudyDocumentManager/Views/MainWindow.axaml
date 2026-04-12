@@ -190,8 +190,6 @@
                 BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
                 Padding="12,3" Height="26">
             <DockPanel>
-                <TextBlock Text="Sẵn sàng" FontSize="11" Foreground="{StaticResource TextSecondary}"
-                           VerticalAlignment="Center"/>
                 <TextBlock DockPanel.Dock="Right" FontSize="11" Foreground="{StaticResource TextSecondary}"
                            VerticalAlignment="Center" HorizontalAlignment="Right"
                            Text="{Binding StatusText, FallbackValue='Tổng số: 0 tài liệu'}"/>

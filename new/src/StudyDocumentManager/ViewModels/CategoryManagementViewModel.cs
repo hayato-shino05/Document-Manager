@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,8 +15,15 @@ public partial class CategoryManagementViewModel : ViewModelBase
 
     [ObservableProperty] private ObservableCollection<CategoryItem> _subjects = new();
     [ObservableProperty] private ObservableCollection<CategoryItem> _types = new();
+
+    // Single selection (for Rename & single-delete fallback)
     [ObservableProperty] private CategoryItem? _selectedSubject;
     [ObservableProperty] private CategoryItem? _selectedType;
+
+    // Multi-selection (bound to ListBox.SelectedItems)
+    [ObservableProperty] private IList _selectedSubjects = new List<CategoryItem>();
+    [ObservableProperty] private IList _selectedTypes = new List<CategoryItem>();
+
     [ObservableProperty] private int _selectedTabIndex;
 
     public CategoryManagementViewModel(IDocumentRepository repository, IDialogService dialogService)
@@ -35,6 +43,8 @@ public partial class CategoryManagementViewModel : ViewModelBase
         Types = new ObservableCollection<CategoryItem>(
             typesData.Select(t => new CategoryItem(t.Name, t.Count)));
     }
+
+    // ─── Rename ──────────────────────────────────────────────────────
 
     [RelayCommand]
     private async Task RenameSubjectAsync()
@@ -64,39 +74,77 @@ public partial class CategoryManagementViewModel : ViewModelBase
         }
     }
 
+    // ─── Delete (multi-select aware) ─────────────────────────────────
+
     [RelayCommand]
     private async Task DeleteSubjectAsync()
     {
-        if (SelectedSubject == null) return;
-
-        bool confirm = await _dialogService.ShowConfirmAsync(
-            "Xóa danh mục",
-            $"Bạn có chắc muốn xóa danh mục '{SelectedSubject.Name}' và {SelectedSubject.Count} tài liệu bên trong?");
-
-        if (confirm)
+        var targets = SelectedSubjects.Cast<CategoryItem>().ToList();
+        if (targets.Count == 0)
         {
-            DatabaseHelper.DeleteDocumentsBySubject(SelectedSubject.Name);
-            LoadData();
-            await _dialogService.ShowMessageAsync("Thành công", "Đã xóa danh mục và tài liệu liên quan");
+            if (SelectedSubject == null) return;
+            targets = [SelectedSubject];
         }
+
+        int totalDocs = targets.Sum(t => t.Count);
+        string namesStr = targets.Count == 1
+            ? $"'{targets[0].Name}'"
+            : $"{targets.Count} danh mục đã chọn";
+
+        string confirmMsg = totalDocs == 0
+            ? $"Xóa {namesStr}?"
+            : $"Xóa {namesStr}?\n\n{totalDocs} tài liệu liên quan sẽ được chuyển vào Thùng rác.";
+
+        bool confirm = await _dialogService.ShowConfirmAsync("Xóa danh mục", confirmMsg);
+        if (!confirm) return;
+
+        foreach (var item in targets)
+            DatabaseHelper.DeleteDocumentsBySubject(item.Name);
+
+        LoadData();
+        SelectedSubjects = new List<CategoryItem>();
+
+        string doneMsg = targets.Count == 1
+            ? $"Đã xóa danh mục '{targets[0].Name}'"
+            : $"Đã xóa {targets.Count} danh mục";
+        await _dialogService.ShowMessageAsync("Thành công", doneMsg);
     }
 
     [RelayCommand]
     private async Task DeleteTypeAsync()
     {
-        if (SelectedType == null) return;
-
-        bool confirm = await _dialogService.ShowConfirmAsync(
-            "Xóa loại tài liệu",
-            $"Bạn có chắc muốn xóa loại '{SelectedType.Name}' và {SelectedType.Count} tài liệu bên trong?");
-
-        if (confirm)
+        var targets = SelectedTypes.Cast<CategoryItem>().ToList();
+        if (targets.Count == 0)
         {
-            DatabaseHelper.DeleteDocumentsByType(SelectedType.Name);
-            LoadData();
-            await _dialogService.ShowMessageAsync("Thành công", "Đã xóa loại tài liệu và tài liệu liên quan");
+            if (SelectedType == null) return;
+            targets = [SelectedType];
         }
+
+        int totalDocs = targets.Sum(t => t.Count);
+        string namesStr = targets.Count == 1
+            ? $"'{targets[0].Name}'"
+            : $"{targets.Count} loại đã chọn";
+
+        string confirmMsg = totalDocs == 0
+            ? $"Xóa {namesStr}?"
+            : $"Xóa {namesStr}?\n\n{totalDocs} tài liệu liên quan sẽ được chuyển vào Thùng rác.";
+
+        bool confirm = await _dialogService.ShowConfirmAsync("Xóa loại tài liệu", confirmMsg);
+        if (!confirm) return;
+
+        foreach (var item in targets)
+            DatabaseHelper.DeleteDocumentsByType(item.Name);
+
+        LoadData();
+        SelectedTypes = new List<CategoryItem>();
+
+        string doneMsg = targets.Count == 1
+            ? $"Đã xóa loại '{targets[0].Name}'"
+            : $"Đã xóa {targets.Count} loại tài liệu";
+        await _dialogService.ShowMessageAsync("Thành công", doneMsg);
     }
+
+    // ─── Add ─────────────────────────────────────────────────────────
 
     [RelayCommand]
     private async Task AddSubjectAsync()

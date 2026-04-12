@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.ViewModels"
+             xmlns:conv="using:StudyDocumentManager.Converters"
              x:Class="StudyDocumentManager.Views.RecentFilesView"
              x:DataType="vm:RecentFilesViewModel">
 
@@ -41,7 +42,17 @@
                               ItemsSource="{Binding RecentFiles}"
                               CanUserResizeColumns="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding DocumentName}" Width="2*"/>
+                            <DataGridTemplateColumn Header="Tên tài liệu" Width="2*" SortMemberPath="DocumentName">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="vm:RecentFileItem">
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
+                                            <Image Source="{Binding FileType, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
+                                                   Width="16" Height="16" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding DocumentName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Danh mục" Binding="{Binding Subject}" Width="*"/>
                             <DataGridTextColumn Header="Loại" Binding="{Binding FileType}" Width="80"/>
                             <DataGridTextColumn Header="Mở lúc" Binding="{Binding OpenedAtDisplay}" Width="130"/>

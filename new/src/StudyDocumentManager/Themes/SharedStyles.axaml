@@ -24,7 +24,7 @@
     ═══════════════════════════════════════════════════════════ -->
     <Style Selector="Border.page-wrapper">
         <Setter Property="Background" Value="{StaticResource ContentBackground}"/>
-        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Padding" Value="{StaticResource PaddingPage}"/>
     </Style>
 
     <!-- ═══════════════════════════════════════════════════════
@@ -84,7 +84,7 @@
     </Style>
 
     <Style Selector="TextBlock.section-title">
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeLg}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -103,7 +103,7 @@
         <Setter Property="Cursor" Value="Hand"/>
     </Style>
     <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
-        <Setter Property="Background" Value="#b91c1c"/>
+        <Setter Property="Background" Value="{StaticResource DangerColorHover}"/>
     </Style>
 
     <Style Selector="Button.warning">
@@ -113,7 +113,7 @@
         <Setter Property="Cursor" Value="Hand"/>
     </Style>
     <Style Selector="Button.warning:pointerover /template/ ContentPresenter">
-        <Setter Property="Background" Value="#d97706"/>
+        <Setter Property="Background" Value="{StaticResource WarningColorHover}"/>
     </Style>
 
     <Style Selector="Button.success">
@@ -123,7 +123,7 @@
         <Setter Property="Cursor" Value="Hand"/>
     </Style>
     <Style Selector="Button.success:pointerover /template/ ContentPresenter">
-        <Setter Property="Background" Value="#047857"/>
+        <Setter Property="Background" Value="{StaticResource SuccessColorHover}"/>
     </Style>
 
     <!-- ghost: nút không viền, chỉ có text -->
@@ -160,7 +160,7 @@
     </Style>
 
     <Style Selector="TextBlock.empty-state-text">
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeLg}"/>
         <Setter Property="Foreground" Value="{StaticResource TextMuted}"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
     </Style>
@@ -194,7 +194,7 @@
             Dùng:  <TextBlock Classes="field-label" Text="Tên ..."/>
     ═══════════════════════════════════════════════════════════ -->
     <Style Selector="TextBlock.field-label">
-        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
         <Setter Property="Margin" Value="0,0,0,2"/>

@@ -1,0 +1,177 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="StudyDocumentManager.Views.AddToCollectionDialog"
+        Title="Thêm tài liệu vào bộ sưu tập"
+        Width="680" Height="520"
+        MinWidth="560" MinHeight="400"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True"
+        Background="{StaticResource ContentBackground}">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource SidebarBackground}"
+                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
+                Padding="16,12">
+            <StackPanel Spacing="2">
+                <TextBlock x:Name="TitleLabel" Text="Thêm tài liệu"
+                           FontSize="15" FontWeight="SemiBold"
+                           Foreground="{StaticResource TextPrimary}"/>
+                <TextBlock x:Name="SubtitleLabel" Text="Chọn một hoặc nhiều tài liệu để thêm vào bộ sưu tập"
+                           FontSize="12" Foreground="{StaticResource TextMuted}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Search bar -->
+        <Border Grid.Row="1" Padding="12,10" Background="{StaticResource ContentBackground}"
+                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBox x:Name="SearchBox" Grid.Column="0"
+                         Watermark="Tìm kiếm theo tên, danh mục, loại..."
+                         Height="30" VerticalContentAlignment="Center"
+                         Padding="12,4,10,4"
+                         FontSize="12">
+                    <TextBox.InnerLeftContent>
+                        <Image Source="{StaticResource IconSearch}" 
+                               Width="14" Height="14" 
+                               Margin="10,0,0,0" 
+                               Opacity="0.6"/>
+                    </TextBox.InnerLeftContent>
+                </TextBox>
+                <TextBlock x:Name="CountLabel" Grid.Column="1"
+                           VerticalAlignment="Center" Margin="10,0,4,0"
+                           FontSize="12" Foreground="{StaticResource TextMuted}"
+                           Text="0 kết quả"/>
+                <Button x:Name="SelectAllBtn" Grid.Column="2"
+                        Content="Chọn tất cả" FontSize="11"
+                        Padding="8,3" VerticalAlignment="Center"
+                        Classes="secondary" Margin="4,0,0,0"/>
+            </Grid>
+        </Border>
+
+        <!-- Document list -->
+        <Border Grid.Row="2" Background="{StaticResource CardBackground}"
+                Margin="12,8,12,0">
+            <Grid RowDefinitions="Auto,*">
+
+                <!-- Column headers -->
+                <Border Grid.Row="0" Background="{StaticResource SidebarBackground}"
+                        BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
+                        Padding="12,6">
+                    <Grid ColumnDefinitions="32,*,130,80">
+                        <CheckBox x:Name="HeaderCheckBox" Grid.Column="0"
+                                  VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="Tên tài liệu"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondary}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="Danh mục"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondary}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="3" Text="Loại"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondary}"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Items -->
+                <ListBox x:Name="DocumentList" Grid.Row="1"
+                         Background="Transparent"
+                         SelectionMode="Single"
+                         Padding="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
+                        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Style>
+                        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="{StaticResource HoverBg}"/>
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{StaticResource CardBorder}"
+                                    BorderThickness="0,0,0,1" Padding="12,7">
+                                <Grid ColumnDefinitions="32,*,130,80">
+                                    <CheckBox Grid.Column="0"
+                                              IsChecked="{Binding IsSelected}"
+                                              VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                                        <TextBlock Text="{Binding Document.Ten}"
+                                                   FontSize="12"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Document.TacGia}"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   IsVisible="{Binding HasAuthor}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding Document.MonHoc}"
+                                               FontSize="11"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <Border Grid.Column="3" VerticalAlignment="Center"
+                                            Background="{StaticResource StatBlueBg}"
+                                            CornerRadius="3" Padding="5,2"
+                                            HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding Document.Loai}"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource AccentBrush}"
+                                                   FontWeight="Medium"/>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+            </Grid>
+        </Border>
+
+        <!-- Footer -->
+        <Border Grid.Row="3" Background="{StaticResource SidebarBackground}"
+                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
+                Padding="16,10" Margin="0,8,0,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="6"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Đã chọn:" FontSize="12"
+                               Foreground="{StaticResource TextMuted}"
+                               VerticalAlignment="Center"/>
+                    <Border Background="{StaticResource AccentBrush}" CornerRadius="10"
+                            Padding="7,2" MinWidth="22">
+                        <TextBlock x:Name="SelectedCountBadge" Text="0"
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="tài liệu" FontSize="12"
+                               Foreground="{StaticResource TextMuted}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
+                            HorizontalAlignment="Right">
+                    <Button x:Name="CancelButton" Content="Hủy"
+                            Classes="secondary" Padding="16,6" FontSize="12"
+                            IsCancel="True"/>
+                    <Button x:Name="ConfirmButton" Content="Thêm vào bộ sưu tập"
+                            Classes="primary" Padding="16,6" FontSize="12"
+                            IsDefault="True" IsEnabled="False"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+    </Grid>
+</Window>

@@ -1,0 +1,72 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="StudyDocumentManager.Views.ChangeCategoryDialog"
+        Title="Đổi danh mục"
+        Width="420" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False">
+    <Window.Styles>
+        <Style Selector="Button.chip">
+            <Setter Property="Background" Value="#F0F4FF"/>
+            <Setter Property="Foreground" Value="#3B4EB8"/>
+            <Setter Property="BorderBrush" Value="#C7D2FE"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,6,6"/>
+        </Style>
+        <Style Selector="Button.chip:pointerover">
+            <Setter Property="Background" Value="#DBEAFE"/>
+        </Style>
+        <Style Selector="AutoCompleteBox">
+            <Setter Property="BorderBrush" Value="#6366F1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+    </Window.Styles>
+
+    <StackPanel Margin="24" Spacing="12">
+
+        <!-- Title label -->
+        <TextBlock x:Name="DocNameLabel"
+                   FontSize="13" FontWeight="SemiBold"
+                   Foreground="#1E293B"
+                   TextWrapping="Wrap"/>
+
+        <!-- Existing categories as chip pills -->
+        <StackPanel>
+            <TextBlock Text="Danh mục hiện có — click để chọn nhanh:"
+                       FontSize="10" Foreground="#64748B" Margin="0,0,0,6"/>
+            <WrapPanel x:Name="ChipsPanel" Orientation="Horizontal"/>
+        </StackPanel>
+
+        <!-- AutoComplete input -->
+        <StackPanel Spacing="4">
+            <TextBlock Text="Hoặc nhập tên danh mục mới:"
+                       FontSize="10" Foreground="#64748B"/>
+            <AutoCompleteBox x:Name="CategoryInput"
+                             Watermark="Tên danh mục..."
+                             MinimumPrefixLength="0"
+                             FilterMode="Contains"
+                             Height="36"/>
+        </StackPanel>
+
+        <!-- Buttons -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8" Margin="0,8,0,0">
+            <Button x:Name="OkButton"
+                    Content="Lưu thay đổi"
+                    IsDefault="True"
+                    MinWidth="110"
+                    HorizontalContentAlignment="Center"/>
+            <Button x:Name="CancelButton"
+                    Content="Hủy"
+                    IsCancel="True"
+                    MinWidth="80"
+                    HorizontalContentAlignment="Center"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

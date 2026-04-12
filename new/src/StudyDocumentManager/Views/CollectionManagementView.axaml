@@ -1,6 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.ViewModels"
+             xmlns:conv="using:StudyDocumentManager.Converters"
+             xmlns:core="using:StudyDocumentManager.Core.Entities"
              x:Class="StudyDocumentManager.Views.CollectionManagementView"
              x:DataType="vm:CollectionManagementViewModel">
 
@@ -20,8 +22,8 @@
                     <DockPanel>
                         <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
                                 CornerRadius="6,6,0,0" Padding="10,7">
-                            <DockPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <DockPanel LastChildFill="False">
+                                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                                     <Image Source="{StaticResource IconCollection}" Width="13" Height="13"/>
                                     <TextBlock Text="Bộ sưu tập" FontSize="13" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextPrimary}"/>
@@ -30,12 +32,12 @@
                                             HorizontalAlignment="Right">
                                     <Button Classes="primary" Command="{Binding CreateCollectionCommand}" Padding="8,4">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
-                                            <TextBlock Text="Tạo" FontSize="11"/>
+                                            <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
+                                            <TextBlock Text="Tạo" FontSize="11" Foreground="White" />
                                         </StackPanel>
                                     </Button>
-                                    <Button Classes="secondary" Command="{Binding DeleteCollectionCommand}" Padding="8,4">
-                                        <Image Source="{StaticResource IconDelete}" Width="11" Height="11"/>
+                                    <Button Classes="danger" Command="{Binding DeleteCollectionCommand}" Padding="8,4">
+                                        <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
                                     </Button>
                                 </StackPanel>
                             </DockPanel>
@@ -63,17 +65,48 @@
                     <DockPanel>
                         <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
                                 CornerRadius="6,6,0,0" Padding="12,8">
-                            <TextBlock Text="Tài liệu trong bộ sưu tập" FontSize="13" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextPrimary}"/>
+                            <DockPanel LastChildFill="False">
+                                <TextBlock DockPanel.Dock="Left" Text="Tài liệu trong bộ sưu tập" FontSize="13" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4"
+                                            HorizontalAlignment="Right">
+                                    <Button Classes="primary" Command="{Binding AddDocumentToCollectionCommand}" Padding="8,4" IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3">
+                                            <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
+                                            <TextBlock Text="Thêm tài liệu" FontSize="11" Foreground="White"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Classes="danger" Command="{Binding RemoveSelectedDocumentsCommand}" Padding="8,4"
+                                            IsEnabled="{Binding SelectedDocumentInCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3">
+                                            <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
+                                            <TextBlock Text="Xóa" FontSize="11" Foreground="White"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </DockPanel>
                         </Border>
 
                         <Panel>
-                            <DataGrid ItemsSource="{Binding DocumentsInCollection}"
+                            <DataGrid x:Name="DocumentGrid"
+                                      ItemsSource="{Binding DocumentsInCollection}"
+                                      SelectedItem="{Binding SelectedDocumentInCollection}"
+                                      SelectionMode="Extended"
                                       AutoGenerateColumns="False" IsReadOnly="True"
                                       CanUserSortColumns="True"
                                       GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding Ten}" Width="*"/>
+                                    <DataGridTemplateColumn Header="Tên tài liệu" Width="*" SortMemberPath="Ten">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate x:DataType="core:StudyDocument">
+                                                <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
+                                                    <Image Source="{Binding Loai, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
+                                                           Width="16" Height="16" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding Ten}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                     <DataGridTextColumn Header="Danh mục" Binding="{Binding MonHoc}" Width="120"/>
                                     <DataGridTextColumn Header="Loại" Binding="{Binding Loai}" Width="80"/>
                                 </DataGrid.Columns>

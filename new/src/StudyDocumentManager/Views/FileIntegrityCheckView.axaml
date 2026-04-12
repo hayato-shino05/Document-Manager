@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.ViewModels"
+             xmlns:conv="using:StudyDocumentManager.Converters"
              x:Class="StudyDocumentManager.Views.FileIntegrityCheckView"
              x:DataType="vm:FileIntegrityCheckViewModel">
 
@@ -86,7 +87,17 @@
 
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Trạng thái" Binding="{Binding Status}" Width="160"/>
-                                <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding Document.Ten}" Width="*" MinWidth="200"/>
+                                <DataGridTemplateColumn Header="Tên tài liệu" Width="*" MinWidth="200" SortMemberPath="Document.Ten">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate x:DataType="vm:IntegrityResult">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
+                                                <Image Source="{Binding Document.Loai, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
+                                                       Width="16" Height="16" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding Document.Ten}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="Đường dẫn" Binding="{Binding FilePath}" Width="350"/>
                             </DataGrid.Columns>
                         </DataGrid>

@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.ViewModels"
+             xmlns:conv="using:StudyDocumentManager.Converters"
              x:Class="StudyDocumentManager.Views.BulkDeleteView"
              x:DataType="vm:BulkDeleteViewModel">
 
@@ -114,7 +115,17 @@
                               GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                         <DataGrid.Columns>
                             <DataGridCheckBoxColumn Header="✓" Binding="{Binding IsSelected}" Width="40"/>
-                            <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding Document.Ten, Mode=OneWay}" Width="*" MinWidth="200"/>
+                            <DataGridTemplateColumn Header="Tên tài liệu" Width="*" MinWidth="200" SortMemberPath="Document.Ten">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="vm:SelectableDocument">
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
+                                            <Image Source="{Binding Document.Loai, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
+                                                   Width="16" Height="16" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding Document.Ten}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Danh mục" Binding="{Binding Document.MonHoc, Mode=OneWay}" Width="120"/>
                             <DataGridTextColumn Header="Loại" Binding="{Binding Document.Loai, Mode=OneWay}" Width="80"/>
                             <DataGridTextColumn Header="Ngày thêm" Binding="{Binding Document.NgayThem, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>

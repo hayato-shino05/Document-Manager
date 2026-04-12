@@ -6,15 +6,9 @@ namespace StudyDocumentManager.Services;
 /// <summary>
 /// Navigation service implementation using ViewModel switching.
 /// </summary>
-public class NavigationService : INavigationService
+public class NavigationService(IServiceProvider serviceProvider) : INavigationService
 {
-    private readonly IServiceProvider _serviceProvider;
     private MainWindowViewModel? _mainViewModel;
-
-    public NavigationService(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
 
     public bool CanGoBack => _mainViewModel?.CurrentView is not DashboardViewModel;
 
@@ -34,22 +28,22 @@ public class NavigationService : INavigationService
 
         var viewModel = viewKey switch
         {
-            "dashboard" => _serviceProvider.GetRequiredService<DashboardViewModel>() as ViewModelBase,
+            "dashboard" => serviceProvider.GetRequiredService<DashboardViewModel>() as ViewModelBase,
             "addedit" or "add" => CreateAddEditViewModel(parameter as int?),
             "edit" => CreateAddEditViewModel(parameter as int?),
-            "categories" => _serviceProvider.GetRequiredService<CategoryManagementViewModel>(),
-            "collections" => _serviceProvider.GetRequiredService<CollectionManagementViewModel>(),
-            "recyclebin" or "recycle" => _serviceProvider.GetRequiredService<RecycleBinViewModel>(),
-            "batchimport" or "batch-import" => _serviceProvider.GetRequiredService<BatchImportViewModel>(),
-            "bulkdelete" or "bulk-delete" => _serviceProvider.GetRequiredService<BulkDeleteViewModel>(),
-            "duplicates" => _serviceProvider.GetRequiredService<DuplicateDetectionViewModel>(),
-            "fileintegrity" or "integrity" => _serviceProvider.GetRequiredService<FileIntegrityCheckViewModel>(),
-            "report" => _serviceProvider.GetRequiredService<ReportViewModel>(),
-            "recentfiles" => _serviceProvider.GetRequiredService<RecentFilesViewModel>(),
-            "treemap" => _serviceProvider.GetRequiredService<TreeMapViewModel>(),
+            "categories" => serviceProvider.GetRequiredService<CategoryManagementViewModel>(),
+            "collections" => serviceProvider.GetRequiredService<CollectionManagementViewModel>(),
+            "recyclebin" or "recycle" => serviceProvider.GetRequiredService<RecycleBinViewModel>(),
+            "batchimport" or "batch-import" => serviceProvider.GetRequiredService<BatchImportViewModel>(),
+            "bulkdelete" or "bulk-delete" => serviceProvider.GetRequiredService<BulkDeleteViewModel>(),
+            "duplicates" => serviceProvider.GetRequiredService<DuplicateDetectionViewModel>(),
+            "fileintegrity" or "integrity" => serviceProvider.GetRequiredService<FileIntegrityCheckViewModel>(),
+            "report" => serviceProvider.GetRequiredService<ReportViewModel>(),
+            "recentfiles" => serviceProvider.GetRequiredService<RecentFilesViewModel>(),
+            "treemap" => serviceProvider.GetRequiredService<TreeMapViewModel>(),
             "personal-note" => CreatePersonalNoteViewModel(parameter),
             "related-docs" => CreateRelatedDocsViewModel(parameter),
-            _ => _serviceProvider.GetRequiredService<DashboardViewModel>(),
+            _ => serviceProvider.GetRequiredService<DashboardViewModel>(),
         };
 
         if (viewModel != null)
@@ -62,12 +56,12 @@ public class NavigationService : INavigationService
     public void GoBack()
     {
         if (_mainViewModel == null) return;
-        _mainViewModel.CurrentView = _serviceProvider.GetRequiredService<DashboardViewModel>();
+        _mainViewModel.CurrentView = serviceProvider.GetRequiredService<DashboardViewModel>();
     }
 
-    private ViewModelBase CreateAddEditViewModel(int? documentId)
+    private AddEditViewModel CreateAddEditViewModel(int? documentId)
     {
-        var vm = _serviceProvider.GetRequiredService<AddEditViewModel>();
+        var vm = serviceProvider.GetRequiredService<AddEditViewModel>();
         if (documentId.HasValue)
         {
             vm.LoadDocument(documentId.Value);
@@ -75,9 +69,9 @@ public class NavigationService : INavigationService
         return vm;
     }
 
-    private ViewModelBase CreatePersonalNoteViewModel(object? parameter)
+    private PersonalNoteViewModel CreatePersonalNoteViewModel(object? parameter)
     {
-        var vm = _serviceProvider.GetRequiredService<PersonalNoteViewModel>();
+        var vm = serviceProvider.GetRequiredService<PersonalNoteViewModel>();
         if (parameter is (int docId, string docName))
         {
             vm.Load(docId, docName);
@@ -85,9 +79,9 @@ public class NavigationService : INavigationService
         return vm;
     }
 
-    private ViewModelBase CreateRelatedDocsViewModel(object? parameter)
+    private RelatedDocumentsViewModel CreateRelatedDocsViewModel(object? parameter)
     {
-        var vm = _serviceProvider.GetRequiredService<RelatedDocumentsViewModel>();
+        var vm = serviceProvider.GetRequiredService<RelatedDocumentsViewModel>();
         if (parameter is (int docId, string docName))
         {
             vm.Load(docId, docName);

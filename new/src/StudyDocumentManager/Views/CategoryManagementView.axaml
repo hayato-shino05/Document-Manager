@@ -46,8 +46,8 @@
                                             HorizontalAlignment="Right">
                                     <Button Classes="primary" Command="{Binding AddSubjectCommand}" Padding="8,4">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
-                                            <TextBlock Text="Thêm" FontSize="11"/>
+                                            <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
+                                            <TextBlock Text="Thêm" FontSize="11" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="secondary" Command="{Binding RenameSubjectCommand}" Padding="8,4"
@@ -60,7 +60,7 @@
                                     <Button Classes="danger" Command="{Binding DeleteSubjectCommand}" Padding="8,4"
                                             IsEnabled="{Binding SelectedSubject, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconDelete}" Width="11" Height="11"/>
+                                            <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
                                             <TextBlock Text="Xóa" FontSize="11"/>
                                         </StackPanel>
                                     </Button>
@@ -70,10 +70,12 @@
 
                         <ListBox ItemsSource="{Binding Subjects}"
                                  SelectedItem="{Binding SelectedSubject}"
+                                 SelectionMode="Multiple"
+                                 SelectedItems="{Binding SelectedSubjects}"
                                  Padding="4">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,8">
                                         <Image Source="{StaticResource IconCategory}" Width="13" Height="13"/>
                                         <TextBlock Text="{Binding Display}" FontSize="12"
                                                    Foreground="{StaticResource TextPrimary}"/>
@@ -100,8 +102,8 @@
                                             HorizontalAlignment="Right">
                                     <Button Classes="primary" Command="{Binding AddTypeCommand}" Padding="8,4">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
-                                            <TextBlock Text="Thêm" FontSize="11"/>
+                                            <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
+                                            <TextBlock Text="Thêm" FontSize="11" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="secondary" Command="{Binding RenameTypeCommand}" Padding="8,4"
@@ -114,7 +116,7 @@
                                     <Button Classes="danger" Command="{Binding DeleteTypeCommand}" Padding="8,4"
                                             IsEnabled="{Binding SelectedType, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconDelete}" Width="11" Height="11"/>
+                                            <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
                                             <TextBlock Text="Xóa" FontSize="11"/>
                                         </StackPanel>
                                     </Button>
@@ -124,10 +126,12 @@
 
                         <ListBox ItemsSource="{Binding Types}"
                                  SelectedItem="{Binding SelectedType}"
+                                 SelectionMode="Multiple"
+                                 SelectedItems="{Binding SelectedTypes}"
                                  Padding="4">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,8">
                                         <Image Source="{StaticResource IconDocPage}" Width="13" Height="13"/>
                                         <TextBlock Text="{Binding Display}" FontSize="12"
                                                    Foreground="{StaticResource TextPrimary}"/>

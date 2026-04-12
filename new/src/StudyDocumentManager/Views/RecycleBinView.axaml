@@ -1,6 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.ViewModels"
+             xmlns:conv="using:StudyDocumentManager.Converters"
+             xmlns:core="using:StudyDocumentManager.Core.Entities"
              x:Class="StudyDocumentManager.Views.RecycleBinView"
              x:DataType="vm:RecycleBinViewModel">
 
@@ -43,7 +45,17 @@
                               ItemsSource="{Binding DeletedDocuments}"
                               SelectedItem="{Binding SelectedDocument}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding Ten}" Width="*" MinWidth="200"/>
+                            <DataGridTemplateColumn Header="Tên tài liệu" Width="*" MinWidth="200" SortMemberPath="Ten">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="core:StudyDocument">
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
+                                            <Image Source="{Binding Loai, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
+                                                   Width="16" Height="16" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding Ten}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Danh mục" Binding="{Binding MonHoc}" Width="120"/>
                             <DataGridTextColumn Header="Loại" Binding="{Binding Loai}" Width="80"/>
                             <DataGridTextColumn Header="Ngày thêm" Binding="{Binding NgayThem, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>

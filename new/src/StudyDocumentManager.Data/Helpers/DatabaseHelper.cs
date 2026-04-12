@@ -91,7 +91,9 @@ public static class DatabaseHelper
                 tac_gia TEXT,
                 quan_trong INTEGER DEFAULT 0,
                 tags TEXT,
-                deadline DATETIME
+                deadline DATETIME,
+                is_deleted INTEGER DEFAULT 0,
+                deleted_at DATETIME
             );
 
             CREATE TABLE IF NOT EXISTS collections (
@@ -944,17 +946,24 @@ public static class DatabaseHelper
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = @"SELECT mon_hoc, COUNT(*) as so_luong
-                           FROM tai_lieu
-                           WHERE mon_hoc IS NOT NULL AND mon_hoc != ''
-                           AND (is_deleted IS NULL OR is_deleted = 0)
-                           GROUP BY mon_hoc
-                           ORDER BY mon_hoc";
+        // UNION: standalone danh_muc table + implicit subjects from tai_lieu not in danh_muc
+        cmd.CommandText = @"
+            SELECT dm.ten, COUNT(t.id) as so_luong
+            FROM danh_muc dm
+            LEFT JOIN tai_lieu t ON t.mon_hoc = dm.ten
+                AND (t.is_deleted IS NULL OR t.is_deleted = 0)
+            GROUP BY dm.ten
+            UNION
+            SELECT t2.mon_hoc, COUNT(t2.id)
+            FROM tai_lieu t2
+            WHERE t2.mon_hoc IS NOT NULL AND t2.mon_hoc != ''
+              AND (t2.is_deleted IS NULL OR t2.is_deleted = 0)
+              AND t2.mon_hoc NOT IN (SELECT ten FROM danh_muc)
+            GROUP BY t2.mon_hoc
+            ORDER BY 1";
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
-        {
             results.Add((reader.GetString(0), reader.GetInt32(1)));
-        }
         return results;
     }
 
@@ -964,17 +973,24 @@ public static class DatabaseHelper
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = @"SELECT loai, COUNT(*) as so_luong
-                           FROM tai_lieu
-                           WHERE loai IS NOT NULL AND loai != ''
-                           AND (is_deleted IS NULL OR is_deleted = 0)
-                           GROUP BY loai
-                           ORDER BY loai";
+        // UNION: standalone loai_tai_lieu table + implicit types from tai_lieu not in loai_tai_lieu
+        cmd.CommandText = @"
+            SELECT ltt.ten, COUNT(t.id) as so_luong
+            FROM loai_tai_lieu ltt
+            LEFT JOIN tai_lieu t ON t.loai = ltt.ten
+                AND (t.is_deleted IS NULL OR t.is_deleted = 0)
+            GROUP BY ltt.ten
+            UNION
+            SELECT t2.loai, COUNT(t2.id)
+            FROM tai_lieu t2
+            WHERE t2.loai IS NOT NULL AND t2.loai != ''
+              AND (t2.is_deleted IS NULL OR t2.is_deleted = 0)
+              AND t2.loai NOT IN (SELECT ten FROM loai_tai_lieu)
+            GROUP BY t2.loai
+            ORDER BY 1";
         using var reader = cmd.ExecuteReader();
         while (reader.Read())
-        {
             results.Add((reader.GetString(0), reader.GetInt32(1)));
-        }
         return results;
     }
 

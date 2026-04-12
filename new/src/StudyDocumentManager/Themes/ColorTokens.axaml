@@ -52,7 +52,7 @@
         <Color x:Key="StatusRed">#C42B1C</Color>
 
         <!-- ── SELECTION ─────────────────────────────────────── -->
-        <Color x:Key="SelectionBlueBg">#CCE4F7</Color>
+        <Color x:Key="SelectionBlueBg">#E1EFFF</Color>
         <Color x:Key="HoverBg">#0A000000</Color>
 
         <!-- ── ICON COLORS (used in DrawingImage GeometryDrawing) -->
@@ -101,8 +101,11 @@
 
         <!-- Button semantic color aliases (used by SharedStyles Button.danger/warning/success) -->
         <SolidColorBrush x:Key="DangerColor"         Color="#DC2626"/>
+        <SolidColorBrush x:Key="DangerColorHover"    Color="#B91C1C"/>
         <SolidColorBrush x:Key="WarningColor"        Color="#F59E0B"/>
+        <SolidColorBrush x:Key="WarningColorHover"   Color="#D97706"/>
         <SolidColorBrush x:Key="SuccessColor"        Color="#059669"/>
+        <SolidColorBrush x:Key="SuccessColorHover"   Color="#047857"/>
         <!-- DynamicResource aliases — TreeMapView / RecentFilesView still reference these -->
         <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource TextDark}"/>
         <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource TextMedium}"/>
@@ -175,6 +178,7 @@
         <Thickness x:Key="PaddingMd">12,6</Thickness>  <!-- standard control -->
         <Thickness x:Key="PaddingLg">16,8</Thickness>  <!-- card, section -->
         <Thickness x:Key="PaddingXl">20,12</Thickness> <!-- hero section -->
+        <Thickness x:Key="PaddingPage">20</Thickness>  <!-- base wrapper -->
         <Thickness x:Key="PaddingRow">12,5</Thickness> <!-- toolbar row -->
         <Thickness x:Key="PaddingSearchBar">12,6</Thickness>
         <Thickness x:Key="PaddingCard">16,12</Thickness>

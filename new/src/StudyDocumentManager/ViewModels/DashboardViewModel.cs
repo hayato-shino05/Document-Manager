@@ -179,9 +179,9 @@ public partial class DashboardViewModel : ViewModelBase
 
     private void BuildCategoryTree(IList<StudyDocument> docs, List<string> subjects, List<string> types)
     {
-        // Use a temp list, then Clear+Add into existing collection to keep same reference
         var items = new List<CategoryTreeItem>();
 
+        // ─── Tất cả ───────────────────────────────────────────────
         items.Add(new CategoryTreeItem
         {
             Name = "Tất cả tài liệu",
@@ -191,40 +191,55 @@ public partial class DashboardViewModel : ViewModelBase
             FilterValue = ""
         });
 
-        foreach (var subject in subjects)
+        // ─── Section: Danh mục ────────────────────────────────────
+        var subjectItems = subjects
+            .Select(s => new { Name = s, Count = docs.Count(d => d.MonHoc == s) })
+            .Where(x => x.Count > 0).ToList();
+
+        if (subjectItems.Count > 0)
         {
-            int count = docs.Count(d => d.MonHoc == subject);
-            if (count > 0)
+            items.Add(new CategoryTreeItem
             {
+                Name = "Danh mục",
+                IconKey = "IconCategory",
+                FilterType = "section-header",
+                IsHeader = true
+            });
+            foreach (var s in subjectItems)
                 items.Add(new CategoryTreeItem
                 {
-                    Name = subject,
-                    Count = count,
+                    Name = s.Name, Count = s.Count,
                     IconKey = "IconCategory",
-                    FilterType = "subject",
-                    FilterValue = subject,
+                    FilterType = "subject", FilterValue = s.Name,
                     IsIndented = true
                 });
-            }
         }
 
-        foreach (var type in types)
+        // ─── Section: Loại file ───────────────────────────────────
+        var typeItems = types
+            .Select(t => new { Name = t, Count = docs.Count(d => d.Loai == t) })
+            .Where(x => x.Count > 0).ToList();
+
+        if (typeItems.Count > 0)
         {
-            int count = docs.Count(d => d.Loai == type);
-            if (count > 0)
+            items.Add(new CategoryTreeItem
             {
+                Name = "Loại file",
+                IconKey = "IconDuplicate",
+                FilterType = "section-header",
+                IsHeader = true
+            });
+            foreach (var t in typeItems)
                 items.Add(new CategoryTreeItem
                 {
-                    Name = type,
-                    Count = count,
-                    IconKey = "IconDuplicate",
-                    FilterType = "type",
-                    FilterValue = type,
+                    Name = t.Name, Count = t.Count,
+                    IconKey = t.Name,  // resolved to file icon in ResolvedIconSource
+                    FilterType = "type", FilterValue = t.Name,
                     IsIndented = true
                 });
-            }
         }
 
+        // ─── Quan trọng ───────────────────────────────────────────
         items.Add(new CategoryTreeItem
         {
             Name = "Quan trọng",
@@ -234,7 +249,7 @@ public partial class DashboardViewModel : ViewModelBase
             FilterValue = ""
         });
 
-        // ═══ Collection nodes ═══
+        // ─── Bộ sưu tập ───────────────────────────────────────────
         try
         {
             var collections = DatabaseHelper.GetCollections();
@@ -242,23 +257,19 @@ public partial class DashboardViewModel : ViewModelBase
             {
                 items.Add(new CategoryTreeItem
                 {
-                    Name = "── Bộ sưu tập ──",
-                    Count = collections.Count,
+                    Name = "Bộ sưu tập",
                     IconKey = "IconCategory",
-                    FilterType = "collection-header",
-                    FilterValue = ""
+                    FilterType = "section-header",
+                    IsHeader = true
                 });
-
                 foreach (var col in collections)
                 {
                     int colCount = DatabaseHelper.GetDocumentsInCollection(col.Id)?.Count ?? 0;
                     items.Add(new CategoryTreeItem
                     {
-                        Name = col.Name,
-                        Count = colCount,
+                        Name = col.Name, Count = colCount,
                         IconKey = "IconStar",
-                        FilterType = "collection",
-                        FilterValue = col.Id.ToString(),
+                        FilterType = "collection", FilterValue = col.Id.ToString(),
                         IsIndented = true
                     });
                 }
@@ -266,7 +277,6 @@ public partial class DashboardViewModel : ViewModelBase
         }
         catch { /* Collections table may not exist yet */ }
 
-        // Keep same reference — do NOT replace CategoryTreeItems
         CategoryTreeItems.Clear();
         foreach (var it in items) CategoryTreeItems.Add(it);
     }
@@ -297,7 +307,7 @@ public partial class DashboardViewModel : ViewModelBase
     [RelayCommand]
     private void FilterByCategory(CategoryTreeItem? item)
     {
-        if (item == null) return;
+        if (item == null || item.IsHeader) return; // section headers are not clickable
 
         switch (item.FilterType)
         {
@@ -322,7 +332,6 @@ public partial class DashboardViewModel : ViewModelBase
                 IsImportantOnly = true;
                 break;
             case "collection":
-                // Filter by collection — use special logic
                 if (int.TryParse(item.FilterValue, out int colId))
                 {
                     var colDocs = DatabaseHelper.GetDocumentsInCollection(colId);
@@ -336,15 +345,43 @@ public partial class DashboardViewModel : ViewModelBase
                             ImportantDocuments = colDocs.Count(d => d.QuanTrong);
                         }
                         finally { _isApplyingFilters = false; }
-                        return; // Skip normal ApplyFilters
+                        return;
                     }
                 }
                 break;
+            case "section-header":
             case "collection-header":
-                return; // Header node, do nothing
+                return; // non-clickable
         }
 
         ApplyFilters();
+    }
+
+    /// <summary>
+    /// Change the category (MonHoc) of the selected document directly from the context menu.
+    /// Presents a picker dialogue with all existing subjects.
+    /// </summary>
+    [RelayCommand]
+    private async Task ChangeCategoryAsync()
+    {
+        if (SelectedDocument == null) return;
+
+        var existing = DatabaseHelper.GetSubjectsWithCount().Select(s => s.Name).ToList();
+        var newCategory = await _dialogService.ShowChangeCategoryAsync(
+            SelectedDocument.Ten,
+            existing,
+            SelectedDocument.MonHoc ?? "");
+
+        if (newCategory == null) return; // cancelled
+        newCategory = newCategory.Trim();
+        if (newCategory == (SelectedDocument.MonHoc ?? "")) return; // no change
+
+        SelectedDocument.MonHoc = newCategory;
+        var ok = _repository.Update(SelectedDocument);
+        if (ok)
+            LoadData();
+        else
+            await _dialogService.ShowMessageAsync("Lỗi", "Không thể cập nhật danh mục.");
     }
 
     private void ApplyFilters()
@@ -608,7 +645,14 @@ public partial class DashboardViewModel : ViewModelBase
     private void OpenPersonalNote()
     {
         if (SelectedDocument == null) return;
-        _navigationService.NavigateTo("personalnote", SelectedDocument.Id);
+        _navigationService.NavigateTo("personal-note", (SelectedDocument.Id, SelectedDocument.Ten));
+    }
+
+    [RelayCommand]
+    private void OpenRelatedDocuments()
+    {
+        if (SelectedDocument == null) return;
+        _navigationService.NavigateTo("related-docs", (SelectedDocument.Id, SelectedDocument.Ten));
     }
 
     // ═══ Context menu actions ═══
@@ -736,32 +780,43 @@ public class CategoryTreeItem
 {
     public string Name { get; set; } = "";
     public int Count { get; set; }
-    public string IconKey { get; set; } = "IconCategory"; // Resource key for DrawingImage
+    public string IconKey { get; set; } = "IconCategory";
     public string FilterType { get; set; } = "";
     public string FilterValue { get; set; } = "";
     public bool IsIndented { get; set; }
+    public bool IsHeader { get; set; } // true = section separator, not clickable
 
-    public string DisplayText => $"{Name} ({Count})";
+    public string DisplayText => IsHeader ? Name : $"{Name} ({Count})";
     public Avalonia.Thickness IndentMargin => IsIndented ? new Avalonia.Thickness(16, 0, 0, 0) : new Avalonia.Thickness(0);
 
     /// <summary>
-    /// Resolves the DrawingImage icon from application resources.
+    /// Returns the appropriate icon for this tree item.
+    /// For "type" filter nodes: loads the file-type PNG from Assets via DocumentTypeIconConverter.
+    /// For all others: resolves a DrawingImage from application resources.
     /// </summary>
-    public Avalonia.Media.IImage? IconSource
+    public Avalonia.Media.IImage? ResolvedIconSource
     {
         get
         {
+            // File-type nodes → load real file icon from Assets
+            if (FilterType == "type")
+            {
+                return StudyDocumentManager.Converters.DocumentTypeIconConverter.Instance
+                    .Convert(IconKey, typeof(Avalonia.Media.IImage), null,
+                             System.Globalization.CultureInfo.InvariantCulture)
+                    as Avalonia.Media.IImage;
+            }
+
+            // All other nodes → DrawingImage from resource dictionary
             var app = Avalonia.Application.Current;
             if (app == null) return null;
 
-            // Search in Application.Resources (includes merged dictionaries)
             if (app.Resources.TryGetResource(IconKey, Avalonia.Styling.ThemeVariant.Default, out var resource) &&
                 resource is Avalonia.Media.IImage img)
             {
                 return img;
             }
 
-            // Search in Styles resources (AppTheme.axaml defines icons inside Styles.Resources)
             foreach (var style in app.Styles)
             {
                 if (style is Avalonia.Styling.Styles styleGroup &&
@@ -774,4 +829,7 @@ public class CategoryTreeItem
             return null;
         }
     }
+
+    // Keep IconSource for legacy compat
+    public Avalonia.Media.IImage? IconSource => ResolvedIconSource;
 }

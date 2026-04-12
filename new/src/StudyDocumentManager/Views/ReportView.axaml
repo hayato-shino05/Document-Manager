@@ -83,13 +83,13 @@
                                             <Border Grid.Column="1" Height="18" CornerRadius="3"
                                                     Background="{StaticResource SidebarBackground}" Margin="8,0">
                                                 <Border Height="18" CornerRadius="3"
-                                                        Background="#059669"
+                                                        Background="{StaticResource SuccessBrush}"
                                                         HorizontalAlignment="Left"
                                                         MinWidth="4"
                                                         Width="{Binding BarWidth}"/>
                                             </Border>
                                             <TextBlock Grid.Column="2" FontSize="11" FontWeight="SemiBold"
-                                                       Foreground="#059669"
+                                                       Foreground="{StaticResource SuccessBrush}"
                                                        HorizontalAlignment="Right" VerticalAlignment="Center"
                                                        Text="{Binding Value}"/>
                                         </Grid>
@@ -121,13 +121,13 @@
                                             <Border Grid.Column="1" Height="18" CornerRadius="3"
                                                     Background="{StaticResource SidebarBackground}" Margin="8,0">
                                                 <Border Height="18" CornerRadius="3"
-                                                        Background="#D97706"
+                                                        Background="{StaticResource WarningBrush}"
                                                         HorizontalAlignment="Left"
                                                         MinWidth="4"
                                                         Width="{Binding BarWidth}"/>
                                             </Border>
                                             <TextBlock Grid.Column="2" FontSize="11" FontWeight="SemiBold"
-                                                       Foreground="#D97706"
+                                                       Foreground="{StaticResource WarningBrush}"
                                                        HorizontalAlignment="Right" VerticalAlignment="Center"
                                                        Text="{Binding Value}"/>
                                         </Grid>
@@ -157,13 +157,13 @@
                                             <Border Grid.Column="1" Height="18" CornerRadius="3"
                                                     Background="{StaticResource SidebarBackground}" Margin="8,0">
                                                 <Border Height="18" CornerRadius="3"
-                                                        Background="#7C3AED"
+                                                        Background="{StaticResource BrushIconIndigo}"
                                                         HorizontalAlignment="Left"
                                                         MinWidth="4"
                                                         Width="{Binding BarWidth}"/>
                                             </Border>
                                             <TextBlock Grid.Column="2" FontSize="11" FontWeight="SemiBold"
-                                                       Foreground="#7C3AED"
+                                                       Foreground="{StaticResource BrushIconIndigo}"
                                                        HorizontalAlignment="Right" VerticalAlignment="Center"
                                                        Text="{Binding Value}"/>
                                         </Grid>
