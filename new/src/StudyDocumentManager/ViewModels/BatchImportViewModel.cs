@@ -55,7 +55,7 @@ public partial class BatchImportViewModel : ViewModelBase
                 {
                     FileName = Path.GetFileNameWithoutExtension(file),
                     FilePath = file,
-                    FileType = ext.TrimStart('.').ToUpperInvariant(),
+                    FileType = Services.FileTypeDetector.Detect(ext),
                     FileSizeMB = info.Length / (1024.0 * 1024.0),
                     IsSelected = true
                 });

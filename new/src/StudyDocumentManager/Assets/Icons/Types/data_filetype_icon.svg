@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- File background -->
+  <rect x="6" y="4" width="30" height="38" rx="3" fill="#0EA5E9"/>
+  <!-- Folded corner -->
+  <path d="M30 4 L36 10 H30 V4 Z" fill="#38BDF8"/>
+  <!-- Table grid lines - horizontal -->
+  <rect x="9" y="15" width="25" height="1.5" rx="0.5" fill="white" opacity="0.8"/>
+  <rect x="9" y="22" width="25" height="1.5" rx="0.5" fill="white" opacity="0.8"/>
+  <rect x="9" y="29" width="25" height="1.5" rx="0.5" fill="white" opacity="0.8"/>
+  <!-- Table grid lines - vertical -->
+  <rect x="18" y="11" width="1.5" height="24" rx="0.5" fill="white" opacity="0.6"/>
+  <rect x="27" y="11" width="1.5" height="24" rx="0.5" fill="white" opacity="0.6"/>
+  <!-- Header row highlight -->
+  <rect x="9" y="11" width="25" height="5" rx="1" fill="white" opacity="0.25"/>
+  <!-- Data dots -->
+  <circle cx="13.5" cy="25.5" r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="22.5" cy="25.5" r="1.5" fill="#FCD34D"/>
+  <circle cx="31.5" cy="25.5" r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="13.5" cy="32.5" r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="22.5" cy="32.5" r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="31.5" cy="32.5" r="1.5" fill="#FCD34D"/>
+</svg>

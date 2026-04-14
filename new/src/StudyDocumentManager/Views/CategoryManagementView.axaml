@@ -51,14 +51,16 @@
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="secondary" Command="{Binding RenameSubjectCommand}" Padding="8,4"
-                                            IsEnabled="{Binding SelectedSubject, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            IsEnabled="{Binding SelectedSubject, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                            ToolTip.Tip="Chọn một mục trong danh sách để đổi tên">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconEdit}" Width="11" Height="11"/>
                                             <TextBlock Text="Đổi tên" FontSize="11"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="danger" Command="{Binding DeleteSubjectCommand}" Padding="8,4"
-                                            IsEnabled="{Binding SelectedSubject, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            IsEnabled="{Binding SelectedSubject, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                            ToolTip.Tip="Chọn một hoặc nhiều mục để xóa (có thể chọn nhiều bằng Ctrl+Click)">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
                                             <TextBlock Text="Xóa" FontSize="11"/>
@@ -107,14 +109,16 @@
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="secondary" Command="{Binding RenameTypeCommand}" Padding="8,4"
-                                            IsEnabled="{Binding SelectedType, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            IsEnabled="{Binding SelectedType, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                            ToolTip.Tip="Chọn một mục trong danh sách để đổi tên">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconEdit}" Width="11" Height="11"/>
                                             <TextBlock Text="Đổi tên" FontSize="11"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="danger" Command="{Binding DeleteTypeCommand}" Padding="8,4"
-                                            IsEnabled="{Binding SelectedType, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                            IsEnabled="{Binding SelectedType, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                            ToolTip.Tip="Chọn một hoặc nhiều mục để xóa (có thể chọn nhiều bằng Ctrl+Click)">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
                                             <TextBlock Text="Xóa" FontSize="11"/>

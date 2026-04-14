@@ -26,6 +26,12 @@ public partial class CategoryManagementViewModel : ViewModelBase
 
     [ObservableProperty] private int _selectedTabIndex;
 
+    // Total document count in DB (not sum of category counts, which misses uncategorised docs)
+    [ObservableProperty] private int _totalDocumentCount;
+
+    /// <summary>Status bar text for the main window footer.</summary>
+    public string StatusText => $"Tổng số: {TotalDocumentCount} tài liệu | Danh mục: {Subjects.Count} | Loại: {Types.Count}";
+
     public CategoryManagementViewModel(IDocumentRepository repository, IDialogService dialogService)
     {
         _repository = repository;
@@ -42,6 +48,9 @@ public partial class CategoryManagementViewModel : ViewModelBase
         var typesData = DatabaseHelper.GetTypesWithCount();
         Types = new ObservableCollection<CategoryItem>(
             typesData.Select(t => new CategoryItem(t.Name, t.Count)));
+
+        TotalDocumentCount = DatabaseHelper.GetTotalDocumentCount();
+        OnPropertyChanged(nameof(StatusText));
     }
 
     // ─── Rename ──────────────────────────────────────────────────────

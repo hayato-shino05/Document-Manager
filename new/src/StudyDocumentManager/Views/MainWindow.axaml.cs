@@ -130,7 +130,7 @@ public partial class MainWindow : Window
                 {
                     Ten = System.IO.Path.GetFileNameWithoutExtension(path),
                     DuongDan = path,
-                    Loai = info.Extension.TrimStart('.').ToUpperInvariant(),
+                    Loai = Services.FileTypeDetector.DetectFromPath(path),
                     KichThuoc = info.Length / (1024.0 * 1024.0)
                 };
                 if (repo.Add(doc))

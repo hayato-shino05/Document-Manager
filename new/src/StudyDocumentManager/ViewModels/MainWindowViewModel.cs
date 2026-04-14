@@ -167,10 +167,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnCurrentViewChanged(ViewModelBase value)
     {
-        if (value is DashboardViewModel dashboard)
+        StatusText = value switch
         {
-            UpdateStatusFromDashboard(dashboard);
-        }
+            DashboardViewModel dashboard => dashboard.StatusText,
+            CategoryManagementViewModel catMgmt => catMgmt.StatusText,
+            _ => string.Empty
+        };
         OnPropertyChanged(nameof(CanGoBack));
     }
 

@@ -134,27 +134,19 @@ public partial class AddEditViewModel : ViewModelBase
             Ten = Path.GetFileNameWithoutExtension(path);
         }
 
-        // Auto-detect file type (Vietnamese labels like WinForms)
-        var ext = Path.GetExtension(path).ToLowerInvariant();
+        // Auto-detect file type using shared helper
         if (string.IsNullOrWhiteSpace(Loai))
         {
-            Loai = DetectFileType(ext);
+            var ext = Path.GetExtension(path);
+            Loai = Services.FileTypeDetector.Detect(ext);
+
+            // Ensure detected type is available in the ComboBox dropdown
+            if (!string.IsNullOrWhiteSpace(Loai) && !Types.Contains(Loai))
+            {
+                Types.Add(Loai);
+            }
         }
     }
-
-    private static string DetectFileType(string ext) => ext switch
-    {
-        ".pdf" => "Tài liệu",
-        ".doc" or ".docx" => "Tài liệu",
-        ".ppt" or ".pptx" => "Tài liệu",
-        ".xls" or ".xlsx" => "Tài liệu",
-        ".txt" => "Tài liệu",
-        ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" or ".ico" or ".tiff" or ".webp" => "Hình ảnh",
-        ".mp4" or ".avi" or ".mkv" or ".mov" or ".wmv" or ".webm" or ".flv" or ".m4v" => "Video",
-        ".mp3" or ".wav" or ".flac" => "Audio",
-        ".zip" or ".rar" or ".7z" => "Nén",
-        _ => ext.TrimStart('.').ToUpperInvariant()
-    };
 
     private static double? GetFileSize(string path)
     {

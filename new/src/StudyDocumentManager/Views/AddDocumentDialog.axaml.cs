@@ -27,21 +27,9 @@ public partial class AddDocumentDialog : Window
         txtFilePath.Text = filePath;
         txtTen.Text = Path.GetFileNameWithoutExtension(filePath);
 
-        // Auto-detect type
-        var ext = Path.GetExtension(filePath).ToLowerInvariant();
-        string detectedType = ext switch
-        {
-            ".pdf" => "Tài liệu",
-            ".doc" or ".docx" => "Tài liệu",
-            ".ppt" or ".pptx" => "Tài liệu",
-            ".xls" or ".xlsx" => "Tài liệu",
-            ".txt" => "Tài liệu",
-            ".jpg" or ".jpeg" or ".png" or ".gif" or ".bmp" => "Hình ảnh",
-            ".mp4" or ".avi" or ".mkv" or ".mov" => "Video",
-            ".mp3" or ".wav" or ".flac" => "Audio",
-            ".zip" or ".rar" or ".7z" => "Nén",
-            _ => ext.TrimStart('.').ToUpperInvariant()
-        };
+        // Auto-detect type using shared helper
+        string detectedType = StudyDocumentManager.Services.FileTypeDetector.Detect(
+            Path.GetExtension(filePath));
 
         // Load dropdowns from lookup tables
         var subjects = DatabaseHelper.GetAllSubjects();
@@ -51,16 +39,17 @@ public partial class AddDocumentDialog : Window
         if (subjects.Count == 0)
             subjects = new List<string> { "Công việc", "Cá nhân", "Học tập", "Dự án", "Tài chính", "Hợp đồng", "Tham khảo", "Khác" };
         if (types.Count == 0)
-            types = new List<string> { "Tài liệu", "Báo cáo", "Hướng dẫn", "Biểu mẫu", "Hình ảnh", "Video", "Audio", "Nén", "Khác" };
+            types = new List<string> { "PDF", "Word", "Excel", "PowerPoint", "Tài liệu", "Báo cáo", "Hướng dẫn", "Biểu mẫu", "Hình ảnh", "Video", "Audio", "Nén", "Khác" };
+
+        // Ensure detected type is in dropdown list
+        if (!types.Contains(detectedType))
+            types.Add(detectedType);
 
         cboMonHoc.ItemsSource = subjects;
         cboLoai.ItemsSource = types;
 
         // Set detected type in dropdown
-        if (types.Contains(detectedType))
-            cboLoai.SelectedItem = detectedType;
-        else
-            cboLoai.SelectedItem = types.FirstOrDefault();
+        cboLoai.SelectedItem = detectedType;
     }
 
     private void OnSaveClick(object? sender, RoutedEventArgs e)

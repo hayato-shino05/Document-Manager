@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- File background -->
+  <rect x="8" y="4" width="26" height="36" rx="3" fill="#0F172A"/>
+  <!-- Folded corner -->
+  <path d="M28 4 L34 10 L28 10 Z" fill="#334155"/>
+  <path d="M28 4 L34 10 H28 V4 Z" fill="#1E293B"/>
+  <!-- Code lines - green tones -->
+  <rect x="12" y="16" width="8" height="2.5" rx="1" fill="#4ADE80"/>
+  <rect x="21" y="16" width="10" height="2.5" rx="1" fill="#60A5FA"/>
+  <rect x="15" y="21" width="12" height="2.5" rx="1" fill="#FCD34D"/>
+  <rect x="12" y="26" width="6" height="2.5" rx="1" fill="#F87171"/>
+  <rect x="19" y="26" width="9" height="2.5" rx="1" fill="#4ADE80"/>
+  <!-- Brackets -->
+  <path d="M12 12 L10 14 L12 16" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <path d="M28 12 L30 14 L28 16" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+</svg>

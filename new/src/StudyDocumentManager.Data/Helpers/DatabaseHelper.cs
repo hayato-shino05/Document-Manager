@@ -201,8 +201,16 @@ public static class DatabaseHelper
         };
         var defaultTypes = new[]
         {
+            // Office
+            "PDF", "Word", "Excel", "PowerPoint",
+            // Generic document
             "Tài liệu", "Báo cáo", "Hướng dẫn", "Biểu mẫu",
-            "Hình ảnh", "Video", "Audio", "Nén", "Khác"
+            // New specific categories
+            "Dữ liệu", "Code", "Sách", "Thiết kế",
+            // Media & archive
+            "Hình ảnh", "Video", "Audio", "Nén",
+            // Catch-all
+            "Khác"
         };
 
         foreach (var s in defaultSubjects)
@@ -453,6 +461,7 @@ public static class DatabaseHelper
 
         return stats;
     }
+
 
     // ═══════════════════════════════════════════════════
     // Recycle Bin
