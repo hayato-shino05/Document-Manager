@@ -5,47 +5,57 @@
         Width="420" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        Background="{StaticResource ContentBackground}">
     <Window.Styles>
-        <Style Selector="Button.chip">
-            <Setter Property="Background" Value="#F0F4FF"/>
-            <Setter Property="Foreground" Value="#3B4EB8"/>
-            <Setter Property="BorderBrush" Value="#C7D2FE"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Padding" Value="10,4"/>
-            <Setter Property="FontSize" Value="11"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Margin" Value="0,0,6,6"/>
-        </Style>
-        <Style Selector="Button.chip:pointerover">
-            <Setter Property="Background" Value="#DBEAFE"/>
-        </Style>
+        <!-- Override AutoCompleteBox border to use accent color -->
         <Style Selector="AutoCompleteBox">
-            <Setter Property="BorderBrush" Value="#6366F1"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
             <Setter Property="CornerRadius" Value="6"/>
         </Style>
     </Window.Styles>
 
     <StackPanel Margin="24" Spacing="12">
 
-        <!-- Title label -->
+        <!-- Document name label -->
         <TextBlock x:Name="DocNameLabel"
-                   FontSize="13" FontWeight="SemiBold"
-                   Foreground="#1E293B"
+                   FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
+                   Foreground="{StaticResource TextPrimary}"
                    TextWrapping="Wrap"/>
 
         <!-- Existing categories as chip pills -->
         <StackPanel>
             <TextBlock Text="Danh mục hiện có — click để chọn nhanh:"
-                       FontSize="10" Foreground="#64748B" Margin="0,0,0,6"/>
-            <WrapPanel x:Name="ChipsPanel" Orientation="Horizontal"/>
+                       FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+
+            <!-- Empty state -->
+            <TextBlock x:Name="EmptyStateText"
+                       Text="(Chưa có danh mục nào — nhập tên mới bên dưới)"
+                       FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                       IsVisible="False"/>
+
+            <!-- Chip list -->
+            <ItemsControl x:Name="ChipsPanel">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding}"
+                                Classes="chip"
+                                Margin="0,0,6,6"
+                                Click="OnChipClicked"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
 
         <!-- AutoComplete input -->
         <StackPanel Spacing="4">
             <TextBlock Text="Hoặc nhập tên danh mục mới:"
-                       FontSize="10" Foreground="#64748B"/>
+                       FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"/>
             <AutoCompleteBox x:Name="CategoryInput"
                              Watermark="Tên danh mục..."
                              MinimumPrefixLength="0"
@@ -53,17 +63,19 @@
                              Height="36"/>
         </StackPanel>
 
-        <!-- Buttons -->
+        <!-- Buttons: OK first, then Cancel -->
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Spacing="8" Margin="0,8,0,0">
             <Button x:Name="OkButton"
                     Content="Lưu thay đổi"
+                    Classes="primary"
                     IsDefault="True"
                     MinWidth="110"
                     HorizontalContentAlignment="Center"/>
             <Button x:Name="CancelButton"
                     Content="Hủy"
+                    Classes="secondary"
                     IsCancel="True"
                     MinWidth="80"
                     HorizontalContentAlignment="Center"/>

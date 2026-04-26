@@ -28,13 +28,18 @@ public static class ToastService
         var window = desktop.MainWindow;
         if (window == null) return;
 
-        var (bg, fg) = type switch
+        var backgroundBrushKey = type switch
         {
-            ToastType.Success => (Color.Parse("#10B981"), Colors.White),
-            ToastType.Error => (Color.Parse("#EF4444"), Colors.White),
-            ToastType.Warning => (Color.Parse("#F59E0B"), Colors.White),
-            _ => (Color.Parse("#3B82F6"), Colors.White),
+            ToastType.Success => "ToastSuccessBrush",
+            ToastType.Error => "ToastErrorBrush",
+            ToastType.Warning => "ToastWarningBrush",
+            _ => "ToastInfoBrush",
         };
+
+        var backgroundBrush = (IBrush?)Application.Current?.FindResource(backgroundBrushKey)
+            ?? Brushes.Transparent;
+        var foregroundBrush = (IBrush?)Application.Current?.FindResource("ToastForegroundBrush")
+            ?? Brushes.White;
 
         var icon = type switch
         {
@@ -46,7 +51,7 @@ public static class ToastService
 
         var border = new Border
         {
-            Background = new SolidColorBrush(bg),
+            Background = backgroundBrush,
             CornerRadius = new CornerRadius(8),
             Padding = new Thickness(16, 10),
             Margin = new Thickness(16),
@@ -68,14 +73,14 @@ public static class ToastService
                     new TextBlock
                     {
                         Text = icon,
-                        Foreground = new SolidColorBrush(fg),
+                        Foreground = foregroundBrush,
                         FontSize = 16,
                         VerticalAlignment = VerticalAlignment.Center
                     },
                     new TextBlock
                     {
                         Text = message,
-                        Foreground = new SolidColorBrush(fg),
+                        Foreground = foregroundBrush,
                         FontSize = 13,
                         TextWrapping = TextWrapping.Wrap,
                         MaxWidth = 320,

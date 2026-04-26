@@ -129,9 +129,16 @@
         </DrawingImage>
 
         <!-- Refresh -->
+        <!-- Refresh — two-arc circular arrows (Material Design style) -->
         <DrawingImage x:Key="IconRefresh">
-            <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"
-                Geometry="M12,4 A8,8 0 1,0 19.6,8 L22,8 L18,14 L14,8 L16.8,8 A6,6 0 1,1 12,6 Z"/>
+            <DrawingGroup>
+                <!-- Top arc: left-to-right, clockwise, with arrowhead pointing right -->
+                <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"
+                    Geometry="M 12,3 A 9,9 0 0,1 20.8,14.5 L 22.5,13 L 21,18 L 16,16.5 L 17.8,15 A 7,7 0 0,0 12,5 Z"/>
+                <!-- Bottom arc: right-to-left, clockwise, with arrowhead pointing left -->
+                <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"
+                    Geometry="M 12,21 A 9,9 0 0,1 3.2,9.5 L 1.5,11 L 3,6 L 8,7.5 L 6.2,9 A 7,7 0 0,0 12,19 Z"/>
+            </DrawingGroup>
         </DrawingImage>
 
         <!-- Search -->
@@ -239,7 +246,7 @@
             <DrawingGroup>
                 <GeometryDrawing Brush="{StaticResource BrushIconNeutralLight}"
                     Geometry="M6,2 L14,2 L19,7 L19,22 L5,22 L5,3 C5,2.4 5.4,2 6,2 Z"/>
-                <GeometryDrawing Brush="#E5E5E5"
+                <GeometryDrawing Brush="{StaticResource IconPaperFoldBrush}"
                     Geometry="M14,2 L14,7 L19,7 Z"/>
                 <GeometryDrawing Brush="{StaticResource BrushIconNeutralLight}"
                     Geometry="M8,11 L16,11 L16,12.5 L8,12.5 Z M8,14 L14,14 L14,15.5 L8,15.5 Z M8,17 L12,17 L12,18.5 L8,18.5 Z"/>
@@ -353,7 +360,7 @@
             <DrawingGroup>
                 <GeometryDrawing Brush="{StaticResource BrushIconNeutralLight}"
                     Geometry="M6,2 L14,2 L20,8 L20,22 L4,22 L4,3 C4,2.4 4.4,2 5,2 Z"/>
-                <GeometryDrawing Brush="#E5E5E5"
+                <GeometryDrawing Brush="{StaticResource IconPaperFoldBrush}"
                     Geometry="M14,2 L14,8 L20,8 Z"/>
             </DrawingGroup>
         </DrawingImage>
@@ -425,6 +432,35 @@
                     Geometry="M4,14 L20,14 L20,18 L4,18 Z"/>
                 <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"
                     Geometry="M17,15 A1,1 0 1,0 17,17 A1,1 0 1,0 17,15 Z"/>
+            </DrawingGroup>
+        </DrawingImage>
+
+        <!-- Related Documents (tri-node relationship graph) -->
+        <DrawingImage x:Key="IconRelatedDocs">
+            <DrawingGroup>
+                <!-- Relationship edges -->
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="{StaticResource BrushIconNeutralLight}" Thickness="1.5"/>
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <LineGeometry StartPoint="5.2,16.8" EndPoint="10.8,7.2"/>
+                            <LineGeometry StartPoint="18.8,16.8" EndPoint="13.2,7.2"/>
+                            <LineGeometry StartPoint="6.5,19"    EndPoint="17.5,19"/>
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <!-- Document nodes -->
+                <GeometryDrawing Brush="{StaticResource BrushIconAccent}">
+                    <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                            <EllipseGeometry Center="12,5"  RadiusX="2.5" RadiusY="2.5"/>
+                            <EllipseGeometry Center="4,19"  RadiusX="2.5" RadiusY="2.5"/>
+                            <EllipseGeometry Center="20,19" RadiusX="2.5" RadiusY="2.5"/>
+                        </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
             </DrawingGroup>
         </DrawingImage>
 

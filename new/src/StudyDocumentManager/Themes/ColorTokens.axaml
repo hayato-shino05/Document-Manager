@@ -50,10 +50,15 @@
         <Color x:Key="StatusGreen">#107C10</Color>
         <Color x:Key="StatusAmber">#9A6300</Color>
         <Color x:Key="StatusRed">#C42B1C</Color>
+        <Color x:Key="StatusYellow">#EAB308</Color>
 
         <!-- ── SELECTION ─────────────────────────────────────── -->
         <Color x:Key="SelectionBlueBg">#E1EFFF</Color>
         <Color x:Key="HoverBg">#0A000000</Color>
+
+        <!-- ── ON-COLOR OVERLAYS (text trên nền màu đậm, e.g. TreeMap) ── -->
+        <Color x:Key="OnColorPrimary">#FFFFFFCC</Color>
+        <Color x:Key="OnColorSecondary">#FFFFFFAA</Color>
 
         <!-- ── ICON COLORS (used in DrawingImage GeometryDrawing) -->
         <Color x:Key="IconNeutral">#606060</Color>
@@ -98,14 +103,53 @@
         <SolidColorBrush x:Key="SuccessBrush"        Color="{StaticResource StatusGreen}"/>
         <SolidColorBrush x:Key="WarningBrush"        Color="{StaticResource StatusAmber}"/>
         <SolidColorBrush x:Key="DangerBrush"         Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="OnColorPrimaryBrush"  Color="{StaticResource OnColorPrimary}"/>
+        <SolidColorBrush x:Key="OnColorSecondaryBrush" Color="{StaticResource OnColorSecondary}"/>
+        <!-- Deadline state brushes — dùng Status tokens thay vì hex riêng -->
+        <SolidColorBrush x:Key="DeadlineOverdueBrush"      Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="DeadlineUrgentBrush"       Color="{StaticResource StatusAmber}"/>
+        <SolidColorBrush x:Key="DeadlineUpcomingBrush"     Color="{StaticResource StatusYellow}"/>
+        <SolidColorBrush x:Key="DeadlineOverdueTextBrush"  Color="#FECACA"/>
+        <SolidColorBrush x:Key="DeadlineUrgentTextBrush"   Color="#FEF3C7"/>
+        <SolidColorBrush x:Key="DeadlineUpcomingTextBrush" Color="#FEF9C3"/>
+        <!-- Toast notification brushes -->
+        <SolidColorBrush x:Key="ToastSuccessBrush"     Color="#10B981"/>
+        <SolidColorBrush x:Key="ToastErrorBrush"       Color="#EF4444"/>
+        <SolidColorBrush x:Key="ToastWarningBrush"     Color="#F59E0B"/>
+        <SolidColorBrush x:Key="ToastInfoBrush"        Color="#3B82F6"/>
+        <SolidColorBrush x:Key="ToastForegroundBrush"  Color="White"/>
+        <SolidColorBrush x:Key="IconPaperFoldBrush" Color="{StaticResource BorderSubtle}"/>
+
 
         <!-- Button semantic color aliases (used by SharedStyles Button.danger/warning/success) -->
-        <SolidColorBrush x:Key="DangerColor"         Color="#DC2626"/>
-        <SolidColorBrush x:Key="DangerColorHover"    Color="#B91C1C"/>
-        <SolidColorBrush x:Key="WarningColor"        Color="#F59E0B"/>
-        <SolidColorBrush x:Key="WarningColorHover"   Color="#D97706"/>
-        <SolidColorBrush x:Key="SuccessColor"        Color="#059669"/>
-        <SolidColorBrush x:Key="SuccessColorHover"   Color="#047857"/>
+        <!-- Primary danger/warning/success palette -->
+        <Color x:Key="ColorDanger">      #DC2626</Color>
+        <Color x:Key="ColorDangerHover"> #B91C1C</Color>
+        <Color x:Key="ColorWarningBtn">  #F59E0B</Color>
+        <Color x:Key="ColorWarningHover">#D97706</Color>
+        <Color x:Key="ColorSuccess">     #059669</Color>
+        <Color x:Key="ColorSuccessHover">#047857</Color>
+        <!-- Chip palette -->
+        <Color x:Key="ChipBg">          #F0F4FF</Color>
+        <Color x:Key="ChipFg">          #3B4EB8</Color>
+        <Color x:Key="ChipBorder">      #C7D2FE</Color>
+        <Color x:Key="ChipHoverBg">     #DBEAFE</Color>
+        <Color x:Key="ChipSelectedBg">  #4F46E5</Color>
+        <Color x:Key="ChipSelectedBorder">#4338CA</Color>
+        <!-- Brushes for Button classes -->
+        <SolidColorBrush x:Key="DangerColor"         Color="{StaticResource ColorDanger}"/>
+        <SolidColorBrush x:Key="DangerColorHover"    Color="{StaticResource ColorDangerHover}"/>
+        <SolidColorBrush x:Key="WarningColor"        Color="{StaticResource ColorWarningBtn}"/>
+        <SolidColorBrush x:Key="WarningColorHover"   Color="{StaticResource ColorWarningHover}"/>
+        <SolidColorBrush x:Key="SuccessColor"        Color="{StaticResource ColorSuccess}"/>
+        <SolidColorBrush x:Key="SuccessColorHover"   Color="{StaticResource ColorSuccessHover}"/>
+        <!-- Chip brushes -->
+        <SolidColorBrush x:Key="ChipBgBrush"           Color="{StaticResource ChipBg}"/>
+        <SolidColorBrush x:Key="ChipFgBrush"           Color="{StaticResource ChipFg}"/>
+        <SolidColorBrush x:Key="ChipBorderBrush"       Color="{StaticResource ChipBorder}"/>
+        <SolidColorBrush x:Key="ChipHoverBgBrush"      Color="{StaticResource ChipHoverBg}"/>
+        <SolidColorBrush x:Key="ChipSelectedBgBrush"   Color="{StaticResource ChipSelectedBg}"/>
+        <SolidColorBrush x:Key="ChipSelectedBorderBrush" Color="{StaticResource ChipSelectedBorder}"/>
         <!-- DynamicResource aliases — TreeMapView / RecentFilesView still reference these -->
         <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource TextDark}"/>
         <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource TextMedium}"/>
@@ -123,7 +167,7 @@
         <SolidColorBrush x:Key="GradientEmerald" Color="{StaticResource StatusGreen}"/>
         <SolidColorBrush x:Key="GradientAmber"   Color="{StaticResource StatusAmber}"/>
         <SolidColorBrush x:Key="GradientRose"    Color="{StaticResource StatusRed}"/>
-        <SolidColorBrush x:Key="GradientCyan"    Color="#0891B2"/>
+        <SolidColorBrush x:Key="GradientCyan"    Color="{StaticResource IconCyan}"/>
 
         <!-- Gradient compat -->
         <LinearGradientBrush x:Key="GradientStatBlue"  StartPoint="0%,0%" EndPoint="100%,100%">
@@ -144,10 +188,12 @@
         </LinearGradientBrush>
 
         <!-- Corner radii -->
+        <CornerRadius x:Key="RadiusXs">3</CornerRadius>
         <CornerRadius x:Key="RadiusSm">4</CornerRadius>
         <CornerRadius x:Key="RadiusMd">6</CornerRadius>
         <CornerRadius x:Key="RadiusLg">8</CornerRadius>
         <CornerRadius x:Key="RadiusXl">12</CornerRadius>
+        <CornerRadius x:Key="RadiusPill">10</CornerRadius>
         <CornerRadius x:Key="RadiusFull">9999</CornerRadius>
 
         <!--
@@ -182,9 +228,22 @@
         <Thickness x:Key="PaddingRow">12,5</Thickness> <!-- toolbar row -->
         <Thickness x:Key="PaddingSearchBar">12,6</Thickness>
         <Thickness x:Key="PaddingCard">16,12</Thickness>
+        <Thickness x:Key="PaddingCardLg">16,10</Thickness>
         <Thickness x:Key="PaddingStatCard">14,10</Thickness>
         <Thickness x:Key="PaddingSidebar">10,6</Thickness>
         <Thickness x:Key="PaddingNavItem">10,7</Thickness>
+        <!-- Button padding variants -->
+        <Thickness x:Key="PaddingBtn">14,4</Thickness>
+        <Thickness x:Key="PaddingBtnSm">10,4</Thickness>
+        <Thickness x:Key="PaddingBtnLg">16,6</Thickness>
+        <!-- Badge / chip padding -->
+        <Thickness x:Key="PaddingChip">8,3</Thickness>
+        <Thickness x:Key="PaddingBadge">5,2</Thickness>
+        <Thickness x:Key="PaddingBadgeMd">7,2</Thickness>
+        <Thickness x:Key="PaddingIcon">4</Thickness>
+        <Thickness x:Key="PaddingBtnMd">10,5</Thickness>
+        <Thickness x:Key="PaddingBtnPrimary">14,6</Thickness>
+        <Thickness x:Key="PaddingSection">16</Thickness>
 
         <!-- Control heights -->
         <x:Double x:Key="HeightControl">28</x:Double>  <!-- TextBox, ComboBox, small Button -->

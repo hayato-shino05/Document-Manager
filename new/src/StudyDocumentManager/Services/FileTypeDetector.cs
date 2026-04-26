@@ -8,13 +8,13 @@ namespace StudyDocumentManager.Services;
 /// Label vocabulary:
 ///   "PDF"         — .pdf
 ///   "Word"        — .doc .docx .odt (LibreOffice Writer)
-///   "Excel"       — .xls .xlsx .ods (LibreOffice Calc)
-///   "PowerPoint"  — .ppt .pptx .odp (LibreOffice Impress)
-///   "Dữ liệu"    — .csv .json .xml .yaml .yml .tsv (data/structured)
+///   "Excel"       — .xls .xlsx .ods .csv (LibreOffice Calc + CSV)
+///   "Dữ liệu"    — .tsv .json .xml .yaml .yml (structured data, NOT csv)
 ///   "Code"        — .py .js .ts .html .css .c .cpp .java .rs .go .php .rb .sh .bat .sql
 ///   "Sách"        — .epub .mobi .azw .fb2 (ebook)
 ///   "Hình ảnh"   — .jpg .jpeg .png .gif .bmp .ico .tiff .webp .svg .raw .heic
-///   "Video"       — .mp4 .avi .mkv .mov .wmv .webm .flv .m4v .3gp .ts
+///   "Video"       — .mp4 .avi .mkv .mov .wmv .webm .flv .m4v .3gp .mpg .mpeg
+///   "Audio"       — .mp3 .wav .flac .m4a .aac .ogg .wma .opus .ape
 ///   "Audio"       — .mp3 .wav .flac .m4a .aac .ogg .wma .opus .ape
 ///   "Nén"         — .zip .rar .7z .tar .gz .bz2 .xz .zst
 ///   "Tài liệu"   — .txt .md .rtf (plain text)
@@ -64,11 +64,11 @@ public static class FileTypeDetector
         ".webp" or ".svg"  or
         ".raw"  or ".heic" or ".heif" => "Hình ảnh",
 
-        // ── Video ─────────────────────────────────────────────────────
+        // ── Video  (.ts excluded — TypeScript was matched earlier) ─────
         ".mp4" or ".avi" or ".mkv" or
         ".mov" or ".wmv" or ".webm" or
         ".flv" or ".m4v" or ".3gp" or
-        ".ts"  or ".mpg" or ".mpeg"   => "Video",
+        ".mpg" or ".mpeg"              => "Video",
 
         // ── Audio ─────────────────────────────────────────────────────
         ".mp3" or ".wav" or ".flac" or

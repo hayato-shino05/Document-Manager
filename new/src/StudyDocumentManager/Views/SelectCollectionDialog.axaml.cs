@@ -1,29 +1,24 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
-using StudyDocumentManager.ViewModels.Items;
+using StudyDocumentManager.Models.Items;
 
 namespace StudyDocumentManager.Views;
 
 /// <summary>
-/// Collection-picker dialog.
-/// Shows existing collections as chip pills — click to select one, then confirm.
-/// Returns the selected collection <c>Id</c> via <see cref="Result"/>, or -1 if cancelled.
+/// Dialog chọn bộ sưu tập.
+/// Hiển thị danh sách bộ sưu tập dạng chip (binding-driven) — click để chọn, confirm để xác nhận.
+/// Trả về Id được chọn qua <see cref="Result"/>, hoặc -1 nếu huỷ.
 /// </summary>
 public partial class SelectCollectionDialog : Window
 {
     public int Result { get; private set; } = -1;
 
-    private readonly IList<(int Id, string Name, int DocCount)> _collections;
-    private readonly WrapPanel _chipsPanel;
-    private readonly TextBlock _selectedLabel;
-    private readonly Button _okButton;
     private readonly SelectCollectionDialogState _state;
 
     private Button? _activeChip;
 
     public SelectCollectionDialog()
     {
-        _collections = [];
         _state = new SelectCollectionDialogState([]);
     }
 
@@ -32,78 +27,57 @@ public partial class SelectCollectionDialog : Window
         IList<(int Id, string Name, int DocCount)> collections)
     {
         InitializeComponent();
-        _collections = collections;
         _state = new SelectCollectionDialogState(collections);
 
-        this.FindControl<TextBlock>("DocNameLabel")!
-            .Text = $"Tài liệu: \"{documentName}\"";
+        // Gán nhãn tài liệu
+        this.FindControl<TextBlock>("DocNameLabel")!.Text = $"Tài liệu: \"{documentName}\"";
 
-        _chipsPanel    = this.FindControl<WrapPanel>("ChipsPanel")!;
-        _selectedLabel = this.FindControl<TextBlock>("SelectedLabel")!;
-        _okButton      = this.FindControl<Button>("OkButton")!;
+        // Binding-driven chip list
+        var chipsPanel  = this.FindControl<ItemsControl>("ChipsPanel")!;
+        var emptyState  = this.FindControl<TextBlock>("EmptyStateText")!;
 
-        BuildChips();
+        if (collections.Count == 0)
+        {
+            emptyState.IsVisible  = true;
+            chipsPanel.IsVisible  = false;
+        }
+        else
+        {
+            var items = collections
+                .Select(c => new CollectionChipItem(c.Id, c.Name, c.DocCount))
+                .ToList();
+            chipsPanel.ItemsSource = items;
+        }
 
+        // Wire buttons
+        this.FindControl<Button>("OkButton")!.Click     += OkClicked;
         this.FindControl<Button>("CancelButton")!.Click += CancelClicked;
-        _okButton.Click += OkClicked;
     }
 
-    // ── Build chip pills ─────────────────────────────────────────────
-
-    private void BuildChips()
-    {
-        if (_collections.Count == 0)
-        {
-            _chipsPanel.Children.Add(new TextBlock
-            {
-                Text = "(Chưa có bộ sưu tập nào — hãy tạo trong menu Bộ sưu tập)",
-                FontSize = 11,
-                Foreground = Avalonia.Media.Brushes.Gray
-            });
-            return;
-        }
-
-        foreach (var col in _collections)
-        {
-            var label = SelectCollectionDialogState.BuildChipLabel(col.Name, col.DocCount);
-
-            var chip = new Button
-            {
-                Content = label,
-                Tag = col.Id,
-                Classes = { "chip" }
-            };
-            chip.Click += OnChipClicked;
-            _chipsPanel.Children.Add(chip);
-        }
-    }
-
-    // ── Chip selection ───────────────────────────────────────────────
-
+    // Được gọi từ AXAML DataTemplate Click="OnChipClicked"
     private void OnChipClicked(object? sender, RoutedEventArgs e)
     {
-        if (sender is not Button chip) return;
+        if (sender is not Button chip || chip.DataContext is not CollectionChipItem item)
+            return;
 
-        // Deselect previous chip
+        // Bỏ chọn chip cũ
         if (_activeChip != null)
         {
             _activeChip.Classes.Remove("chip-selected");
             _activeChip.Classes.Add("chip");
         }
 
-        // Activate new chip
+        // Chọn chip mới
         chip.Classes.Remove("chip");
         chip.Classes.Add("chip-selected");
         _activeChip = chip;
 
-        var selectedId = (int)(chip.Tag ?? -1);
-        _state.Select(selectedId);
+        _state.Select(item.Id);
 
-        _selectedLabel.Text = _state.SelectedLabel;
-        _okButton.IsEnabled = _state.CanConfirm;
+        // Cập nhật footer
+        this.FindControl<TextBlock>("SelectedLabel")!.Text   = _state.SelectedLabel;
+        this.FindControl<Button>("OkButton")!.IsEnabled      = _state.CanConfirm;
     }
-
-    // ── Confirm / Cancel ────────────────────────────────────────────
 
     private void OkClicked(object? sender, RoutedEventArgs e)
     {

@@ -1,0 +1,144 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             x:Class="StudyDocumentManager.Views.RelatedDocuments"
+             x:DataType="vm:RelatedDocumentsModel">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+        <DockPanel>
+            <!-- Header -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                <Button Classes="secondary" Command="{Binding GoBackCommand}" Padding="{StaticResource PaddingSm}"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconBack}" Width="12" Height="12"/>
+                        <TextBlock Text="Quay l?i" FontSize="{StaticResource FontSizeSm}"/>
+                    </StackPanel>
+                </Button>
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="12,0,0,0">
+                    <Image Source="{StaticResource IconLink}" Width="18" Height="18"/>
+                    <TextBlock Text="T�i li?u li�n quan" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Document info -->
+            <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}" CornerRadius="{StaticResource RadiusMd}"
+                    Padding="{StaticResource PaddingMd}" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="T�i li?u ch�nh:" FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
+                    <TextBlock Text="{Binding DocumentName}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+            </Border>
+
+            <Grid ColumnDefinitions="*,20,*">
+
+                <!-- Left: Current related -->
+                <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
+                                CornerRadius="6,6,0,0" Padding="{StaticResource PaddingNavItem}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Source="{StaticResource IconLink}" Width="13" Height="13"/>
+                                <TextBlock Text="�ang li�n k?t" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Panel>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                          IsVisible="{Binding !!RelatedDocuments.Count}">
+                                <ItemsControl ItemsSource="{Binding RelatedDocuments}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:RelatedDocItem}">
+                                            <Border Padding="{StaticResource PaddingBtnMd}" BorderBrush="{StaticResource CardBorder}"
+                                                    BorderThickness="0,0,0,1">
+                                                <DockPanel>
+                                                    <Button DockPanel.Dock="Right" Classes="secondary" Padding="6,2"
+                                                            Command="{Binding $parent[ItemsControl].DataContext.RemoveRelationCommand}"
+                                                            CommandParameter="{Binding}">
+                                                        <Image Source="{StaticResource IconClose}" Width="10" Height="10"/>
+                                                    </Button>
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Document.Ten}" FontSize="{StaticResource FontSizeMd}"
+                                                                   Foreground="{StaticResource TextPrimary}"/>
+                                                        <TextBlock FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}">
+                                                            <TextBlock.Text>
+                                                                <MultiBinding StringFormat="{}{0} | {1}">
+                                                                    <Binding Path="Document.MonHoc"/>
+                                                                    <Binding Path="RelationType"/>
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+
+                            <TextBlock Text="Chua c� li�n k?t n�o" FontSize="{StaticResource FontSizeMd}"
+                                       IsVisible="{Binding !RelatedDocuments.Count}"
+                                       Foreground="{StaticResource TextMuted}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Panel>
+                    </DockPanel>
+                </Border>
+
+                <!-- Right: Available to add -->
+                <Border Grid.Column="2" Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
+                                CornerRadius="6,6,0,0" Padding="{StaticResource PaddingNavItem}">
+                            <DockPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <Image Source="{StaticResource IconDocPage}" Width="13" Height="13"/>
+                                    <TextBlock Text="T�i li?u kh? d?ng" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimary}"/>
+                                </StackPanel>
+
+                                <!-- Relation type selector + Add button -->
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <TextBlock Text="Lo?i:" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
+                                               Foreground="{StaticResource TextSecondary}"/>
+                                    <ComboBox ItemsSource="{Binding RelationTypes}"
+                                              SelectedItem="{Binding SelectedRelationType}"
+                                              Width="110" Height="26" FontSize="{StaticResource FontSizeSm}"/>
+                                    <Button Classes="primary"
+                                            Command="{Binding AddRelationCommand}" Padding="{StaticResource PaddingBtnSm}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3">
+                                            <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
+                                            <TextBlock Text="Th�m li�n k?t" FontSize="{StaticResource FontSizeSm}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+
+                        <ListBox ItemsSource="{Binding AvailableDocuments}"
+                                 SelectedItem="{Binding SelectedAvailableDoc}"
+                                 Padding="{StaticResource PaddingIcon}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="4,2">
+                                        <Image Source="{StaticResource IconDocPage}" Width="11" Height="11"/>
+                                        <TextBlock Text="{Binding Ten}" FontSize="{StaticResource FontSizeSm}"
+                                                   Foreground="{StaticResource TextPrimary}"/>
+                                        <TextBlock Text="{Binding MonHoc}" FontSize="{StaticResource FontSizeXs}"
+                                                   Foreground="{StaticResource TextMuted}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </DockPanel>
+    </Border>
+
+</UserControl>

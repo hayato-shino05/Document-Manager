@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using StudyDocumentManager.Core.Entities;
-using StudyDocumentManager.Data.Helpers;
+using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Views;
 
 public partial class AddDocumentDialog : Window
 {
-    public StudyDocument? Result { get; private set; }
+    public AddDocumentDraft? Result { get; private set; }
 
     private readonly string _filePath;
 
@@ -19,38 +18,36 @@ public partial class AddDocumentDialog : Window
         _filePath = string.Empty;
     }
 
-    public AddDocumentDialog(string filePath) : this()
+    /// <summary>
+    /// Mở dialog import 1 file.
+    /// subjects và types được chuẩn bị bởi caller (MainWindow qua IDocumentRepository).
+    /// </summary>
+    public AddDocumentDialog(string filePath, IList<string> subjects, IList<string> types) : this()
     {
         _filePath = filePath;
 
-        // Pre-fill from file
+        // Điền sẵn từ file
         txtFilePath.Text = filePath;
         txtTen.Text = Path.GetFileNameWithoutExtension(filePath);
 
-        // Auto-detect type using shared helper
+        // Tự nhận diện loại file
         string detectedType = StudyDocumentManager.Services.FileTypeDetector.Detect(
             Path.GetExtension(filePath));
 
-        // Load dropdowns from lookup tables
-        var subjects = DatabaseHelper.GetAllSubjects();
-        var types = DatabaseHelper.GetAllTypes();
+        // Chuyển sang List để có thể thêm nếu cần
+        var typeList = types.ToList();
 
-        // Seed default values if DB is empty
-        if (subjects.Count == 0)
-            subjects = new List<string> { "Công việc", "Cá nhân", "Học tập", "Dự án", "Tài chính", "Hợp đồng", "Tham khảo", "Khác" };
-        if (types.Count == 0)
-            types = new List<string> { "PDF", "Word", "Excel", "PowerPoint", "Tài liệu", "Báo cáo", "Hướng dẫn", "Biểu mẫu", "Hình ảnh", "Video", "Audio", "Nén", "Khác" };
-
-        // Ensure detected type is in dropdown list
-        if (!types.Contains(detectedType))
-            types.Add(detectedType);
+        // Đảm bảo loại tự nhận diện có trong danh sách
+        if (!typeList.Contains(detectedType))
+            typeList.Add(detectedType);
 
         cboMonHoc.ItemsSource = subjects;
-        cboLoai.ItemsSource = types;
+        cboLoai.ItemsSource = typeList;
 
-        // Set detected type in dropdown
+        // Chọn sẵn loại tự nhận diện
         cboLoai.SelectedItem = detectedType;
     }
+
 
     private void OnSaveClick(object? sender, RoutedEventArgs e)
     {
@@ -61,15 +58,7 @@ public partial class AddDocumentDialog : Window
             return;
         }
 
-        double? fileSize = null;
-        try
-        {
-            if (File.Exists(_filePath))
-                fileSize = new FileInfo(_filePath).Length / (1024.0 * 1024.0);
-        }
-        catch { /* ignore */ }
-
-        Result = new StudyDocument
+        Result = new AddDocumentDraft
         {
             Ten = name,
             MonHoc = (cboMonHoc?.SelectedItem as string ?? "").Trim(),
@@ -79,8 +68,7 @@ public partial class AddDocumentDialog : Window
             TacGia = txtTacGia?.Text?.Trim() ?? "",
             Tags = txtTags?.Text?.Trim() ?? "",
             QuanTrong = chkQuanTrong?.IsChecked == true,
-            Deadline = dpDeadline?.SelectedDate?.DateTime,
-            KichThuoc = fileSize
+            Deadline = dpDeadline?.SelectedDate?.DateTime
         };
 
         Close(true);

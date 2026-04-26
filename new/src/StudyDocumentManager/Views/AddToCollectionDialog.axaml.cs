@@ -1,56 +1,10 @@
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using StudyDocumentManager.Core.Entities;
+using StudyDocumentManager.Models.Items;
 
 namespace StudyDocumentManager.Views;
-
-/// <summary>
-/// Selectable wrapper for StudyDocument — used in AddToCollectionDialog list.
-/// </summary>
-public class SelectableDocumentItem : INotifyPropertyChanged
-{
-    private bool _isSelected;
-
-    public StudyDocument Document { get; }
-    public bool HasAuthor => !string.IsNullOrWhiteSpace(Document.TacGia);
-
-    public bool IsSelected
-    {
-        get => _isSelected;
-        set
-        {
-            if (_isSelected == value) return;
-            _isSelected = value;
-            OnPropertyChanged();
-            SelectionChanged?.Invoke(this, EventArgs.Empty);
-        }
-    }
-
-    public event EventHandler? SelectionChanged;
-
-    public SelectableDocumentItem(StudyDocument doc)
-    {
-        Document = doc;
-    }
-
-    public bool MatchesSearch(string term)
-    {
-        if (string.IsNullOrWhiteSpace(term)) return true;
-        term = term.Trim();
-        return Document.Ten.Contains(term, StringComparison.OrdinalIgnoreCase)
-            || (Document.MonHoc?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false)
-            || (Document.Loai?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false)
-            || (Document.TacGia?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false)
-            || (Document.Tags?.Contains(term, StringComparison.OrdinalIgnoreCase) ?? false);
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    private void OnPropertyChanged([CallerMemberName] string? name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-}
 
 /// <summary>
 /// Document picker dialog — shows searchable checklist of documents.
@@ -59,9 +13,7 @@ public class SelectableDocumentItem : INotifyPropertyChanged
 public partial class AddToCollectionDialog : Window
 {
     // ─── Data ───────────────────────────────────────────────────────
-    private readonly List<SelectableDocumentItem> _allItems;
-    private readonly ObservableCollection<SelectableDocumentItem> _visibleItems = new();
-    private string _searchTerm = string.Empty;
+    private readonly AddToCollectionDialogState _state;
     private bool _updatingHeader;
 
     /// <summary>Documents selected by the user. Null = cancelled.</summary>
@@ -72,33 +24,28 @@ public partial class AddToCollectionDialog : Window
     public AddToCollectionDialog()
     {
         InitializeComponent();
-        _allItems = [];
+        _state = new AddToCollectionDialogState([]);
     }
 
     public AddToCollectionDialog(
         IEnumerable<StudyDocument> allDocuments,
         IEnumerable<int> alreadyInCollection,
-        string collectionName)
+        string collectionName) : this()
     {
-        InitializeComponent();
 
         // Update title with collection name
         TitleLabel.Text = $"Thêm tài liệu vào \"{collectionName}\"";
 
         // Build items, excluding docs already in the collection
         var excluded = alreadyInCollection.ToHashSet();
-        _allItems = allDocuments
+        var items = allDocuments
             .Where(d => !excluded.Contains(d.Id))
             .OrderBy(d => d.Ten)
-            .Select(d =>
-            {
-                var item = new SelectableDocumentItem(d);
-                item.SelectionChanged += OnItemSelectionChanged;
-                return item;
-            })
+            .Select(d => new SelectableDocumentItem(d))
             .ToList();
 
-        DocumentList.ItemsSource = _visibleItems;
+        _state = new AddToCollectionDialogState(items);
+        DocumentList.ItemsSource = _state.VisibleItems;
 
         // Wire up events
         SearchBox.TextChanged += OnSearchChanged;
@@ -111,7 +58,8 @@ public partial class AddToCollectionDialog : Window
         Opened += (_, _) =>
         {
             SearchBox.Focus();
-            ApplyFilter(string.Empty);
+            _state.ApplyFilter(string.Empty);
+            SyncStateToView();
         };
     }
 
@@ -119,78 +67,49 @@ public partial class AddToCollectionDialog : Window
     // ─── Search / Filter ────────────────────────────────────────────
     private void OnSearchChanged(object? sender, TextChangedEventArgs e)
     {
-        _searchTerm = SearchBox.Text ?? string.Empty;
-        ApplyFilter(_searchTerm);
-    }
-
-    private void ApplyFilter(string term)
-    {
-        _visibleItems.Clear();
-        var matches = _allItems.Where(i => i.MatchesSearch(term)).ToList();
-        foreach (var item in matches)
-            _visibleItems.Add(item);
-
-        CountLabel.Text = matches.Count == _allItems.Count
-            ? $"{matches.Count} tài liệu"
-            : $"{matches.Count} / {_allItems.Count} tài liệu";
-
-        UpdateHeaderCheckBox();
-        UpdateFooter();
+        _state.ApplyFilter(SearchBox.Text ?? string.Empty);
+        SyncStateToView();
     }
 
     // ─── Select All (header checkbox + button) ──────────────────────
     private void OnSelectAllClicked(object? sender, RoutedEventArgs e)
     {
-        bool anyUnselected = _visibleItems.Any(i => !i.IsSelected);
-        foreach (var item in _visibleItems)
-            item.IsSelected = anyUnselected;
+        _state.ToggleSelectAllVisible();
+        SyncStateToView();
     }
 
     private void OnHeaderCheckChanged(object? sender, RoutedEventArgs e)
     {
-        if (_updatingHeader) return;
-        bool check = HeaderCheckBox.IsChecked == true;
-        foreach (var item in _visibleItems)
-            item.IsSelected = check;
-    }
+        if (_updatingHeader)
+            return;
 
-    private void UpdateHeaderCheckBox()
-    {
-        _updatingHeader = true;
-        if (_visibleItems.Count == 0)
-            HeaderCheckBox.IsChecked = false;
-        else if (_visibleItems.All(i => i.IsSelected))
-            HeaderCheckBox.IsChecked = true;
-        else if (_visibleItems.Any(i => i.IsSelected))
-            HeaderCheckBox.IsChecked = null; // indeterminate
-        else
-            HeaderCheckBox.IsChecked = false;
-        _updatingHeader = false;
+        _state.SetHeaderSelection(HeaderCheckBox.IsChecked == true);
+        SyncStateToView();
     }
 
     // ─── Footer / Confirm button ─────────────────────────────────────
     private void OnItemSelectionChanged(object? sender, EventArgs e)
     {
-        UpdateFooter();
-        UpdateHeaderCheckBox();
-    }
-
-    private void UpdateFooter()
-    {
-        int count = _allItems.Count(i => i.IsSelected);
-        SelectedCountBadge.Text = count.ToString();
-        ConfirmButton.IsEnabled = count > 0;
-
-        SelectAllBtn.Content = _visibleItems.All(i => i.IsSelected) && _visibleItems.Count > 0
-            ? "Bỏ chọn tất cả"
-            : "Chọn tất cả";
+        SyncStateToView();
     }
 
     // ─── Confirm / Cancel ───────────────────────────────────────────
     private void OnConfirmClicked(object? sender, RoutedEventArgs e)
     {
-        Result = _allItems.Where(i => i.IsSelected).Select(i => i.Document).ToList();
+        Result = _state.GetSelectedDocuments();
         Close();
+    }
+
+    private void SyncStateToView()
+    {
+        CountLabel.Text = _state.CountText;
+        SelectedCountBadge.Text = _state.SelectedCountText;
+        ConfirmButton.IsEnabled = _state.CanConfirm;
+        SelectAllBtn.Content = _state.SelectAllButtonText;
+
+        _updatingHeader = true;
+        HeaderCheckBox.IsChecked = _state.HeaderCheckState;
+        _updatingHeader = false;
     }
 
     private void OnCancelClicked(object? sender, RoutedEventArgs e)

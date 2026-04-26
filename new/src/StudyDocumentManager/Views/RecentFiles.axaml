@@ -1,0 +1,71 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             xmlns:conv="using:StudyDocumentManager.Converters"
+             x:Class="StudyDocumentManager.Views.RecentFiles"
+             x:DataType="vm:RecentFilesModel">
+
+    <Border Classes="page-wrapper">
+        <DockPanel>
+            <!-- Header -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+                <StackPanel Classes="page-header-stack" Margin="0">
+                    <Image Source="{StaticResource IconCalendar}" Width="18" Height="18"/>
+                    <TextBlock Classes="page-title" Text="Lịch sử file đã mở"/>
+                </StackPanel>
+                <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center"
+                           Text="{Binding RecentFiles.Count, StringFormat='Tổng: {0} file gần đây'}"
+                           FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
+            </DockPanel>
+
+            <!-- Bottom actions -->
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8"
+                        HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button Classes="secondary" Command="{Binding RefreshCommand}" Padding="12,5">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconRefresh}" Width="12" Height="12"/>
+                        <TextBlock Text="Làm mới" FontSize="{StaticResource FontSizeSm}"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="danger" Command="{Binding ClearHistoryCommand}" Padding="12,5">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconDelete}" Width="12" Height="12"/>
+                        <TextBlock Text="Xóa lịch sử" FontSize="{StaticResource FontSizeSm}"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <!-- File list -->
+            <Border Classes="card" ClipToBounds="True">
+                <Panel>
+                    <DataGrid Classes="std"
+                              ItemsSource="{Binding RecentFiles}"
+                              CanUserResizeColumns="True">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="Tên tài liệu" Width="2*" SortMemberPath="DocumentName">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="vm:RecentFileItem">
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
+                                            <Image Source="{Binding FileType, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
+                                                   Width="16" Height="16" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding DocumentName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Danh mục" Binding="{Binding Subject}" Width="*"/>
+                            <DataGridTextColumn Header="Loại" Binding="{Binding FileType}" Width="80"/>
+                            <DataGridTextColumn Header="Mở lúc" Binding="{Binding OpenedAtDisplay}" Width="130"/>
+                            <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusDisplay}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel Classes="empty-state" IsVisible="{Binding !RecentFiles.Count}">
+                        <Image Classes="empty-state-icon" Source="{StaticResource IconCalendar}"/>
+                        <TextBlock Classes="empty-state-text" Text="Chưa có file nào được mở gần đây"/>
+                    </StackPanel>
+                </Panel>
+            </Border>
+        </DockPanel>
+    </Border>
+
+</UserControl>

@@ -16,6 +16,14 @@ public interface IDialogService
     /// <summary>Show a confirmation dialog. Returns true if confirmed.</summary>
     Task<bool> ShowConfirmAsync(string title, string message);
 
+    /// <summary>
+    /// Show a confirmation dialog with custom confirm button text and optional danger styling.
+    /// Use isDanger=true for destructive actions (delete, permanent remove etc.).
+    /// Returns true if confirmed.
+    /// </summary>
+    Task<bool> ShowConfirmAsync(string title, string message,
+        string confirmText, bool isDanger = false);
+
     /// <summary>Show an input dialog. Returns the entered string or null if cancelled.</summary>
     Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "");
 
@@ -24,6 +32,12 @@ public interface IDialogService
     /// Returns the chosen/entered category name, or null if cancelled.
     /// </summary>
     Task<string?> ShowChangeCategoryAsync(string documentName, IList<string> existingCategories, string currentCategory);
+
+    /// <summary>
+    /// Show a collection-picker dialog listing all available collections.
+    /// Returns the selected collection id, or -1 if cancelled.
+    /// </summary>
+    Task<int> ShowSelectCollectionAsync(string documentName, IList<(int Id, string Name, int DocCount)> collections);
 
     /// <summary>
     /// Show a searchable document picker dialog.
@@ -42,4 +56,10 @@ public interface IDialogService
 
     /// <summary>Show a file save dialog. Returns selected path or null.</summary>
     Task<string?> ShowSaveFileAsync(string title, string defaultFileName, string? filter = null);
+
+    /// <summary>
+    /// Show the add-document dialog prefilled from a dropped file.
+    /// Returns the draft or null if cancelled.
+    /// </summary>
+    Task<AddDocumentDraft?> ShowAddDocumentAsync(string filePath, IList<string> subjects, IList<string> types);
 }

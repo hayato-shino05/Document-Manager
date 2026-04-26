@@ -1,8 +1,8 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
-using StudyDocumentManager.ViewModels;
+using StudyDocumentManager.Models;
 using StudyDocumentManager.Views;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Data.Helpers;
@@ -37,7 +37,7 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = Services.GetRequiredService<MainWindowViewModel>()
+                DataContext = Services.GetRequiredService<MainWindowModel>()
             };
         }
 
@@ -55,29 +55,29 @@ public partial class App : Application
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<DroppedFileImportService>();
 
-        // ViewModels — Main
-        services.AddSingleton<MainWindowViewModel>();
-        services.AddTransient<DashboardViewModel>();
+        // Models — Main
+        services.AddSingleton<MainWindowModel>();
+        services.AddTransient<DashboardModel>();
 
-        // ViewModels — Documents
-        services.AddTransient<AddEditViewModel>();
-        services.AddTransient<BatchImportViewModel>();
-        services.AddTransient<BulkDeleteViewModel>();
-        services.AddTransient<DuplicateDetectionViewModel>();
-        services.AddTransient<PersonalNoteViewModel>();
-        services.AddTransient<RelatedDocumentsViewModel>();
+        // Models — Documents
+        services.AddTransient<AddEditModel>();
+        services.AddTransient<BatchImportModel>();
+        services.AddTransient<BulkDeleteModel>();
+        services.AddTransient<DuplicateDetectionModel>();
+        services.AddTransient<PersonalNoteModel>();
+        services.AddTransient<RelatedDocumentsModel>();
 
-        // ViewModels — Management
-        services.AddTransient<CategoryManagementViewModel>();
-        services.AddTransient<CollectionManagementViewModel>();
-        services.AddTransient<RecycleBinViewModel>();
-        services.AddTransient<FileIntegrityCheckViewModel>();
+        // Models — Management
+        services.AddTransient<CategoryManagementModel>();
+        services.AddTransient<CollectionManagementModel>();
+        services.AddTransient<RecycleBinModel>();
+        services.AddTransient<FileIntegrityCheckModel>();
 
-        // ViewModels — Reports
-        services.AddTransient<ReportViewModel>();
-        services.AddTransient<TreeMapViewModel>();
+        // Models — Reports
+        services.AddTransient<ReportModel>();
+        services.AddTransient<TreeMapModel>();
 
-        // ViewModels — Utilities
-        services.AddTransient<RecentFilesViewModel>();
+        // Models — Utilities
+        services.AddTransient<RecentFilesModel>();
     }
 }

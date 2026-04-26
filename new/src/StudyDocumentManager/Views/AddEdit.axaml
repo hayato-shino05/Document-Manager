@@ -1,0 +1,136 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             x:Class="StudyDocumentManager.Views.AddEdit"
+             x:DataType="vm:AddEditModel">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+        <DockPanel MaxWidth="700">
+
+            <!-- Title -->
+            <TextBlock DockPanel.Dock="Top" Text="{Binding PageTitle}" FontSize="{StaticResource FontSizeXl}"
+                       FontWeight="Bold" Foreground="{StaticResource TextPrimary}"
+                       Margin="0,0,0,16"/>
+
+            <!-- Buttons bottom -->
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="10"
+                        HorizontalAlignment="Right" Margin="0,16,0,0">
+                <Button Classes="primary" Command="{Binding SaveCommand}" Padding="20,8"
+                        HotKey="Ctrl+S"
+                        ToolTip.Tip="Luu t�i li?u (Ctrl+S)">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconSave}" Width="13" Height="13"/>
+                        <TextBlock Text="Luu" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="20,8"
+                        HotKey="Escape"
+                        ToolTip.Tip="H?y v� quay l?i (Escape)">
+                    <TextBlock Text="H?y" FontSize="{StaticResource FontSizeLg}"/>
+                </Button>
+            </StackPanel>
+
+            <!-- Form fields -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                        Padding="{StaticResource PaddingPage}">
+                    <StackPanel Spacing="12">
+
+                        <!-- T�n t�i li?u -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="T�n t�i li?u *" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimary}"/>
+                            <TextBox Text="{Binding Ten, Mode=TwoWay}" FontSize="{StaticResource FontSizeLg}"
+                                     Watermark="Nh?p t�n t�i li?u..." Height="32"/>
+                        </StackPanel>
+
+                        <!-- Row: Danh m?c + Lo?i -->
+                        <Grid ColumnDefinitions="*,16,*">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Danh m?c (M�n h?c)" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                                <ComboBox ItemsSource="{Binding Subjects}"
+                                          SelectedItem="{Binding MonHoc, Mode=TwoWay}"
+                                          IsTextSearchEnabled="True"
+                                          PlaceholderText="Ch?n danh m?c..."
+                                          FontSize="{StaticResource FontSizeMd}" Height="32"
+                                          HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="Lo?i t�i li?u" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                                <ComboBox ItemsSource="{Binding Types}"
+                                          SelectedItem="{Binding Loai, Mode=TwoWay}"
+                                          IsTextSearchEnabled="True"
+                                          PlaceholderText="Ch?n lo?i..."
+                                          FontSize="{StaticResource FontSizeMd}" Height="32"
+                                          HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- �u?ng d?n file -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="�u?ng d?n file" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimary}"/>
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right" Classes="secondary" Margin="6,0,0,0"
+                                        Command="{Binding BrowseFileCommand}" Padding="{StaticResource PaddingMd}">
+                                    <StackPanel Orientation="Horizontal" Spacing="3">
+                                        <Image Source="{StaticResource IconOpenFile}" Width="11" Height="11"/>
+                                        <TextBlock Text="Ch?n file" FontSize="{StaticResource FontSizeSm}"/>
+                                    </StackPanel>
+                                </Button>
+                                <TextBox Text="{Binding DuongDan, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                                         Watermark="�u?ng d?n t?i file..." Height="32"/>
+                            </DockPanel>
+                        </StackPanel>
+
+                        <!-- T�c gi? -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="T�c gi?" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimary}"/>
+                            <TextBox Text="{Binding TacGia, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                                     Watermark="T�n t�c gi?..." Height="32"/>
+                        </StackPanel>
+
+                        <!-- Tags -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Tags (ph�n t�ch b?ng d?u ph?y)" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimary}"/>
+                            <TextBox Text="{Binding Tags, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                                     Watermark="tag1, tag2, tag3..." Height="32"/>
+                        </StackPanel>
+
+                        <!-- Ghi ch� -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Ghi ch�" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimary}"/>
+                            <TextBox Text="{Binding GhiChu, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                                     Watermark="Ghi ch� th�m..."
+                                     AcceptsReturn="True" TextWrapping="Wrap"
+                                     Height="80"/>
+                        </StackPanel>
+
+                        <!-- Row: Deadline + Quan tr?ng -->
+                        <Grid ColumnDefinitions="*,16,Auto">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="H?n ch?t (Deadline)" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                                <DatePicker SelectedDate="{Binding Deadline}" FontSize="{StaticResource FontSizeMd}"
+                                            HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4" VerticalAlignment="Bottom"
+                                        Margin="0,0,0,4">
+                                <CheckBox Content="��nh d?u quan tr?ng" FontSize="{StaticResource FontSizeMd}"
+                                          IsChecked="{Binding QuanTrong}"/>
+                            </StackPanel>
+                        </Grid>
+
+                    </StackPanel>
+                </Border>
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
+
+</UserControl>

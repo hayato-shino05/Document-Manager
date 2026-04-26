@@ -210,4 +210,136 @@
         <Setter Property="Margin" Value="4,4"/>
     </Style>
 
+    <!-- ═══════════════════════════════════════════════════════
+         11. CHIP PILL — Badge chọn lựa (dùng trong dialog Đổi danh mục, Thêm vào BST)
+             Dùng:  <Button Classes="chip" Content="Toán học"/>
+                    <Button Classes="chip chip-selected" Content="Lập trình"/>
+    ═══════════════════════════════════════════════════════════ -->
+    <Style Selector="Button.chip">
+        <Setter Property="Background"       Value="{StaticResource ChipBgBrush}"/>
+        <Setter Property="Foreground"       Value="{StaticResource ChipFgBrush}"/>
+        <Setter Property="BorderBrush"      Value="{StaticResource ChipBorderBrush}"/>
+        <Setter Property="BorderThickness"  Value="1"/>
+        <Setter Property="CornerRadius"     Value="12"/>
+        <Setter Property="Padding"          Value="10,4"/>
+        <Setter Property="FontSize"         Value="{StaticResource FontSizeSm}"/>
+        <Setter Property="Cursor"           Value="Hand"/>
+        <Setter Property="Margin"           Value="0,0,6,6"/>
+    </Style>
+    <Style Selector="Button.chip:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource ChipHoverBgBrush}"/>
+    </Style>
+
+    <!-- chip-selected: solid accent (indigo) when picked -->
+    <Style Selector="Button.chip-selected">
+        <Setter Property="Background"      Value="{StaticResource ChipSelectedBgBrush}"/>
+        <Setter Property="Foreground"      Value="White"/>
+        <Setter Property="BorderBrush"     Value="{StaticResource ChipSelectedBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius"    Value="12"/>
+        <Setter Property="Padding"         Value="10,4"/>
+        <Setter Property="FontSize"        Value="{StaticResource FontSizeSm}"/>
+        <Setter Property="Cursor"          Value="Hand"/>
+        <Setter Property="Margin"          Value="0,0,6,6"/>
+    </Style>
+    <Style Selector="Button.chip-selected:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource ChipSelectedBorderBrush}"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════
+         12. TOOLBAR ACTION BUTTON — Button icon+label chuẩn hóa cho toolbar
+             Thay thế pattern lặp đi lặp lại:
+               <Button Classes="secondary" Padding="10,5">
+                   <StackPanel Orientation="Horizontal" Spacing="4">
+                       <Image Source="..." Width="14" Height="14"/>
+                       <TextBlock Text="..." FontSize="{StaticResource FontSizeSm}"/>
+                   </StackPanel>
+               </Button>
+             Dùng:
+               <Button Classes="secondary toolbar-btn" Command="...">
+                   <StackPanel Classes="toolbar-btn-stack">
+                       <Image Source="..." Classes="toolbar-btn-icon"/>
+                       <TextBlock Text="..." Classes="toolbar-btn-label"/>
+                   </StackPanel>
+               </Button>
+    ═══════════════════════════════════════════════════════════ -->
+    <Style Selector="Button.toolbar-btn">
+        <Setter Property="Padding"      Value="10,5"/>
+        <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+        <Setter Property="Cursor"       Value="Hand"/>
+    </Style>
+
+    <Style Selector="StackPanel.toolbar-btn-stack">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="Spacing"     Value="4"/>
+    </Style>
+
+    <!-- WARNING: sizing kept at 14 to match toolbar density; first button uses 16 (primary action) -->
+    <Style Selector="Image.toolbar-btn-icon">
+        <Setter Property="Width"             Value="14"/>
+        <Setter Property="Height"            Value="14"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style Selector="TextBlock.toolbar-btn-label">
+        <Setter Property="FontSize"          Value="{StaticResource FontSizeSm}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════
+         13. STAT CARD — Info card trong Dashboard header
+             Dùng:
+               <Border Classes="stat-card">
+                   <StackPanel Classes="stat-card-body">
+                       <TextBlock Classes="stat-card-value" Text="42"/>
+                       <TextBlock Classes="stat-card-label" Text="Tổng tài liệu"/>
+                   </StackPanel>
+               </Border>
+    ═══════════════════════════════════════════════════════════ -->
+    <Style Selector="Border.stat-card">
+        <Setter Property="Background"      Value="{StaticResource CardBackground}"/>
+        <Setter Property="CornerRadius"    Value="{StaticResource RadiusMd}"/>
+        <Setter Property="BorderBrush"     Value="{StaticResource CardBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding"         Value="{StaticResource PaddingCard}"/>
+        <Setter Property="Cursor"          Value="Hand"/>
+    </Style>
+
+    <Style Selector="StackPanel.stat-card-body">
+        <Setter Property="Spacing" Value="2"/>
+    </Style>
+
+    <Style Selector="TextBlock.stat-card-value">
+        <Setter Property="FontSize"   Value="{StaticResource FontSizeHeading}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+    </Style>
+
+    <Style Selector="TextBlock.stat-card-label">
+        <Setter Property="FontSize"   Value="{StaticResource FontSizeSm}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════
+         14. DIALOG PATTERNS — Shared patterns for all dialog windows
+         ─────────────────────────────────────────────────────── -->
+
+    <!-- Form field label: replaces inline FontSize=11 FontWeight=SemiBold Foreground=TextSecondary -->
+    <Style Selector="TextBlock.field-label">
+        <Setter Property="FontSize"   Value="{StaticResource FontSizeSm}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+    </Style>
+
+    <!-- Info banner: replaces inline badge in AddDocumentDialog (file path, etc.) -->
+    <Style Selector="Border.info-banner">
+        <Setter Property="Background"       Value="{StaticResource StatBlueBg}"/>
+        <Setter Property="CornerRadius"     Value="{StaticResource RadiusSm}"/>
+        <Setter Property="Padding"          Value="10,6"/>
+        <Setter Property="Margin"           Value="0,0,0,14"/>
+        <Setter Property="BorderBrush"      Value="{StaticResource CardBorder}"/>
+        <Setter Property="BorderThickness"  Value="1"/>
+        <Setter Property="DockPanel.Dock"   Value="Top"/>
+    </Style>
+
 </Styles>

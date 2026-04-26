@@ -1,0 +1,65 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             x:Class="StudyDocumentManager.Views.PersonalNote"
+             x:DataType="vm:PersonalNoteModel">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+        <DockPanel MaxWidth="700">
+            <!-- Header -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                <Button Classes="secondary" Command="{Binding GoBackCommand}" Padding="{StaticResource PaddingSm}"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconBack}" Width="12" Height="12"/>
+                        <TextBlock Text="Quay l?i" FontSize="{StaticResource FontSizeSm}"/>
+                    </StackPanel>
+                </Button>
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="12,0,0,0">
+                    <Image Source="{StaticResource IconNote}" Width="18" Height="18"/>
+                    <TextBlock Text="Ghi ch� c� nh�n" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Document info -->
+            <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}" CornerRadius="{StaticResource RadiusMd}"
+                    Padding="{StaticResource PaddingMd}" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="T�i li?u:" FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
+                    <TextBlock Text="{Binding DocumentName}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Buttons bottom -->
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8"
+                        HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button Classes="primary" Command="{Binding SaveNoteCommand}" Padding="16,7">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconSave}" Width="13" Height="13"/>
+                        <TextBlock Text="Luu ghi ch�" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="secondary" Command="{Binding DeleteNoteCommand}" Padding="{StaticResource PaddingNavItem}"
+                        IsVisible="{Binding HasExistingNote}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
+                        <TextBlock Text="X�a ghi ch�" FontSize="{StaticResource FontSizeMd}"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <!-- Note editor -->
+            <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                    Padding="{StaticResource PaddingIcon}">
+                <TextBox Text="{Binding NoteContent, Mode=TwoWay}"
+                         AcceptsReturn="True" TextWrapping="Wrap"
+                         FontSize="{StaticResource FontSizeLg}" Watermark="Vi?t ghi ch� t?i d�y..."
+                         BorderThickness="0"/>
+            </Border>
+        </DockPanel>
+    </Border>
+
+</UserControl>

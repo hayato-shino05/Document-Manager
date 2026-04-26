@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="StudyDocumentManager.Views.AddToCollectionDialog"
         Title="Thêm tài liệu vào bộ sưu tập"
@@ -13,25 +13,25 @@
         <!-- Header -->
         <Border Grid.Row="0" Background="{StaticResource SidebarBackground}"
                 BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
-                Padding="16,12">
+                Padding="{StaticResource PaddingCard}">
             <StackPanel Spacing="2">
                 <TextBlock x:Name="TitleLabel" Text="Thêm tài liệu"
-                           FontSize="15" FontWeight="SemiBold"
+                           FontSize="{StaticResource FontSizeXl}" FontWeight="SemiBold"
                            Foreground="{StaticResource TextPrimary}"/>
                 <TextBlock x:Name="SubtitleLabel" Text="Chọn một hoặc nhiều tài liệu để thêm vào bộ sưu tập"
-                           FontSize="12" Foreground="{StaticResource TextMuted}"/>
+                           FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"/>
             </StackPanel>
         </Border>
 
         <!-- Search bar -->
-        <Border Grid.Row="1" Padding="12,10" Background="{StaticResource ContentBackground}"
+        <Border Grid.Row="1" Padding="{StaticResource PaddingStatCard}" Background="{StaticResource ContentBackground}"
                 BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1">
             <Grid ColumnDefinitions="*,Auto,Auto">
                 <TextBox x:Name="SearchBox" Grid.Column="0"
                          Watermark="Tìm kiếm theo tên, danh mục, loại..."
                          Height="30" VerticalContentAlignment="Center"
                          Padding="12,4,10,4"
-                         FontSize="12">
+                         FontSize="{StaticResource FontSizeMd}">
                     <TextBox.InnerLeftContent>
                         <Image Source="{StaticResource IconSearch}" 
                                Width="14" Height="14" 
@@ -41,11 +41,11 @@
                 </TextBox>
                 <TextBlock x:Name="CountLabel" Grid.Column="1"
                            VerticalAlignment="Center" Margin="10,0,4,0"
-                           FontSize="12" Foreground="{StaticResource TextMuted}"
+                           FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
                            Text="0 kết quả"/>
                 <Button x:Name="SelectAllBtn" Grid.Column="2"
-                        Content="Chọn tất cả" FontSize="11"
-                        Padding="8,3" VerticalAlignment="Center"
+                        Content="Chọn tất cả" FontSize="{StaticResource FontSizeSm}"
+                        Padding="{StaticResource PaddingChip}" VerticalAlignment="Center"
                         Classes="secondary" Margin="4,0,0,0"/>
             </Grid>
         </Border>
@@ -58,20 +58,20 @@
                 <!-- Column headers -->
                 <Border Grid.Row="0" Background="{StaticResource SidebarBackground}"
                         BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
-                        Padding="12,6">
+                        Padding="{StaticResource PaddingMd}">
                     <Grid ColumnDefinitions="32,*,130,80">
                         <CheckBox x:Name="HeaderCheckBox" Grid.Column="0"
                                   VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="1" Text="Tên tài liệu"
-                                   FontSize="11" FontWeight="SemiBold"
+                                   FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextSecondary}"
                                    VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="2" Text="Danh mục"
-                                   FontSize="11" FontWeight="SemiBold"
+                                   FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextSecondary}"
                                    VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="3" Text="Loại"
-                                   FontSize="11" FontWeight="SemiBold"
+                                   FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextSecondary}"
                                    VerticalAlignment="Center"/>
                     </Grid>
@@ -99,34 +99,34 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Border BorderBrush="{StaticResource CardBorder}"
-                                    BorderThickness="0,0,0,1" Padding="12,7">
+                                    BorderThickness="0,0,0,1" Padding="{StaticResource PaddingNavItem}">
                                 <Grid ColumnDefinitions="32,*,130,80">
                                     <CheckBox Grid.Column="0"
                                               IsChecked="{Binding IsSelected}"
                                               VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
                                         <TextBlock Text="{Binding Document.Ten}"
-                                                   FontSize="12"
+                                                   FontSize="{StaticResource FontSizeMd}"
                                                    Foreground="{StaticResource TextPrimary}"
                                                    TextTrimming="CharacterEllipsis"/>
                                         <TextBlock Text="{Binding Document.TacGia}"
-                                                   FontSize="10"
+                                                   FontSize="{StaticResource FontSizeXs}"
                                                    Foreground="{StaticResource TextMuted}"
                                                    IsVisible="{Binding HasAuthor}"
                                                    TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                     <TextBlock Grid.Column="2"
                                                Text="{Binding Document.MonHoc}"
-                                               FontSize="11"
+                                               FontSize="{StaticResource FontSizeSm}"
                                                Foreground="{StaticResource TextSecondary}"
                                                VerticalAlignment="Center"
                                                TextTrimming="CharacterEllipsis"/>
                                     <Border Grid.Column="3" VerticalAlignment="Center"
                                             Background="{StaticResource StatBlueBg}"
-                                            CornerRadius="3" Padding="5,2"
+                                            CornerRadius="{StaticResource RadiusXs}" Padding="{StaticResource PaddingBadge}"
                                             HorizontalAlignment="Left">
                                         <TextBlock Text="{Binding Document.Loai}"
-                                                   FontSize="10"
+                                                   FontSize="{StaticResource FontSizeXs}"
                                                    Foreground="{StaticResource AccentBrush}"
                                                    FontWeight="Medium"/>
                                     </Border>
@@ -142,33 +142,34 @@
         <!-- Footer -->
         <Border Grid.Row="3" Background="{StaticResource SidebarBackground}"
                 BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
-                Padding="16,10" Margin="0,8,0,0">
+                Padding="{StaticResource PaddingCardLg}" Margin="0,8,0,0">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="6"
                             VerticalAlignment="Center">
-                    <TextBlock Text="Đã chọn:" FontSize="12"
+                    <TextBlock Text="Đã chọn:" FontSize="{StaticResource FontSizeMd}"
                                Foreground="{StaticResource TextMuted}"
                                VerticalAlignment="Center"/>
-                    <Border Background="{StaticResource AccentBrush}" CornerRadius="10"
-                            Padding="7,2" MinWidth="22">
+                    <Border Background="{StaticResource AccentBrush}" CornerRadius="{StaticResource RadiusPill}"
+                            Padding="{StaticResource PaddingBadgeMd}" MinWidth="22">
                         <TextBlock x:Name="SelectedCountBadge" Text="0"
-                                   FontSize="11" FontWeight="SemiBold"
+                                   FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
                                    Foreground="White"
                                    HorizontalAlignment="Center"/>
                     </Border>
-                    <TextBlock Text="tài liệu" FontSize="12"
+                    <TextBlock Text="tài liệu" FontSize="{StaticResource FontSizeMd}"
                                Foreground="{StaticResource TextMuted}"
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
+                <!-- Confirm first, then Cancel — consistent button order -->  
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
                             HorizontalAlignment="Right">
-                    <Button x:Name="CancelButton" Content="Hủy"
-                            Classes="secondary" Padding="16,6" FontSize="12"
-                            IsCancel="True"/>
                     <Button x:Name="ConfirmButton" Content="Thêm vào bộ sưu tập"
-                            Classes="primary" Padding="16,6" FontSize="12"
+                            Classes="primary" Padding="{StaticResource PaddingBtnLg}" FontSize="{StaticResource FontSizeMd}"
                             IsDefault="True" IsEnabled="False"/>
+                    <Button x:Name="CancelButton" Content="Hủy"
+                            Classes="secondary" Padding="{StaticResource PaddingBtnLg}" FontSize="{StaticResource FontSizeMd}"
+                            IsCancel="True"/>
                 </StackPanel>
             </DockPanel>
         </Border>

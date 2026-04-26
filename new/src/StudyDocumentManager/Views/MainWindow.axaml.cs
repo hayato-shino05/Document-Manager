@@ -1,8 +1,8 @@
-using System.Linq;
+﻿using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using StudyDocumentManager.ViewModels;
+using StudyDocumentManager.Models;
 
 namespace StudyDocumentManager.Views;
 
@@ -22,8 +22,8 @@ public partial class MainWindow : Window
     {
         base.OnKeyDown(e);
 
-        var vm = DataContext as MainWindowViewModel;
-        if (vm?.CurrentView is not DashboardViewModel dashboard) return;
+        var vm = DataContext as MainWindowModel;
+        if (vm?.CurrentView is not DashboardModel dashboard) return;
 
         // Keyboard shortcuts — only active when on Dashboard
         if (e.KeyModifiers == KeyModifiers.Control)
@@ -78,7 +78,7 @@ public partial class MainWindow : Window
         if (!e.Data.Contains(DataFormats.Files))
             return;
 
-        if (DataContext is not MainWindowViewModel vm)
+        if (DataContext is not MainWindowModel vm)
             return;
 
         var filePaths = e.Data.GetFiles()?

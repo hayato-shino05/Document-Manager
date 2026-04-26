@@ -1,9 +1,9 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:StudyDocumentManager.ViewModels"
+        xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:v="using:StudyDocumentManager.Views"
         x:Class="StudyDocumentManager.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
+        x:DataType="vm:MainWindowModel"
         Title="Study Document Manager - Professional Edition"
         Width="1280" Height="800"
         MinWidth="960" MinHeight="640"
@@ -58,108 +58,108 @@
             <DockPanel>
                 <StackPanel Orientation="Horizontal" Spacing="1">
                     <!-- CRUD -->
-                    <Button Classes="secondary" Command="{Binding NavigateCommand}" CommandParameter="add"
-                            FontWeight="SemiBold" Padding="10,5">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
+                    <!-- WARNING: first button uses 16px icon (primary action) — does not inherit toolbar-btn-icon size -->
+                    <Button Classes="secondary toolbar-btn" Command="{Binding NavigateCommand}" CommandParameter="add"
+                            FontWeight="SemiBold">
+                        <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconAdd}" Width="16" Height="16"/>
-                            <TextBlock Text="Thêm" FontSize="11"/>
+                            <TextBlock Text="Thêm" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary" Padding="10,5" Command="{Binding EditDocumentCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconEdit}" Width="14" Height="14"/>
-                            <TextBlock Text="Sửa" FontSize="11"/>
+                    <Button Classes="secondary toolbar-btn" Command="{Binding EditDocumentCommand}">
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconEdit}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="Sửa" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary" Padding="10,5" Command="{Binding DeleteDocumentCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconDelete}" Width="14" Height="14"/>
-                            <TextBlock Text="Xóa" FontSize="11"/>
+                    <Button Classes="secondary toolbar-btn" Command="{Binding DeleteDocumentCommand}">
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconDelete}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="Xóa" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
 
-                    <Border Width="1" Background="{StaticResource CardBorder}" Margin="4,4"/>
+                    <Border Classes="toolbar-sep"/>
 
                     <!-- File operations -->
-                    <Button Classes="secondary" Padding="10,5" Command="{Binding OpenFileCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconOpenFile}" Width="14" Height="14"/>
-                            <TextBlock Text="Mở file" FontSize="11"/>
+                    <Button Classes="secondary toolbar-btn" Command="{Binding OpenFileCommand}">
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconOpenFile}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="Mở file" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary" Padding="10,5" Command="{Binding ExportCsvCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconExport}" Width="14" Height="14"/>
-                            <TextBlock Text="Xuất" FontSize="11"/>
+                    <Button Classes="secondary toolbar-btn" Command="{Binding ExportCsvCommand}">
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconExport}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="Xuất" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
 
-                    <Border Width="1" Background="{StaticResource CardBorder}" Margin="4,4"/>
-
+                    <Border Classes="toolbar-sep"/>
 
                     <!-- Refresh + Import -->
-                    <Button Classes="secondary" Padding="10,5"
+                    <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="batch-import">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconImport}" Width="14" Height="14"/>
-                            <TextBlock Text="Import" FontSize="11"/>
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconImport}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="Import" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
 
-                    <Border Width="1" Background="{StaticResource CardBorder}" Margin="4,4"/>
+                    <Border Classes="toolbar-sep"/>
 
                     <!-- Tools: Recycle, Bulk, Recent, Backup -->
-                    <Button Classes="secondary" Padding="10,5"
+                    <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="recycle">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconRecycle}" Width="14" Height="14"/>
-                            <TextBlock Text="Thùng rác" FontSize="11"/>
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconRecycle}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="Thùng rác" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary" Padding="10,5"
+                    <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="bulk-delete">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconBulkDelete}" Width="14" Height="14"/>
-                            <TextBlock Text="Hàng loạt" FontSize="11"/>
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconBulkDelete}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="Hàng loạt" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary" Padding="10,5"
+                    <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="recentfiles">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconClock}" Width="14" Height="14"/>
-                            <TextBlock Text="Gần đây" FontSize="11"/>
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconClock}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="Gần đây" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary" Padding="10,5"
+                    <Button Classes="secondary toolbar-btn"
                             Command="{Binding BackupDatabaseCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconSave}" Width="14" Height="14"/>
-                            <TextBlock Text="Sao lưu" FontSize="11"/>
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconSave}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="Sao lưu" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
 
-                    <Border Width="1" Background="{StaticResource CardBorder}" Margin="4,4"/>
+                    <Border Classes="toolbar-sep"/>
 
                     <!-- Analytics -->
-                    <Button Classes="secondary" Padding="10,5"
+                    <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="duplicates">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconDuplicate}" Width="14" Height="14"/>
-                            <TextBlock Text="Trùng lặp" FontSize="11"/>
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconDuplicate}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="Trùng lặp" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary" Padding="10,5"
+                    <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="report">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconReport}" Width="14" Height="14"/>
-                            <TextBlock Text="Thống kê" FontSize="11"/>
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconReport}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="Thống kê" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary" Padding="10,5"
+                    <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="treemap">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconDashboard}" Width="14" Height="14"/>
-                            <TextBlock Text="TreeMap" FontSize="11"/>
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconDashboard}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="TreeMap" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -167,14 +167,14 @@
                 <!-- Right side -->
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
                             HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Button Classes="secondary" Padding="10,5" Command="{Binding GoBackCommand}"
+                    <Button Classes="secondary toolbar-btn" Command="{Binding GoBackCommand}"
                             IsVisible="{Binding CanGoBack}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
+                        <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconBack}" Width="12" Height="12"/>
-                            <TextBlock Text="Quay lại" FontSize="11"/>
+                            <TextBlock Text="Quay lại" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <TextBlock Text="{Binding AppVersion, StringFormat='v{0}'}" FontSize="10"
+                    <TextBlock Text="{Binding AppVersion, StringFormat='v{0}'}" FontSize="{StaticResource FontSizeXs}"
                                Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
                 </StackPanel>
             </DockPanel>
@@ -185,7 +185,7 @@
                 BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
                 Padding="12,3" Height="26">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Right" FontSize="11" Foreground="{StaticResource TextSecondary}"
+                <TextBlock DockPanel.Dock="Right" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
                            VerticalAlignment="Center" HorizontalAlignment="Right"
                            Text="{Binding StatusText, FallbackValue='Tổng số: 0 tài liệu'}"/>
             </DockPanel>
@@ -194,47 +194,47 @@
         <!-- ═══ MAIN CONTENT ═══ -->
         <ContentControl Content="{Binding CurrentView}">
             <ContentControl.DataTemplates>
-                <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
-                    <v:DashboardView />
+                <DataTemplate DataType="{x:Type vm:DashboardModel}">
+                    <v:Dashboard />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:AddEditViewModel}">
-                    <v:AddEditView />
+                <DataTemplate DataType="{x:Type vm:AddEditModel}">
+                    <v:AddEdit />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:CategoryManagementViewModel}">
-                    <v:CategoryManagementView />
+                <DataTemplate DataType="{x:Type vm:CategoryManagementModel}">
+                    <v:CategoryManagement />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:CollectionManagementViewModel}">
-                    <v:CollectionManagementView />
+                <DataTemplate DataType="{x:Type vm:CollectionManagementModel}">
+                    <v:CollectionManagement />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:RecycleBinViewModel}">
-                    <v:RecycleBinView />
+                <DataTemplate DataType="{x:Type vm:RecycleBinModel}">
+                    <v:RecycleBin />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:BatchImportViewModel}">
-                    <v:BatchImportView />
+                <DataTemplate DataType="{x:Type vm:BatchImportModel}">
+                    <v:BatchImport />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:BulkDeleteViewModel}">
-                    <v:BulkDeleteView />
+                <DataTemplate DataType="{x:Type vm:BulkDeleteModel}">
+                    <v:BulkDelete />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:DuplicateDetectionViewModel}">
-                    <v:DuplicateDetectionView />
+                <DataTemplate DataType="{x:Type vm:DuplicateDetectionModel}">
+                    <v:DuplicateDetection />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:FileIntegrityCheckViewModel}">
-                    <v:FileIntegrityCheckView />
+                <DataTemplate DataType="{x:Type vm:FileIntegrityCheckModel}">
+                    <v:FileIntegrityCheck />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:PersonalNoteViewModel}">
-                    <v:PersonalNoteView />
+                <DataTemplate DataType="{x:Type vm:PersonalNoteModel}">
+                    <v:PersonalNote />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:RelatedDocumentsViewModel}">
-                    <v:RelatedDocumentsView />
+                <DataTemplate DataType="{x:Type vm:RelatedDocumentsModel}">
+                    <v:RelatedDocuments />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:ReportViewModel}">
-                    <v:ReportView />
+                <DataTemplate DataType="{x:Type vm:ReportModel}">
+                    <v:Report />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:RecentFilesViewModel}">
-                    <v:RecentFilesView />
+                <DataTemplate DataType="{x:Type vm:RecentFilesModel}">
+                    <v:RecentFiles />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:TreeMapViewModel}">
-                    <v:TreeMapView />
+                <DataTemplate DataType="{x:Type vm:TreeMapModel}">
+                    <v:TreeMap />
                 </DataTemplate>
             </ContentControl.DataTemplates>
         </ContentControl>

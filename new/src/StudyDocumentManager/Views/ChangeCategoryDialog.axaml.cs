@@ -1,20 +1,17 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Layout;
 
 namespace StudyDocumentManager.Views;
 
 /// <summary>
-/// Dialog for changing a document's category (MonHoc).
-/// Shows existing categories as chip pills for quick-select and an AutoCompleteBox for new input.
+/// Dialog đổi danh mục (MonHoc) cho tài liệu.
+/// Hiển thị danh sách danh mục hiện có dạng chip (binding-driven) và AutoCompleteBox để nhập mới.
 /// </summary>
 public partial class ChangeCategoryDialog : Window
 {
     public string? Result { get; private set; }
 
-    private readonly AutoCompleteBox _categoryInput;
-    private readonly WrapPanel _chipsPanel;
+    private AutoCompleteBox? _categoryInput;
 
     public ChangeCategoryDialog() { } // XAML loader
 
@@ -22,57 +19,44 @@ public partial class ChangeCategoryDialog : Window
     {
         InitializeComponent();
 
-        // Set doc name label
+        // Gán nhãn tài liệu
         var nameLabel = this.FindControl<TextBlock>("DocNameLabel")!;
         nameLabel.Text = $"Tài liệu: \"{documentName}\"";
 
-        _chipsPanel = this.FindControl<WrapPanel>("ChipsPanel")!;
         _categoryInput = this.FindControl<AutoCompleteBox>("CategoryInput")!;
-
-        // Populate AutoComplete items
         _categoryInput.ItemsSource = existingCategories;
         _categoryInput.Text = currentCategory;
 
-        // Build chip pills for each existing category
-        foreach (var cat in existingCategories)
-        {
-            var chip = new Button
-            {
-                Content = cat,
-                Classes = { "chip" }
-            };
-            chip.Click += (_, _) =>
-            {
-                _categoryInput.Text = cat;
-                _categoryInput.Focus();
-            };
-            _chipsPanel.Children.Add(chip);
-        }
+        // Binding-driven chip list — không cần tạo Button thủ công
+        var chipsPanel = this.FindControl<ItemsControl>("ChipsPanel")!;
+        chipsPanel.ItemsSource = existingCategories;
 
-        // Show a placeholder message if no categories exist
-        if (existingCategories.Count == 0)
-        {
-            _chipsPanel.Children.Add(new TextBlock
-            {
-                Text = "(Chưa có danh mục nào — nhập tên mới bên dưới)",
-                Classes = { "empty-state-text" }
-            });
-        }
+        // Hiện empty state nếu không có danh mục
+        var emptyState = this.FindControl<TextBlock>("EmptyStateText")!;
+        emptyState.IsVisible = existingCategories.Count == 0;
+        chipsPanel.IsVisible  = existingCategories.Count > 0;
 
         // Wire buttons
-        this.FindControl<Button>("OkButton")!.Click += OkClicked;
+        this.FindControl<Button>("OkButton")!.Click     += OkClicked;
         this.FindControl<Button>("CancelButton")!.Click += CancelClicked;
 
-        // Focus input after window opens
-        this.Opened += (_, _) =>
+        // Focus input khi mở
+        this.Opened += (_, _) => _categoryInput.Focus();
+    }
+
+    // Được gọi từ AXAML ItemTemplate DataTemplate Click="OnChipClicked"
+    private void OnChipClicked(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { DataContext: string category })
         {
+            _categoryInput!.Text = category;
             _categoryInput.Focus();
-        };
+        }
     }
 
     private void OkClicked(object? sender, RoutedEventArgs e)
     {
-        Result = _categoryInput.Text?.Trim();
+        Result = _categoryInput?.Text?.Trim();
         Close();
     }
 

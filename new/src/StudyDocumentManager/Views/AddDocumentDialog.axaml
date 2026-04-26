@@ -8,39 +8,40 @@
         CanResize="False"
         Background="{StaticResource ContentBackground}">
 
-    <Border Padding="20">
+    <Border Padding="{StaticResource PaddingPage}">
         <DockPanel>
             <!-- Header -->
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,16">
                 <Image Source="{StaticResource IconAdd}" Width="20" Height="20"/>
-                <TextBlock Text="Thêm tài liệu mới" FontSize="18" FontWeight="Bold"
+                <TextBlock Text="Thêm tài liệu mới" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
                            Foreground="{StaticResource TextPrimary}"/>
             </StackPanel>
 
             <!-- File info badge -->
-            <Border DockPanel.Dock="Top" Background="{StaticResource StatBlueBg}"
-                    CornerRadius="6" Padding="10,6" Margin="0,0,0,14"
-                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+            <Border DockPanel.Dock="Top" Classes="info-banner">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <Image Source="{StaticResource IconOpenFile}" Width="13" Height="13"/>
-                    <TextBlock Name="txtFilePath" FontSize="11" Foreground="{StaticResource TextSecondary}"
+                    <TextBlock Name="txtFilePath" FontSize="{StaticResource FontSizeSm}"
+                               Foreground="{StaticResource TextSecondary}"
                                TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
             </Border>
 
-            <!-- Buttons -->
+            <!-- Buttons: OK first, then Cancel -->
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="10"
                         HorizontalAlignment="Right" Margin="0,16,0,0">
-                <Button Classes="primary" Name="btnSave" Click="OnSaveClick" Padding="20,8">
+                <Button Classes="primary" Name="btnSave" Click="OnSaveClick" Padding="20,8"
+                        IsDefault="True">
                     <StackPanel Orientation="Horizontal" Spacing="5">
                         <Image Source="{StaticResource IconCheck}" Width="13" Height="13"/>
-                        <TextBlock Text="Lưu" FontSize="12" FontWeight="SemiBold"/>
+                        <TextBlock Text="Lưu" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
                     </StackPanel>
                 </Button>
-                <Button Classes="secondary" Name="btnCancel" Click="OnCancelClick" Padding="20,8">
+                <Button Classes="secondary" Name="btnCancel" Click="OnCancelClick" Padding="20,8"
+                        IsCancel="True">
                     <StackPanel Orientation="Horizontal" Spacing="5">
                         <Image Source="{StaticResource IconClose}" Width="10" Height="10"/>
-                        <TextBlock Text="Hủy" FontSize="12"/>
+                        <TextBlock Text="Hủy" FontSize="{StaticResource FontSizeMd}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -50,27 +51,24 @@
                 <StackPanel Spacing="10">
                     <!-- Tên -->
                     <StackPanel Spacing="3">
-                        <TextBlock Text="Tên tài liệu *" FontSize="11" FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextSecondary}"/>
-                        <TextBox Name="txtTen" Watermark="Nhập tên tài liệu..." FontSize="12"/>
+                        <TextBlock Text="Tên tài liệu *" Classes="field-label"/>
+                        <TextBox Name="txtTen" Watermark="Nhập tên tài liệu..." FontSize="{StaticResource FontSizeMd}"/>
                     </StackPanel>
 
                     <!-- Danh mục + Loại -->
                     <Grid ColumnDefinitions="*,12,*">
                         <StackPanel Spacing="3">
-                            <TextBlock Text="Danh mục" FontSize="11" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextSecondary}"/>
+                            <TextBlock Text="Danh mục" Classes="field-label"/>
                             <ComboBox Name="cboMonHoc"
                                       IsTextSearchEnabled="True"
-                                      PlaceholderText="Chọn danh mục..." FontSize="12"
+                                      PlaceholderText="Chọn danh mục..." FontSize="{StaticResource FontSizeMd}"
                                       HorizontalAlignment="Stretch"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Spacing="3">
-                            <TextBlock Text="Loại" FontSize="11" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextSecondary}"/>
+                            <TextBlock Text="Loại" Classes="field-label"/>
                             <ComboBox Name="cboLoai"
                                       IsTextSearchEnabled="True"
-                                      PlaceholderText="Chọn loại..." FontSize="12"
+                                      PlaceholderText="Chọn loại..." FontSize="{StaticResource FontSizeMd}"
                                       HorizontalAlignment="Stretch"/>
                         </StackPanel>
                     </Grid>
@@ -78,32 +76,30 @@
                     <!-- Tác giả + Tags -->
                     <Grid ColumnDefinitions="*,12,*">
                         <StackPanel Spacing="3">
-                            <TextBlock Text="Tác giả" FontSize="11" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextSecondary}"/>
-                            <TextBox Name="txtTacGia" Watermark="Tác giả..." FontSize="12"/>
+                            <TextBlock Text="Tác giả" Classes="field-label"/>
+                            <TextBox Name="txtTacGia" Watermark="Tác giả..." FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Spacing="3">
-                            <TextBlock Text="Tags" FontSize="11" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextSecondary}"/>
-                            <TextBox Name="txtTags" Watermark="tag1, tag2, ..." FontSize="12"/>
+                            <TextBlock Text="Tags" Classes="field-label"/>
+                            <TextBox Name="txtTags" Watermark="tag1, tag2, ..." FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Grid>
 
                     <!-- Ghi chú -->
                     <StackPanel Spacing="3">
-                        <TextBlock Text="Ghi chú" FontSize="11" FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextSecondary}"/>
-                        <TextBox Name="txtGhiChu" Watermark="Ghi chú..." FontSize="12"
+                        <TextBlock Text="Ghi chú" Classes="field-label"/>
+                        <TextBox Name="txtGhiChu" Watermark="Ghi chú..." FontSize="{StaticResource FontSizeMd}"
                                  AcceptsReturn="True" TextWrapping="Wrap" Height="60"/>
                     </StackPanel>
 
                     <!-- Quan trọng + Deadline -->
                     <Grid ColumnDefinitions="Auto,*,Auto,Auto">
-                        <CheckBox Name="chkQuanTrong" Content="Quan trọng" FontSize="12"
+                        <CheckBox Name="chkQuanTrong" Content="Quan trọng" FontSize="{StaticResource FontSizeMd}"
                                   VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="2" Text="Hạn chốt:" FontSize="11" VerticalAlignment="Center"
-                                   Margin="0,0,6,0" Foreground="{StaticResource TextSecondary}"/>
-                        <DatePicker Grid.Column="3" Name="dpDeadline" FontSize="12"/>
+                        <TextBlock Grid.Column="2" Text="Hạn chốt:" FontSize="{StaticResource FontSizeSm}"
+                                   VerticalAlignment="Center" Margin="0,0,6,0"
+                                   Foreground="{StaticResource TextSecondary}"/>
+                        <DatePicker Grid.Column="3" Name="dpDeadline" FontSize="{StaticResource FontSizeMd}"/>
                     </Grid>
                 </StackPanel>
             </ScrollViewer>

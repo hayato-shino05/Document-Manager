@@ -1,4 +1,4 @@
-using StudyDocumentManager.ViewModels;
+﻿using StudyDocumentManager.Models;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace StudyDocumentManager.Services;
@@ -8,13 +8,13 @@ namespace StudyDocumentManager.Services;
 /// </summary>
 public class NavigationService(IServiceProvider serviceProvider) : INavigationService
 {
-    private MainWindowViewModel? _mainViewModel;
+    private MainWindowModel? _mainModel;
 
-    public bool CanGoBack => _mainViewModel?.CurrentView is not DashboardViewModel;
+    public bool CanGoBack => _mainModel?.CurrentView is not DashboardModel;
 
-    public void SetMainViewModel(MainWindowViewModel mainViewModel)
+    public void SetMainModel(MainWindowModel mainModel)
     {
-        _mainViewModel = mainViewModel;
+        _mainModel = mainModel;
     }
 
     public void NavigateTo(string viewKey)
@@ -24,44 +24,44 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
 
     public void NavigateTo(string viewKey, object? parameter)
     {
-        if (_mainViewModel == null) return;
+        if (_mainModel == null) return;
 
         var viewModel = viewKey switch
         {
-            "dashboard" => serviceProvider.GetRequiredService<DashboardViewModel>() as ViewModelBase,
-            "addedit" or "add" => CreateAddEditViewModel(parameter as int?),
-            "edit" => CreateAddEditViewModel(parameter as int?),
-            "categories" => serviceProvider.GetRequiredService<CategoryManagementViewModel>(),
-            "collections" => serviceProvider.GetRequiredService<CollectionManagementViewModel>(),
-            "recyclebin" or "recycle" => serviceProvider.GetRequiredService<RecycleBinViewModel>(),
-            "batchimport" or "batch-import" => serviceProvider.GetRequiredService<BatchImportViewModel>(),
-            "bulkdelete" or "bulk-delete" => serviceProvider.GetRequiredService<BulkDeleteViewModel>(),
-            "duplicates" => serviceProvider.GetRequiredService<DuplicateDetectionViewModel>(),
-            "fileintegrity" or "integrity" => serviceProvider.GetRequiredService<FileIntegrityCheckViewModel>(),
-            "report" => serviceProvider.GetRequiredService<ReportViewModel>(),
-            "recentfiles" => serviceProvider.GetRequiredService<RecentFilesViewModel>(),
-            "treemap" => serviceProvider.GetRequiredService<TreeMapViewModel>(),
-            "personal-note" => CreatePersonalNoteViewModel(parameter),
-            "related-docs" => CreateRelatedDocsViewModel(parameter),
-            _ => serviceProvider.GetRequiredService<DashboardViewModel>(),
+            "dashboard" => serviceProvider.GetRequiredService<DashboardModel>() as ModelBase,
+            "addedit" or "add" => CreateAddEditModel(parameter as int?),
+            "edit" => CreateAddEditModel(parameter as int?),
+            "categories" => serviceProvider.GetRequiredService<CategoryManagementModel>(),
+            "collections" => serviceProvider.GetRequiredService<CollectionManagementModel>(),
+            "recyclebin" or "recycle" => serviceProvider.GetRequiredService<RecycleBinModel>(),
+            "batchimport" or "batch-import" => serviceProvider.GetRequiredService<BatchImportModel>(),
+            "bulkdelete" or "bulk-delete" => serviceProvider.GetRequiredService<BulkDeleteModel>(),
+            "duplicates" => serviceProvider.GetRequiredService<DuplicateDetectionModel>(),
+            "fileintegrity" or "integrity" => serviceProvider.GetRequiredService<FileIntegrityCheckModel>(),
+            "report" => serviceProvider.GetRequiredService<ReportModel>(),
+            "recentfiles" => serviceProvider.GetRequiredService<RecentFilesModel>(),
+            "treemap" => serviceProvider.GetRequiredService<TreeMapModel>(),
+            "personal-note" => CreatePersonalNoteModel(parameter),
+            "related-docs" => CreateRelatedDocsModel(parameter),
+            _ => serviceProvider.GetRequiredService<DashboardModel>(),
         };
 
         if (viewModel != null)
         {
-            _mainViewModel.CurrentView = viewModel;
+            _mainModel.CurrentView = viewModel;
         }
     }
 
     // Always go back to Dashboard — matches WinForms behavior where closing sub-form = return to main
     public void GoBack()
     {
-        if (_mainViewModel == null) return;
-        _mainViewModel.CurrentView = serviceProvider.GetRequiredService<DashboardViewModel>();
+        if (_mainModel == null) return;
+        _mainModel.CurrentView = serviceProvider.GetRequiredService<DashboardModel>();
     }
 
-    private AddEditViewModel CreateAddEditViewModel(int? documentId)
+    private AddEditModel CreateAddEditModel(int? documentId)
     {
-        var vm = serviceProvider.GetRequiredService<AddEditViewModel>();
+        var vm = serviceProvider.GetRequiredService<AddEditModel>();
         if (documentId.HasValue)
         {
             vm.LoadDocument(documentId.Value);
@@ -69,9 +69,9 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
         return vm;
     }
 
-    private PersonalNoteViewModel CreatePersonalNoteViewModel(object? parameter)
+    private PersonalNoteModel CreatePersonalNoteModel(object? parameter)
     {
-        var vm = serviceProvider.GetRequiredService<PersonalNoteViewModel>();
+        var vm = serviceProvider.GetRequiredService<PersonalNoteModel>();
         if (parameter is (int docId, string docName))
         {
             vm.Load(docId, docName);
@@ -79,9 +79,9 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
         return vm;
     }
 
-    private RelatedDocumentsViewModel CreateRelatedDocsViewModel(object? parameter)
+    private RelatedDocumentsModel CreateRelatedDocsModel(object? parameter)
     {
-        var vm = serviceProvider.GetRequiredService<RelatedDocumentsViewModel>();
+        var vm = serviceProvider.GetRequiredService<RelatedDocumentsModel>();
         if (parameter is (int docId, string docName))
         {
             vm.Load(docId, docName);

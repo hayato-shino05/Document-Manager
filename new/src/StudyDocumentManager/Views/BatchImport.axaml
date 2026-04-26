@@ -1,0 +1,109 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             x:Class="StudyDocumentManager.Views.BatchImport"
+             x:DataType="vm:BatchImportModel">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+        <DockPanel>
+            <!-- Header -->
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,12">
+                <Image Source="{StaticResource IconImport}" Width="18" Height="18"/>
+                <TextBlock Text="Import H�ng Lo?t" FontSize="{StaticResource FontSizeXl}"
+                           FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+            </StackPanel>
+
+            <!-- Folder selection row -->
+            <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                    Padding="{StaticResource PaddingStatCard}" Margin="0,0,0,12">
+                <StackPanel Spacing="8">
+                    <DockPanel>
+                        <TextBlock Text="Thu m?c:" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"
+                                   Margin="0,0,8,0"/>
+                        <Button DockPanel.Dock="Right" Classes="secondary"
+                                Command="{Binding BrowseFolderCommand}" Padding="{StaticResource PaddingBtnMd}" Margin="6,0,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Image Source="{StaticResource IconCategory}" Width="11" Height="11"/>
+                                <TextBlock Text="Ch?n thu m?c" FontSize="{StaticResource FontSizeSm}"/>
+                            </StackPanel>
+                        </Button>
+                        <Button DockPanel.Dock="Right" Classes="primary"
+                                Command="{Binding ScanFolderCommand}" Padding="{StaticResource PaddingBtnMd}" Margin="6,0,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Image Source="{StaticResource IconScan}" Width="11" Height="11"/>
+                                <TextBlock Text="Qu�t" FontSize="{StaticResource FontSizeSm}"/>
+                            </StackPanel>
+                        </Button>
+                        <TextBox Text="{Binding FolderPath, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                                 Watermark="Nh?p du?ng d?n thu m?c ho?c nh?n Ch?n thu m?c..."
+                                 Height="30"/>
+                    </DockPanel>
+                    <DockPanel>
+                        <TextBlock Text="Danh m?c m?c d?nh:" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
+                                   Foreground="{StaticResource TextPrimary}" Margin="0,0,8,0"/>
+                        <TextBox Text="{Binding DefaultSubject, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                                 Watermark="Nh?p danh m?c cho c�c t�i li?u import..."
+                                 Height="30" Width="250" HorizontalAlignment="Left"/>
+                    </DockPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Bottom buttons -->
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8"
+                        HorizontalAlignment="Right" Margin="0,12,0,0">
+                <Button Classes="secondary" Command="{Binding SelectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconCheck}" Width="11" Height="11"/>
+                        <TextBlock Text="Ch?n t?t c?" FontSize="{StaticResource FontSizeSm}"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="secondary" Command="{Binding DeselectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconClose}" Width="11" Height="11"/>
+                        <TextBlock Text="B? ch?n" FontSize="{StaticResource FontSizeSm}"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="primary" Command="{Binding ImportCommand}" Padding="{StaticResource PaddingBtnLg}"
+                        IsEnabled="{Binding !IsImporting}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image Source="{StaticResource IconImport}" Width="13" Height="13"/>
+                        <TextBlock Text="Import t�i li?u d� ch?n" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+                <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="{StaticResource PaddingMd}">
+                    <TextBlock Text="H?y" FontSize="{StaticResource FontSizeMd}"/>
+                </Button>
+            </StackPanel>
+
+            <!-- File list DataGrid -->
+            <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1" ClipToBounds="True">
+                <Panel>
+                    <DataGrid ItemsSource="{Binding Files}"
+                              AutoGenerateColumns="False"
+                              CanUserSortColumns="True"
+                              GridLinesVisibility="Horizontal" HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="?" Binding="{Binding IsSelected}" Width="40"/>
+                            <DataGridTextColumn Header="T�n file" Binding="{Binding FileName}" Width="*" MinWidth="200"/>
+                            <DataGridTextColumn Header="Lo?i" Binding="{Binding FileType}" Width="70"/>
+                            <DataGridTextColumn Header="K�ch thu?c (MB)" Binding="{Binding FileSizeMB, StringFormat=\{0:F2\}}" Width="110"/>
+                            <DataGridTextColumn Header="�u?ng d?n" Binding="{Binding FilePath}" Width="300"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel IsVisible="{Binding !Files.Count}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                        <Image Source="{StaticResource IconCategory}" Width="36" Height="36"
+                               HorizontalAlignment="Center" Opacity="0.4"/>
+                        <TextBlock Text="Nh?p du?ng d?n thu m?c v� nh?n Qu�t" FontSize="{StaticResource FontSizeLg}"
+                                   Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Panel>
+            </Border>
+        </DockPanel>
+    </Border>
+
+</UserControl>

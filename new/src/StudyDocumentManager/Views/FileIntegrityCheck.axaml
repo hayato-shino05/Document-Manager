@@ -1,0 +1,118 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             xmlns:conv="using:StudyDocumentManager.Converters"
+             x:Class="StudyDocumentManager.Views.FileIntegrityCheck"
+             x:DataType="vm:FileIntegrityCheckModel">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+        <DockPanel>
+            <!-- Header -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Image Source="{StaticResource IconWrench}" Width="18" Height="18"/>
+                    <TextBlock Text="Ki?m tra t�nh to�n v?n file" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
+                            HorizontalAlignment="Right">
+                    <Button Classes="primary" Command="{Binding CheckIntegrityCommand}" Padding="{StaticResource PaddingBtnPrimary}"
+                            IsEnabled="{Binding !IsChecking}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconScan}" Width="13" Height="13"/>
+                            <TextBlock Text="Ki?m tra" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="danger" Command="{Binding RemoveMissingCommand}" Padding="{StaticResource PaddingBtnPrimary}"
+                            IsVisible="{Binding !!MissingCount}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
+                            <TextBlock Text="X�a file b? thi?u" FontSize="{StaticResource FontSizeMd}"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Stats -->
+            <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                    Padding="{StaticResource PaddingMd}" Margin="0,0,0,12"
+                    IsVisible="{Binding !!TotalChecked}">
+                <StackPanel Orientation="Horizontal" Spacing="20">
+                    <TextBlock FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="�� ki?m tra: {0} t�i li?u">
+                                <Binding Path="TotalChecked"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock FontSize="{StaticResource FontSizeMd}" Foreground="{DynamicResource ColorDanger}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="File b? m?t: {0}">
+                                <Binding Path="MissingCount"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <!-- Results DataGrid -->
+            <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1" ClipToBounds="True">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusText}" FontSize="{StaticResource FontSizeXs}"
+                               Foreground="{StaticResource TextMuted}" Margin="8,4"/>
+                    <Panel>
+                        <DataGrid Name="dgvMissingFiles"
+                                  ItemsSource="{Binding Results}"
+                                  AutoGenerateColumns="False" IsReadOnly="True"
+                                  CanUserSortColumns="True"
+                                  GridLinesVisibility="Horizontal" HeadersVisibility="Column">
+
+                            <!-- Per-item context menu -->
+                            <DataGrid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Ch?n file m?i..."
+                                              Command="{Binding SelectNewFileCommand}"
+                                              CommandParameter="{Binding #dgvMissingFiles.SelectedItem}"/>
+                                    <MenuItem Header="X�a du?ng d?n (gi? metadata)"
+                                              Command="{Binding ClearFilePathCommand}"
+                                              CommandParameter="{Binding #dgvMissingFiles.SelectedItem}"/>
+                                    <Separator/>
+                                    <MenuItem Header="X�a t�i li?u"
+                                              Command="{Binding DeleteDocumentCommand}"
+                                              CommandParameter="{Binding #dgvMissingFiles.SelectedItem}"/>
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Tr?ng th�i" Binding="{Binding Status}" Width="160"/>
+                                <DataGridTemplateColumn Header="T�n t�i li?u" Width="*" MinWidth="200" SortMemberPath="Document.Ten">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate x:DataType="vm:IntegrityResult">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
+                                                <Image Source="{Binding Document.Loai, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
+                                                       Width="16" Height="16" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding Document.Ten}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="�u?ng d?n" Binding="{Binding FilePath}" Width="350"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <StackPanel IsVisible="{Binding !Results.Count}"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                            <Image Source="{StaticResource IconWrench}" Width="36" Height="36"
+                                   HorizontalAlignment="Center" Opacity="0.4"/>
+                            <TextBlock Text="Nh?n &quot;Ki?m tra&quot; d? qu�t to�n b? t�i li?u" FontSize="{StaticResource FontSizeLg}"
+                                       Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Panel>
+                </DockPanel>
+            </Border>
+        </DockPanel>
+    </Border>
+
+</UserControl>

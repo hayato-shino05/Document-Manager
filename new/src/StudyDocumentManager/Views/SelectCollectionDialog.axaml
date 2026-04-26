@@ -5,29 +5,54 @@
         Width="440" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        Background="{StaticResource ContentBackground}">
 
     <StackPanel Margin="24" Spacing="12">
 
-        <!-- Document name -->
+        <!-- Document name label -->
         <TextBlock x:Name="DocNameLabel"
-                   FontSize="13" FontWeight="SemiBold"
+                   FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
                    Foreground="{StaticResource TextPrimary}"
                    TextWrapping="Wrap"/>
 
         <!-- Collection chips -->
         <StackPanel>
             <TextBlock Text="Chọn bộ sưu tập — click để chọn:"
-                       FontSize="10" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
-            <WrapPanel x:Name="ChipsPanel" Orientation="Horizontal"/>
+                       FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+
+            <!-- Empty state -->
+            <TextBlock x:Name="EmptyStateText"
+                       Text="(Chưa có bộ sưu tập nào — hãy tạo trong menu Bộ sưu tập)"
+                       FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                       IsVisible="False" TextWrapping="Wrap"/>
+
+            <!-- Chip list -->
+            <ItemsControl x:Name="ChipsPanel">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Classes="chip"
+                                Margin="0,0,6,6"
+                                Tag="{Binding Id}"
+                                Click="OnChipClicked">
+                            <TextBlock Text="{Binding Label}"/>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
 
         <!-- Selected indicator -->
         <TextBlock x:Name="SelectedLabel"
-                   FontSize="11" Foreground="{StaticResource TextSecondary}"
+                   FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
                    Text="Chưa chọn bộ sưu tập nào."/>
 
-        <!-- Buttons -->
+        <!-- Buttons: OK first, then Cancel -->
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Spacing="8" Margin="0,8,0,0">
