@@ -22,10 +22,6 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // CRITICAL: Remove Avalonia's built-in INPC binding plugin to prevent
-        // duplicate PropertyChanged subscriptions with CommunityToolkit.Mvvm.
-        // Without this, DataGrid triggers StackOverflowException from infinite
-        // binding loops (InpcPropertyAccessorPlugin double-subscribes).
         Avalonia.Data.Core.Plugins.BindingPlugins.DataValidators.RemoveAt(0);
         var services = new ServiceCollection();
         ConfigureServices(services);
@@ -47,7 +43,13 @@ public partial class App : Application
     private static void ConfigureServices(IServiceCollection services)
     {
         // Repositories
-        services.AddSingleton<IDocumentRepository, DocumentRepository>();
+        services.AddSingleton<IDocument, DocumentRepository>();
+        services.AddSingleton<ICategory, CategoryRepository>();
+        services.AddSingleton<ICollection, CollectionRepository>();
+        services.AddSingleton<IPersonalNote, PersonalNoteRepository>();
+        services.AddSingleton<IRelatedDocument, RelatedDocumentRepository>();
+        services.AddSingleton<IRecentFile, RecentFileRepository>();
+        services.AddSingleton<IReport, ReportRepository>();
 
         // Services
         services.AddSingleton<NavigationService>();
@@ -55,11 +57,11 @@ public partial class App : Application
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<DroppedFileImportService>();
 
-        // Models — Main
+        // Models â€” Main
         services.AddSingleton<MainWindowModel>();
         services.AddTransient<DashboardModel>();
 
-        // Models — Documents
+        // Models â€” Documents
         services.AddTransient<AddEditModel>();
         services.AddTransient<BatchImportModel>();
         services.AddTransient<BulkDeleteModel>();
@@ -67,17 +69,17 @@ public partial class App : Application
         services.AddTransient<PersonalNoteModel>();
         services.AddTransient<RelatedDocumentsModel>();
 
-        // Models — Management
+        // Models â€” Management
         services.AddTransient<CategoryManagementModel>();
         services.AddTransient<CollectionManagementModel>();
         services.AddTransient<RecycleBinModel>();
         services.AddTransient<FileIntegrityCheckModel>();
 
-        // Models — Reports
+        // Models â€” Reports
         services.AddTransient<ReportModel>();
         services.AddTransient<TreeMapModel>();
 
-        // Models — Utilities
+        // Models â€” Utilities
         services.AddTransient<RecentFilesModel>();
     }
 }
