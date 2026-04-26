@@ -931,7 +931,7 @@ public class RecentFilesLimitTests : DatabaseTestBase
 
 public class DocumentRepositoryContractTests : DatabaseTestBase
 {
-    private readonly IDocumentRepository _repo;
+    private readonly IDocument _repo;
 
     public DocumentRepositoryContractTests()
     {
