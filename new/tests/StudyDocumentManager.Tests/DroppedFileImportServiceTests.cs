@@ -32,7 +32,7 @@ public class DroppedFileImportServiceTests
         }
     }
 
-    private sealed class FakeDocumentRepository : IDocumentRepository
+    private sealed class FakeDocumentRepository : IDocument
     {
         public List<StudyDocument> GetAll() => throw new NotImplementedException();
         public StudyDocument? GetById(int id) => throw new NotImplementedException();
