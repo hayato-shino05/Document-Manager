@@ -1,8 +1,8 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using StudyDocumentManager.Data.Helpers;
+using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
@@ -11,19 +11,21 @@ public partial class RecentFilesModel : ModelBase
 {
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
+    private readonly IRecentFile _recentRepo;
 
     [ObservableProperty] private ObservableCollection<RecentFileItem> _recentFiles = new();
 
-    public RecentFilesModel(IDialogService dialogService, INavigationService navigationService)
+    public RecentFilesModel(IDialogService dialogService, INavigationService navigationService, IRecentFile recentRepo)
     {
         _dialogService = dialogService;
         _navigationService = navigationService;
+        _recentRepo = recentRepo;
         LoadData();
     }
 
     private void LoadData()
     {
-        var files = DatabaseHelper.GetRecentFiles();
+        var files = _recentRepo.GetAll();
         // Use Clear+Add to keep same ObservableCollection reference (avoid StackOverflow)
         RecentFiles.Clear();
         foreach (var f in files)
@@ -48,7 +50,7 @@ public partial class RecentFilesModel : ModelBase
 
         try
         {
-            DatabaseHelper.AddRecentFile(item.DocumentId);
+            _recentRepo.Add(item.DocumentId);
             Process.Start(new ProcessStartInfo
             {
                 FileName = item.FilePath,
@@ -66,7 +68,7 @@ public partial class RecentFilesModel : ModelBase
         var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận", "Xóa toàn bộ lịch sử file đã mở?");
         if (confirmed)
         {
-            DatabaseHelper.ClearRecentFiles();
+            _recentRepo.Clear();
             LoadData();
         }
     }

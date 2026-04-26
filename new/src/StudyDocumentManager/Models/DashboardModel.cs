@@ -7,36 +7,38 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
-using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
 
 public partial class DashboardModel : ModelBase
 {
-    private readonly IDocumentRepository _repository;
+    private readonly IDocument _repository;
+    private readonly ICategory _categoryRepo;
+    private readonly ICollection _collectionRepo;
+    private readonly IRecentFile _recentFileRepo;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private bool _isLoadingData; // Guard flag to prevent re-entrant ApplyFilters during LoadData
     private bool _isApplyingFilters; // Re-entrancy guard for ApplyFilters
 
-    // ═══ Document list ═══
+    // â•â•â• Document list â•â•â•
     [ObservableProperty]
     private List<StudyDocument> _documents = new();
 
     [ObservableProperty]
     private StudyDocument? _selectedDocument;
 
-    // ═══ Preview ═══
+    // â•â•â• Preview â•â•â•
     public string PreviewIcon => SelectedDocument switch
     {
-        null => "📄",
-        var d when d.Loai is "Hình ảnh" => "🖼️",
-        var d when d.Loai is "Video" => "🎬",
-        var d when d.Loai is "Audio" => "🎵",
-        var d when d.Loai is "Nén" => "📦",
-        var d when d.Loai is "Tài liệu" => "📝",
-        _ => "📄"
+        null => "ðŸ“„",
+        var d when d.Loai is "HÃ¬nh áº£nh" => "ðŸ–¼ï¸",
+        var d when d.Loai is "Video" => "ðŸŽ¬",
+        var d when d.Loai is "Audio" => "ðŸŽµ",
+        var d when d.Loai is "NÃ©n" => "ðŸ“¦",
+        var d when d.Loai is "TÃ i liá»‡u" => "ðŸ“",
+        _ => "ðŸ“„"
     };
 
     partial void OnSelectedDocumentChanged(StudyDocument? value)
@@ -47,23 +49,23 @@ public partial class DashboardModel : ModelBase
         OnPropertyChanged(nameof(PreviewIcon));
     }
 
-    // ═══ Stats ═══
+    // â•â•â• Stats â•â•â•
     [ObservableProperty] private int _totalDocuments;
     [ObservableProperty] private int _importantDocuments;
     [ObservableProperty] private int _overdueDocuments;
     [ObservableProperty] private int _totalCategories;
     [ObservableProperty] private int _noFileDocuments;
     [ObservableProperty] private int _deletedCount;
-    [ObservableProperty] private string _statusText = "Sẵn sàng";
+    [ObservableProperty] private string _statusText = "Sáºµn sÃ ng";
 
-    // ═══ Search & Filter ═══
+    // â•â•â• Search & Filter â•â•â•
     [ObservableProperty] private string _searchKeyword = string.Empty;
     [ObservableProperty] private List<string> _subjects = new();
     [ObservableProperty] private List<string> _types = new();
-    [ObservableProperty] private string _selectedSubject = "Tất cả";
-    [ObservableProperty] private string _selectedType = "Tất cả";
+    [ObservableProperty] private string _selectedSubject = "Táº¥t cáº£";
+    [ObservableProperty] private string _selectedType = "Táº¥t cáº£";
 
-    // ═══ Advanced Filter ═══
+    // â•â•â• Advanced Filter â•â•â•
     [ObservableProperty] private bool _isAdvancedFilterVisible;
     [ObservableProperty] private bool _isDateFilterEnabled;
     [ObservableProperty] private DateTimeOffset? _filterFromDate;
@@ -85,7 +87,7 @@ public partial class DashboardModel : ModelBase
         }
     }
 
-    // ═══ Stat card aliases for view binding ═══
+    // â•â•â• Stat card aliases for view binding â•â•â•
     public int TotalCount => TotalDocuments;
     public int SubjectCount => TotalCategories;
     public int ImportantCount => ImportantDocuments;
@@ -93,16 +95,25 @@ public partial class DashboardModel : ModelBase
     public int NoFileCount => NoFileDocuments;
     public int RecycleBinCount => DeletedCount;
 
-    // ═══ Category Tree Items ═══
+    // â•â•â• Category Tree Items â•â•â•
     [ObservableProperty]
     private ObservableCollection<CategoryTreeItem> _categoryTreeItems = new();
 
-    public DashboardModel(IDocumentRepository repository, IDialogService dialogService, INavigationService navigationService)
+    public DashboardModel(
+        IDocument repository,
+        ICategory categoryRepo,
+        ICollection collectionRepo,
+        IRecentFile recentFileRepo,
+        IDialogService dialogService,
+        INavigationService navigationService)
     {
         _repository = repository;
+        _categoryRepo = categoryRepo;
+        _collectionRepo = collectionRepo;
+        _recentFileRepo = recentFileRepo;
         _dialogService = dialogService;
         _navigationService = navigationService;
-        // DO NOT call LoadData() here — it causes StackOverflowException
+        // DO NOT call LoadData() here â€” it causes StackOverflowException
         // because DataGrid layout hasn't completed yet.
         // Call Initialize() from View.Loaded event instead.
     }
@@ -131,31 +142,31 @@ public partial class DashboardModel : ModelBase
         ImportantDocuments = docs.Count(d => d.QuanTrong);
         OverdueDocuments = _repository.GetOverdueDocuments().Count;
         NoFileDocuments = docs.Count(d => string.IsNullOrEmpty(d.DuongDan));
-        TotalCategories = DatabaseHelper.GetAllSubjects().Count;
-        DeletedCount = DatabaseHelper.GetDeletedDocumentCount();
+        TotalCategories = _categoryRepo.GetAllSubjects().Count;
+        DeletedCount = _repository.GetDeletedDocumentCount();
 
-        // Load filter dropdowns — clear and re-populate EXISTING collections
+        // Load filter dropdowns â€” clear and re-populate EXISTING collections
         // to avoid replacing the ObservableCollection reference which causes
         // Avalonia ComboBox binding loop (StackOverflowException).
-        var subjects = DatabaseHelper.GetAllSubjects();
-        var types = DatabaseHelper.GetAllTypes();
+        var subjects = _categoryRepo.GetAllSubjects();
+        var types = _categoryRepo.GetAllTypes();
 
-        var subjectList = new List<string> { "Tất cả" };
+        var subjectList = new List<string> { "Táº¥t cáº£" };
         subjectList.AddRange(subjects);
         Subjects = subjectList;
 
-        var typeList = new List<string> { "Tất cả" };
+        var typeList = new List<string> { "Táº¥t cáº£" };
         typeList.AddRange(types);
         Types = typeList;
 
         System.Diagnostics.Debug.WriteLine($"[DEBUG] Subjects={Subjects.Count}, Types={Types.Count}");
 
         // Reset filter AFTER collections are populated
-        SelectedSubject = "Tất cả";
-        SelectedType = "Tất cả";
+        SelectedSubject = "Táº¥t cáº£";
+        SelectedType = "Táº¥t cáº£";
         System.Diagnostics.Debug.WriteLine($"[DEBUG] After filter reset: Subject='{SelectedSubject}', Type='{SelectedType}'");
 
-        // Assign new List (not ObservableCollection) — DataGrid ItemsSource
+        // Assign new List (not ObservableCollection) â€” DataGrid ItemsSource
         // is set from code-behind to avoid binding loop.
         Documents = docs.ToList();
 
@@ -163,7 +174,7 @@ public partial class DashboardModel : ModelBase
         BuildCategoryTree(docs, subjects, types);
 
         // Update status
-        StatusText = $"Tổng: {TotalDocuments} tài liệu | Quan trọng: {ImportantDocuments} | Quá hạn: {OverdueDocuments}";
+        StatusText = $"Tá»•ng: {TotalDocuments} tÃ i liá»‡u | Quan trá»ng: {ImportantDocuments} | QuÃ¡ háº¡n: {OverdueDocuments}";
 
         // Notify stat card properties changed
         OnPropertyChanged(nameof(TotalCount));
@@ -181,17 +192,17 @@ public partial class DashboardModel : ModelBase
     {
         var items = new List<CategoryTreeItem>();
 
-        // ─── Tất cả ───────────────────────────────────────────────
+        // â”€â”€â”€ Táº¥t cáº£ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         items.Add(new CategoryTreeItem
         {
-            Name = "Tất cả tài liệu",
+            Name = "Táº¥t cáº£ tÃ i liá»‡u",
             Count = docs.Count,
             IconKey = "IconAllDocs",
             FilterType = "all",
             FilterValue = ""
         });
 
-        // ─── Section: Danh mục ────────────────────────────────────
+        // â”€â”€â”€ Section: Danh má»¥c â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         var subjectItems = subjects
             .Select(s => new { Name = s, Count = docs.Count(d => d.MonHoc == s) })
             .Where(x => x.Count > 0).ToList();
@@ -200,7 +211,7 @@ public partial class DashboardModel : ModelBase
         {
             items.Add(new CategoryTreeItem
             {
-                Name = "Danh mục",
+                Name = "Danh má»¥c",
                 IconKey = "IconCategory",
                 FilterType = "section-header",
                 IsHeader = true
@@ -215,7 +226,7 @@ public partial class DashboardModel : ModelBase
                 });
         }
 
-        // ─── Section: Loại file ───────────────────────────────────
+        // â”€â”€â”€ Section: Loáº¡i file â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         var typeItems = types
             .Select(t => new { Name = t, Count = docs.Count(d => d.Loai == t) })
             .Where(x => x.Count > 0).ToList();
@@ -224,7 +235,7 @@ public partial class DashboardModel : ModelBase
         {
             items.Add(new CategoryTreeItem
             {
-                Name = "Loại file",
+                Name = "Loáº¡i file",
                 IconKey = "IconDuplicate",
                 FilterType = "section-header",
                 IsHeader = true
@@ -239,32 +250,32 @@ public partial class DashboardModel : ModelBase
                 });
         }
 
-        // ─── Quan trọng ───────────────────────────────────────────
+        // â”€â”€â”€ Quan trá»ng â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         items.Add(new CategoryTreeItem
         {
-            Name = "Quan trọng",
+            Name = "Quan trá»ng",
             Count = docs.Count(d => d.QuanTrong),
             IconKey = "IconStar",
             FilterType = "important",
             FilterValue = ""
         });
 
-        // ─── Bộ sưu tập ───────────────────────────────────────────
+        // â”€â”€â”€ Bá»™ sÆ°u táº­p â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         try
         {
-            var collections = DatabaseHelper.GetCollections();
+            var collections = _collectionRepo.GetAll();
             if (collections.Count > 0)
             {
                 items.Add(new CategoryTreeItem
                 {
-                    Name = "Bộ sưu tập",
+                    Name = "Bá»™ sÆ°u táº­p",
                     IconKey = "IconCategory",
                     FilterType = "section-header",
                     IsHeader = true
                 });
                 foreach (var col in collections)
                 {
-                    int colCount = DatabaseHelper.GetDocumentsInCollection(col.Id)?.Count ?? 0;
+                    int colCount = _collectionRepo.GetDocuments(col.Id)?.Count ?? 0;
                     items.Add(new CategoryTreeItem
                     {
                         Name = col.Name, Count = colCount,
@@ -281,7 +292,7 @@ public partial class DashboardModel : ModelBase
         foreach (var it in items) CategoryTreeItems.Add(it);
     }
 
-    // ═══ Search & Filter commands ═══
+    // â•â•â• Search & Filter commands â•â•â•
     [RelayCommand]
     private void Search() => ApplyFilters();
 
@@ -312,29 +323,29 @@ public partial class DashboardModel : ModelBase
         switch (item.FilterType)
         {
             case "all":
-                SelectedSubject = "Tất cả";
-                SelectedType = "Tất cả";
+                SelectedSubject = "Táº¥t cáº£";
+                SelectedType = "Táº¥t cáº£";
                 IsImportantOnly = false;
                 break;
             case "subject":
                 SelectedSubject = item.FilterValue;
-                SelectedType = "Tất cả";
+                SelectedType = "Táº¥t cáº£";
                 IsImportantOnly = false;
                 break;
             case "type":
-                SelectedSubject = "Tất cả";
+                SelectedSubject = "Táº¥t cáº£";
                 SelectedType = item.FilterValue;
                 IsImportantOnly = false;
                 break;
             case "important":
-                SelectedSubject = "Tất cả";
-                SelectedType = "Tất cả";
+                SelectedSubject = "Táº¥t cáº£";
+                SelectedType = "Táº¥t cáº£";
                 IsImportantOnly = true;
                 break;
             case "collection":
                 if (int.TryParse(item.FilterValue, out int colId))
                 {
-                    var colDocs = DatabaseHelper.GetDocumentsInCollection(colId);
+                    var colDocs = _collectionRepo.GetDocuments(colId);
                     if (colDocs != null)
                     {
                         _isApplyingFilters = true;
@@ -366,7 +377,7 @@ public partial class DashboardModel : ModelBase
     {
         if (SelectedDocument == null) return;
 
-        var existing = DatabaseHelper.GetSubjectsWithCount().Select(s => s.Name).ToList();
+        var existing = _categoryRepo.GetSubjectsWithCount().Select(s => s.Name).ToList();
         var newCategory = await _dialogService.ShowChangeCategoryAsync(
             SelectedDocument.Ten,
             existing,
@@ -381,7 +392,7 @@ public partial class DashboardModel : ModelBase
         if (ok)
             LoadData();
         else
-            await _dialogService.ShowMessageAsync("Lỗi", "Không thể cập nhật danh mục.");
+            await _dialogService.ShowMessageAsync("Lá»—i", "KhÃ´ng thá»ƒ cáº­p nháº­t danh má»¥c.");
     }
 
     private void ApplyFilters()
@@ -395,8 +406,8 @@ public partial class DashboardModel : ModelBase
         try
         {
             string keyword = SearchKeyword?.Trim() ?? "";
-            string subject = SelectedSubject == "Tất cả" ? "" : SelectedSubject;
-            string type = SelectedType == "Tất cả" ? "" : SelectedType;
+            string subject = SelectedSubject == "Táº¥t cáº£" ? "" : SelectedSubject;
+            string type = SelectedType == "Táº¥t cáº£" ? "" : SelectedType;
 
             DateTime? fromDate = IsDateFilterEnabled && FilterFromDate.HasValue
                 ? FilterFromDate.Value.DateTime : null;
@@ -425,7 +436,7 @@ public partial class DashboardModel : ModelBase
         }
     }
 
-    // ═══ Document actions ═══
+    // â•â•â• Document actions â•â•â•
     [RelayCommand]
     private void OpenFile()
     {
@@ -436,7 +447,9 @@ public partial class DashboardModel : ModelBase
             if (File.Exists(SelectedDocument.DuongDan))
             {
                 // Track recent file
-                DatabaseHelper.AddRecentFile(SelectedDocument.Id);
+                // NOTE: AddRecentFile is called via DashboardModel but RecentFileRepository is not injected here.
+                // This is intentional â€” recent file tracking does not affect dashboard state.
+                _recentFileRepo.Add(SelectedDocument.Id);
 
                 Process.Start(new ProcessStartInfo
                 {
@@ -453,9 +466,9 @@ public partial class DashboardModel : ModelBase
     {
         if (SelectedDocument == null) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận xóa",
-            $"Xóa tài liệu '{SelectedDocument.Ten}' vào Thùng rác?",
-            "Xoá", isDanger: true);
+        var confirmed = await _dialogService.ShowConfirmAsync("XÃ¡c nháº­n xÃ³a",
+            $"XÃ³a tÃ i liá»‡u '{SelectedDocument.Ten}' vÃ o ThÃ¹ng rÃ¡c?",
+            "XoÃ¡", isDanger: true);
         if (confirmed)
         {
             _repository.Delete(SelectedDocument.Id);
@@ -501,17 +514,17 @@ public partial class DashboardModel : ModelBase
     [RelayCommand]
     private async Task BackupDatabaseAsync()
     {
-        var path = await _dialogService.ShowSaveFileAsync("Sao lưu", "backup_study_docs.db", "Database|*.db|All Files|*.*");
+        var path = await _dialogService.ShowSaveFileAsync("Sao lÆ°u", "backup_study_docs.db", "Database|*.db|All Files|*.*");
         if (!string.IsNullOrWhiteSpace(path))
         {
             try
             {
-                DatabaseHelper.BackupDatabase(path);
-                await _dialogService.ShowMessageAsync("Thành công", $"Đã sao lưu cơ sở dữ liệu tại:\n{path}");
+                _repository.BackupDatabase(path);
+                await _dialogService.ShowMessageAsync("ThÃ nh cÃ´ng", $"ÄÃ£ sao lÆ°u cÆ¡ sá»Ÿ dá»¯ liá»‡u táº¡i:\n{path}");
             }
             catch (Exception ex)
             {
-                await _dialogService.ShowErrorAsync("Lỗi", $"Không thể sao lưu: {ex.Message}");
+                await _dialogService.ShowErrorAsync("Lá»—i", $"KhÃ´ng thá»ƒ sao lÆ°u: {ex.Message}");
             }
         }
     }
@@ -519,14 +532,14 @@ public partial class DashboardModel : ModelBase
     [RelayCommand]
     private async Task ExportCsvAsync()
     {
-        var path = await _dialogService.ShowSaveFileAsync("Xuất CSV", "tai_lieu_export.csv", "CSV|*.csv|All Files|*.*");
+        var path = await _dialogService.ShowSaveFileAsync("Xuáº¥t CSV", "tai_lieu_export.csv", "CSV|*.csv|All Files|*.*");
         if (string.IsNullOrWhiteSpace(path)) return;
 
         try
         {
             var docs = Documents;
             using var writer = new StreamWriter(path, false, System.Text.Encoding.UTF8);
-            await writer.WriteLineAsync("ID,Tên,Danh mục,Loại,Đường dẫn,Tác giả,Tags,Quan trọng,Dung lượng (MB),Ngày thêm,Deadline,Ghi chú");
+            await writer.WriteLineAsync("ID,TÃªn,Danh má»¥c,Loáº¡i,ÄÆ°á»ng dáº«n,TÃ¡c giáº£,Tags,Quan trá»ng,Dung lÆ°á»£ng (MB),NgÃ y thÃªm,Deadline,Ghi chÃº");
             foreach (var doc in docs)
             {
                 string line = string.Join(",",
@@ -537,7 +550,7 @@ public partial class DashboardModel : ModelBase
                     EscapeCsv(doc.DuongDan),
                     EscapeCsv(doc.TacGia),
                     EscapeCsv(doc.Tags),
-                    doc.QuanTrong ? "Có" : "Không",
+                    doc.QuanTrong ? "CÃ³" : "KhÃ´ng",
                     doc.KichThuoc?.ToString("F2") ?? "",
                     doc.NgayThem.ToString("dd/MM/yyyy"),
                     doc.Deadline?.ToString("dd/MM/yyyy") ?? "",
@@ -545,11 +558,11 @@ public partial class DashboardModel : ModelBase
                 );
                 await writer.WriteLineAsync(line);
             }
-            await _dialogService.ShowMessageAsync("Thành công", $"Đã xuất {docs.Count} tài liệu ra file:\n{path}");
+            await _dialogService.ShowMessageAsync("ThÃ nh cÃ´ng", $"ÄÃ£ xuáº¥t {docs.Count} tÃ i liá»‡u ra file:\n{path}");
         }
         catch (Exception ex)
         {
-            await _dialogService.ShowErrorAsync("Lỗi", $"Không thể xuất CSV: {ex.Message}");
+            await _dialogService.ShowErrorAsync("Lá»—i", $"KhÃ´ng thá»ƒ xuáº¥t CSV: {ex.Message}");
         }
     }
 
@@ -564,29 +577,29 @@ public partial class DashboardModel : ModelBase
     [RelayCommand]
     private async Task RestoreDatabaseAsync()
     {
-        var path = await _dialogService.ShowOpenFileAsync("Chọn file backup", "Database|*.db|All Files|*.*");
+        var path = await _dialogService.ShowOpenFileAsync("Chá»n file backup", "Database|*.db|All Files|*.*");
         if (string.IsNullOrWhiteSpace(path)) return;
 
         if (!File.Exists(path))
         {
-            await _dialogService.ShowErrorAsync("Lỗi", "File backup không tồn tại.");
+            await _dialogService.ShowErrorAsync("Lá»—i", "File backup khÃ´ng tá»“n táº¡i.");
             return;
         }
 
-        var confirmed = await _dialogService.ShowConfirmAsync("⚠️ Xác nhận",
-            "Khôi phục sẽ GHI ĐÈ toàn bộ dữ liệu hiện tại. Bạn có chắc chắn?",
-            "Ghi đè & Khôi phục", isDanger: true);
+        var confirmed = await _dialogService.ShowConfirmAsync("âš ï¸ XÃ¡c nháº­n",
+            "KhÃ´i phá»¥c sáº½ GHI ÄÃˆ toÃ n bá»™ dá»¯ liá»‡u hiá»‡n táº¡i. Báº¡n cÃ³ cháº¯c cháº¯n?",
+            "Ghi Ä‘Ã¨ & KhÃ´i phá»¥c", isDanger: true);
         if (confirmed)
         {
             try
             {
-                File.Copy(path, DatabaseHelper.DatabasePath, overwrite: true);
+                File.Copy(path, _repository.DatabasePath, overwrite: true);
                 LoadData();
-                await _dialogService.ShowMessageAsync("Thành công", "Đã khôi phục cơ sở dữ liệu thành công!");
+                await _dialogService.ShowMessageAsync("ThÃ nh cÃ´ng", "ÄÃ£ khÃ´i phá»¥c cÆ¡ sá»Ÿ dá»¯ liá»‡u thÃ nh cÃ´ng!");
             }
             catch (Exception ex)
             {
-                await _dialogService.ShowErrorAsync("Lỗi", $"Không thể khôi phục: {ex.Message}");
+                await _dialogService.ShowErrorAsync("Lá»—i", $"KhÃ´ng thá»ƒ khÃ´i phá»¥c: {ex.Message}");
             }
         }
     }
@@ -597,8 +610,8 @@ public partial class DashboardModel : ModelBase
         // Set guard BEFORE changing properties to block ApplyFilters re-entrance
         _isLoadingData = true;
         SearchKeyword = string.Empty;
-        SelectedSubject = "Tất cả";
-        SelectedType = "Tất cả";
+        SelectedSubject = "Táº¥t cáº£";
+        SelectedType = "Táº¥t cáº£";
         IsAdvancedFilterVisible = false;
         IsDateFilterEnabled = false;
         FilterFromDate = null;
@@ -612,7 +625,7 @@ public partial class DashboardModel : ModelBase
         LoadData();
     }
 
-    // ═══ Navigation commands ═══
+    // â•â•â• Navigation commands â•â•â•
     [RelayCommand]
     private void OpenBatchImport() => _navigationService.NavigateTo("batchimport");
 
@@ -657,7 +670,7 @@ public partial class DashboardModel : ModelBase
         _navigationService.NavigateTo("related-docs", (SelectedDocument.Id, SelectedDocument.Ten));
     }
 
-    // ═══ Context menu actions ═══
+    // â•â•â• Context menu actions â•â•â•
     [RelayCommand]
     private void CopyPath()
     {
@@ -690,10 +703,10 @@ public partial class DashboardModel : ModelBase
         if (SelectedDocument == null) return;
 
         var result = await _dialogService.ShowInputAsync(
-            "Sửa Tags",
+            "Sá»­a Tags",
             $"Tags cho \"{SelectedDocument.Ten}\":",
             SelectedDocument.Tags ?? "",
-            "Ví dụ: lập trình, toán học, vật lý");
+            "VÃ­ dá»¥: láº­p trÃ¬nh, toÃ¡n há»c, váº­t lÃ½");
 
         if (result == null) return; // cancelled
 
@@ -708,10 +721,10 @@ public partial class DashboardModel : ModelBase
         if (SelectedDocument == null) return;
 
         var result = await _dialogService.ShowInputAsync(
-            "Sửa Ghi chú",
-            $"Ghi chú cho \"{SelectedDocument.Ten}\":",
+            "Sá»­a Ghi chÃº",
+            $"Ghi chÃº cho \"{SelectedDocument.Ten}\":",
             SelectedDocument.GhiChu ?? "",
-            "Nhập ghi chú nội bộ...");
+            "Nháº­p ghi chÃº ná»™i bá»™...");
 
         if (result == null) return; // cancelled
 
@@ -725,18 +738,18 @@ public partial class DashboardModel : ModelBase
     {
         if (SelectedDocument == null) return;
 
-        var rawCollections = DatabaseHelper.GetCollections();
+        var rawCollections = _collectionRepo.GetAll();
         if (rawCollections.Count == 0)
         {
-            await _dialogService.ShowMessageAsync("Thông báo",
-                "Chưa có bộ sưu tập nào. Vui lòng tạo bộ sưu tập trong menu 'Bộ sưu tập' trước.");
+            await _dialogService.ShowMessageAsync("ThÃ´ng bÃ¡o",
+                "ChÆ°a cÃ³ bá»™ sÆ°u táº­p nÃ o. Vui lÃ²ng táº¡o bá»™ sÆ°u táº­p trong menu 'Bá»™ sÆ°u táº­p' trÆ°á»›c.");
             return;
         }
 
         // Build picker items with doc counts
         var items = rawCollections
             .Select(c => (c.Id, c.Name,
-                DocCount: DatabaseHelper.GetDocumentsInCollection(c.Id)?.Count ?? 0))
+                DocCount: _collectionRepo.GetDocuments(c.Id)?.Count ?? 0))
             .ToList();
 
         var selectedId = await _dialogService.ShowSelectCollectionAsync(
@@ -746,16 +759,16 @@ public partial class DashboardModel : ModelBase
 
         var collection = rawCollections.First(c => c.Id == selectedId);
 
-        if (DatabaseHelper.AddDocumentToCollection(collection.Id, SelectedDocument.Id))
+        if (_collectionRepo.AddDocument(collection.Id, SelectedDocument.Id))
         {
-            await _dialogService.ShowMessageAsync("Thành công",
-                $"Đã thêm '{SelectedDocument.Ten}' vào bộ sưu tập '{collection.Name}'.");
+            await _dialogService.ShowMessageAsync("ThÃ nh cÃ´ng",
+                $"ÄÃ£ thÃªm '{SelectedDocument.Ten}' vÃ o bá»™ sÆ°u táº­p '{collection.Name}'.");
             Refresh();
         }
         else
         {
-            await _dialogService.ShowMessageAsync("Thông báo",
-                $"Tài liệu đã có trong bộ sưu tập '{collection.Name}' rồi.");
+            await _dialogService.ShowMessageAsync("ThÃ´ng bÃ¡o",
+                $"TÃ i liá»‡u Ä‘Ã£ cÃ³ trong bá»™ sÆ°u táº­p '{collection.Name}' rá»“i.");
         }
     }
 
@@ -779,13 +792,13 @@ public partial class DashboardModel : ModelBase
         catch { /* ignore */ }
     }
 
-    // ═══ Deadline quick filters ═══
+    // â•â•â• Deadline quick filters â•â•â•
     [RelayCommand]
     private void ShowUpcomingDeadlines()
     {
         var docs = _repository.GetUpcomingDeadlines(7);
         Documents = docs.ToList();
-        StatusText = $"Sắp đến hạn (7 ngày): {docs.Count} tài liệu";
+        StatusText = $"Sáº¯p Ä‘áº¿n háº¡n (7 ngÃ y): {docs.Count} tÃ i liá»‡u";
     }
 
     [RelayCommand]
@@ -793,20 +806,20 @@ public partial class DashboardModel : ModelBase
     {
         var docs = _repository.GetOverdueDocuments();
         Documents = docs.ToList();
-        StatusText = $"Quá hạn: {docs.Count} tài liệu";
+        StatusText = $"QuÃ¡ háº¡n: {docs.Count} tÃ i liá»‡u";
     }
 
-    // ═══ About dialog ═══
+    // â•â•â• About dialog â•â•â•
     [RelayCommand]
     private async Task ShowAboutAsync()
     {
-        var version = StudyDocumentManager.Core.Services.AppVersion.Current;
-        await _dialogService.ShowMessageAsync("Giới thiệu",
+        var version = StudyDocumentManager.Services.AppVersion.Current;
+        await _dialogService.ShowMessageAsync("Giá»›i thiá»‡u",
             $"Study Document Manager v{version}\n\n" +
-            "Ứng dụng quản lý tài liệu học tập cá nhân\n" +
+            "á»¨ng dá»¥ng quáº£n lÃ½ tÃ i liá»‡u há»c táº­p cÃ¡ nhÃ¢n\n" +
             "Framework: Avalonia UI (.NET 9)\n" +
             "Database: SQLite (local)\n\n" +
-            "© 2025 hayato-shino05\n" +
+            "Â© 2025 hayato-shino05\n" +
             "GitHub: github.com/hayato-shino05/study-document-manager");
     }
 
@@ -846,7 +859,7 @@ public class CategoryTreeItem
     {
         get
         {
-            // File-type nodes → load real file icon from Assets
+            // File-type nodes â†’ load real file icon from Assets
             if (FilterType == "type")
             {
                 return StudyDocumentManager.Converters.DocumentTypeIconConverter.Instance
@@ -855,7 +868,7 @@ public class CategoryTreeItem
                     as Avalonia.Media.IImage;
             }
 
-            // All other nodes → DrawingImage from resource dictionary
+            // All other nodes â†’ DrawingImage from resource dictionary
             var app = Avalonia.Application.Current;
             if (app == null) return null;
 

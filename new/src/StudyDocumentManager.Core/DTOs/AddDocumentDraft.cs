@@ -1,6 +1,6 @@
 using StudyDocumentManager.Core.Entities;
 
-namespace StudyDocumentManager.Services;
+namespace StudyDocumentManager.Core.DTOs;
 
 public class AddDocumentDraft
 {

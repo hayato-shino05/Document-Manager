@@ -1,16 +1,16 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
-using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
 
 public partial class RelatedDocumentsModel : ModelBase
 {
-    private readonly IDocumentRepository _repository;
+    private readonly IDocument _repository;
+    private readonly IRelatedDocument _relatedDocRepo;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
 
@@ -30,9 +30,10 @@ public partial class RelatedDocumentsModel : ModelBase
         "kế tiếp"
     };
 
-    public RelatedDocumentsModel(IDocumentRepository repository, IDialogService dialogService, INavigationService navigationService)
+    public RelatedDocumentsModel(IDocument repository, IRelatedDocument relatedDocRepo, IDialogService dialogService, INavigationService navigationService)
     {
         _repository = repository;
+        _relatedDocRepo = relatedDocRepo;
         _dialogService = dialogService;
         _navigationService = navigationService;
     }
@@ -48,7 +49,7 @@ public partial class RelatedDocumentsModel : ModelBase
     private void RefreshRelated()
     {
         RelatedDocuments.Clear();
-        var related = DatabaseHelper.GetRelatedDocuments(DocumentId);
+        var related = _relatedDocRepo.GetRelated(DocumentId);
         foreach (var (doc, relId, relType) in related)
         {
             RelatedDocuments.Add(new RelatedDocItem
@@ -75,7 +76,7 @@ public partial class RelatedDocumentsModel : ModelBase
     {
         if (SelectedAvailableDoc == null) return;
 
-        DatabaseHelper.AddDocumentRelation(DocumentId, SelectedAvailableDoc.Id, SelectedRelationType);
+        _relatedDocRepo.AddRelation(DocumentId, SelectedAvailableDoc.Id, SelectedRelationType);
         RefreshRelated();
         LoadAvailable();
     }
@@ -89,7 +90,7 @@ public partial class RelatedDocumentsModel : ModelBase
             $"Gỡ liên kết với '{item.Document.Ten}'?");
         if (!confirmed) return;
 
-        DatabaseHelper.RemoveDocumentRelation(item.RelationId);
+        _relatedDocRepo.RemoveRelation(item.RelationId);
         RefreshRelated();
         LoadAvailable();
     }

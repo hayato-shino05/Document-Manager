@@ -3,7 +3,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform.Storage;
+using StudyDocumentManager.Core.DTOs;
 using StudyDocumentManager.Core.Entities;
+using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Views;
 
 namespace StudyDocumentManager.Services;

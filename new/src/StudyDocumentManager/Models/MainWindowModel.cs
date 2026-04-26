@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using StudyDocumentManager.Core.Interfaces;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Services;
@@ -11,7 +12,7 @@ public partial class MainWindowModel : ModelBase
     private ModelBase _currentView;
 
     [ObservableProperty]
-    private string _appVersion = Core.Services.AppVersion.Current;
+    private string _appVersion = Services.AppVersion.Current;
 
     [ObservableProperty]
     private string _statusText = "Tổng số: 0 tài liệu";
@@ -66,7 +67,7 @@ public partial class MainWindowModel : ModelBase
         }
         else if (!info.HasUpdate)
         {
-            await _dialogService.ShowMessageAsync("Cập nhật", $"Bạn đang sử dụng phiên bản mới nhất (v{Core.Services.AppVersion.Current}).");
+            await _dialogService.ShowMessageAsync("Cập nhật", $"Bạn đang sử dụng phiên bản mới nhất (v{Services.AppVersion.Current}).");
             StatusText = "Đã là phiên bản mới nhất";
         }
         else
@@ -136,7 +137,7 @@ public partial class MainWindowModel : ModelBase
     [RelayCommand]
     private async Task ShowAboutAsync()
     {
-        var version = Core.Services.AppVersion.Current;
+        var version = Services.AppVersion.Current;
         await _dialogService.ShowMessageAsync("Giới thiệu",
             $"Study Document Manager\n" +
             $"Professional Edition\n" +

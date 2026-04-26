@@ -1,3 +1,4 @@
+﻿using StudyDocumentManager.Core.Interfaces;
 using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
@@ -19,7 +20,7 @@ public static class UpdateService
     {
         if (update == null || !update.HasUpdate) return;
 
-        var message = $"Phiên bản mới {update.NewVersion} đã sẵn sàng!\n\n";
+        var message = $"PhiÃªn báº£n má»›i {update.NewVersion} Ä‘Ã£ sáºµn sÃ ng!\n\n";
 
         if (!string.IsNullOrEmpty(update.ReleaseNotes))
         {
@@ -30,9 +31,9 @@ public static class UpdateService
             message += $"Release Notes:\n{notes}\n\n";
         }
 
-        message += "Bạn có muốn mở trang tải về không?";
+        message += "Báº¡n cÃ³ muá»‘n má»Ÿ trang táº£i vá» khÃ´ng?";
 
-        var confirmed = await dialogService.ShowConfirmAsync("Cập nhật có sẵn", message);
+        var confirmed = await dialogService.ShowConfirmAsync("Cáº­p nháº­t cÃ³ sáºµn", message);
         if (!confirmed) return;
 
         // Open release page in browser
@@ -50,8 +51,8 @@ public static class UpdateService
         }
         catch
         {
-            await dialogService.ShowErrorAsync("Lỗi",
-                $"Không thể mở trình duyệt.\nVui lòng truy cập: {url}");
+            await dialogService.ShowErrorAsync("Lá»—i",
+                $"KhÃ´ng thá»ƒ má»Ÿ trÃ¬nh duyá»‡t.\nVui lÃ²ng truy cáº­p: {url}");
         }
     }
 
@@ -64,7 +65,7 @@ public static class UpdateService
         if (info is { HasUpdate: true })
         {
             ToastService.Show(
-                $"Phiên bản mới {info.NewVersion} có sẵn! Vào Trợ giúp → Kiểm tra cập nhật.",
+                $"PhiÃªn báº£n má»›i {info.NewVersion} cÃ³ sáºµn! VÃ o Trá»£ giÃºp â†’ Kiá»ƒm tra cáº­p nháº­t.",
                 ToastService.ToastType.Info,
                 5000);
         }

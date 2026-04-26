@@ -3,9 +3,9 @@ using StudyDocumentManager.Core.Interfaces;
 
 namespace StudyDocumentManager.Services;
 
-public class DroppedFileImportService(IDocumentRepository repository)
+public class DroppedFileImportService(IDocument repository)
 {
-    private readonly IDocumentRepository _repository = repository;
+    private readonly IDocument _repository = repository;
 
     public List<string> GetAvailableSubjects(IReadOnlyList<string> fallbackSubjects)
     {

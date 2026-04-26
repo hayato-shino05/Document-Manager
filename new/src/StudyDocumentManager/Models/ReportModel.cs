@@ -1,9 +1,8 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
-using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
@@ -17,8 +16,11 @@ public partial class ReportModel : ModelBase
 
     [ObservableProperty] private string _selectedTab = "subject";
 
-    public ReportModel()
+    private readonly IReport _reportRepo;
+
+    public ReportModel(IReport reportRepo)
     {
+        _reportRepo = reportRepo;
         LoadAllData();
     }
 
@@ -26,16 +28,16 @@ public partial class ReportModel : ModelBase
     private void LoadAllData()
     {
         BySubjectData = CreateChartData(
-            DatabaseHelper.GetDocumentsBySubject().Select(x => new ChartDataItem { Label = x.Label, Value = x.Count }));
+            _reportRepo.GetBySubject().Select(x => new ChartDataItem { Label = x.Label, Value = x.Count }));
 
         ByTypeData = CreateChartData(
-            DatabaseHelper.GetDocumentsByType().Select(x => new ChartDataItem { Label = x.Label, Value = x.Count }));
+            _reportRepo.GetByType().Select(x => new ChartDataItem { Label = x.Label, Value = x.Count }));
 
         ByDayData = CreateChartData(
-            DatabaseHelper.GetDocumentsByDay(7).Select(x => new ChartDataItem { Label = x.Label, Value = x.Count }));
+            _reportRepo.GetByDay(7).Select(x => new ChartDataItem { Label = x.Label, Value = x.Count }));
 
         ByMonthData = CreateChartData(
-            DatabaseHelper.GetDocumentsByMonth(12).Select(x => new ChartDataItem { Label = x.Label, Value = x.Count }));
+            _reportRepo.GetByMonth(12).Select(x => new ChartDataItem { Label = x.Label, Value = x.Count }));
     }
 
     private static ObservableCollection<ChartDataItem> CreateChartData(IEnumerable<ChartDataItem> items)

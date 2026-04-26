@@ -1,18 +1,18 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
-using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
 
 public partial class CollectionManagementModel : ModelBase
 {
-    private readonly IDocumentRepository _repository;
+    private readonly IDocument _repository;
+    private readonly Core.Interfaces.ICollection _collectionRepo;
     private readonly IDialogService _dialogService;
 
     [ObservableProperty] private ObservableCollection<CollectionItem> _collections = [];
@@ -23,9 +23,10 @@ public partial class CollectionManagementModel : ModelBase
     // Multi-select for batch removal
     [ObservableProperty] private IList _selectedDocumentsInCollection = new List<StudyDocument>();
 
-    public CollectionManagementModel(IDocumentRepository repository, IDialogService dialogService)
+    public CollectionManagementModel(IDocument repository, Core.Interfaces.ICollection collectionRepo, IDialogService dialogService)
     {
         _repository = repository;
+        _collectionRepo = collectionRepo;
         _dialogService = dialogService;
         LoadCollections();
     }
@@ -35,7 +36,7 @@ public partial class CollectionManagementModel : ModelBase
         try
         {
             Debug.WriteLine("[CollectionVM] LoadCollections() called");
-            var data = DatabaseHelper.GetCollections();
+            var data = _collectionRepo.GetAll();
             Debug.WriteLine($"[CollectionVM] GetCollections() returned {data.Count} items");
             Collections = new ObservableCollection<CollectionItem>(
                 data.Select(c => new CollectionItem
@@ -58,7 +59,7 @@ public partial class CollectionManagementModel : ModelBase
     {
         if (value != null)
         {
-            var docs = DatabaseHelper.GetDocumentsInCollection(value.Id);
+            var docs = _collectionRepo.GetDocuments(value.Id);
             DocumentsInCollection = new ObservableCollection<StudyDocument>(docs);
         }
         else
@@ -78,9 +79,9 @@ public partial class CollectionManagementModel : ModelBase
 
             if (!string.IsNullOrWhiteSpace(name))
             {
-                Debug.WriteLine($"[CollectionVM] Calling DatabaseHelper.CreateCollection('{name}')");
-                var newId = DatabaseHelper.CreateCollection(name);
-                Debug.WriteLine($"[CollectionVM] CreateCollection returned id={newId}");
+                Debug.WriteLine($"[CollectionVM] Calling _collectionRepo.Create('{name}')");
+                var newId = _collectionRepo.Create(name);
+                Debug.WriteLine($"[CollectionVM] Create returned id={newId}");
                 LoadCollections();
                 await _dialogService.ShowMessageAsync("Thành công", $"Đã tạo bộ sưu tập '{name}'");
             }
@@ -106,7 +107,7 @@ public partial class CollectionManagementModel : ModelBase
         var newName = await _dialogService.ShowInputAsync("Đổi tên", "Tên mới:", SelectedCollection.Name);
         if (!string.IsNullOrWhiteSpace(newName) && newName != SelectedCollection.Name)
         {
-            DatabaseHelper.UpdateCollection(SelectedCollection.Id, newName);
+            _collectionRepo.Update(SelectedCollection.Id, newName);
             LoadCollections();
         }
     }
@@ -121,7 +122,7 @@ public partial class CollectionManagementModel : ModelBase
             "Xoá", isDanger: true);
         if (confirmed)
         {
-            DatabaseHelper.DeleteCollection(SelectedCollection.Id);
+            _collectionRepo.Delete(SelectedCollection.Id);
             SelectedCollection = null;
             LoadCollections();
         }
@@ -138,7 +139,7 @@ public partial class CollectionManagementModel : ModelBase
         {
             // Load all documents and IDs already in collection
             var allDocs = _repository.GetAll();
-            var alreadyIn = DatabaseHelper.GetDocumentsInCollection(SelectedCollection.Id)
+            var alreadyIn = _collectionRepo.GetDocuments(SelectedCollection.Id)
                                           .Select(d => d.Id)
                                           .ToList();
 
@@ -170,9 +171,9 @@ public partial class CollectionManagementModel : ModelBase
             int addedCount = 0;
             foreach (var doc in selected)
             {
-                bool ok = DatabaseHelper.AddDocumentToCollection(selectedId, doc.Id);
+                bool ok = _collectionRepo.AddDocument(selectedId, doc.Id);
                 if (ok) addedCount++;
-                Debug.WriteLine($"[CollectionVM] AddDocumentToCollection({doc.Id}, '{doc.Ten}') = {ok}");
+                Debug.WriteLine($"[CollectionVM] AddDocument({doc.Id}, '{doc.Ten}') = {ok}");
             }
 
             // Refresh document list before reload
@@ -204,7 +205,7 @@ public partial class CollectionManagementModel : ModelBase
         if (confirmed)
         {
             int selectedId = SelectedCollection.Id;
-            DatabaseHelper.RemoveDocumentFromCollection(selectedId, doc.Id);
+            _collectionRepo.RemoveDocument(selectedId, doc.Id);
             OnSelectedCollectionChanged(SelectedCollection);
             LoadCollections();
             SelectedCollection = Collections.FirstOrDefault(c => c.Id == selectedId);
@@ -228,7 +229,7 @@ public partial class CollectionManagementModel : ModelBase
 
         int selectedId = SelectedCollection.Id;
         foreach (var d in targets)
-            DatabaseHelper.RemoveDocumentFromCollection(selectedId, d.Id);
+            _collectionRepo.RemoveDocument(selectedId, d.Id);
 
         OnSelectedCollectionChanged(SelectedCollection);
         LoadCollections();

@@ -9,14 +9,14 @@ namespace StudyDocumentManager.Models;
 
 public partial class DuplicateDetectionModel : ModelBase
 {
-    private readonly IDocumentRepository _repository;
+    private readonly IDocument _repository;
     private readonly IDialogService _dialogService;
 
     [ObservableProperty] private ObservableCollection<DuplicateGroup> _duplicateGroups = new();
     [ObservableProperty] private bool _isScanning;
     [ObservableProperty] private int _totalGroups;
 
-    public DuplicateDetectionModel(IDocumentRepository repository, IDialogService dialogService)
+    public DuplicateDetectionModel(IDocument repository, IDialogService dialogService)
     {
         _repository = repository;
         _dialogService = dialogService;

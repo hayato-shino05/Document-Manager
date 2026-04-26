@@ -1,16 +1,16 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
-using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
 
 public partial class BulkDeleteModel : ModelBase
 {
-    private readonly IDocumentRepository _repository;
+    private readonly IDocument _repository;
+    private readonly ICategory _categoryRepo;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
 
@@ -32,9 +32,10 @@ public partial class BulkDeleteModel : ModelBase
     [ObservableProperty] private string _statusText = "";
     public int SelectedCount => Documents.Count(d => d.IsSelected);
 
-    public BulkDeleteModel(IDocumentRepository repository, IDialogService dialogService, INavigationService navigationService)
+    public BulkDeleteModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService, INavigationService navigationService)
     {
         _repository = repository;
+        _categoryRepo = categoryRepo;
         _dialogService = dialogService;
         _navigationService = navigationService;
     }
@@ -50,8 +51,8 @@ public partial class BulkDeleteModel : ModelBase
 
     private void LoadFilterData()
     {
-        var subjects = DatabaseHelper.GetAllSubjects();
-        var types = DatabaseHelper.GetAllTypes();
+        var subjects = _categoryRepo.GetAllSubjects();
+        var types = _categoryRepo.GetAllTypes();
 
         // Assign new List references instead of Clear()+Add()
         var subjectList = new List<string> { "Tất cả" };
@@ -106,7 +107,7 @@ public partial class BulkDeleteModel : ModelBase
         if (!confirmed) return;
 
         var ids = selected.Select(s => s.Document.Id).ToList();
-        int deleted = DatabaseHelper.BulkSoftDelete(ids);
+        int deleted = _repository.BulkSoftDelete(ids);
 
         await _dialogService.ShowMessageAsync("Hoàn tất", $"Đã xóa {deleted} tài liệu vào Thùng rác.");
         _navigationService.NavigateTo("dashboard");
@@ -124,7 +125,7 @@ public partial class BulkDeleteModel : ModelBase
         }
 
         var ids = selected.Select(s => s.Document.Id).ToList();
-        int updated = DatabaseHelper.BulkToggleImportant(ids, true);
+        int updated = _repository.BulkToggleImportant(ids, true);
 
         await _dialogService.ShowMessageAsync("Hoàn tất", $"Đã đánh dấu {updated} tài liệu là quan trọng.");
         LoadData();
@@ -152,7 +153,7 @@ public partial class BulkDeleteModel : ModelBase
         if (!confirmed) return;
 
         var ids = selected.Select(s => s.Document.Id).ToList();
-        int updated = DatabaseHelper.BulkUpdateSubject(ids, NewSubjectValue);
+        int updated = _repository.BulkUpdateSubject(ids, NewSubjectValue);
 
         await _dialogService.ShowMessageAsync("Hoàn tất", $"Đã cập nhật danh mục cho {updated} tài liệu.");
         LoadData();

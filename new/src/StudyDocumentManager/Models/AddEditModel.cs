@@ -1,16 +1,16 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
-using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
 
 public partial class AddEditModel : ModelBase
 {
-    private readonly IDocumentRepository _repository;
+    private readonly IDocument _repository;
+    private readonly ICategory _categoryRepo;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private int? _editingId;
@@ -30,15 +30,15 @@ public partial class AddEditModel : ModelBase
     [ObservableProperty] private ObservableCollection<string> _subjects = new();
     [ObservableProperty] private ObservableCollection<string> _types = new();
 
-    public AddEditModel(IDocumentRepository repository, IDialogService dialogService, INavigationService navigationService)
+    public AddEditModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService, INavigationService navigationService)
     {
         _repository = repository;
+        _categoryRepo = categoryRepo;
         _dialogService = dialogService;
         _navigationService = navigationService;
 
-        // Load dropdown data from lookup tables
-        Subjects = new ObservableCollection<string>(DatabaseHelper.GetAllSubjects());
-        Types = new ObservableCollection<string>(DatabaseHelper.GetAllTypes());
+        Subjects = new ObservableCollection<string>(_categoryRepo.GetAllSubjects());
+        Types = new ObservableCollection<string>(_categoryRepo.GetAllTypes());
     }
 
     public void LoadDocument(int documentId)
@@ -99,9 +99,9 @@ public partial class AddEditModel : ModelBase
         {
             // Sync new categories to lookup tables
             if (!string.IsNullOrWhiteSpace(doc.MonHoc))
-                DatabaseHelper.AddSubject(doc.MonHoc);
+                _categoryRepo.AddSubject(doc.MonHoc);
             if (!string.IsNullOrWhiteSpace(doc.Loai))
-                DatabaseHelper.AddType(doc.Loai);
+                _categoryRepo.AddType(doc.Loai);
 
             await _dialogService.ShowMessageAsync("Thành công",
                 IsEditing ? "Đã cập nhật tài liệu!" : "Đã thêm tài liệu mới!");

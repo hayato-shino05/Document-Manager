@@ -1,15 +1,15 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
-using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
 
 public partial class PersonalNoteModel : ModelBase
 {
+    private readonly IPersonalNote _noteRepo;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
 
@@ -18,8 +18,9 @@ public partial class PersonalNoteModel : ModelBase
     [ObservableProperty] private string _noteContent = string.Empty;
     [ObservableProperty] private bool _hasExistingNote;
 
-    public PersonalNoteModel(IDialogService dialogService, INavigationService navigationService)
+    public PersonalNoteModel(IPersonalNote noteRepo, IDialogService dialogService, INavigationService navigationService)
     {
+        _noteRepo = noteRepo;
         _dialogService = dialogService;
         _navigationService = navigationService;
     }
@@ -28,7 +29,7 @@ public partial class PersonalNoteModel : ModelBase
     {
         DocumentId = docId;
         DocumentName = docName;
-        var note = DatabaseHelper.GetPersonalNote(docId);
+        var note = _noteRepo.GetNote(docId);
         NoteContent = note ?? string.Empty;
         HasExistingNote = note != null;
     }
@@ -36,7 +37,7 @@ public partial class PersonalNoteModel : ModelBase
     [RelayCommand]
     private async Task SaveNoteAsync()
     {
-        if (DatabaseHelper.SavePersonalNote(DocumentId, NoteContent))
+        if (_noteRepo.SaveNote(DocumentId, NoteContent))
         {
             await _dialogService.ShowMessageAsync("Thành công", "Đã lưu ghi chú!");
             HasExistingNote = true;
@@ -55,7 +56,7 @@ public partial class PersonalNoteModel : ModelBase
         var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận", "Xóa ghi chú này?");
         if (!confirmed) return;
 
-        if (DatabaseHelper.DeletePersonalNote(DocumentId))
+        if (_noteRepo.DeleteNote(DocumentId))
         {
             NoteContent = string.Empty;
             HasExistingNote = false;

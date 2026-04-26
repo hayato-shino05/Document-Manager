@@ -1,16 +1,15 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
-using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
 
 public partial class FileIntegrityCheckModel : ModelBase
 {
-    private readonly IDocumentRepository _repository;
+    private readonly IDocument _repository;
     private readonly IDialogService _dialogService;
 
     [ObservableProperty] private ObservableCollection<IntegrityResult> _results = new();
@@ -19,7 +18,7 @@ public partial class FileIntegrityCheckModel : ModelBase
     [ObservableProperty] private int _missingCount;
     [ObservableProperty] private string _statusText = "Nhấn 'Quét' để kiểm tra tính toàn vẹn file.";
 
-    public FileIntegrityCheckModel(IDocumentRepository repository, IDialogService dialogService)
+    public FileIntegrityCheckModel(IDocument repository, IDialogService dialogService)
     {
         _repository = repository;
         _dialogService = dialogService;
@@ -72,7 +71,7 @@ public partial class FileIntegrityCheckModel : ModelBase
             "Tất cả file (*.*)|*.*|PDF (*.pdf)|*.pdf|Word (*.docx;*.doc)|*.docx;*.doc|Excel (*.xlsx)|*.xlsx");
         if (string.IsNullOrWhiteSpace(newPath)) return;
 
-        if (DatabaseHelper.UpdateDocumentPath(item.Document.Id, newPath))
+        if (_repository.UpdateDocumentPath(item.Document.Id, newPath))
         {
             Results.Remove(item);
             MissingCount--;
@@ -93,7 +92,7 @@ public partial class FileIntegrityCheckModel : ModelBase
             "Bạn có chắc muốn xóa đường dẫn file?\nMetadata tài liệu sẽ được giữ lại (đường dẫn sẽ rỗng).");
         if (!confirmed) return;
 
-        if (DatabaseHelper.ClearDocumentPath(item.Document.Id))
+        if (_repository.ClearDocumentPath(item.Document.Id))
         {
             Results.Remove(item);
             MissingCount--;

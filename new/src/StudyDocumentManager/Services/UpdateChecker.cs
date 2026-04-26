@@ -1,7 +1,7 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using StudyDocumentManager.Core.Services;
+using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Services;
 
@@ -19,7 +19,7 @@ public class UpdateInfo
 
 /// <summary>
 /// Checks GitHub Releases API for new versions.
-/// Ported from WinForms (WebClient → HttpClient, JavaScriptSerializer → System.Text.Json).
+/// Ported from WinForms (WebClient â†’ HttpClient, JavaScriptSerializer â†’ System.Text.Json).
 /// </summary>
 public static class UpdateChecker
 {

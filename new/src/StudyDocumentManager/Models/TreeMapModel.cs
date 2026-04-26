@@ -1,7 +1,7 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using StudyDocumentManager.Data.Helpers;
+using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
@@ -9,6 +9,7 @@ namespace StudyDocumentManager.Models;
 public partial class TreeMapModel : ModelBase
 {
     private readonly INavigationService _navigationService;
+    private readonly IReport _reportRepo;
 
     [ObservableProperty] private ObservableCollection<TreeMapItem> _items = new();
     [ObservableProperty] private string _selectedMode = "subject"; // "subject" or "type"
@@ -22,9 +23,10 @@ public partial class TreeMapModel : ModelBase
         "#84cc16", "#e11d48", "#0ea5e9", "#a855f7", "#eab308"
     };
 
-    public TreeMapModel(INavigationService navigationService)
+    public TreeMapModel(INavigationService navigationService, IReport reportRepo)
     {
         _navigationService = navigationService;
+        _reportRepo = reportRepo;
         LoadData();
     }
 
@@ -34,8 +36,8 @@ public partial class TreeMapModel : ModelBase
     private void LoadData()
     {
         var data = SelectedMode == "type"
-            ? DatabaseHelper.GetDocumentsByType()
-            : DatabaseHelper.GetDocumentsBySubject();
+            ? _reportRepo.GetByType()
+            : _reportRepo.GetBySubject();
 
         TotalDocuments = data.Sum(d => d.Count);
 

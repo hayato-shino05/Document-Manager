@@ -1,4 +1,5 @@
-﻿using StudyDocumentManager.Models;
+﻿using StudyDocumentManager.Core.Interfaces;
+using StudyDocumentManager.Models;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace StudyDocumentManager.Services;

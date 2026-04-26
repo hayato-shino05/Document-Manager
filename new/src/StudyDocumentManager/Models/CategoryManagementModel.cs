@@ -1,16 +1,17 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Interfaces;
-using StudyDocumentManager.Data.Helpers;
+
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
 
 public partial class CategoryManagementModel : ModelBase
 {
-    private readonly IDocumentRepository _repository;
+    private readonly IDocument _repository;
+    private readonly ICategory _categoryRepo;
     private readonly IDialogService _dialogService;
 
     [ObservableProperty] private ObservableCollection<CategoryItem> _subjects = new();
@@ -32,24 +33,25 @@ public partial class CategoryManagementModel : ModelBase
     /// <summary>Status bar text for the main window footer.</summary>
     public string StatusText => $"Tổng số: {TotalDocumentCount} tài liệu | Danh mục: {Subjects.Count} | Loại: {Types.Count}";
 
-    public CategoryManagementModel(IDocumentRepository repository, IDialogService dialogService)
+    public CategoryManagementModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService)
     {
         _repository = repository;
+        _categoryRepo = categoryRepo;
         _dialogService = dialogService;
         LoadData();
     }
 
     private void LoadData()
     {
-        var subjectsData = DatabaseHelper.GetSubjectsWithCount();
+        var subjectsData = _categoryRepo.GetSubjectsWithCount();
         Subjects = new ObservableCollection<CategoryItem>(
             subjectsData.Select(s => new CategoryItem(s.Name, s.Count)));
 
-        var typesData = DatabaseHelper.GetTypesWithCount();
+        var typesData = _categoryRepo.GetTypesWithCount();
         Types = new ObservableCollection<CategoryItem>(
             typesData.Select(t => new CategoryItem(t.Name, t.Count)));
 
-        TotalDocumentCount = DatabaseHelper.GetTotalDocumentCount();
+        TotalDocumentCount = _categoryRepo.GetTotalDocumentCount();
         OnPropertyChanged(nameof(StatusText));
     }
 
@@ -63,7 +65,7 @@ public partial class CategoryManagementModel : ModelBase
         var newName = await _dialogService.ShowInputAsync("Đổi tên danh mục", "Tên mới:", SelectedSubject.Name);
         if (!string.IsNullOrWhiteSpace(newName) && newName != SelectedSubject.Name)
         {
-            DatabaseHelper.UpdateSubjectName(SelectedSubject.Name, newName);
+            _categoryRepo.UpdateSubjectName(SelectedSubject.Name, newName);
             LoadData();
             await _dialogService.ShowMessageAsync("Thành công", $"Đã đổi tên danh mục thành '{newName}'");
         }
@@ -77,7 +79,7 @@ public partial class CategoryManagementModel : ModelBase
         var newName = await _dialogService.ShowInputAsync("Đổi tên loại", "Tên mới:", SelectedType.Name);
         if (!string.IsNullOrWhiteSpace(newName) && newName != SelectedType.Name)
         {
-            DatabaseHelper.UpdateTypeName(SelectedType.Name, newName);
+            _categoryRepo.UpdateTypeName(SelectedType.Name, newName);
             LoadData();
             await _dialogService.ShowMessageAsync("Thành công", $"Đã đổi tên loại thành '{newName}'");
         }
@@ -109,7 +111,7 @@ public partial class CategoryManagementModel : ModelBase
         if (!confirm) return;
 
         foreach (var item in targets)
-            DatabaseHelper.DeleteDocumentsBySubject(item.Name);
+            _categoryRepo.DeleteDocumentsBySubject(item.Name);
 
         LoadData();
         SelectedSubjects = new List<CategoryItem>();
@@ -144,7 +146,7 @@ public partial class CategoryManagementModel : ModelBase
         if (!confirm) return;
 
         foreach (var item in targets)
-            DatabaseHelper.DeleteDocumentsByType(item.Name);
+            _categoryRepo.DeleteDocumentsByType(item.Name);
 
         LoadData();
         SelectedTypes = new List<CategoryItem>();
@@ -169,7 +171,7 @@ public partial class CategoryManagementModel : ModelBase
                 await _dialogService.ShowMessageAsync("Lỗi", $"Danh mục '{trimmed}' đã tồn tại.");
                 return;
             }
-            DatabaseHelper.AddSubject(trimmed);
+            _categoryRepo.AddSubject(trimmed);
             LoadData();
             await _dialogService.ShowMessageAsync("Thành công", $"Đã thêm danh mục '{trimmed}'");
         }
@@ -187,7 +189,7 @@ public partial class CategoryManagementModel : ModelBase
                 await _dialogService.ShowMessageAsync("Lỗi", $"Loại '{trimmed}' đã tồn tại.");
                 return;
             }
-            DatabaseHelper.AddType(trimmed);
+            _categoryRepo.AddType(trimmed);
             LoadData();
             await _dialogService.ShowMessageAsync("Thành công", $"Đã thêm loại '{trimmed}'");
         }
