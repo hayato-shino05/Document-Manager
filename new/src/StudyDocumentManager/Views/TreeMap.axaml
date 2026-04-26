@@ -1,0 +1,66 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             x:Class="StudyDocumentManager.Views.TreeMap"
+             x:DataType="vm:TreeMapModel">
+
+    <Border Classes="page-wrapper">
+        <DockPanel>
+            <!-- Header -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+                <StackPanel Classes="page-header-stack" Margin="0">
+                    <Image Source="{StaticResource IconTreeMap}" Width="18" Height="18"/>
+                    <TextBlock Classes="page-title" Text="TreeMap � Ph�n b? t�i li?u"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Mode toggle row -->
+            <Border DockPanel.Dock="Top" Classes="card" Padding="{StaticResource PaddingNavItem}" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Ph�n lo?i theo:" VerticalAlignment="Center"
+                               FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
+                    <Button Classes="primary" Content="Danh m?c"
+                            Command="{Binding ShowBySubjectCommand}" Padding="{StaticResource PaddingBtnSm}" FontSize="{StaticResource FontSizeSm}"/>
+                    <Button Classes="secondary" Content="Lo?i t�i li?u"
+                            Command="{Binding ShowByTypeCommand}" Padding="{StaticResource PaddingBtnSm}" FontSize="{StaticResource FontSizeSm}"/>
+                    <TextBlock Text="{Binding TotalDocuments, StringFormat='T?ng: {0} t�i li?u'}"
+                               VerticalAlignment="Center" Margin="12,0,0,0"
+                               FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold"/>
+                </StackPanel>
+            </Border>
+
+            <!-- TreeMap grid -->
+            <Border Classes="card" Padding="{StaticResource Space4}">
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding Items}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:TreeMapItem">
+                                <Border MinWidth="120" MinHeight="80"
+                                        Margin="4" Padding="{StaticResource Space4}" CornerRadius="{StaticResource RadiusMd}"
+                                        Background="{Binding Color}">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding Label}"
+                                                   Foreground="White" FontWeight="Bold" FontSize="{StaticResource FontSizeLg}"
+                                                   TextAlignment="Center" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{Binding Count, StringFormat='{}{0} t�i li?u'}"
+                                                   Foreground="{StaticResource OnColorPrimaryBrush}" FontSize="{StaticResource FontSizeMd}"
+                                                   TextAlignment="Center"/>
+                                        <TextBlock Text="{Binding Percentage, StringFormat='{}{0:F1}%'}"
+                                                   Foreground="{StaticResource OnColorSecondaryBrush}" FontSize="{StaticResource FontSizeSm}"
+                                                   TextAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+        </DockPanel>
+    </Border>
+
+</UserControl>
