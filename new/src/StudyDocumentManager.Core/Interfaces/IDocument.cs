@@ -6,7 +6,7 @@ namespace StudyDocumentManager.Core.Interfaces;
 /// Repository interface for document CRUD and queries.
 /// Mirrors the WinForms IDocumentRepository contract exactly.
 /// </summary>
-public interface IDocumentRepository
+public interface IDocument
 {
     List<StudyDocument> GetAll();
     StudyDocument? GetById(int id);
@@ -37,5 +37,24 @@ public interface IDocumentRepository
     /// Gọi sau khi thêm tài liệu có Loai mới.
     /// </summary>
     void EnsureTypeExists(string type);
-}
 
+    // ─── RecycleBin ───────────────────────────────────────────────────────
+    List<StudyDocument> GetDeletedDocuments();
+    bool RestoreDocument(int id);
+    bool PermanentDeleteDocument(int id);
+    int EmptyRecycleBin();
+    int GetDeletedDocumentCount();
+
+    // ─── Bulk operations ──────────────────────────────────────────────────
+    int BulkSoftDelete(List<int> ids);
+    int BulkUpdateSubject(List<int> ids, string subject);
+    int BulkToggleImportant(List<int> ids, bool important);
+
+    // ─── Backup & Restore ─────────────────────────────────────────────────
+    bool BackupDatabase(string destPath);
+    string DatabasePath { get; }
+
+    // ─── File integrity ───────────────────────────────────────────────────
+    bool UpdateDocumentPath(int id, string newPath);
+    bool ClearDocumentPath(int id);
+}
