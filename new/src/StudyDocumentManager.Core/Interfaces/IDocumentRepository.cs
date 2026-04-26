@@ -25,4 +25,17 @@ public interface IDocumentRepository
     List<string> GetDistinctTags();
     List<StudyDocument> GetUpcomingDeadlines(int days);
     List<StudyDocument> GetOverdueDocuments();
+
+    /// <summary>
+    /// Đảm bảo danh mục tồn tại trong lookup table (nếu chưa có thì thêm).
+    /// Gọi sau khi thêm tài liệu có MonHoc mới.
+    /// </summary>
+    void EnsureSubjectExists(string subject);
+
+    /// <summary>
+    /// Đảm bảo loại tài liệu tồn tại trong lookup table (nếu chưa có thì thêm).
+    /// Gọi sau khi thêm tài liệu có Loai mới.
+    /// </summary>
+    void EnsureTypeExists(string type);
 }
+

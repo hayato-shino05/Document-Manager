@@ -61,6 +61,32 @@ public class DialogService : IDialogService
         return result;
     }
 
+    public async Task<bool> ShowConfirmAsync(string title, string message,
+        string confirmText, bool isDanger = false)
+    {
+        var result = false;
+        var dialog = CreateDialog(title, message, showCancel: true,
+            okText: confirmText, okIsDanger: isDanger);
+
+        if (dialog.Content is StackPanel panel)
+        {
+            var buttonPanel = panel.Children.OfType<StackPanel>().LastOrDefault();
+            if (buttonPanel != null)
+            {
+                var okButton = buttonPanel.Children.OfType<Button>().FirstOrDefault();
+                if (okButton != null)
+                    okButton.Click += (_, _) => { result = true; dialog.Close(); };
+
+                var cancelButton = buttonPanel.Children.OfType<Button>().LastOrDefault();
+                if (cancelButton != null)
+                    cancelButton.Click += (_, _) => { result = false; dialog.Close(); };
+            }
+        }
+
+        await dialog.ShowDialog(GetMainWindow()!);
+        return result;
+    }
+
     public async Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "")
     {
         Debug.WriteLine($"[DialogService] ShowInputAsync called: title='{title}', label='{label}', defaultValue='{defaultValue}'");
@@ -85,17 +111,19 @@ public class DialogService : IDialogService
         // Keep direct references to buttons — do NOT rely on OfType traversal
         var okButton = new Button
         {
-            Content = "OK",
+            Content = "Đồng ý",
             MinWidth = 80,
             IsDefault = true,
-            HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center
+            HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+            Classes = { "primary" }
         };
         var cancelButton = new Button
         {
             Content = "Hủy",
             MinWidth = 80,
             IsCancel = true,
-            HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center
+            HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+            Classes = { "secondary" }
         };
 
         var buttonRowPanel = new StackPanel
@@ -229,6 +257,16 @@ public class DialogService : IDialogService
         return dialog.Result;
     }
 
+    public async Task<AddDocumentDraft?> ShowAddDocumentAsync(string filePath, IList<string> subjects, IList<string> types)
+    {
+        var owner = GetMainWindow();
+        if (owner == null) return null;
+
+        var dialog = new AddDocumentDialog(filePath, subjects, types);
+        var result = await dialog.ShowDialog<bool?>(owner);
+        return result == true ? dialog.Result : null;
+    }
+
     // ═══ Document Picker ═══
 
     public async Task<List<StudyDocument>?> ShowDocumentPickerAsync(
@@ -248,7 +286,22 @@ public class DialogService : IDialogService
         return dialog.Result;
     }
 
+    // ═══ Collection Picker ═══
+
+    public async Task<int> ShowSelectCollectionAsync(
+        string documentName,
+        IList<(int Id, string Name, int DocCount)> collections)
+    {
+        var owner = GetMainWindow();
+        if (owner == null) return -1;
+
+        var dialog = new SelectCollectionDialog(documentName, collections);
+        await dialog.ShowDialog(owner);
+        return dialog.Result;
+    }
+
     // ═══ Helpers ═══
+
 
     private static List<FilePickerFileType>? BuildFileFilter(string? filter)
     {
@@ -267,7 +320,8 @@ public class DialogService : IDialogService
         return types.Count > 0 ? types : null;
     }
 
-    private static Window CreateDialog(string title, string message, bool showCancel)
+    private static Window CreateDialog(string title, string message, bool showCancel,
+        string okText = "Đồng ý", bool okIsDanger = false)
     {
         var panel = new StackPanel
         {
@@ -281,7 +335,7 @@ public class DialogService : IDialogService
                     TextWrapping = Avalonia.Media.TextWrapping.Wrap,
                     MaxWidth = 350
                 },
-                CreateButtonPanel(showCancel)
+                CreateButtonPanel(showCancel, okText, okIsDanger)
             }
         };
 
@@ -308,7 +362,8 @@ public class DialogService : IDialogService
         return dialog;
     }
 
-    private static StackPanel CreateButtonPanel(bool showCancel = true)
+    private static StackPanel CreateButtonPanel(bool showCancel = true,
+        string okText = "Đồng ý", bool okIsDanger = false)
     {
         var panel = new StackPanel
         {
@@ -318,23 +373,27 @@ public class DialogService : IDialogService
             Margin = new Thickness(0, 8, 0, 0)
         };
 
-        panel.Children.Add(new Button
+        var okBtn = new Button
         {
-            Content = "OK",
+            Content = okText,
             MinWidth = 80,
             HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
             IsDefault = true
-        });
+        };
+        okBtn.Classes.Add(okIsDanger ? "danger" : "primary");
+        panel.Children.Add(okBtn);
 
         if (showCancel)
         {
-            panel.Children.Add(new Button
+            var cancelBtn = new Button
             {
                 Content = "Hủy",
                 MinWidth = 80,
                 HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 IsCancel = true
-            });
+            };
+            cancelBtn.Classes.Add("secondary");
+            panel.Children.Add(cancelBtn);
         }
 
         return panel;

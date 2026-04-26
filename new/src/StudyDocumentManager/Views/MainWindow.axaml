@@ -96,13 +96,8 @@
 
                     <Border Width="1" Background="{StaticResource CardBorder}" Margin="4,4"/>
 
+
                     <!-- Refresh + Import -->
-                    <Button Classes="secondary" Padding="10,5" Command="{Binding RefreshCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconRefresh}" Width="14" Height="14"/>
-                            <TextBlock Text="Làm mới" FontSize="11"/>
-                        </StackPanel>
-                    </Button>
                     <Button Classes="secondary" Padding="10,5"
                             Command="{Binding NavigateCommand}" CommandParameter="batch-import">
                         <StackPanel Orientation="Horizontal" Spacing="4">

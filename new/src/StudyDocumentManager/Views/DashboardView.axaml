@@ -188,8 +188,8 @@
                     <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
                             Padding="10,7">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <Image Source="{StaticResource IconCategory}" Width="14" Height="14"/>
-                            <TextBlock Text="Phân loại" FontSize="12" FontWeight="SemiBold"
+                            <Image Source="{StaticResource IconCategory}" Width="15" Height="15"/>
+                            <TextBlock Text="Phân loại" FontSize="13" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
                         </StackPanel>
                     </Border>
@@ -201,24 +201,24 @@
                                     <Panel>
                                         <!-- Section headers: muted uppercase label, NOT clickable -->
                                         <Border IsVisible="{Binding IsHeader}"
-                                                Padding="10,10,10,2" Margin="0,4,0,0">
+                                                Padding="10,10,10,3" Margin="0,6,0,0">
                                             <TextBlock Text="{Binding Name}"
-                                                       FontSize="9" FontWeight="SemiBold"
+                                                       FontSize="11" FontWeight="Bold"
                                                        Foreground="{StaticResource TextMuted}"
-                                                       Opacity="0.7"/>
+                                                       Opacity="0.8"/>
                                         </Border>
                                         <!-- Normal nav items: clickable buttons -->
                                         <Button IsVisible="{Binding !IsHeader}"
                                                 Classes="nav-item"
-                                                Padding="10,5"
+                                                Padding="10,6"
                                                 Margin="{Binding IndentMargin}"
                                                 Command="{Binding $parent[ItemsControl].DataContext.FilterByCategoryCommand}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip.Tip="Click để lọc theo mục này">
-                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <Image Source="{Binding ResolvedIconSource}" Width="13" Height="13"
+                                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                                <Image Source="{Binding ResolvedIconSource}" Width="15" Height="15"
                                                        VerticalAlignment="Center"/>
-                                                <TextBlock Text="{Binding DisplayText}" FontSize="11"
+                                                <TextBlock Text="{Binding DisplayText}" FontSize="12"
                                                            Foreground="{StaticResource TextPrimary}"/>
                                             </StackPanel>
                                         </Button>
@@ -350,30 +350,69 @@
                             <!-- Context Menu -->
                             <DataGrid.ContextMenu>
                                 <ContextMenu>
+                                    <!-- Primary actions -->
                                     <MenuItem Header="Mở file"
-                                              Command="{Binding $parent[DataGrid].DataContext.OpenFileCommand}"/>
+                                              Command="{Binding $parent[DataGrid].DataContext.OpenFileCommand}">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconDocPage}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
                                     <MenuItem Header="Sửa tài liệu"
-                                              Command="{Binding $parent[DataGrid].DataContext.EditDocumentCommand}"/>
+                                              Command="{Binding $parent[DataGrid].DataContext.EditDocumentCommand}">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconEdit}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
                                     <MenuItem Header="Đổi danh mục..."
-                                              Command="{Binding $parent[DataGrid].DataContext.ChangeCategoryCommand}"
-                                              ToolTip.Tip="Thay đổi danh mục của tài liệu này"/>
+                                              Command="{Binding $parent[DataGrid].DataContext.ChangeCategoryCommand}">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconCategory}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
                                     <MenuItem Header="Xóa (vào Thùng rác)"
-                                              Command="{Binding $parent[DataGrid].DataContext.DeleteDocumentCommand}"/>
+                                              Command="{Binding $parent[DataGrid].DataContext.DeleteDocumentCommand}">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconDelete}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
                                     <Separator/>
+                                    <!-- Copy &amp; Open -->
+                                    <MenuItem Header="Sao chép tên tài liệu"
+                                              Command="{Binding $parent[DataGrid].DataContext.CopyNameCommand}">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconClipboard}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
                                     <MenuItem Header="Sao chép đường dẫn"
-                                              Command="{Binding $parent[DataGrid].DataContext.CopyPathCommand}"/>
+                                              Command="{Binding $parent[DataGrid].DataContext.CopyPathCommand}">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconExport}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
                                     <MenuItem Header="Mở thư mục chứa"
-                                              Command="{Binding $parent[DataGrid].DataContext.OpenFolderCommand}"/>
+                                              Command="{Binding $parent[DataGrid].DataContext.OpenFolderCommand}">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconOpenFile}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
                                     <Separator/>
-                                    <MenuItem Header="⭐ Đánh dấu Quan trọng"
-                                              Command="{Binding $parent[DataGrid].DataContext.ToggleImportantCommand}"/>
+                                    <!-- Quick-edit hidden fields -->
+                                    <MenuItem Header="Sửa Tags..."
+                                              Command="{Binding $parent[DataGrid].DataContext.QuickEditTagsCommand}"
+                                              ToolTip.Tip="Tags không hiển thị trực tiếp trên bảng — chỉnh sửa nhanh tại đây">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconTag}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="Sửa ghi chú..."
+                                              Command="{Binding $parent[DataGrid].DataContext.QuickEditGhiChuCommand}"
+                                              ToolTip.Tip="Ghi chú nội bộ không hiển thị trực tiếp trên bảng — chỉnh sửa nhanh tại đây">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconNote}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator/>
+                                    <!-- Mark &amp; manage -->
+                                    <MenuItem Header="Đánh dấu Quan trọng"
+                                              Command="{Binding $parent[DataGrid].DataContext.ToggleImportantCommand}">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconStar}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
                                     <MenuItem Header="Ghi chú cá nhân"
-                                              Command="{Binding $parent[DataGrid].DataContext.OpenPersonalNoteCommand}"/>
+                                              Command="{Binding $parent[DataGrid].DataContext.OpenPersonalNoteCommand}"
+                                              ToolTip.Tip="Riêng tư, lưu tách biệt với Ghi chú nội bộ ở trên">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconBook}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
                                     <MenuItem Header="Thêm vào Bộ sưu tập"
-                                              Command="{Binding $parent[DataGrid].DataContext.AddToCollectionCommand}"/>
+                                              Command="{Binding $parent[DataGrid].DataContext.AddToCollectionCommand}">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconAdd}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
                                     <Separator/>
                                     <MenuItem Header="Tài liệu liên quan"
-                                              Command="{Binding $parent[DataGrid].DataContext.OpenRelatedDocumentsCommand}"/>
+                                              Command="{Binding $parent[DataGrid].DataContext.OpenRelatedDocumentsCommand}">
+                                        <MenuItem.Icon><Image Source="{StaticResource IconRelatedDocs}" Width="14" Height="14"/></MenuItem.Icon>
+                                    </MenuItem>
                                 </ContextMenu>
                             </DataGrid.ContextMenu>
                             <DataGrid.Columns>
@@ -508,13 +547,22 @@
                     <Border Grid.Row="3" Background="{StaticResource CardBackground}"
                             BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
                             Padding="12,6">
-                        <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto">
+                        <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto">
                             <TextBlock Text="{Binding StatusText}" FontSize="11"
                                        Foreground="{StaticResource TextSecondary}"
                                        VerticalAlignment="Center"/>
 
                             <!-- Quick action buttons -->
                             <Button Grid.Column="1" Classes="secondary" Padding="8,3"
+                                    Command="{Binding RefreshCommand}"
+                                    Margin="4,0" Height="24" VerticalAlignment="Center"
+                                    ToolTip.Tip="Làm mới danh sách tài liệu (F5)">
+                                <StackPanel Orientation="Horizontal" Spacing="3">
+                                    <Image Source="{StaticResource IconRefresh}" Width="10" Height="10"/>
+                                    <TextBlock Text="Làm mới" FontSize="10"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="2" Classes="secondary" Padding="8,3"
                                     Command="{Binding ShowUpcomingDeadlinesCommand}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
                                     ToolTip.Tip="Xem danh sách tài liệu sắp đến hạn">
@@ -523,7 +571,7 @@
                                     <TextBlock Text="Sắp đến hạn" FontSize="10"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="2" Classes="secondary" Padding="8,3"
+                            <Button Grid.Column="3" Classes="secondary" Padding="8,3"
                                     Command="{Binding ShowOverdueCommand}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
                                     ToolTip.Tip="Xem danh sách tài liệu đã quá hạn">
@@ -532,7 +580,7 @@
                                     <TextBlock Text="Quá hạn" FontSize="10"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="3" Classes="secondary" Padding="8,3"
+                            <Button Grid.Column="4" Classes="secondary" Padding="8,3"
                                     Command="{Binding CopyPathCommand}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
                                     ToolTip.Tip="Sao chép đường dẫn tài liệu đang chọn">
@@ -541,7 +589,7 @@
                                     <TextBlock Text="Copy Path" FontSize="10"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="4" Classes="secondary" Padding="8,3"
+                            <Button Grid.Column="5" Classes="secondary" Padding="8,3"
                                     Command="{Binding OpenFolderCommand}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
                                     ToolTip.Tip="Mở thư mục chứa tài liệu đang chọn">
@@ -550,7 +598,7 @@
                                     <TextBlock Text="Mở Folder" FontSize="10"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="5" Classes="secondary" Padding="8,3"
+                            <Button Grid.Column="6" Classes="secondary" Padding="8,3"
                                     Command="{Binding ShowAboutCommand}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
                                     ToolTip.Tip="Thông tin phần mềm">

@@ -48,10 +48,10 @@
                                                    Foreground="White" FontWeight="Bold" FontSize="14"
                                                    TextAlignment="Center" TextWrapping="Wrap"/>
                                         <TextBlock Text="{Binding Count, StringFormat='{}{0} tài liệu'}"
-                                                   Foreground="#ffffffcc" FontSize="12"
+                                                   Foreground="{StaticResource OnColorPrimaryBrush}" FontSize="12"
                                                    TextAlignment="Center"/>
                                         <TextBlock Text="{Binding Percentage, StringFormat='{}{0:F1}%'}"
-                                                   Foreground="#ffffffaa" FontSize="11"
+                                                   Foreground="{StaticResource OnColorSecondaryBrush}" FontSize="11"
                                                    TextAlignment="Center"/>
                                     </StackPanel>
                                 </Border>

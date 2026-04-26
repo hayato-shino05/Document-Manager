@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="StudyDocumentManager.Views.SelectCollectionDialog"
+        Title="Thêm vào Bộ sưu tập"
+        Width="440" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False">
+
+    <StackPanel Margin="24" Spacing="12">
+
+        <!-- Document name -->
+        <TextBlock x:Name="DocNameLabel"
+                   FontSize="13" FontWeight="SemiBold"
+                   Foreground="{StaticResource TextPrimary}"
+                   TextWrapping="Wrap"/>
+
+        <!-- Collection chips -->
+        <StackPanel>
+            <TextBlock Text="Chọn bộ sưu tập — click để chọn:"
+                       FontSize="10" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+            <WrapPanel x:Name="ChipsPanel" Orientation="Horizontal"/>
+        </StackPanel>
+
+        <!-- Selected indicator -->
+        <TextBlock x:Name="SelectedLabel"
+                   FontSize="11" Foreground="{StaticResource TextSecondary}"
+                   Text="Chưa chọn bộ sưu tập nào."/>
+
+        <!-- Buttons -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8" Margin="0,8,0,0">
+            <Button x:Name="OkButton"
+                    Content="Thêm vào"
+                    Classes="primary"
+                    IsDefault="True"
+                    IsEnabled="False"
+                    MinWidth="100"
+                    HorizontalContentAlignment="Center"/>
+            <Button x:Name="CancelButton"
+                    Content="Hủy"
+                    Classes="secondary"
+                    IsCancel="True"
+                    MinWidth="80"
+                    HorizontalContentAlignment="Center"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

@@ -75,77 +75,24 @@ public partial class MainWindow : Window
 
     private async void OnDrop(object? sender, DragEventArgs e)
     {
-        if (!e.Data.Contains(DataFormats.Files)) return;
+        if (!e.Data.Contains(DataFormats.Files))
+            return;
 
-        var vm = DataContext as MainWindowViewModel;
-        if (vm == null) return;
+        if (DataContext is not MainWindowViewModel vm)
+            return;
 
-        var files = e.Data.GetFiles()?.ToList();
-        if (files == null || files.Count == 0) return;
+        var filePaths = e.Data.GetFiles()?
+            .OfType<Avalonia.Platform.Storage.IStorageFile>()
+            .Select(file => file.Path.LocalPath)
+            .Where(path => !string.IsNullOrEmpty(path))
+            .Cast<string>()
+            .ToList();
 
-        var filePaths = new List<string>();
-        foreach (var item in files)
-        {
-            if (item is Avalonia.Platform.Storage.IStorageFile file)
-            {
-                var path = file.Path.LocalPath;
-                if (!string.IsNullOrEmpty(path))
-                    filePaths.Add(path);
-            }
-        }
+        if (filePaths == null || filePaths.Count == 0)
+            return;
 
-        if (filePaths.Count == 0) return;
-
-        var repo = App.Services?.GetService(typeof(StudyDocumentManager.Core.Interfaces.IDocumentRepository))
-            as StudyDocumentManager.Core.Interfaces.IDocumentRepository;
-        if (repo == null) return;
-
-        int imported = 0;
-
-        if (filePaths.Count == 1)
-        {
-            // Single file: show modal dialog for user to fill metadata
-            var dialog = new AddDocumentDialog(filePaths[0]);
-            var result = await dialog.ShowDialog<bool?>(this);
-            if (result == true && dialog.Result != null)
-            {
-                if (repo.Add(dialog.Result))
-                {
-                    imported++;
-                    // Sync to lookup tables
-                    if (!string.IsNullOrWhiteSpace(dialog.Result.MonHoc))
-                        StudyDocumentManager.Data.Helpers.DatabaseHelper.AddSubject(dialog.Result.MonHoc);
-                    if (!string.IsNullOrWhiteSpace(dialog.Result.Loai))
-                        StudyDocumentManager.Data.Helpers.DatabaseHelper.AddType(dialog.Result.Loai);
-                }
-            }
-        }
-        else
-        {
-            // Multiple files: bulk import directly
-            foreach (var path in filePaths)
-            {
-                var info = new System.IO.FileInfo(path);
-                var doc = new StudyDocumentManager.Core.Entities.StudyDocument
-                {
-                    Ten = System.IO.Path.GetFileNameWithoutExtension(path),
-                    DuongDan = path,
-                    Loai = Services.FileTypeDetector.DetectFromPath(path),
-                    KichThuoc = info.Length / (1024.0 * 1024.0)
-                };
-                if (repo.Add(doc))
-                {
-                    imported++;
-                    StudyDocumentManager.Data.Helpers.DatabaseHelper.AddType(doc.Loai);
-                }
-            }
-        }
-
-        if (imported > 0 && vm.CurrentView is DashboardViewModel dashboard)
-        {
-            dashboard.RefreshCommand.Execute(null);
-        }
-
+        await vm.HandleDroppedFilesAsync(filePaths);
         e.Handled = true;
     }
+
 }

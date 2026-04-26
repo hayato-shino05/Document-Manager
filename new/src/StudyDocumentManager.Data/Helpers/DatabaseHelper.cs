@@ -1,4 +1,5 @@
 using System.Data;
+using System.Linq;
 using Microsoft.Data.Sqlite;
 using StudyDocumentManager.Core.DTOs;
 using StudyDocumentManager.Core.Entities;
@@ -176,6 +177,9 @@ public static class DatabaseHelper
 
         // Seed danh_muc and loai_tai_lieu from existing data
         MigrateSeedCategories(conn);
+
+        // Normalize legacy raw-extension loai values (e.g. 'WEBM' → 'Video')
+        MigrateNormalizeFileTypes(conn);
     }
 
     /// <summary>
@@ -226,6 +230,143 @@ public static class DatabaseHelper
             ins.Parameters.AddWithValue("@ten", t);
             ins.ExecuteNonQuery();
         }
+    }
+
+    /// <summary>
+    /// Normalizes legacy raw-extension values stored in loai column.
+    /// Old code stored e.g. 'WEBM', 'CSV', 'XLSX' directly as the type.
+    /// This migration converts them to proper labels matching FileTypeDetector output.
+    /// Safe to call multiple times — each UPDATE only affects matching rows.
+    /// </summary>
+    private static void MigrateNormalizeFileTypes(SqliteConnection conn)
+    {
+        // Map: (SQL IN-list of uppercase raw exts) → proper label
+        var mappings = new (string[] RawExts, string Label)[]
+        {
+            (new[] { "WEBM", "MP4", "AVI", "MKV", "MOV", "WMV", "FLV", "M4V", "3GP", "MPG", "MPEG", "TS" },
+                "Video"),
+            (new[] { "MP3", "WAV", "FLAC", "M4A", "AAC", "OGG", "WMA", "OPUS", "APE" },
+                "Audio"),
+            // CSV goes to Excel group (same as FileTypeDetector)
+            (new[] { "XLS", "XLSX", "ODS", "CSV" },
+                "Excel"),
+            (new[] { "DOC", "DOCX", "ODT" },
+                "Word"),
+            (new[] { "PPT", "PPTX", "ODP" },
+                "PowerPoint"),
+            (new[] { "JSON", "XML", "YAML", "YML", "TSV" },
+                "Dữ liệu"),
+            (new[] { "PY", "IPYNB", "JS", "HTML", "HTM", "CSS", "JAVA", "CS", "GO",
+                     "RS", "PHP", "SH", "BAT", "PS1", "SQL", "CPP", "C", "VB", "KT", "RB" },
+                "Code"),
+            (new[] { "EPUB", "MOBI", "AZW", "AZW3", "FB2" },
+                "Sách"),
+            (new[] { "JPG", "JPEG", "PNG", "GIF", "BMP", "ICO", "TIFF", "TIF", "WEBP", "SVG", "RAW", "HEIC", "HEIF" },
+                "Hình ảnh"),
+            (new[] { "ZIP", "RAR", "7Z", "TAR", "GZ", "BZ2", "XZ", "ZST" },
+                "Nén"),
+            (new[] { "PSD", "AI", "XD", "FIG", "SKETCH", "INDD" },
+                "Thiết kế"),
+        };
+
+        foreach (var (rawExts, label) in mappings)
+        {
+            // Build parameterized IN clause
+            var paramNames = rawExts.Select((_, i) => $"@ext{i}").ToList();
+            var inClause = string.Join(", ", paramNames);
+
+            // Match both bare uppercase extensions (e.g. 'WEBM') and
+            // dot-prefixed lowercase forms (e.g. '.webm') that may have been stored
+            var sql = $"""
+                UPDATE tai_lieu
+                SET loai = @label
+                WHERE (is_deleted IS NULL OR is_deleted = 0)
+                  AND (
+                    UPPER(loai) IN ({inClause})
+                    OR LOWER(loai) IN ({string.Join(", ", rawExts.Select((e, i) => $"@extL{i}"))})
+                  )
+                """;
+
+            using var cmd = new SqliteCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@label", label);
+            for (int i = 0; i < rawExts.Length; i++)
+            {
+                cmd.Parameters.AddWithValue($"@ext{i}", rawExts[i]);           // UPPERCASE
+                cmd.Parameters.AddWithValue($"@extL{i}", rawExts[i].ToLowerInvariant()); // lowercase
+            }
+            cmd.ExecuteNonQuery();
+        }
+
+        // ── Phase 2: Re-detect from duong_dan file path extension ────────────
+        // Fixes records where loai is ANY wrong value (e.g. 'Audio' for a .csv or .webm).
+        // This is the authoritative pass — file path determines type.
+        var pathMappings = new (string[] Exts, string Label)[]
+        {
+            // Video checked first — .webm never misclassified as audio
+            (new[] { ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".webm",
+                     ".flv", ".m4v", ".3gp", ".mpg", ".mpeg" },       "Video"),
+            (new[] { ".mp3", ".wav", ".flac", ".m4a", ".aac",
+                     ".ogg", ".wma", ".opus", ".ape" },                "Audio"),
+            (new[] { ".pdf" },                                          "PDF"),
+            (new[] { ".doc", ".docx", ".odt" },                        "Word"),
+            (new[] { ".xls", ".xlsx", ".ods", ".csv" },                "Excel"),
+            (new[] { ".ppt", ".pptx", ".odp" },                        "PowerPoint"),
+            (new[] { ".txt", ".md", ".rtf" },                          "Tài liệu"),
+            (new[] { ".json", ".xml", ".yaml", ".yml", ".tsv" },       "Dữ liệu"),
+            (new[] { ".py", ".ipynb", ".js", ".html", ".htm", ".css",
+                     ".java", ".cs", ".go", ".rs", ".php",
+                     ".sh", ".bat", ".ps1", ".sql", ".cpp", ".c",
+                     ".vb", ".kt", ".rb" },                             "Code"),
+            (new[] { ".epub", ".mobi", ".azw", ".azw3", ".fb2" },      "Sách"),
+            (new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".ico",
+                     ".tiff", ".tif", ".webp", ".svg", ".raw",
+                     ".heic", ".heif" },                                "Hình ảnh"),
+            (new[] { ".zip", ".rar", ".7z", ".tar", ".gz",
+                     ".bz2", ".xz", ".zst" },                           "Nén"),
+            (new[] { ".psd", ".ai", ".xd", ".fig", ".sketch", ".indd" }, "Thiết kế"),
+        };
+
+        int pIdx = 0;
+        foreach (var (exts, label) in pathMappings)
+        {
+            var likeParams = new List<string>();
+            var likeValues = new List<string>();
+            foreach (var ext in exts)
+            {
+                likeParams.Add($"@pp{pIdx}");
+                likeValues.Add($"%{ext}");
+                pIdx++;
+            }
+
+            var whereLike = string.Join(" OR ",
+                likeParams.Select(p => $"LOWER(duong_dan) LIKE {p}"));
+
+            var labelParam = $"@plbl{pIdx}";
+
+            var pathSql = $"""
+                UPDATE tai_lieu
+                SET loai = {labelParam}
+                WHERE (is_deleted IS NULL OR is_deleted = 0)
+                  AND duong_dan IS NOT NULL
+                  AND duong_dan != ''
+                  AND ({whereLike})
+                """;
+
+            using var pathCmd = new SqliteCommand(pathSql, conn);
+            pathCmd.Parameters.AddWithValue(labelParam, label);
+            int startIdx = pIdx - exts.Length;
+            for (int i = 0; i < exts.Length; i++)
+                pathCmd.Parameters.AddWithValue($"@pp{startIdx + i}", likeValues[i]);
+
+            pathCmd.ExecuteNonQuery();
+            pIdx++;
+        }
+
+        // Re-seed lookup table with any newly produced label values
+        using var reseed = new SqliteCommand(
+            "INSERT OR IGNORE INTO loai_tai_lieu (ten) SELECT DISTINCT loai FROM tai_lieu WHERE loai IS NOT NULL AND loai != ''",
+            conn);
+        reseed.ExecuteNonQuery();
     }
 
     private static void MigrateAddColumn(SqliteConnection conn, string table, string column, string type)

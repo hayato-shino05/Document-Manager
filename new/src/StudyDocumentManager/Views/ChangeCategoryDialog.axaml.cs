@@ -55,9 +55,7 @@ public partial class ChangeCategoryDialog : Window
             _chipsPanel.Children.Add(new TextBlock
             {
                 Text = "(Chưa có danh mục nào — nhập tên mới bên dưới)",
-                FontSize = 11,
-                Foreground = Avalonia.Media.Brushes.Gray,
-                Margin = new Thickness(0, 2)
+                Classes = { "empty-state-text" }
             });
         }
 
