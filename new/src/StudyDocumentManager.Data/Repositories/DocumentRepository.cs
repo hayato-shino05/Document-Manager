@@ -38,4 +38,16 @@ public class DocumentRepository : IDocumentRepository
     public List<StudyDocument> GetUpcomingDeadlines(int days) => DatabaseHelper.GetUpcomingDeadlines(days);
 
     public List<StudyDocument> GetOverdueDocuments() => DatabaseHelper.GetOverdueDocuments();
+
+    public void EnsureSubjectExists(string subject)
+    {
+        if (!string.IsNullOrWhiteSpace(subject))
+            DatabaseHelper.AddSubject(subject);
+    }
+
+    public void EnsureTypeExists(string type)
+    {
+        if (!string.IsNullOrWhiteSpace(type))
+            DatabaseHelper.AddType(type);
+    }
 }

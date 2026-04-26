@@ -1,9 +1,22 @@
 using System;
 using System.Globalization;
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 
 namespace StudyDocumentManager.Converters;
+
+internal static class DeadlineBrushResources
+{
+    public static IBrush? GetBrush(string key)
+    {
+        if (Application.Current?.Resources.TryGetResource(key, null, out var value) == true)
+            return value as IBrush;
+
+        return null;
+    }
+}
 
 /// <summary>
 /// Converts a DateTime? deadline to a colored brush:
@@ -15,6 +28,10 @@ namespace StudyDocumentManager.Converters;
 /// </summary>
 public class DeadlineBrushConverter : IValueConverter
 {
+    public const string DeadlineOverdueBrushKey = "DeadlineOverdueBrush";
+    public const string DeadlineUrgentBrushKey = "DeadlineUrgentBrush";
+    public const string DeadlineUpcomingBrushKey = "DeadlineUpcomingBrush";
+
     public static readonly DeadlineBrushConverter Instance = new();
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -25,11 +42,11 @@ public class DeadlineBrushConverter : IValueConverter
         var daysLeft = (deadline.Date - DateTime.Today).TotalDays;
 
         if (daysLeft < 0)
-            return new SolidColorBrush(Color.Parse("#DC2626")); // Red - overdue
+            return DeadlineBrushResources.GetBrush(DeadlineOverdueBrushKey) ?? Brushes.Transparent;
         if (daysLeft < 3)
-            return new SolidColorBrush(Color.Parse("#F59E0B")); // Orange - urgent
+            return DeadlineBrushResources.GetBrush(DeadlineUrgentBrushKey) ?? Brushes.Transparent;
         if (daysLeft < 7)
-            return new SolidColorBrush(Color.Parse("#EAB308")); // Yellow - upcoming
+            return DeadlineBrushResources.GetBrush(DeadlineUpcomingBrushKey) ?? Brushes.Transparent;
 
         return Brushes.Transparent;
     }
@@ -47,6 +64,10 @@ public class DeadlineBrushConverter : IValueConverter
 /// </summary>
 public class DeadlineTextConverter : IValueConverter
 {
+    public const string DeadlineOverdueTextBrushKey = "DeadlineOverdueTextBrush";
+    public const string DeadlineUrgentTextBrushKey = "DeadlineUrgentTextBrush";
+    public const string DeadlineUpcomingTextBrushKey = "DeadlineUpcomingTextBrush";
+
     public static readonly DeadlineTextConverter Instance = new();
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -57,11 +78,11 @@ public class DeadlineTextConverter : IValueConverter
         var daysLeft = (deadline.Date - DateTime.Today).TotalDays;
 
         if (daysLeft < 0)
-            return new SolidColorBrush(Color.Parse("#FECACA")); // Light red text
+            return DeadlineBrushResources.GetBrush(DeadlineOverdueTextBrushKey);
         if (daysLeft < 3)
-            return new SolidColorBrush(Color.Parse("#FEF3C7")); // Light amber text
+            return DeadlineBrushResources.GetBrush(DeadlineUrgentTextBrushKey);
         if (daysLeft < 7)
-            return new SolidColorBrush(Color.Parse("#FEF9C3")); // Light yellow text
+            return DeadlineBrushResources.GetBrush(DeadlineUpcomingTextBrushKey);
 
         return null;
     }

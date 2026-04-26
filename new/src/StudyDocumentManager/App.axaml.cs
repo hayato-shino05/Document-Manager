@@ -53,6 +53,7 @@ public partial class App : Application
         services.AddSingleton<NavigationService>();
         services.AddSingleton<INavigationService>(sp => sp.GetRequiredService<NavigationService>());
         services.AddSingleton<IDialogService, DialogService>();
+        services.AddSingleton<DroppedFileImportService>();
 
         // ViewModels — Main
         services.AddSingleton<MainWindowViewModel>();
