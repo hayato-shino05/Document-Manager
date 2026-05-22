@@ -1,24 +1,27 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using StudyDocumentManager.Core.Entities;
+using StudyDocumentManager.Core.Interfaces;
 
 namespace StudyDocumentManager.Models.Items;
 
 public class AddToCollectionDialogState
 {
     private readonly List<SelectableDocumentItem> _allItems;
+    private readonly ILocalizationService _loc;
 
-    public AddToCollectionDialogState(IEnumerable<SelectableDocumentItem> items)
+    public AddToCollectionDialogState(IEnumerable<SelectableDocumentItem> items, ILocalizationService loc)
     {
         _allItems = items.ToList();
+        _loc = loc;
         VisibleItems = new ObservableCollection<SelectableDocumentItem>();
         foreach (var item in _allItems)
             item.SelectionChanged += (_, _) => RefreshSelectionState();
     }
 
     public ObservableCollection<SelectableDocumentItem> VisibleItems { get; }
-    public string CountText { get; private set; } = "0 tài liệu";
+    public string CountText { get; private set; } = string.Empty;
     public string SelectedCountText { get; private set; } = "0";
-    public string SelectAllButtonText { get; private set; } = "Chọn tất cả";
+    public string SelectAllButtonText { get; private set; } = string.Empty;
     public bool CanConfirm { get; private set; }
     public bool? HeaderCheckState { get; private set; }
 
@@ -30,8 +33,8 @@ public class AddToCollectionDialogState
             VisibleItems.Add(item);
 
         CountText = matches.Count == _allItems.Count
-            ? $"{matches.Count} tài liệu"
-            : $"{matches.Count} / {_allItems.Count} tài liệu";
+            ? string.Format(_loc["Collection_DocCount"], matches.Count)
+            : string.Format(_loc["Collection_DocCountFiltered"], matches.Count, _allItems.Count);
 
         RefreshSelectionState();
     }
@@ -62,8 +65,8 @@ public class AddToCollectionDialogState
         SelectedCountText = selectedCount.ToString();
         CanConfirm = selectedCount > 0;
         SelectAllButtonText = VisibleItems.All(item => item.IsSelected) && VisibleItems.Count > 0
-            ? "Bỏ chọn tất cả"
-            : "Chọn tất cả";
+            ? _loc["Collection_DeselectAll"]
+            : _loc["Collection_SelectAll"];
 
         if (VisibleItems.Count == 0)
             HeaderCheckState = false;

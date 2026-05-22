@@ -12,17 +12,19 @@ public partial class PersonalNoteModel : ModelBase
     private readonly IPersonalNote _noteRepo;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
+    private readonly ILocalizationService _loc;
 
     [ObservableProperty] private int _documentId;
     [ObservableProperty] private string _documentName = string.Empty;
     [ObservableProperty] private string _noteContent = string.Empty;
     [ObservableProperty] private bool _hasExistingNote;
 
-    public PersonalNoteModel(IPersonalNote noteRepo, IDialogService dialogService, INavigationService navigationService)
+    public PersonalNoteModel(IPersonalNote noteRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
         _noteRepo = noteRepo;
         _dialogService = dialogService;
         _navigationService = navigationService;
+        _loc = loc;
     }
 
     public void Load(int docId, string docName)
@@ -39,12 +41,12 @@ public partial class PersonalNoteModel : ModelBase
     {
         if (_noteRepo.SaveNote(DocumentId, NoteContent))
         {
-            await _dialogService.ShowMessageAsync("Thành công", "Đã lưu ghi chú!");
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Note_SaveSuccess"]);
             HasExistingNote = true;
         }
         else
         {
-            await _dialogService.ShowErrorAsync("Lỗi", "Không thể lưu ghi chú.");
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
         }
     }
 
@@ -53,14 +55,14 @@ public partial class PersonalNoteModel : ModelBase
     {
         if (!HasExistingNote) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận", "Xóa ghi chú này?");
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"], _loc["Note_ConfirmDelete"]);
         if (!confirmed) return;
 
         if (_noteRepo.DeleteNote(DocumentId))
         {
             NoteContent = string.Empty;
             HasExistingNote = false;
-            await _dialogService.ShowMessageAsync("Đã xóa", "Ghi chú đã được xóa.");
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Deleted"], _loc["Note_DeleteSuccess"]);
         }
     }
 

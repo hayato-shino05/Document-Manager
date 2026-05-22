@@ -1,8 +1,10 @@
+using StudyDocumentManager.Core;
 using StudyDocumentManager.Core.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Services;
+using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
@@ -16,25 +18,21 @@ public partial class MainWindowModel : ModelBase
     private string _appVersion = Core.Services.AppVersion.Current;
 
     [ObservableProperty]
-    private string _statusText = "Tổng số: 0 tài liệu";
+    private string _statusText = string.Empty;
+
+    [ObservableProperty]
+    private SupportedLanguage _selectedLanguage;
+
+    public IReadOnlyList<SupportedLanguage> AvailableLanguages => _loc.AvailableLanguages;
 
     public bool CanGoBack => _navigationService.CanGoBack;
-
-    private static readonly List<string> DefaultSubjects =
-    [
-        "Công việc", "Cá nhân", "Học tập", "Dự án", "Tài chính", "Hợp đồng", "Tham khảo", "Khác"
-    ];
-
-    private static readonly List<string> DefaultTypes =
-    [
-        "PDF", "Word", "Excel", "PowerPoint", "Tài liệu", "Báo cáo", "Hướng dẫn", "Biểu mẫu", "Hình ảnh", "Video", "Audio", "Nén", "Khác"
-    ];
 
     private readonly INavigationService _navigationService;
     private readonly IDialogService _dialogService;
     private readonly ICustomDialogService _customDialogService;
     private readonly IDroppedFileImportService _droppedFileImportService;
     private readonly IApplicationLifecycleService _lifecycleService;
+    private readonly ILocalizationService _loc;
 
     public MainWindowModel(
         DashboardModel dashboardModel,
@@ -42,42 +40,49 @@ public partial class MainWindowModel : ModelBase
         IDialogService dialogService,
         ICustomDialogService customDialogService,
         IDroppedFileImportService droppedFileImportService,
-        IApplicationLifecycleService lifecycleService)
+        IApplicationLifecycleService lifecycleService,
+        ILocalizationService loc)
     {
         _navigationService = navigationService;
         _dialogService = dialogService;
         _customDialogService = customDialogService;
         _droppedFileImportService = droppedFileImportService;
         _lifecycleService = lifecycleService;
+        _loc = loc;
         _currentView = dashboardModel;
+        _statusText = string.Format(_loc["Status_TotalDocs"], 0);
+
+        // DB保存済み言語をロード
+        LoadLanguageFromSettings();
 
         // 起動後3秒でサイレント更新チェック
         _ = Task.Run(async () =>
         {
             await Task.Delay(3000);
-            await UpdateService.CheckSilentlyAsync(_dialogService);
+            await UpdateService.CheckSilentlyAsync(_dialogService, _loc);
         });
     }
 
     [RelayCommand]
     private async Task CheckForUpdateAsync()
     {
-        StatusText = "Đang kiểm tra cập nhật...";
+        StatusText = _loc["Status_CheckingUpdate"];
         var info = await UpdateChecker.CheckForUpdateAsync();
         if (info == null)
         {
-            await _dialogService.ShowMessageAsync("Cập nhật", "Không thể kết nối đến server.\nVui lòng kiểm tra kết nối mạng.");
-            StatusText = "Không thể kiểm tra cập nhật";
+            await _dialogService.ShowMessageAsync(_loc["Main_UpdateTitle"], _loc["Main_CannotConnect"]);
+            StatusText = _loc["Status_CannotCheckUpdate"];
         }
         else if (!info.HasUpdate)
         {
-            await _dialogService.ShowMessageAsync("Cập nhật", $"Bạn đang sử dụng phiên bản mới nhất (v{Core.Services.AppVersion.Current}).");
-            StatusText = "Đã là phiên bản mới nhất";
+            await _dialogService.ShowMessageAsync(_loc["Main_UpdateTitle"],
+                string.Format(_loc["Main_AlreadyLatest"], Core.Services.AppVersion.Current));
+            StatusText = _loc["Status_UpToDate"];
         }
         else
         {
-            await UpdateService.HandleUpdateAsync(info, _dialogService);
-            StatusText = $"Phiên bản mới {info.NewVersion} có sẵn";
+            await UpdateService.HandleUpdateAsync(info, _dialogService, _loc);
+            StatusText = string.Format(_loc["Status_NewVersionAvailable"], info.NewVersion);
         }
     }
 
@@ -107,8 +112,6 @@ public partial class MainWindowModel : ModelBase
             UpdateStatusFromDashboard(dashboard);
         }
     }
-
-    // ═══ Proxy commands — delegate to active DashboardVM ═══
 
     [RelayCommand]
     private void EditDocument()
@@ -142,20 +145,8 @@ public partial class MainWindowModel : ModelBase
     private async Task ShowAboutAsync()
     {
         var version = Core.Services.AppVersion.Current;
-        await _dialogService.ShowMessageAsync("Giới thiệu",
-            $"Study Document Manager\n" +
-            $"Professional Edition\n" +
-            $"\n" +
-            $"Phiên bản {version}\n" +
-            $"\n" +
-            $"Ứng dụng quản lý tài liệu học tập\n" +
-            $"Kiến trúc MVVM • Avalonia UI • .NET 9.0\n" +
-            $"\n" +
-            $"Sinh viên thực hiện: Vũ Đức Dũng - TT601-K14\n" +
-            $"Cán bộ hướng dẫn: Lê Thị Mai\n" +
-            $"\n" +
-            $"© 2024-2025 hayato-shino05\n" +
-            $"GitHub: hayato-shino05/study-document-manager");
+        await _dialogService.ShowMessageAsync(_loc["Dialog_About"],
+            string.Format(_loc["Main_About"], version));
     }
 
     [RelayCommand]
@@ -199,8 +190,8 @@ public partial class MainWindowModel : ModelBase
         if (filePaths.Count == 0)
             return;
 
-        var subjects = _droppedFileImportService.GetAvailableSubjects(DefaultSubjects);
-        var types = _droppedFileImportService.GetAvailableTypes(DefaultTypes);
+        var subjects = _droppedFileImportService.GetAvailableSubjects([]);
+        var types = _droppedFileImportService.GetAvailableTypes([]);
 
         int imported = filePaths.Count == 1
             ? await ImportSingleFileAsync(filePaths[0], subjects, types)
@@ -241,6 +232,24 @@ public partial class MainWindowModel : ModelBase
 
         return imported;
     }
+
+    private void LoadLanguageFromSettings()
+    {
+        var saved = DatabaseHelper.GetSetting("language");
+        if (Enum.TryParse<SupportedLanguage>(saved, out var lang))
+        {
+            _loc.SetLanguage(lang);
+            _selectedLanguage = lang;
+        }
+        else
+        {
+            _selectedLanguage = _loc.CurrentLanguage;
+        }
+    }
+
+    partial void OnSelectedLanguageChanged(SupportedLanguage value)
+    {
+        _loc.SetLanguage(value);
+        DatabaseHelper.SetSetting("language", value.ToString());
+    }
 }
-
-

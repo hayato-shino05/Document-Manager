@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
              x:Class="StudyDocumentManager.Views.AddEdit"
@@ -17,16 +17,16 @@
                         HorizontalAlignment="Right" Margin="0,16,0,0">
                 <Button Classes="primary" Command="{Binding SaveCommand}" Padding="20,8"
                         HotKey="Ctrl+S"
-                        ToolTip.Tip="Luu t�i li?u (Ctrl+S)">
+                        ToolTip.Tip="{Binding [AddEdit_TipSave], Source={StaticResource Loc}}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconSave}" Width="13" Height="13"/>
-                        <TextBlock Text="Luu" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding [AddEdit_BtnSave], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"/>
                     </StackPanel>
                 </Button>
                 <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="20,8"
                         HotKey="Escape"
-                        ToolTip.Tip="H?y v� quay l?i (Escape)">
-                    <TextBlock Text="H?y" FontSize="{StaticResource FontSizeLg}"/>
+                        ToolTip.Tip="{Binding [AddEdit_TipCancel], Source={StaticResource Loc}}">
+                    <TextBlock Text="{Binding [AddEdit_BtnCancel], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeLg}"/>
                 </Button>
             </StackPanel>
 
@@ -37,92 +37,92 @@
                         Padding="{StaticResource PaddingPage}">
                     <StackPanel Spacing="12">
 
-                        <!-- T�n t�i li?u -->
+                        <!-- Document Name -->
                         <StackPanel Spacing="4">
-                            <TextBlock Text="T�n t�i li?u *" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                            <TextBlock Text="{Binding [AddEdit_LblDocName], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
                             <TextBox Text="{Binding Ten, Mode=TwoWay}" FontSize="{StaticResource FontSizeLg}"
-                                     Watermark="Nh?p t�n t�i li?u..." Height="32"/>
+                                     Watermark="{Binding [AddEdit_PlaceholderDocName], Source={StaticResource Loc}}" Height="32"/>
                         </StackPanel>
 
-                        <!-- Row: Danh m?c + Lo?i -->
+                        <!-- Row: Category + Type -->
                         <Grid ColumnDefinitions="*,16,*">
                             <StackPanel Spacing="4">
-                                <TextBlock Text="Danh m?c (M�n h?c)" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                <TextBlock Text="{Binding [AddEdit_LblCategory], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
                                 <ComboBox ItemsSource="{Binding Subjects}"
                                           SelectedItem="{Binding MonHoc, Mode=TwoWay}"
                                           IsTextSearchEnabled="True"
-                                          PlaceholderText="Ch?n danh m?c..."
+                                          PlaceholderText="{Binding [AddEdit_PlaceholderCategory], Source={StaticResource Loc}}"
                                           FontSize="{StaticResource FontSizeMd}" Height="32"
                                           HorizontalAlignment="Stretch"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2" Spacing="4">
-                                <TextBlock Text="Lo?i t�i li?u" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                <TextBlock Text="{Binding [AddEdit_LblDocType], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
                                 <ComboBox ItemsSource="{Binding Types}"
                                           SelectedItem="{Binding Loai, Mode=TwoWay}"
                                           IsTextSearchEnabled="True"
-                                          PlaceholderText="Ch?n lo?i..."
+                                          PlaceholderText="{Binding [AddEdit_PlaceholderDocType], Source={StaticResource Loc}}"
                                           FontSize="{StaticResource FontSizeMd}" Height="32"
                                           HorizontalAlignment="Stretch"/>
                             </StackPanel>
                         </Grid>
 
-                        <!-- �u?ng d?n file -->
+                        <!-- File Path -->
                         <StackPanel Spacing="4">
-                            <TextBlock Text="�u?ng d?n file" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                            <TextBlock Text="{Binding [AddEdit_LblFilePath], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
                             <DockPanel>
                                 <Button DockPanel.Dock="Right" Classes="secondary" Margin="6,0,0,0"
                                         Command="{Binding BrowseFileCommand}" Padding="{StaticResource PaddingMd}">
                                     <StackPanel Orientation="Horizontal" Spacing="3">
                                         <Image Source="{StaticResource IconOpenFile}" Width="11" Height="11"/>
-                                        <TextBlock Text="Ch?n file" FontSize="{StaticResource FontSizeSm}"/>
+                                        <TextBlock Text="{Binding [AddEdit_BtnBrowse], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
                                     </StackPanel>
                                 </Button>
                                 <TextBox Text="{Binding DuongDan, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
-                                         Watermark="�u?ng d?n t?i file..." Height="32"/>
+                                         Watermark="{Binding [AddEdit_PlaceholderFilePath], Source={StaticResource Loc}}" Height="32"/>
                             </DockPanel>
                         </StackPanel>
 
-                        <!-- T�c gi? -->
+                        <!-- Author -->
                         <StackPanel Spacing="4">
-                            <TextBlock Text="T�c gi?" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                            <TextBlock Text="{Binding [AddEdit_LblAuthor], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
                             <TextBox Text="{Binding TacGia, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
-                                     Watermark="T�n t�c gi?..." Height="32"/>
+                                     Watermark="{Binding [AddEdit_PlaceholderAuthor], Source={StaticResource Loc}}" Height="32"/>
                         </StackPanel>
 
                         <!-- Tags -->
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Tags (ph�n t�ch b?ng d?u ph?y)" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                            <TextBlock Text="{Binding [AddEdit_LblTags], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
                             <TextBox Text="{Binding Tags, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
                                      Watermark="tag1, tag2, tag3..." Height="32"/>
                         </StackPanel>
 
-                        <!-- Ghi ch� -->
+                        <!-- Notes -->
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Ghi ch�" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                            <TextBlock Text="{Binding [AddEdit_LblNotes], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
                             <TextBox Text="{Binding GhiChu, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
-                                     Watermark="Ghi ch� th�m..."
+                                     Watermark="{Binding [AddEdit_PlaceholderNotes], Source={StaticResource Loc}}"
                                      AcceptsReturn="True" TextWrapping="Wrap"
                                      Height="80"/>
                         </StackPanel>
 
-                        <!-- Row: Deadline + Quan tr?ng -->
+                        <!-- Row: Deadline + Important -->
                         <Grid ColumnDefinitions="*,16,Auto">
                             <StackPanel Spacing="4">
-                                <TextBlock Text="H?n ch?t (Deadline)" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                <TextBlock Text="{Binding [AddEdit_LblDeadline], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
                                 <DatePicker SelectedDate="{Binding Deadline}" FontSize="{StaticResource FontSizeMd}"
                                             HorizontalAlignment="Stretch"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2" Spacing="4" VerticalAlignment="Bottom"
                                         Margin="0,0,0,4">
-                                <CheckBox Content="��nh d?u quan tr?ng" FontSize="{StaticResource FontSizeMd}"
+                                <CheckBox Content="{Binding [AddEdit_ChkImportant], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}"
                                           IsChecked="{Binding QuanTrong}"/>
                             </StackPanel>
                         </Grid>

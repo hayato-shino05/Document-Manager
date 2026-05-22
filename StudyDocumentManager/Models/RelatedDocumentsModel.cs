@@ -13,29 +13,32 @@ public partial class RelatedDocumentsModel : ModelBase
     private readonly IRelatedDocument _relatedDocRepo;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
+    private readonly ILocalizationService _loc;
 
     [ObservableProperty] private int _documentId;
     [ObservableProperty] private string _documentName = string.Empty;
     [ObservableProperty] private ObservableCollection<RelatedDocItem> _relatedDocuments = new();
     [ObservableProperty] private ObservableCollection<StudyDocument> _availableDocuments = new();
     [ObservableProperty] private StudyDocument? _selectedAvailableDoc;
-    [ObservableProperty] private string _selectedRelationType = "liên quan";
+    [ObservableProperty] private string _selectedRelationType = "related";
 
+    // DB stores English keys; UI displays localized labels
     public List<string> RelationTypes { get; } = new()
     {
-        "liên quan",
-        "tham khảo",
-        "bổ sung",
-        "tiền đề",
-        "kế tiếp"
+        "related",
+        "reference",
+        "supplement",
+        "prerequisite",
+        "sequel"
     };
 
-    public RelatedDocumentsModel(IDocument repository, IRelatedDocument relatedDocRepo, IDialogService dialogService, INavigationService navigationService)
+    public RelatedDocumentsModel(IDocument repository, IRelatedDocument relatedDocRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
         _repository = repository;
         _relatedDocRepo = relatedDocRepo;
         _dialogService = dialogService;
         _navigationService = navigationService;
+        _loc = loc;
     }
 
     public void Load(int docId, string docName)
@@ -65,7 +68,7 @@ public partial class RelatedDocumentsModel : ModelBase
     {
         var allDocs = _repository.GetAll();
         var relatedIds = RelatedDocuments.Select(r => r.Document.Id).ToHashSet();
-        relatedIds.Add(DocumentId); // Exclude self
+        relatedIds.Add(DocumentId);
 
         AvailableDocuments = new ObservableCollection<StudyDocument>(
             allDocs.Where(d => !relatedIds.Contains(d.Id)));
@@ -86,8 +89,8 @@ public partial class RelatedDocumentsModel : ModelBase
     {
         if (item == null) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận",
-            $"Gỡ liên kết với '{item.Document.Name}'?");
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+            string.Format(_loc["Related_ConfirmRemove"], item.Document.Name));
         if (!confirmed) return;
 
         _relatedDocRepo.RemoveRelation(item.RelationId);

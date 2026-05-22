@@ -12,6 +12,7 @@ public partial class RecentFilesModel : ModelBase
     private readonly INavigationService _navigationService;
     private readonly IRecentFile _recentRepo;
     private readonly IProcessLauncherService _processLauncher;
+    private readonly ILocalizationService _loc;
 
     [ObservableProperty] private ObservableCollection<RecentFileItem> _recentFiles = new();
 
@@ -19,19 +20,20 @@ public partial class RecentFilesModel : ModelBase
         IDialogService dialogService,
         INavigationService navigationService,
         IRecentFile recentRepo,
-        IProcessLauncherService processLauncher)
+        IProcessLauncherService processLauncher,
+        ILocalizationService loc)
     {
         _dialogService = dialogService;
         _navigationService = navigationService;
         _recentRepo = recentRepo;
         _processLauncher = processLauncher;
+        _loc = loc;
         LoadData();
     }
 
     private void LoadData()
     {
         var files = _recentRepo.GetAll();
-        // Use Clear+Add to keep same ObservableCollection reference (avoid StackOverflow)
         RecentFiles.Clear();
         foreach (var f in files)
         {
@@ -43,7 +45,9 @@ public partial class RecentFilesModel : ModelBase
                 FileType = f.Type ?? "",
                 FilePath = f.FilePath ?? "",
                 OpenedAt = f.OpenedAt,
-                FileExists = !string.IsNullOrEmpty(f.FilePath) && File.Exists(f.FilePath)
+                FileExists = !string.IsNullOrEmpty(f.FilePath) && File.Exists(f.FilePath),
+                FileExistsLabel = _loc["Recent_FileExists"],
+                FileMissingLabel = _loc["Recent_FileMissing"]
             });
         }
     }
@@ -66,7 +70,7 @@ public partial class RecentFilesModel : ModelBase
     {
         if (RecentFiles.Count == 0) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận", "Xóa toàn bộ lịch sử file đã mở?");
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"], _loc["Recent_ConfirmClear"]);
         if (confirmed)
         {
             _recentRepo.Clear();
@@ -90,6 +94,8 @@ public class RecentFileItem
     public string FilePath { get; set; } = string.Empty;
     public DateTime OpenedAt { get; set; }
     public bool FileExists { get; set; }
+    public string FileExistsLabel { get; set; } = "✓";
+    public string FileMissingLabel { get; set; } = "✗";
     public string OpenedAtDisplay => OpenedAt.ToString("dd/MM/yyyy HH:mm");
-    public string StatusDisplay => FileExists ? "✓" : "✗ Mất file";
+    public string StatusDisplay => FileExists ? FileExistsLabel : FileMissingLabel;
 }
