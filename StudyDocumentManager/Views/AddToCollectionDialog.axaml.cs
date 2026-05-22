@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using StudyDocumentManager.Core.Entities;
+using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Models.Items;
 
 namespace StudyDocumentManager.Views;
@@ -14,6 +15,7 @@ public partial class AddToCollectionDialog : Window
 {
     // ─── Data ───────────────────────────────────────────────────────
     private readonly AddToCollectionDialogState _state;
+    private readonly ILocalizationService _loc;
     private bool _updatingHeader;
 
     /// <summary>Documents selected by the user. Null = cancelled.</summary>
@@ -24,19 +26,20 @@ public partial class AddToCollectionDialog : Window
     public AddToCollectionDialog()
     {
         InitializeComponent();
-        _state = new AddToCollectionDialogState([]);
+        _loc = null!;
+        _state = new AddToCollectionDialogState([], _loc);
     }
 
     public AddToCollectionDialog(
         IEnumerable<StudyDocument> allDocuments,
         IEnumerable<int> alreadyInCollection,
-        string collectionName) : this()
+        string collectionName,
+        ILocalizationService loc) : this()
     {
+        _loc = loc;
 
-        // Update title with collection name
-        TitleLabel.Text = $"Thêm tài liệu vào \"{collectionName}\"";
+        TitleLabel.Text = string.Format(loc["Collection_AddToTitle"], collectionName);
 
-        // Build items, excluding docs already in the collection
         var excluded = alreadyInCollection.ToHashSet();
         var items = allDocuments
             .Where(d => !excluded.Contains(d.Id))
@@ -44,17 +47,15 @@ public partial class AddToCollectionDialog : Window
             .Select(d => new SelectableDocumentItem(d))
             .ToList();
 
-        _state = new AddToCollectionDialogState(items);
+        _state = new AddToCollectionDialogState(items, loc);
         DocumentList.ItemsSource = _state.VisibleItems;
 
-        // Wire up events
         SearchBox.TextChanged += OnSearchChanged;
         SelectAllBtn.Click    += OnSelectAllClicked;
         ConfirmButton.Click   += OnConfirmClicked;
         CancelButton.Click    += OnCancelClicked;
         HeaderCheckBox.IsCheckedChanged += OnHeaderCheckChanged;
 
-        // Focus search box on open
         Opened += (_, _) =>
         {
             SearchBox.Focus();
