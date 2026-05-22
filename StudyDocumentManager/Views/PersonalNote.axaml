@@ -1,7 +1,8 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-             x:Class="StudyDocumentManager.Views.PersonalNote"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+                     x:Class="StudyDocumentManager.Views.PersonalNote"
              x:DataType="vm:PersonalNoteModel">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
@@ -11,12 +12,12 @@
                         VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconBack}" Width="12" Height="12"/>
-                        <TextBlock Text="{Binding [Toolbar_GoBack], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
+                        <TextBlock Text="{loc:Localize Toolbar_GoBack}" FontSize="{StaticResource FontSizeSm}"/>
                     </StackPanel>
                 </Button>
                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="12,0,0,0">
                     <Image Source="{StaticResource IconNote}" Width="18" Height="18"/>
-                    <TextBlock Text="{Binding [PersonalNote_Title], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
+                    <TextBlock Text="{loc:Localize PersonalNote_Title}" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
                                Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
             </DockPanel>
@@ -24,7 +25,7 @@
             <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}" CornerRadius="{StaticResource RadiusMd}"
                     Padding="{StaticResource PaddingMd}" Margin="0,0,0,12">
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                    <TextBlock Text="{Binding [AddEdit_LblName], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
+                    <TextBlock Text="{loc:Localize AddEdit_LblName}" FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
                     <TextBlock Text="{Binding DocumentName}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
@@ -35,14 +36,14 @@
                 <Button Classes="primary" Command="{Binding SaveNoteCommand}" Padding="16,7">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconSave}" Width="13" Height="13"/>
-                        <TextBlock Text="{Binding [PersonalNote_BtnSave], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{loc:Localize PersonalNote_BtnSave}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
                     </StackPanel>
                 </Button>
                 <Button Classes="secondary" Command="{Binding DeleteNoteCommand}" Padding="{StaticResource PaddingNavItem}"
                         IsVisible="{Binding HasExistingNote}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
-                        <TextBlock Text="{Binding [PersonalNote_BtnDelete], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}"/>
+                        <TextBlock Text="{loc:Localize PersonalNote_BtnDelete}" FontSize="{StaticResource FontSizeMd}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -52,7 +53,7 @@
                     Padding="{StaticResource PaddingIcon}">
                 <TextBox Text="{Binding NoteContent, Mode=TwoWay}"
                          AcceptsReturn="True" TextWrapping="Wrap"
-                         FontSize="{StaticResource FontSizeLg}" Watermark="{Binding [PersonalNote_Placeholder], Source={StaticResource Loc}}"
+                         FontSize="{StaticResource FontSizeLg}" Watermark="{loc:Localize PersonalNote_Placeholder}"
                          BorderThickness="0"/>
             </Border>
         </DockPanel>

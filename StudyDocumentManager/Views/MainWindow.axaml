@@ -4,6 +4,7 @@
         xmlns:v="using:StudyDocumentManager.Views"
         xmlns:core="using:StudyDocumentManager.Core"
         xmlns:conv="using:StudyDocumentManager.Converters"
+        xmlns:loc="using:StudyDocumentManager.Markup"
         x:Class="StudyDocumentManager.Views.MainWindow"
         x:DataType="vm:MainWindowModel"
         Title="Study Document Manager - Professional Edition"
@@ -22,55 +23,77 @@
         <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}"
                 Padding="0" Height="30">
             <DockPanel>
-                <!-- Language selector (right side of menu bar) -->
-                <ComboBox DockPanel.Dock="Right"
-                          ItemsSource="{Binding AvailableLanguages}"
-                          SelectedItem="{Binding SelectedLanguage}"
-                          FontSize="{StaticResource FontSizeXs}"
-                          Padding="4,1" MinWidth="84" MaxHeight="22"
-                          Margin="4,0,8,0"
-                          VerticalAlignment="Center">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Converter={StaticResource LangDisplayConverter}}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                <!-- Language selector (right side) — Button+Flyout -->
+                <Button DockPanel.Dock="Right"
+                        Classes="secondary"
+                        Margin="4,0,8,0"
+                        Padding="10,5"
+                        VerticalAlignment="Center"
+                        CornerRadius="4"
+                        ToolTip.Tip="{loc:Localize Menu_ChangeLanguage}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Image Source="{StaticResource IconLanguage}" Width="16" Height="16" Classes="toolbar-btn-icon"/>
+                        <TextBlock Text="{Binding SelectedLanguage, Converter={StaticResource LangDisplayConverter}}" 
+                                   VerticalAlignment="Center" 
+                                   FontSize="{StaticResource FontSizeSm}"/>
+                        <TextBlock Text="▼" 
+                                   VerticalAlignment="Center" 
+                                   FontSize="9" 
+                                   Opacity="0.5"
+                                   Margin="2,1,0,0"/>
+                    </StackPanel>
+                    <Button.Flyout>
+                        <MenuFlyout Placement="BottomEdgeAlignedRight">
+                            <MenuItem Header="日本語"
+                                      Command="{Binding ChangeLanguageCommand}"
+                                      CommandParameter="Japanese"/>
+                            <MenuItem Header="English"
+                                      Command="{Binding ChangeLanguageCommand}"
+                                      CommandParameter="English"/>
+                            <MenuItem Header="Tiếng Việt"
+                                      Command="{Binding ChangeLanguageCommand}"
+                                      CommandParameter="Vietnamese"/>
+                            <MenuItem Header="中文"
+                                      Command="{Binding ChangeLanguageCommand}"
+                                      CommandParameter="Chinese"/>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
 
                 <Menu Background="Transparent" Padding="4,0">
-                    <MenuItem Header="{Binding [Menu_File], Source={StaticResource Loc}}">
-                        <MenuItem Header="{Binding [Menu_AddNewDocument], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="add" InputGesture="Ctrl+N"/>
-                        <MenuItem Header="{Binding [Menu_OpenDocument], Source={StaticResource Loc}}" Command="{Binding OpenFileCommand}" InputGesture="Ctrl+O"/>
+                    <MenuItem Header="{loc:Localize Menu_File}">
+                        <MenuItem Header="{loc:Localize Menu_AddNewDocument}" Command="{Binding NavigateCommand}" CommandParameter="add" InputGesture="Ctrl+N"/>
+                        <MenuItem Header="{loc:Localize Menu_OpenDocument}" Command="{Binding OpenFileCommand}" InputGesture="Ctrl+O"/>
                         <Separator/>
-                        <MenuItem Header="{Binding [Menu_ExportCsv], Source={StaticResource Loc}}" Command="{Binding ExportCsvCommand}" InputGesture="Ctrl+E"/>
-                        <MenuItem Header="{Binding [Menu_BackupDb], Source={StaticResource Loc}}" Command="{Binding BackupDatabaseCommand}"/>
-                        <MenuItem Header="{Binding [Menu_RestoreDb], Source={StaticResource Loc}}" Command="{Binding RestoreDatabaseCommand}"/>
+                        <MenuItem Header="{loc:Localize Menu_ExportCsv}" Command="{Binding ExportCsvCommand}" InputGesture="Ctrl+E"/>
+                        <MenuItem Header="{loc:Localize Menu_BackupDb}" Command="{Binding BackupDatabaseCommand}"/>
+                        <MenuItem Header="{loc:Localize Menu_RestoreDb}" Command="{Binding RestoreDatabaseCommand}"/>
                         <Separator/>
-                        <MenuItem Header="{Binding [Menu_Exit], Source={StaticResource Loc}}" Command="{Binding ExitAppCommand}" InputGesture="Alt+F4"/>
+                        <MenuItem Header="{loc:Localize Menu_Exit}" Command="{Binding ExitAppCommand}" InputGesture="Alt+F4"/>
                     </MenuItem>
-                    <MenuItem Header="{Binding [Menu_Edit], Source={StaticResource Loc}}">
-                        <MenuItem Header="{Binding [Menu_EditDocument], Source={StaticResource Loc}}" Command="{Binding EditDocumentCommand}" InputGesture="Ctrl+U"/>
-                        <MenuItem Header="{Binding [Menu_DeleteDocument], Source={StaticResource Loc}}" Command="{Binding DeleteDocumentCommand}" InputGesture="Delete"/>
+                    <MenuItem Header="{loc:Localize Menu_Edit}">
+                        <MenuItem Header="{loc:Localize Menu_EditDocument}" Command="{Binding EditDocumentCommand}" InputGesture="Ctrl+U"/>
+                        <MenuItem Header="{loc:Localize Menu_DeleteDocument}" Command="{Binding DeleteDocumentCommand}" InputGesture="Delete"/>
                         <Separator/>
-                        <MenuItem Header="{Binding [Menu_RefreshList], Source={StaticResource Loc}}" Command="{Binding RefreshCommand}" InputGesture="F5"/>
+                        <MenuItem Header="{loc:Localize Menu_RefreshList}" Command="{Binding RefreshCommand}" InputGesture="F5"/>
                     </MenuItem>
-                    <MenuItem Header="{Binding [Menu_Tools], Source={StaticResource Loc}}">
-                        <MenuItem Header="{Binding [Menu_ManageCategories], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="categories" InputGesture="Ctrl+M"/>
-                        <MenuItem Header="{Binding [Menu_Collections], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="collections"/>
+                    <MenuItem Header="{loc:Localize Menu_Tools}">
+                        <MenuItem Header="{loc:Localize Menu_ManageCategories}" Command="{Binding NavigateCommand}" CommandParameter="categories" InputGesture="Ctrl+M"/>
+                        <MenuItem Header="{loc:Localize Menu_Collections}" Command="{Binding NavigateCommand}" CommandParameter="collections"/>
                         <Separator/>
-                        <MenuItem Header="{Binding [Menu_BatchImport], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="batch-import"/>
-                        <MenuItem Header="{Binding [Menu_BulkDelete], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
-                        <MenuItem Header="{Binding [Menu_FindDuplicates], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="duplicates"/>
-                        <MenuItem Header="{Binding [Menu_FileCheck], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="integrity"/>
+                        <MenuItem Header="{loc:Localize Menu_BatchImport}" Command="{Binding NavigateCommand}" CommandParameter="batch-import"/>
+                        <MenuItem Header="{loc:Localize Menu_BulkDelete}" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
+                        <MenuItem Header="{loc:Localize Menu_FindDuplicates}" Command="{Binding NavigateCommand}" CommandParameter="duplicates"/>
+                        <MenuItem Header="{loc:Localize Menu_FileCheck}" Command="{Binding NavigateCommand}" CommandParameter="integrity"/>
                         <Separator/>
-                        <MenuItem Header="{Binding [Menu_Statistics], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="report" InputGesture="Ctrl+S"/>
+                        <MenuItem Header="{loc:Localize Menu_Statistics}" Command="{Binding NavigateCommand}" CommandParameter="report" InputGesture="Ctrl+S"/>
                         <Separator/>
-                        <MenuItem Header="{Binding [Menu_RecycleBin], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="recycle"/>
+                        <MenuItem Header="{loc:Localize Menu_RecycleBin}" Command="{Binding NavigateCommand}" CommandParameter="recycle"/>
                     </MenuItem>
-                    <MenuItem Header="{Binding [Menu_Help], Source={StaticResource Loc}}">
-                        <MenuItem Header="{Binding [Menu_CheckUpdate], Source={StaticResource Loc}}" Command="{Binding CheckForUpdateCommand}"/>
+                    <MenuItem Header="{loc:Localize Menu_Help}">
+                        <MenuItem Header="{loc:Localize Menu_CheckUpdate}" Command="{Binding CheckForUpdateCommand}"/>
                         <Separator/>
-                        <MenuItem Header="{Binding [Menu_About], Source={StaticResource Loc}}" Command="{Binding ShowAboutCommand}"/>
+                        <MenuItem Header="{loc:Localize Menu_About}" Command="{Binding ShowAboutCommand}"/>
                     </MenuItem>
                 </Menu>
             </DockPanel>
@@ -88,19 +111,19 @@
                             FontWeight="SemiBold">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconAdd}" Width="16" Height="16"/>
-                            <TextBlock Text="{Binding [Toolbar_Add], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_Add}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn" Command="{Binding EditDocumentCommand}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconEdit}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{Binding [Toolbar_Edit], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_Edit}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn" Command="{Binding DeleteDocumentCommand}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconDelete}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{Binding [Toolbar_Delete], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_Delete}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
 
@@ -110,13 +133,13 @@
                     <Button Classes="secondary toolbar-btn" Command="{Binding OpenFileCommand}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconOpenFile}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{Binding [Toolbar_OpenFile], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_OpenFile}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn" Command="{Binding ExportCsvCommand}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconExport}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{Binding [Toolbar_Export], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_Export}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
 
@@ -138,28 +161,28 @@
                             Command="{Binding NavigateCommand}" CommandParameter="recycle">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconRecycle}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{Binding [Toolbar_RecycleBin], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_RecycleBin}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="bulk-delete">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconBulkDelete}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{Binding [Toolbar_Bulk], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_Bulk}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="recentfiles">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconClock}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{Binding [Toolbar_Recent], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_Recent}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn"
                             Command="{Binding BackupDatabaseCommand}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconSave}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{Binding [Toolbar_Backup], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_Backup}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
 
@@ -170,14 +193,14 @@
                             Command="{Binding NavigateCommand}" CommandParameter="duplicates">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconDuplicate}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{Binding [Toolbar_Duplicates], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_Duplicates}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="report">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconReport}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{Binding [Toolbar_Statistics], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_Statistics}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn"
@@ -196,7 +219,7 @@
                             IsVisible="{Binding CanGoBack}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconBack}" Width="12" Height="12"/>
-                            <TextBlock Text="{Binding [Toolbar_GoBack], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Toolbar_GoBack}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>

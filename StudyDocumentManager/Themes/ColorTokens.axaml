@@ -250,13 +250,13 @@
         <x:Double x:Key="HeightButton">30</x:Double>   <!-- standard Button -->
         <x:Double x:Key="HeightButtonLg">34</x:Double> <!-- large Button -->
 
-        <!-- Font sizes -->
-        <x:Double x:Key="FontSizeXs">10</x:Double>
-        <x:Double x:Key="FontSizeSm">11</x:Double>
-        <x:Double x:Key="FontSizeMd">12</x:Double>
-        <x:Double x:Key="FontSizeLg">13</x:Double>
-        <x:Double x:Key="FontSizeXl">16</x:Double>
-        <x:Double x:Key="FontSizeHeading">20</x:Double>
+        <!-- Font sizes (CJK-optimized: min 12px for kanji legibility) -->
+        <x:Double x:Key="FontSizeXs">12</x:Double>
+        <x:Double x:Key="FontSizeSm">13</x:Double>
+        <x:Double x:Key="FontSizeMd">14</x:Double>
+        <x:Double x:Key="FontSizeLg">15</x:Double>
+        <x:Double x:Key="FontSizeXl">18</x:Double>
+        <x:Double x:Key="FontSizeHeading">22</x:Double>
 
     </Styles.Resources>
 

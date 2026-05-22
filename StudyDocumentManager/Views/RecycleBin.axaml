@@ -1,9 +1,10 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
              xmlns:conv="using:StudyDocumentManager.Converters"
              xmlns:core="using:StudyDocumentManager.Core.Entities"
-             x:Class="StudyDocumentManager.Views.RecycleBin"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+                     x:Class="StudyDocumentManager.Views.RecycleBin"
              x:DataType="vm:RecycleBinModel">
 
     <Border Classes="page-wrapper">
@@ -12,26 +13,26 @@
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
                 <StackPanel Classes="page-header-stack" Margin="0">
                     <Image Source="{StaticResource IconRecycle}" Width="18" Height="18"/>
-                    <TextBlock Classes="page-title" Text="{Binding [RecycleBin_Title], Source={StaticResource Loc}}"/>
+                    <TextBlock Classes="page-title" Text="{loc:Localize RecycleBin_Title}"/>
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
                             HorizontalAlignment="Right">
                     <Button Classes="primary" Command="{Binding RestoreCommand}" Padding="{StaticResource PaddingMd}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconRestore}" Width="13" Height="13"/>
-                            <TextBlock Text="{Binding [RecycleBin_BtnRestore], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}"/>
+                            <TextBlock Text="{loc:Localize RecycleBin_BtnRestore}" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary" Command="{Binding PermanentDeleteCommand}" Padding="{StaticResource PaddingMd}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
-                            <TextBlock Text="{Binding [RecycleBin_BtnPermanentDelete], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}"/>
+                            <TextBlock Text="{loc:Localize RecycleBin_BtnPermanentDelete}" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="danger" Command="{Binding EmptyTrashCommand}" Padding="{StaticResource PaddingMd}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconRecycle}" Width="13" Height="13"/>
-                            <TextBlock Text="{Binding [RecycleBin_BtnEmptyTrash], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}"/>
+                            <TextBlock Text="{loc:Localize RecycleBin_BtnEmptyTrash}" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -44,7 +45,7 @@
                               ItemsSource="{Binding DeletedDocuments}"
                               SelectedItem="{Binding SelectedDocument}">
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="{Binding [RecycleBin_ColName], Source={StaticResource Loc}}" Width="*" MinWidth="200" SortMemberPath="Name">
+                            <DataGridTemplateColumn Header="{loc:Localize RecycleBin_ColName}" Width="*" MinWidth="200" SortMemberPath="Name">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="core:StudyDocument">
                                         <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
@@ -55,15 +56,15 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{Binding [RecycleBin_ColSubject], Source={StaticResource Loc}}" Binding="{Binding Subject}" Width="120"/>
-                            <DataGridTextColumn Header="{Binding [RecycleBin_ColType], Source={StaticResource Loc}}" Binding="{Binding Type}" Width="80"/>
-                            <DataGridTextColumn Header="{Binding [RecycleBin_ColDate], Source={StaticResource Loc}}" Binding="{Binding CreatedAt, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColSubject}" Binding="{Binding Subject}" Width="120"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColType}" Binding="{Binding Type}" Width="80"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColDate}" Binding="{Binding CreatedAt, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
                         </DataGrid.Columns>
                     </DataGrid>
 
                     <StackPanel Classes="empty-state" IsVisible="{Binding !DeletedDocuments.Count}">
                         <Image Classes="empty-state-icon" Source="{StaticResource IconRecycle}"/>
-                        <TextBlock Classes="empty-state-text" Text="{Binding [RecycleBin_EmptyState], Source={StaticResource Loc}}"/>
+                        <TextBlock Classes="empty-state-text" Text="{loc:Localize RecycleBin_EmptyState}"/>
                     </StackPanel>
                 </Panel>
             </Border>

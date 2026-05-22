@@ -1,14 +1,15 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-             x:Class="StudyDocumentManager.Views.BatchImport"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+                     x:Class="StudyDocumentManager.Views.BatchImport"
              x:DataType="vm:BatchImportModel">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
         <DockPanel>
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,12">
                 <Image Source="{StaticResource IconImport}" Width="18" Height="18"/>
-                <TextBlock Text="{Binding [BatchImport_Title], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXl}"
+                <TextBlock Text="{loc:Localize BatchImport_Title}" FontSize="{StaticResource FontSizeXl}"
                            FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
             </StackPanel>
 
@@ -17,28 +18,28 @@
                     Padding="{StaticResource PaddingStatCard}" Margin="0,0,0,12">
                 <StackPanel Spacing="8">
                     <DockPanel>
-                        <TextBlock Text="{Binding [BatchImport_LblFolder], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                        <TextBlock Text="{loc:Localize BatchImport_LblFolder}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"
                                    Margin="0,0,8,0"/>
                         <Button DockPanel.Dock="Right" Classes="secondary"
                                 Command="{Binding BrowseFolderCommand}" Padding="{StaticResource PaddingBtnMd}" Margin="6,0,0,0">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconCategory}" Width="11" Height="11"/>
-                                <TextBlock Text="{Binding [BatchImport_BtnBrowse], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
+                                <TextBlock Text="{loc:Localize BatchImport_BtnBrowse}" FontSize="{StaticResource FontSizeSm}"/>
                             </StackPanel>
                         </Button>
                         <Button DockPanel.Dock="Right" Classes="primary"
                                 Command="{Binding ScanFolderCommand}" Padding="{StaticResource PaddingBtnMd}" Margin="6,0,0,0">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconScan}" Width="11" Height="11"/>
-                                <TextBlock Text="{Binding [BatchImport_BtnScan], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
+                                <TextBlock Text="{loc:Localize BatchImport_BtnScan}" FontSize="{StaticResource FontSizeSm}"/>
                             </StackPanel>
                         </Button>
                         <TextBox Text="{Binding FolderPath, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
                                  Height="30"/>
                     </DockPanel>
                     <DockPanel>
-                        <TextBlock Text="{Binding [BatchImport_LblDefaultSubject], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
+                        <TextBlock Text="{loc:Localize BatchImport_LblDefaultSubject}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
                                    Foreground="{StaticResource TextPrimary}" Margin="0,0,8,0"/>
                         <TextBox Text="{Binding DefaultSubject, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
                                  Height="30" Width="250" HorizontalAlignment="Left"/>
@@ -51,24 +52,24 @@
                 <Button Classes="secondary" Command="{Binding SelectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconCheck}" Width="11" Height="11"/>
-                        <TextBlock Text="{Binding [Bulk_BtnSelectAll], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
+                        <TextBlock Text="{loc:Localize Bulk_BtnSelectAll}" FontSize="{StaticResource FontSizeSm}"/>
                     </StackPanel>
                 </Button>
                 <Button Classes="secondary" Command="{Binding DeselectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconClose}" Width="11" Height="11"/>
-                        <TextBlock Text="{Binding [Bulk_BtnDeselectAll], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
+                        <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{StaticResource FontSizeSm}"/>
                     </StackPanel>
                 </Button>
                 <Button Classes="primary" Command="{Binding ImportCommand}" Padding="{StaticResource PaddingBtnLg}"
                         IsEnabled="{Binding !IsImporting}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconImport}" Width="13" Height="13"/>
-                        <TextBlock Text="{Binding [BatchImport_BtnImport], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{loc:Localize BatchImport_BtnImport}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
                     </StackPanel>
                 </Button>
                 <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="{StaticResource PaddingMd}">
-                    <TextBlock Text="{Binding [AddEdit_BtnCancel], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}"/>
+                    <TextBlock Text="{loc:Localize AddEdit_BtnCancel}" FontSize="{StaticResource FontSizeMd}"/>
                 </Button>
             </StackPanel>
 
@@ -81,10 +82,10 @@
                               GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                         <DataGrid.Columns>
                             <DataGridCheckBoxColumn Header="✓" Binding="{Binding IsSelected}" Width="40"/>
-                            <DataGridTextColumn Header="{Binding [BatchImport_ColFileName], Source={StaticResource Loc}}" Binding="{Binding FileName}" Width="*" MinWidth="200"/>
-                            <DataGridTextColumn Header="{Binding [AddEdit_LblType], Source={StaticResource Loc}}" Binding="{Binding FileType}" Width="70"/>
-                            <DataGridTextColumn Header="{Binding [BatchImport_ColSize], Source={StaticResource Loc}}" Binding="{Binding FileSizeMB, StringFormat=\{0:F2\}}" Width="110"/>
-                            <DataGridTextColumn Header="{Binding [BatchImport_ColPath], Source={StaticResource Loc}}" Binding="{Binding FilePath}" Width="300"/>
+                            <DataGridTextColumn Header="{loc:Localize BatchImport_ColFileName}" Binding="{Binding FileName}" Width="*" MinWidth="200"/>
+                            <DataGridTextColumn Header="{loc:Localize AddEdit_LblType}" Binding="{Binding FileType}" Width="70"/>
+                            <DataGridTextColumn Header="{loc:Localize BatchImport_ColSize}" Binding="{Binding FileSizeMB, StringFormat=\{0:F2\}}" Width="110"/>
+                            <DataGridTextColumn Header="{loc:Localize BatchImport_ColPath}" Binding="{Binding FilePath}" Width="300"/>
                         </DataGrid.Columns>
                     </DataGrid>
 
@@ -92,7 +93,7 @@
                                 HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
                         <Image Source="{StaticResource IconCategory}" Width="36" Height="36"
                                HorizontalAlignment="Center" Opacity="0.4"/>
-                        <TextBlock Text="{Binding [BatchImport_EmptyState], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeLg}"
+                        <TextBlock Text="{loc:Localize BatchImport_EmptyState}" FontSize="{StaticResource FontSizeLg}"
                                    Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Panel>

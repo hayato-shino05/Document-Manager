@@ -1,7 +1,8 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-             x:Class="StudyDocumentManager.Views.TreeMap"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+                     x:Class="StudyDocumentManager.Views.TreeMap"
              x:DataType="vm:TreeMapModel">
 
     <Border Classes="page-wrapper">
@@ -10,18 +11,18 @@
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
                 <StackPanel Classes="page-header-stack" Margin="0">
                     <Image Source="{StaticResource IconTreeMap}" Width="18" Height="18"/>
-                    <TextBlock Classes="page-title" Text="{Binding [TreeMap_Title], Source={StaticResource Loc}}"/>
+                    <TextBlock Classes="page-title" Text="{loc:Localize TreeMap_Title}"/>
                 </StackPanel>
             </DockPanel>
 
             <!-- Mode toggle row -->
             <Border DockPanel.Dock="Top" Classes="card" Padding="{StaticResource PaddingNavItem}" Margin="0,0,0,12">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="{Binding [TreeMap_LblGroupBy], Source={StaticResource Loc}}" VerticalAlignment="Center"
+                    <TextBlock Text="{loc:Localize TreeMap_LblGroupBy}" VerticalAlignment="Center"
                                FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
-                    <Button Classes="primary" Content="{Binding [TreeMap_BtnByCategory], Source={StaticResource Loc}}"
+                    <Button Classes="primary" Content="{loc:Localize TreeMap_BtnByCategory}"
                             Command="{Binding ShowBySubjectCommand}" Padding="{StaticResource PaddingBtnSm}" FontSize="{StaticResource FontSizeSm}"/>
-                    <Button Classes="secondary" Content="{Binding [TreeMap_BtnByType], Source={StaticResource Loc}}"
+                    <Button Classes="secondary" Content="{loc:Localize TreeMap_BtnByType}"
                             Command="{Binding ShowByTypeCommand}" Padding="{StaticResource PaddingBtnSm}" FontSize="{StaticResource FontSizeSm}"/>
                     <TextBlock Text="{Binding TotalDocuments, StringFormat='Total: {0} documents'}"
                                VerticalAlignment="Center" Margin="12,0,0,0"

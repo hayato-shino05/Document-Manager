@@ -1,15 +1,16 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
              xmlns:conv="using:StudyDocumentManager.Converters"
-             x:Class="StudyDocumentManager.Views.BulkDelete"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+                     x:Class="StudyDocumentManager.Views.BulkDelete"
              x:DataType="vm:BulkDeleteModel">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
         <DockPanel>
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,12">
                 <Image Source="{StaticResource IconBulkDelete}" Width="18" Height="18"/>
-                <TextBlock Text="{Binding [BulkDelete_Title], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXl}"
+                <TextBlock Text="{loc:Localize BulkDelete_Title}" FontSize="{StaticResource FontSizeXl}"
                            FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
             </StackPanel>
 
@@ -17,24 +18,24 @@
                     BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
                     Padding="{StaticResource PaddingMd}" Margin="0,0,0,12">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="{Binding [Search_Label], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
+                    <TextBlock Text="{loc:Localize Search_Label}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
                                Foreground="{StaticResource TextPrimary}"/>
                     <TextBox Text="{Binding SearchKeyword, Mode=TwoWay}" Width="220" FontSize="{StaticResource FontSizeMd}"
                              Height="28"/>
                     <Button Classes="primary" Command="{Binding SearchCommand}" Padding="12,5">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconSearch}" Width="12" Height="12"/>
-                            <TextBlock Text="{Binding [Search_BtnSearch], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
+                            <TextBlock Text="{loc:Localize Search_BtnSearch}" FontSize="{StaticResource FontSizeSm}"/>
                         </StackPanel>
                     </Button>
 
                     <Border Width="1" Height="20" Background="{StaticResource CardBorder}" Margin="4,0"/>
 
-                    <TextBlock Text="{Binding [AddEdit_LblSubject], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
+                    <TextBlock Text="{loc:Localize AddEdit_LblSubject}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
                                Foreground="{StaticResource TextSecondary}"/>
                     <ComboBox Name="cboSubject" Width="130" FontSize="{StaticResource FontSizeSm}" Height="28" VerticalAlignment="Center"/>
 
-                    <TextBlock Text="{Binding [AddEdit_LblType], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
+                    <TextBlock Text="{loc:Localize AddEdit_LblType}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
                                Foreground="{StaticResource TextSecondary}"/>
                     <ComboBox Name="cboType" Width="110" FontSize="{StaticResource FontSizeSm}" Height="28" VerticalAlignment="Center"/>
                 </StackPanel>
@@ -47,13 +48,13 @@
                         <Button Classes="secondary" Command="{Binding SelectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconCheck}" Width="11" Height="11"/>
-                                <TextBlock Text="{Binding [Bulk_BtnSelectAll], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
+                                <TextBlock Text="{loc:Localize Bulk_BtnSelectAll}" FontSize="{StaticResource FontSizeSm}"/>
                             </StackPanel>
                         </Button>
                         <Button Classes="secondary" Command="{Binding DeselectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconClose}" Width="11" Height="11"/>
-                                <TextBlock Text="{Binding [Bulk_BtnDeselectAll], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
+                                <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{StaticResource FontSizeSm}"/>
                             </StackPanel>
                         </Button>
 
@@ -63,7 +64,7 @@
                                 Classes="warning">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconStar}" Width="12" Height="12"/>
-                                <TextBlock Text="{Binding [BulkDelete_BtnMarkImportant], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{loc:Localize BulkDelete_BtnMarkImportant}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Button>
 
@@ -72,7 +73,7 @@
                                 Classes="primary">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconCategory}" Width="12" Height="12"/>
-                                <TextBlock Text="{Binding [BulkDelete_BtnChangeSubject], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{loc:Localize BulkDelete_BtnChangeSubject}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -82,11 +83,11 @@
                                 Classes="danger">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
-                                <TextBlock Text="{Binding [BulkDelete_BtnDelete], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{loc:Localize BulkDelete_BtnDelete}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Button>
                         <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="{StaticResource PaddingMd}">
-                            <TextBlock Text="{Binding [Toolbar_GoBack], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}"/>
+                            <TextBlock Text="{loc:Localize Toolbar_GoBack}" FontSize="{StaticResource FontSizeMd}"/>
                         </Button>
                     </StackPanel>
                 </Grid>
@@ -103,7 +104,7 @@
                               GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                         <DataGrid.Columns>
                             <DataGridCheckBoxColumn Header="✓" Binding="{Binding IsSelected}" Width="40"/>
-                            <DataGridTemplateColumn Header="{Binding [AddEdit_LblName], Source={StaticResource Loc}}" Width="*" MinWidth="200" SortMemberPath="Document.Name">
+                            <DataGridTemplateColumn Header="{loc:Localize AddEdit_LblName}" Width="*" MinWidth="200" SortMemberPath="Document.Name">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="vm:SelectableDocument">
                                         <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
@@ -114,9 +115,9 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{Binding [AddEdit_LblSubject], Source={StaticResource Loc}}" Binding="{Binding Document.Subject, Mode=OneWay}" Width="120"/>
-                            <DataGridTextColumn Header="{Binding [AddEdit_LblType], Source={StaticResource Loc}}" Binding="{Binding Document.Type, Mode=OneWay}" Width="80"/>
-                            <DataGridTextColumn Header="{Binding [BulkDelete_ColDateAdded], Source={StaticResource Loc}}" Binding="{Binding Document.CreatedAt, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
+                            <DataGridTextColumn Header="{loc:Localize AddEdit_LblSubject}" Binding="{Binding Document.Subject, Mode=OneWay}" Width="120"/>
+                            <DataGridTextColumn Header="{loc:Localize AddEdit_LblType}" Binding="{Binding Document.Type, Mode=OneWay}" Width="80"/>
+                            <DataGridTextColumn Header="{loc:Localize BulkDelete_ColDateAdded}" Binding="{Binding Document.CreatedAt, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
                             <DataGridCheckBoxColumn Header="★" Binding="{Binding Document.IsImportant, Mode=OneWay}" Width="40" IsReadOnly="True"/>
                         </DataGrid.Columns>
                     </DataGrid>

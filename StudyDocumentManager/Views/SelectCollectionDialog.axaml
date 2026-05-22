@@ -1,7 +1,8 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="StudyDocumentManager.Views.SelectCollectionDialog"
-        Title="{Binding [SelectCollDialog_Title], Source={StaticResource Loc}}"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+                x:Class="StudyDocumentManager.Views.SelectCollectionDialog"
+        Title="{loc:Localize SelectCollDialog_Title}"
         Width="440" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
@@ -18,12 +19,12 @@
 
         <!-- Collection chips -->
         <StackPanel>
-            <TextBlock Text="{Binding [SelectCollDialog_SelectChips], Source={StaticResource Loc}}"
+            <TextBlock Text="{loc:Localize SelectCollDialog_SelectChips}"
                        FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
 
             <!-- Empty state -->
             <TextBlock x:Name="EmptyStateText"
-                       Text="{Binding [SelectCollDialog_EmptyState], Source={StaticResource Loc}}"
+                       Text="{loc:Localize SelectCollDialog_EmptyState}"
                        FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
                        IsVisible="False" TextWrapping="Wrap"/>
 
@@ -50,21 +51,21 @@
         <!-- Selected indicator -->
         <TextBlock x:Name="SelectedLabel"
                    FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
-                   Text="{Binding [SelectCollDialog_NoneSelected], Source={StaticResource Loc}}"/>
+                   Text="{loc:Localize SelectCollDialog_NoneSelected}"/>
 
         <!-- Buttons: OK first, then Cancel -->
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Spacing="8" Margin="0,8,0,0">
             <Button x:Name="OkButton"
-                    Content="{Binding [SelectCollDialog_BtnAdd], Source={StaticResource Loc}}"
+                    Content="{loc:Localize SelectCollDialog_BtnAdd}"
                     Classes="primary"
                     IsDefault="True"
                     IsEnabled="False"
                     MinWidth="100"
                     HorizontalContentAlignment="Center"/>
             <Button x:Name="CancelButton"
-                    Content="{Binding [Action_Cancel], Source={StaticResource Loc}}"
+                    Content="{loc:Localize Action_Cancel}"
                     Classes="secondary"
                     IsCancel="True"
                     MinWidth="80"

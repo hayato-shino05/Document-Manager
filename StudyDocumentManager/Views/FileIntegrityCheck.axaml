@@ -1,7 +1,8 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-             x:Class="StudyDocumentManager.Views.FileIntegrityCheck"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+                     x:Class="StudyDocumentManager.Views.FileIntegrityCheck"
              x:DataType="vm:FileIntegrityCheckModel">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
@@ -9,14 +10,14 @@
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <Image Source="{StaticResource IconShield}" Width="20" Height="20"/>
-                    <TextBlock Text="{Binding [FileIntegrity_Title], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXl}"
+                    <TextBlock Text="{loc:Localize FileIntegrity_Title}" FontSize="{StaticResource FontSizeXl}"
                                FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
                     <Button Classes="primary" Command="{Binding RunIntegrityCheckCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconSearch}" Width="12" Height="12"/>
-                            <TextBlock Text="{Binding [FileIntegrity_BtnScan], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                            <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -27,7 +28,7 @@
                     BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <Image Source="{StaticResource IconInfo}" Width="13" Height="13"/>
-                    <TextBlock Text="{Binding [FileIntegrity_InfoHint], Source={StaticResource Loc}}"
+                    <TextBlock Text="{loc:Localize FileIntegrity_InfoHint}"
                                FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
                                TextWrapping="Wrap"/>
                 </StackPanel>
@@ -36,7 +37,7 @@
             <Border DockPanel.Dock="Top" IsVisible="{Binding IsChecking}" Margin="0,0,0,10">
                 <StackPanel Spacing="6" HorizontalAlignment="Center">
                     <ProgressBar IsIndeterminate="True" Width="300"/>
-                    <TextBlock Text="{Binding [FileIntegrity_Checking], Source={StaticResource Loc}}"
+                    <TextBlock Text="{loc:Localize FileIntegrity_Checking}"
                                FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
                                HorizontalAlignment="Center"/>
                 </StackPanel>
@@ -50,7 +51,7 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Image Source="{StaticResource IconCheck}" Width="14" Height="14"/>
                                 <TextBlock FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource StatGreenFg}">
-                                    <Run Text="{Binding [FileIntegrity_StatValid], Source={StaticResource Loc}}"/>
+                                    <Run Text="{loc:Localize FileIntegrity_StatValid}"/>
                                     <Run Text=": "/>
                                     <Run Text="{Binding ValidCount}" FontWeight="Bold"/>
                                 </TextBlock>
@@ -60,7 +61,7 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Image Source="{StaticResource IconWarning}" Width="14" Height="14"/>
                                 <TextBlock FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource StatRedFg}">
-                                    <Run Text="{Binding [FileIntegrity_StatMissing], Source={StaticResource Loc}}"/>
+                                    <Run Text="{loc:Localize FileIntegrity_StatMissing}"/>
                                     <Run Text=": "/>
                                     <Run Text="{Binding MissingCount}" FontWeight="Bold"/>
                                 </TextBlock>
@@ -70,7 +71,7 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Image Source="{StaticResource IconWarning}" Width="14" Height="14"/>
                                 <TextBlock FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource StatYellowFg}">
-                                    <Run Text="{Binding [FileIntegrity_StatCorrupted], Source={StaticResource Loc}}"/>
+                                    <Run Text="{loc:Localize FileIntegrity_StatCorrupted}"/>
                                     <Run Text=": "/>
                                     <Run Text="{Binding CorruptedCount}" FontWeight="Bold"/>
                                 </TextBlock>
@@ -86,7 +87,7 @@
                                 CornerRadius="6,6,0,0" Padding="{StaticResource PaddingMd}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Image Source="{StaticResource IconDocPage}" Width="14" Height="14"/>
-                                <TextBlock Text="{Binding [FileIntegrity_ResultHeader], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeLg}"
+                                <TextBlock Text="{loc:Localize FileIntegrity_ResultHeader}" FontSize="{StaticResource FontSizeLg}"
                                            FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
                             </StackPanel>
                         </Border>
@@ -95,7 +96,7 @@
                             <StackPanel IsVisible="{Binding !HasResults}"
                                         VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="0,40">
                                 <Image Source="{StaticResource IconShield}" Width="36" Height="36" Opacity="0.4"/>
-                                <TextBlock Text="{Binding [FileIntegrity_EmptyState], Source={StaticResource Loc}}"
+                                <TextBlock Text="{loc:Localize FileIntegrity_EmptyState}"
                                            FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>

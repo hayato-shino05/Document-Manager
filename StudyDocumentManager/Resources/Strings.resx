@@ -294,6 +294,9 @@
   <data name="Lang_Vietnamese" xml:space="preserve"><value>Tiếng Việt</value></data>
   <data name="Lang_Chinese" xml:space="preserve"><value>中文</value></data>
 
+  <!-- Language Switcher -->
+  <data name="Main_ChangeLanguage" xml:space="preserve"><value>言語を変更</value></data>
+
   <!-- MainWindow - Menu -->
   <data name="Menu_File" xml:space="preserve"><value>ファイル</value></data>
   <data name="Menu_AddNewDocument" xml:space="preserve"><value>新しい文書を追加</value></data>

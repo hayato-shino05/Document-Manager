@@ -29,8 +29,8 @@ public partial class App : Application
 
         DatabaseHelper.InitializeDatabase();
 
-        // AXAML側で{StaticResource Loc}として使えるよう登録
-        Resources["Loc"] = Services.GetRequiredService<ILocalizationService>();
+        // Avalonia needs the concrete type (implements INotifyPropertyChanged) for indexer binding refresh
+        Resources["Loc"] = Services.GetRequiredService<LocalizationService>();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

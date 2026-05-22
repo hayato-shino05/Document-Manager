@@ -249,7 +249,24 @@ public partial class MainWindowModel : ModelBase
 
     partial void OnSelectedLanguageChanged(SupportedLanguage value)
     {
+        System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] OnSelectedLanguageChanged fired: value={value}");
         _loc.SetLanguage(value);
         DatabaseHelper.SetSetting("language", value.ToString());
+        System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] Language persisted to DB: {value}");
+    }
+
+    [RelayCommand]
+    private void ChangeLanguage(string langName)
+    {
+        System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] ChangeLanguageCommand invoked: langName='{langName}'");
+        if (Enum.TryParse<SupportedLanguage>(langName, out var lang))
+        {
+            System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] Parsed OK → {lang}, current={SelectedLanguage}");
+            SelectedLanguage = lang;
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] PARSE FAILED for '{langName}'");
+        }
     }
 }

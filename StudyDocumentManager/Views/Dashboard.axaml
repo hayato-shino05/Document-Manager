@@ -1,9 +1,10 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
              xmlns:conv="using:StudyDocumentManager.Converters"
              xmlns:core="using:StudyDocumentManager.Core.Entities"
-             x:Class="StudyDocumentManager.Views.Dashboard"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+                     x:Class="StudyDocumentManager.Views.Dashboard"
              x:DataType="vm:DashboardModel">
 
     <UserControl.Resources>
@@ -24,23 +25,23 @@
                     <Image Source="{StaticResource IconSearch}" Width="13" Height="13"
                            VerticalAlignment="Center" Opacity="0.5"/>
                     <TextBox Width="260" Height="{StaticResource HeightControl}" FontSize="{StaticResource FontSizeMd}"
-                             Watermark="{Binding [Dashboard_SearchPlaceholder], Source={StaticResource Loc}}"
+                             Watermark="{loc:Localize Dashboard_SearchPlaceholder}"
                              Text="{Binding SearchKeyword, Mode=TwoWay}"
                              VerticalContentAlignment="Center"/>
                     <Button Classes="primary" Command="{Binding SearchCommand}"
                             Padding="{StaticResource PaddingBtn}" Height="{StaticResource HeightControl}" VerticalAlignment="Center"
-                            ToolTip.Tip="{Binding [Dashboard_TipSearch], Source={StaticResource Loc}}">
-                        <TextBlock Text="{Binding [Dashboard_BtnSearch], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                            ToolTip.Tip="{loc:Localize Dashboard_TipSearch}">
+                        <TextBlock Text="{loc:Localize Dashboard_BtnSearch}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
                     </Button>
 
                     <Border Width="1" Height="18" Background="{StaticResource CardBorder}" Margin="4,0"/>
 
-                    <TextBlock Text="{Binding [Dashboard_LblCategory], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
+                    <TextBlock Text="{loc:Localize Dashboard_LblCategory}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
                                Foreground="{StaticResource TextSecondary}"/>
                     <ComboBox Name="cboSubject" Width="140" FontSize="{StaticResource FontSizeMd}"
                               Height="{StaticResource HeightControl}" VerticalAlignment="Center"/>
 
-                    <TextBlock Text="{Binding [Dashboard_LblType], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
+                    <TextBlock Text="{loc:Localize Dashboard_LblType}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
                                Foreground="{StaticResource TextSecondary}"/>
                     <ComboBox Name="cboType" Width="120" FontSize="{StaticResource FontSizeMd}"
                               Height="{StaticResource HeightControl}" VerticalAlignment="Center"/>
@@ -50,11 +51,11 @@
                 <Button Grid.Column="1" Classes="secondary"
                         Padding="{StaticResource PaddingBtnSm}" Height="{StaticResource HeightControl}" VerticalAlignment="Center"
                         Command="{Binding ToggleAdvancedFilterCommand}"
-                        ToolTip.Tip="{Binding [Dashboard_TipAdvancedFilter], Source={StaticResource Loc}}">
+                        ToolTip.Tip="{loc:Localize Dashboard_TipAdvancedFilter}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                         <Image Source="{StaticResource IconFilter}" Width="12" Height="12"
                                VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding [Dashboard_BtnAdvancedFilter], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{loc:Localize Dashboard_BtnAdvancedFilter}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                         <Image Width="9" Height="9" VerticalAlignment="Center"
                                IsVisible="{Binding IsAdvancedFilterVisible}"
                                Source="{StaticResource IconChevronUp}"/>
@@ -87,17 +88,17 @@
                                           VerticalAlignment="Center"/>
                                 <Image Source="{StaticResource IconCalendar}" Width="14" Height="14"
                                        VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding [Dashboard_LblDateRange], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                <TextBlock Text="{loc:Localize Dashboard_LblDateRange}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <Grid ColumnDefinitions="Auto,*,Auto,*" IsEnabled="{Binding IsDateFilterEnabled}">
-                                <TextBlock Text="{Binding [Dashboard_LblFrom], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
+                                <TextBlock Text="{loc:Localize Dashboard_LblFrom}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
                                            Foreground="{StaticResource TextSecondary}" Margin="0,0,6,0"/>
                                 <DatePicker Grid.Column="1" FontSize="{StaticResource FontSizeSm}" Height="30"
                                             SelectedDate="{Binding FilterFromDate}"
                                             HorizontalAlignment="Stretch"/>
-                                <TextBlock Grid.Column="2" Text="{Binding [Dashboard_LblTo], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
+                                <TextBlock Grid.Column="2" Text="{loc:Localize Dashboard_LblTo}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
                                            Foreground="{StaticResource TextSecondary}" Margin="10,0,6,0"/>
                                 <DatePicker Grid.Column="3" FontSize="{StaticResource FontSizeSm}" Height="30"
                                             SelectedDate="{Binding FilterToDate}"
@@ -117,13 +118,13 @@
                                           VerticalAlignment="Center"/>
                                 <Image Source="{StaticResource IconSize}" Width="14" Height="14"
                                        VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding [Dashboard_LblFileSize], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                                <TextBlock Text="{loc:Localize Dashboard_LblFileSize}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Spacing="6"
                                         IsEnabled="{Binding IsSizeFilterEnabled}">
-                                <TextBlock Text="{Binding [Dashboard_LblSizeFrom], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
+                                <TextBlock Text="{loc:Localize Dashboard_LblSizeFrom}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
                                            Foreground="{StaticResource TextSecondary}"/>
                                 <NumericUpDown Width="80" FontSize="{StaticResource FontSizeSm}" Height="30"
                                                Value="{Binding FilterMinSize}"
@@ -145,7 +146,7 @@
                                     <StackPanel Orientation="Horizontal" Spacing="4">
                                         <Image Source="{StaticResource IconStar}" Width="13" Height="13"
                                                VerticalAlignment="Center"/>
-                                        <TextBlock Text="{Binding [Dashboard_LblImportantOnly], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"
+                                        <TextBlock Text="{loc:Localize Dashboard_LblImportantOnly}" FontSize="{StaticResource FontSizeSm}"
                                                    Foreground="{StaticResource TextPrimary}"/>
                                     </StackPanel>
                                 </CheckBox>
@@ -158,18 +159,18 @@
                                 MinWidth="110">
                         <Button Classes="primary" Command="{Binding ApplyAdvancedFilterCommand}"
                                 Padding="16,7" HorizontalAlignment="Stretch"
-                                ToolTip.Tip="{Binding [Dashboard_TipApplyFilter], Source={StaticResource Loc}}">
+                                ToolTip.Tip="{loc:Localize Dashboard_TipApplyFilter}">
                             <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
                                 <Image Source="{StaticResource IconCheck}" Width="12" Height="12"/>
-                                <TextBlock Text="{Binding [Dashboard_BtnApplyFilter], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{loc:Localize Dashboard_BtnApplyFilter}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Button>
                         <Button Classes="secondary" Command="{Binding ClearAdvancedFilterCommand}"
                                 Padding="16,7" HorizontalAlignment="Stretch"
-                                ToolTip.Tip="{Binding [Dashboard_TipClearFilter], Source={StaticResource Loc}}">
+                                ToolTip.Tip="{loc:Localize Dashboard_TipClearFilter}">
                             <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
                                 <Image Source="{StaticResource IconClose}" Width="10" Height="10"/>
-                                <TextBlock Text="{Binding [Dashboard_BtnClearFilter], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
+                                <TextBlock Text="{loc:Localize Dashboard_BtnClearFilter}" FontSize="{StaticResource FontSizeSm}"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -189,7 +190,7 @@
                             Padding="{StaticResource PaddingNavItem}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
                             <Image Source="{StaticResource IconCategory}" Width="15" Height="15"/>
-                            <TextBlock Text="{Binding [Dashboard_LblClassification], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
+                            <TextBlock Text="{loc:Localize Dashboard_LblClassification}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
                         </StackPanel>
                     </Border>
@@ -214,7 +215,7 @@
                                                 Margin="{Binding IndentMargin}"
                                                 Command="{Binding $parent[ItemsControl].DataContext.FilterByCategoryCommand}"
                                                 CommandParameter="{Binding}"
-                                                ToolTip.Tip="{Binding [Dashboard_TipCategoryItem], Source={StaticResource Loc}}">
+                                                ToolTip.Tip="{loc:Localize Dashboard_TipCategoryItem}">
                                             <StackPanel Orientation="Horizontal" Spacing="7">
                                                 <Image Source="{Binding ResolvedIconSource}" Width="15" Height="15"
                                                        VerticalAlignment="Center"/>
@@ -251,7 +252,7 @@
                                 <StackPanel Spacing="{StaticResource Space1}">
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconAllDocs}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding [Dashboard_StatTotal], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXs}"
+                                        <TextBlock Text="{loc:Localize Dashboard_StatTotal}" FontSize="{StaticResource FontSizeXs}"
                                                    Foreground="{StaticResource TextMuted}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding TotalCount}" FontSize="{StaticResource FontSizeXl}"
@@ -266,7 +267,7 @@
                                 <StackPanel Spacing="{StaticResource Space1}">
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconCategory}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding [Dashboard_StatCategories], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXs}"
+                                        <TextBlock Text="{loc:Localize Dashboard_StatCategories}" FontSize="{StaticResource FontSizeXs}"
                                                    Foreground="{StaticResource TextMuted}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding SubjectCount}" FontSize="{StaticResource FontSizeXl}"
@@ -281,7 +282,7 @@
                                 <StackPanel Spacing="{StaticResource Space1}">
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconStar}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding [Dashboard_StatImportant], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXs}"
+                                        <TextBlock Text="{loc:Localize Dashboard_StatImportant}" FontSize="{StaticResource FontSizeXs}"
                                                    Foreground="{StaticResource TextMuted}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding ImportantCount}" FontSize="{StaticResource FontSizeXl}"
@@ -296,7 +297,7 @@
                                 <StackPanel Spacing="{StaticResource Space1}">
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconClock}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding [Dashboard_StatOverdue], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXs}"
+                                        <TextBlock Text="{loc:Localize Dashboard_StatOverdue}" FontSize="{StaticResource FontSizeXs}"
                                                    Foreground="{StaticResource TextMuted}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding OverdueCount}" FontSize="{StaticResource FontSizeXl}"
@@ -311,7 +312,7 @@
                                 <StackPanel Spacing="{StaticResource Space1}">
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconWarning}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding [Dashboard_StatNoFile], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXs}"
+                                        <TextBlock Text="{loc:Localize Dashboard_StatNoFile}" FontSize="{StaticResource FontSizeXs}"
                                                    Foreground="{StaticResource TextMuted}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding NoFileCount}" FontSize="{StaticResource FontSizeXl}"
@@ -326,7 +327,7 @@
                                 <StackPanel Spacing="{StaticResource Space1}">
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconRecycle}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding [Dashboard_StatRecycleBin], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXs}"
+                                        <TextBlock Text="{loc:Localize Dashboard_StatRecycleBin}" FontSize="{StaticResource FontSizeXs}"
                                                    Foreground="{StaticResource TextMuted}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding RecycleBinCount}" FontSize="{StaticResource FontSizeXl}"
@@ -351,72 +352,72 @@
                             <DataGrid.ContextMenu>
                                 <ContextMenu>
                                     <!-- Primary actions -->
-                                    <MenuItem Header="{Binding [Dashboard_CtxOpenFile], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxOpenFile}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenFileCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconDocPage}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{Binding [Dashboard_CtxEditDoc], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxEditDoc}"
                                               Command="{Binding $parent[DataGrid].DataContext.EditDocumentCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconEdit}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{Binding [Dashboard_CtxChangeCategory], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxChangeCategory}"
                                               Command="{Binding $parent[DataGrid].DataContext.ChangeCategoryCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconCategory}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{Binding [Dashboard_CtxDeleteToTrash], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxDeleteToTrash}"
                                               Command="{Binding $parent[DataGrid].DataContext.DeleteDocumentCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconDelete}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
                                     <!-- Copy &amp; Open -->
-                                    <MenuItem Header="{Binding [Dashboard_CtxCopyName], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxCopyName}"
                                               Command="{Binding $parent[DataGrid].DataContext.CopyNameCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconClipboard}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{Binding [Dashboard_CtxCopyPath], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxCopyPath}"
                                               Command="{Binding $parent[DataGrid].DataContext.CopyPathCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconExport}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{Binding [Dashboard_CtxOpenFolder], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxOpenFolder}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenFolderCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconOpenFile}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
                                     <!-- Quick-edit hidden fields -->
-                                    <MenuItem Header="{Binding [Dashboard_CtxEditTags], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxEditTags}"
                                               Command="{Binding $parent[DataGrid].DataContext.QuickEditTagsCommand}"
-                                              ToolTip.Tip="{Binding [Dashboard_TipEditTags], Source={StaticResource Loc}}">
+                                              ToolTip.Tip="{loc:Localize Dashboard_TipEditTags}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconTag}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{Binding [Dashboard_CtxEditNotes], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxEditNotes}"
                                               Command="{Binding $parent[DataGrid].DataContext.QuickEditGhiChuCommand}"
-                                              ToolTip.Tip="{Binding [Dashboard_TipEditNotes], Source={StaticResource Loc}}">
+                                              ToolTip.Tip="{loc:Localize Dashboard_TipEditNotes}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconNote}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
                                     <!-- Mark &amp; manage -->
-                                    <MenuItem Header="{Binding [Dashboard_CtxMarkImportant], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxMarkImportant}"
                                               Command="{Binding $parent[DataGrid].DataContext.ToggleImportantCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconStar}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{Binding [Dashboard_CtxPersonalNote], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxPersonalNote}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenPersonalNoteCommand}"
-                                              ToolTip.Tip="{Binding [Dashboard_TipPersonalNote], Source={StaticResource Loc}}">
+                                              ToolTip.Tip="{loc:Localize Dashboard_TipPersonalNote}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconBook}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{Binding [Dashboard_CtxAddToCollection], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxAddToCollection}"
                                               Command="{Binding $parent[DataGrid].DataContext.AddToCollectionCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconAdd}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
-                                    <MenuItem Header="{Binding [Dashboard_CtxRelatedDocs], Source={StaticResource Loc}}"
+                                    <MenuItem Header="{loc:Localize Dashboard_CtxRelatedDocs}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenRelatedDocumentsCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconRelatedDocs}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                 </ContextMenu>
                             </DataGrid.ContextMenu>
                             <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="{Binding [Dashboard_ColDocName], Source={StaticResource Loc}}" Width="*" MinWidth="200" SortMemberPath="Ten">
+                                <DataGridTemplateColumn Header="{loc:Localize Dashboard_ColDocName}" Width="*" MinWidth="200" SortMemberPath="Ten">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate DataType="{x:Type core:StudyDocument}">
                                             <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
@@ -427,11 +428,11 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="{Binding [Dashboard_ColSubject], Source={StaticResource Loc}}" Binding="{Binding MonHoc, Mode=OneWay}" Width="120"/>
-                                <DataGridTextColumn Header="{Binding [Dashboard_ColType], Source={StaticResource Loc}}" Binding="{Binding Loai, Mode=OneWay}" Width="80"/>
-                                <DataGridTextColumn Header="{Binding [Dashboard_ColDate], Source={StaticResource Loc}}"
+                                <DataGridTextColumn Header="{loc:Localize Dashboard_ColSubject}" Binding="{Binding MonHoc, Mode=OneWay}" Width="120"/>
+                                <DataGridTextColumn Header="{loc:Localize Dashboard_ColType}" Binding="{Binding Loai, Mode=OneWay}" Width="80"/>
+                                <DataGridTextColumn Header="{loc:Localize Dashboard_ColDate}"
                                     Binding="{Binding NgayThem, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
-                                <DataGridTextColumn Header="{Binding [Dashboard_ColSize], Source={StaticResource Loc}}"
+                                <DataGridTextColumn Header="{loc:Localize Dashboard_ColSize}"
                                     Binding="{Binding KichThuoc, Mode=OneWay, StringFormat=\{0:F2\}}" Width="80"/>
                                 <DataGridTemplateColumn Header="★" Width="40">
                                     <DataGridTemplateColumn.CellTemplate>
@@ -451,7 +452,7 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Header="{Binding [Dashboard_ColDeadline], Source={StaticResource Loc}}" Width="100">
+                                <DataGridTemplateColumn Header="{loc:Localize Dashboard_ColDeadline}" Width="100">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate DataType="{x:Type core:StudyDocument}">
                                             <Border Background="{Binding Deadline, Converter={StaticResource DeadlineBrushConverter}}"
@@ -506,7 +507,7 @@
                                     <StackPanel Orientation="Horizontal" Spacing="3"
                                                 IsVisible="{Binding SelectedDocument.IsImportant}">
                                         <Image Source="{StaticResource IconStar}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding [Dashboard_PreviewImportant], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource WarningBrush}"/>
+                                        <TextBlock Text="{loc:Localize Dashboard_PreviewImportant}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource WarningBrush}"/>
                                     </StackPanel>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Spacing="3">
@@ -556,34 +557,34 @@
                             <Button Grid.Column="1" Classes="secondary" Padding="{StaticResource PaddingChip}"
                                     Command="{Binding RefreshCommand}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
-                                    ToolTip.Tip="{Binding [Dashboard_TipRefresh], Source={StaticResource Loc}}">
+                                    ToolTip.Tip="{loc:Localize Dashboard_TipRefresh}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
                                     <Image Source="{StaticResource IconRefresh}" Width="10" Height="10"/>
-                                    <TextBlock Text="{Binding [Dashboard_BtnRefresh], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXs}"/>
+                                    <TextBlock Text="{loc:Localize Dashboard_BtnRefresh}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
                             <Button Grid.Column="2" Classes="secondary" Padding="{StaticResource PaddingChip}"
                                     Command="{Binding ShowUpcomingDeadlinesCommand}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
-                                    ToolTip.Tip="{Binding [Dashboard_TipUpcoming], Source={StaticResource Loc}}">
+                                    ToolTip.Tip="{loc:Localize Dashboard_TipUpcoming}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
                                     <Image Source="{StaticResource IconClock}" Width="10" Height="10"/>
-                                    <TextBlock Text="{Binding [Dashboard_BtnUpcoming], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXs}"/>
+                                    <TextBlock Text="{loc:Localize Dashboard_BtnUpcoming}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
                             <Button Grid.Column="3" Classes="secondary" Padding="{StaticResource PaddingChip}"
                                     Command="{Binding ShowOverdueCommand}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
-                                    ToolTip.Tip="{Binding [Dashboard_TipOverdue], Source={StaticResource Loc}}">
+                                    ToolTip.Tip="{loc:Localize Dashboard_TipOverdue}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
                                     <Image Source="{StaticResource IconWarning}" Width="10" Height="10"/>
-                                    <TextBlock Text="{Binding [Dashboard_BtnOverdue], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXs}"/>
+                                    <TextBlock Text="{loc:Localize Dashboard_BtnOverdue}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
                             <Button Grid.Column="4" Classes="secondary" Padding="{StaticResource PaddingChip}"
                                     Command="{Binding CopyPathCommand}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
-                                    ToolTip.Tip="{Binding [Dashboard_TipCopyPath], Source={StaticResource Loc}}">
+                                    ToolTip.Tip="{loc:Localize Dashboard_TipCopyPath}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
                                     <Image Source="{StaticResource IconClipboard}" Width="10" Height="10"/>
                                     <TextBlock Text="Copy Path" FontSize="{StaticResource FontSizeXs}"/>
@@ -592,16 +593,16 @@
                             <Button Grid.Column="5" Classes="secondary" Padding="{StaticResource PaddingChip}"
                                     Command="{Binding OpenFolderCommand}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
-                                    ToolTip.Tip="{Binding [Dashboard_TipOpenFolder], Source={StaticResource Loc}}">
+                                    ToolTip.Tip="{loc:Localize Dashboard_TipOpenFolder}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
                                     <Image Source="{StaticResource IconCategory}" Width="10" Height="10"/>
-                                    <TextBlock Text="{Binding [Dashboard_BtnOpenFolder], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXs}"/>
+                                    <TextBlock Text="{loc:Localize Dashboard_BtnOpenFolder}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
                             <Button Grid.Column="6" Classes="secondary" Padding="{StaticResource PaddingChip}"
                                     Command="{Binding ShowAboutCommand}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
-                                    ToolTip.Tip="{Binding [Dashboard_TipAbout], Source={StaticResource Loc}}">
+                                    ToolTip.Tip="{loc:Localize Dashboard_TipAbout}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
                                     <Image Source="{StaticResource IconInfo}" Width="10" Height="10"/>
                                     <TextBlock Text="About" FontSize="{StaticResource FontSizeXs}"/>
