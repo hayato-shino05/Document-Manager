@@ -12,18 +12,21 @@ public partial class FileIntegrityCheckModel : ModelBase
     private readonly IDocument _repository;
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
+    private readonly ILocalizationService _loc;
 
     [ObservableProperty] private ObservableCollection<IntegrityResult> _results = new();
     [ObservableProperty] private bool _isChecking;
     [ObservableProperty] private int _totalChecked;
     [ObservableProperty] private int _missingCount;
-    [ObservableProperty] private string _statusText = "Nhấn 'Quét' để kiểm tra tính toàn vẹn file.";
+    [ObservableProperty] private string _statusText = string.Empty;
 
-    public FileIntegrityCheckModel(IDocument repository, IDialogService dialogService, IFileDialogService fileDialogService)
+    public FileIntegrityCheckModel(IDocument repository, IDialogService dialogService, IFileDialogService fileDialogService, ILocalizationService loc)
     {
         _repository = repository;
         _dialogService = dialogService;
         _fileDialogService = fileDialogService;
+        _loc = loc;
+        _statusText = _loc["Status_ScanPrompt"];
     }
 
     [RelayCommand]
@@ -45,21 +48,20 @@ public partial class FileIntegrityCheckModel : ModelBase
                 {
                     Document = doc,
                     FilePath = doc.FilePath,
-                    Status = "❌ File không tồn tại"
+                    Status = _loc["Integrity_FileNotExist"]
                 });
             }
         }
 
         IsChecking = false;
-        StatusText = $"Hoàn thành! Tìm thấy {MissingCount}/{TotalChecked} file bị thiếu.";
+        StatusText = string.Format(_loc["Status_ScanComplete"], MissingCount, TotalChecked);
 
         if (MissingCount == 0)
         {
-            await _dialogService.ShowMessageAsync("Kết quả", $"Đã kiểm tra {TotalChecked} tài liệu. Tất cả file đều tồn tại! ✅");
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Result"],
+                string.Format(_loc["Integrity_AllFilesOk"], TotalChecked));
         }
     }
-
-    // ═══ Per-item actions (matching legacy WinForms) ═══
 
     /// <summary>
     /// Select a new file to replace the missing one - updates path in DB.
@@ -69,16 +71,16 @@ public partial class FileIntegrityCheckModel : ModelBase
     {
         if (item == null) return;
 
-        var newPath = await _fileDialogService.ShowOpenFileAsync("Chọn file mới",
-            "Tất cả file (*.*)|*.*|PDF (*.pdf)|*.pdf|Word (*.docx;*.doc)|*.docx;*.doc|Excel (*.xlsx)|*.xlsx");
+        var newPath = await _fileDialogService.ShowOpenFileAsync(
+            _loc["Integrity_SelectNewFile"], _loc["Integrity_FileFilter"]);
         if (string.IsNullOrWhiteSpace(newPath)) return;
 
         if (_repository.UpdateDocumentPath(item.Document.Id, newPath))
         {
             Results.Remove(item);
             MissingCount--;
-            StatusText = $"File thiếu: {MissingCount}";
-            await _dialogService.ShowMessageAsync("Thành công", "Đã cập nhật đường dẫn file!");
+            StatusText = string.Format(_loc["Status_MissingFiles"], MissingCount);
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Integrity_PathUpdated"]);
         }
     }
 
@@ -90,15 +92,15 @@ public partial class FileIntegrityCheckModel : ModelBase
     {
         if (item == null) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận",
-            "Bạn có chắc muốn xóa đường dẫn file?\nMetadata tài liệu sẽ được giữ lại (đường dẫn sẽ rỗng).");
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+            _loc["Integrity_ConfirmClearPath"]);
         if (!confirmed) return;
 
         if (_repository.ClearDocumentPath(item.Document.Id))
         {
             Results.Remove(item);
             MissingCount--;
-            StatusText = $"File thiếu: {MissingCount}";
+            StatusText = string.Format(_loc["Status_MissingFiles"], MissingCount);
         }
     }
 
@@ -110,16 +112,16 @@ public partial class FileIntegrityCheckModel : ModelBase
     {
         if (item == null) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận xóa",
-            $"Bạn có chắc muốn xóa tài liệu:\n\"{item.Document.Name}\"?\n\n(Có thể khôi phục từ Thùng rác)",
-            "Xoá", isDanger: true);
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+            string.Format(_loc["Integrity_ConfirmDeleteDoc"], item.Document.Name),
+            _loc["Action_Delete"], isDanger: true);
         if (!confirmed) return;
 
         if (_repository.Delete(item.Document.Id))
         {
             Results.Remove(item);
             MissingCount--;
-            StatusText = $"File thiếu: {MissingCount}";
+            StatusText = string.Format(_loc["Status_MissingFiles"], MissingCount);
         }
     }
 
@@ -131,9 +133,9 @@ public partial class FileIntegrityCheckModel : ModelBase
     {
         if (Results.Count == 0) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận",
-            $"Xóa {Results.Count} tài liệu có file bị mất khỏi cơ sở dữ liệu?\n(Có thể khôi phục từ Thùng rác)",
-            "Xoá tất cả", isDanger: true);
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+            string.Format(_loc["Integrity_ConfirmRemoveAll"], Results.Count),
+            _loc["Btn_DeleteAll"], isDanger: true);
         if (!confirmed) return;
 
         int removed = 0;
@@ -147,8 +149,9 @@ public partial class FileIntegrityCheckModel : ModelBase
         }
 
         MissingCount = Results.Count;
-        StatusText = $"Đã di chuyển {removed} tài liệu vào Thùng rác.";
-        await _dialogService.ShowMessageAsync("Hoàn tất", $"Đã di chuyển {removed} tài liệu vào Thùng rác.");
+        StatusText = string.Format(_loc["Integrity_MovedToTrash"], removed);
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
+            string.Format(_loc["Integrity_MovedToTrash"], removed));
     }
 }
 
