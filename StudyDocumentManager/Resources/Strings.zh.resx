@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter</value></resheader>
+  <data name="Nav_Dashboard" xml:space="preserve"><value>仪表盘</value></data>
+  <data name="Nav_AddDocument" xml:space="preserve"><value>添加文档</value></data>
+  <data name="Nav_Categories" xml:space="preserve"><value>分类管理</value></data>
+  <data name="Nav_Collections" xml:space="preserve"><value>收藏集</value></data>
+  <data name="Nav_RecycleBin" xml:space="preserve"><value>回收站</value></data>
+  <data name="Nav_Reports" xml:space="preserve"><value>报告</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>设置</value></data>
+  <data name="Action_Add" xml:space="preserve"><value>添加</value></data>
+  <data name="Action_Edit" xml:space="preserve"><value>编辑</value></data>
+  <data name="Action_Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="Action_Save" xml:space="preserve"><value>保存</value></data>
+  <data name="Action_Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Action_Search" xml:space="preserve"><value>搜索</value></data>
+  <data name="Action_Filter" xml:space="preserve"><value>筛选</value></data>
+  <data name="Action_Refresh" xml:space="preserve"><value>刷新</value></data>
+  <data name="Action_Close" xml:space="preserve"><value>关闭</value></data>
+  <data name="Action_Open" xml:space="preserve"><value>打开</value></data>
+  <data name="Action_Export" xml:space="preserve"><value>导出</value></data>
+  <data name="Action_Import" xml:space="preserve"><value>导入</value></data>
+  <data name="Action_Restore" xml:space="preserve"><value>恢复</value></data>
+  <data name="Action_SelectAll" xml:space="preserve"><value>全选</value></data>
+  <data name="Action_DeselectAll" xml:space="preserve"><value>取消全选</value></data>
+  <data name="Field_Name" xml:space="preserve"><value>名称</value></data>
+  <data name="Field_Subject" xml:space="preserve"><value>科目</value></data>
+  <data name="Field_Type" xml:space="preserve"><value>类型</value></data>
+  <data name="Field_Author" xml:space="preserve"><value>作者</value></data>
+  <data name="Field_FilePath" xml:space="preserve"><value>文件路径</value></data>
+  <data name="Field_FileSize" xml:space="preserve"><value>文件大小</value></data>
+  <data name="Field_CreatedAt" xml:space="preserve"><value>添加日期</value></data>
+  <data name="Field_Notes" xml:space="preserve"><value>备注</value></data>
+  <data name="Field_Important" xml:space="preserve"><value>重要</value></data>
+  <data name="Field_Description" xml:space="preserve"><value>描述</value></data>
+  <data name="Filter_All" xml:space="preserve"><value>全部</value></data>
+  <data name="Filter_AllSubjects" xml:space="preserve"><value>所有科目</value></data>
+  <data name="Filter_AllTypes" xml:space="preserve"><value>所有类型</value></data>
+  <data name="Filter_SearchPlaceholder" xml:space="preserve"><value>搜索文档...</value></data>
+  <data name="Msg_ConfirmDelete" xml:space="preserve"><value>确定要删除吗？</value></data>
+  <data name="Msg_DeleteSuccess" xml:space="preserve"><value>删除成功</value></data>
+  <data name="Msg_SaveSuccess" xml:space="preserve"><value>保存成功</value></data>
+  <data name="Msg_Error" xml:space="preserve"><value>发生错误</value></data>
+  <data name="Msg_NoDocuments" xml:space="preserve"><value>没有文档</value></data>
+  <data name="Msg_FileNotFound" xml:space="preserve"><value>文件未找到</value></data>
+  <data name="Msg_RestoreSuccess" xml:space="preserve"><value>恢复成功</value></data>
+  <data name="Msg_ImportSuccess" xml:space="preserve"><value>导入成功</value></data>
+  <data name="Dashboard_TotalDocuments" xml:space="preserve"><value>文档总数</value></data>
+  <data name="Dashboard_TotalSubjects" xml:space="preserve"><value>科目总数</value></data>
+  <data name="Dashboard_RecentFiles" xml:space="preserve"><value>最近文件</value></data>
+  <data name="Dashboard_ImportantDocs" xml:space="preserve"><value>重要文档</value></data>
+  <data name="Report_BySubject" xml:space="preserve"><value>按科目</value></data>
+  <data name="Report_ByType" xml:space="preserve"><value>按类型</value></data>
+  <data name="Report_Timeline" xml:space="preserve"><value>时间线</value></data>
+  <data name="Report_Unknown" xml:space="preserve"><value>未知</value></data>
+  <data name="Lang_Japanese" xml:space="preserve"><value>日本語</value></data>
+  <data name="Lang_English" xml:space="preserve"><value>English</value></data>
+  <data name="Lang_Vietnamese" xml:space="preserve"><value>Tiếng Việt</value></data>
+  <data name="Lang_Chinese" xml:space="preserve"><value>中文</value></data>
+</root>

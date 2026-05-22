@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="StudyDocumentManager.Views.AddDocumentDialog"
-        Title="Thêm tài liệu"
+        Title="{Binding [AddDocDialog_Title], Source={StaticResource Loc}}"
         Width="520" Height="480"
         MinWidth="450" MinHeight="400"
         WindowStartupLocation="CenterOwner"
@@ -10,14 +10,14 @@
 
     <Border Padding="{StaticResource PaddingPage}">
         <DockPanel>
-            <!-- Header -->
+
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,16">
                 <Image Source="{StaticResource IconAdd}" Width="20" Height="20"/>
-                <TextBlock Text="Thêm tài liệu mới" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
+                <TextBlock Text="{Binding [AddDocDialog_Title], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
                            Foreground="{StaticResource TextPrimary}"/>
             </StackPanel>
 
-            <!-- File info badge -->
+
             <Border DockPanel.Dock="Top" Classes="info-banner">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                     <Image Source="{StaticResource IconOpenFile}" Width="13" Height="13"/>
@@ -27,57 +27,57 @@
                 </StackPanel>
             </Border>
 
-            <!-- Buttons: OK first, then Cancel -->
+
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="10"
                         HorizontalAlignment="Right" Margin="0,16,0,0">
                 <Button Classes="primary" Name="btnSave" Click="OnSaveClick" Padding="20,8"
                         IsDefault="True">
                     <StackPanel Orientation="Horizontal" Spacing="5">
                         <Image Source="{StaticResource IconCheck}" Width="13" Height="13"/>
-                        <TextBlock Text="Lưu" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding [AddEdit_BtnSave], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
                     </StackPanel>
                 </Button>
                 <Button Classes="secondary" Name="btnCancel" Click="OnCancelClick" Padding="20,8"
                         IsCancel="True">
                     <StackPanel Orientation="Horizontal" Spacing="5">
                         <Image Source="{StaticResource IconClose}" Width="10" Height="10"/>
-                        <TextBlock Text="Hủy" FontSize="{StaticResource FontSizeMd}"/>
+                        <TextBlock Text="{Binding [AddEdit_BtnCancel], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
 
-            <!-- Form -->
+
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Spacing="10">
-                    <!-- Tên -->
+
                     <StackPanel Spacing="3">
-                        <TextBlock Text="Tên tài liệu *" Classes="field-label"/>
-                        <TextBox Name="txtTen" Watermark="Nhập tên tài liệu..." FontSize="{StaticResource FontSizeMd}"/>
+                        <TextBlock Text="{Binding [AddEdit_LblName], Source={StaticResource Loc}}" Classes="field-label"/>
+                        <TextBox Name="txtTen" FontSize="{StaticResource FontSizeMd}"/>
                     </StackPanel>
 
-                    <!-- Danh mục + Loại -->
+
                     <Grid ColumnDefinitions="*,12,*">
                         <StackPanel Spacing="3">
-                            <TextBlock Text="Danh mục" Classes="field-label"/>
+                            <TextBlock Text="{Binding [AddEdit_LblSubject], Source={StaticResource Loc}}" Classes="field-label"/>
                             <ComboBox Name="cboMonHoc"
                                       IsTextSearchEnabled="True"
-                                      PlaceholderText="Chọn danh mục..." FontSize="{StaticResource FontSizeMd}"
+                                      FontSize="{StaticResource FontSizeMd}"
                                       HorizontalAlignment="Stretch"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Spacing="3">
-                            <TextBlock Text="Loại" Classes="field-label"/>
+                            <TextBlock Text="{Binding [AddEdit_LblType], Source={StaticResource Loc}}" Classes="field-label"/>
                             <ComboBox Name="cboLoai"
                                       IsTextSearchEnabled="True"
-                                      PlaceholderText="Chọn loại..." FontSize="{StaticResource FontSizeMd}"
+                                      FontSize="{StaticResource FontSizeMd}"
                                       HorizontalAlignment="Stretch"/>
                         </StackPanel>
                     </Grid>
 
-                    <!-- Tác giả + Tags -->
+
                     <Grid ColumnDefinitions="*,12,*">
                         <StackPanel Spacing="3">
-                            <TextBlock Text="Tác giả" Classes="field-label"/>
-                            <TextBox Name="txtTacGia" Watermark="Tác giả..." FontSize="{StaticResource FontSizeMd}"/>
+                            <TextBlock Text="{Binding [AddEdit_LblAuthor], Source={StaticResource Loc}}" Classes="field-label"/>
+                            <TextBox Name="txtTacGia" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Spacing="3">
                             <TextBlock Text="Tags" Classes="field-label"/>
@@ -85,18 +85,18 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- Ghi chú -->
+
                     <StackPanel Spacing="3">
-                        <TextBlock Text="Ghi chú" Classes="field-label"/>
-                        <TextBox Name="txtGhiChu" Watermark="Ghi chú..." FontSize="{StaticResource FontSizeMd}"
+                        <TextBlock Text="{Binding [AddEdit_LblNotes], Source={StaticResource Loc}}" Classes="field-label"/>
+                        <TextBox Name="txtGhiChu" FontSize="{StaticResource FontSizeMd}"
                                  AcceptsReturn="True" TextWrapping="Wrap" Height="60"/>
                     </StackPanel>
 
-                    <!-- Quan trọng + Deadline -->
+
                     <Grid ColumnDefinitions="Auto,*,Auto,Auto">
-                        <CheckBox Name="chkQuanTrong" Content="Quan trọng" FontSize="{StaticResource FontSizeMd}"
+                        <CheckBox Name="chkQuanTrong" Content="{Binding [AddEdit_LblImportant], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}"
                                   VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="2" Text="Hạn chốt:" FontSize="{StaticResource FontSizeSm}"
+                        <TextBlock Grid.Column="2" Text="{Binding [AddEdit_LblDeadline], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"
                                    VerticalAlignment="Center" Margin="0,0,6,0"
                                    Foreground="{StaticResource TextSecondary}"/>
                         <DatePicker Grid.Column="3" Name="dpDeadline" FontSize="{StaticResource FontSizeMd}"/>

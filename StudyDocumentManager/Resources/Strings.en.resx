@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter</value></resheader>
+
+  <!-- Navigation -->
+  <data name="Nav_Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Nav_AddDocument" xml:space="preserve"><value>Add Document</value></data>
+  <data name="Nav_Categories" xml:space="preserve"><value>Category Management</value></data>
+  <data name="Nav_Collections" xml:space="preserve"><value>Collections</value></data>
+  <data name="Nav_RecycleBin" xml:space="preserve"><value>Recycle Bin</value></data>
+  <data name="Nav_Reports" xml:space="preserve"><value>Reports</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Settings</value></data>
+
+  <!-- Common Actions -->
+  <data name="Action_Add" xml:space="preserve"><value>Add</value></data>
+  <data name="Action_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Action_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Action_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Action_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Action_Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Action_Filter" xml:space="preserve"><value>Filter</value></data>
+  <data name="Action_Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Action_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Action_Open" xml:space="preserve"><value>Open</value></data>
+  <data name="Action_Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Action_Import" xml:space="preserve"><value>Import</value></data>
+  <data name="Action_Restore" xml:space="preserve"><value>Restore</value></data>
+  <data name="Action_SelectAll" xml:space="preserve"><value>Select All</value></data>
+  <data name="Action_DeselectAll" xml:space="preserve"><value>Deselect All</value></data>
+
+  <!-- Document Fields -->
+  <data name="Field_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Field_Subject" xml:space="preserve"><value>Subject</value></data>
+  <data name="Field_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Field_Author" xml:space="preserve"><value>Author</value></data>
+  <data name="Field_FilePath" xml:space="preserve"><value>File Path</value></data>
+  <data name="Field_FileSize" xml:space="preserve"><value>File Size</value></data>
+  <data name="Field_CreatedAt" xml:space="preserve"><value>Date Added</value></data>
+  <data name="Field_Notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="Field_Important" xml:space="preserve"><value>Important</value></data>
+  <data name="Field_Description" xml:space="preserve"><value>Description</value></data>
+
+  <!-- Filter -->
+  <data name="Filter_All" xml:space="preserve"><value>All</value></data>
+  <data name="Filter_AllSubjects" xml:space="preserve"><value>All Subjects</value></data>
+  <data name="Filter_AllTypes" xml:space="preserve"><value>All Types</value></data>
+  <data name="Filter_SearchPlaceholder" xml:space="preserve"><value>Search documents...</value></data>
+
+  <!-- Messages -->
+  <data name="Msg_ConfirmDelete" xml:space="preserve"><value>Are you sure you want to delete?</value></data>
+  <data name="Msg_DeleteSuccess" xml:space="preserve"><value>Deleted successfully</value></data>
+  <data name="Msg_SaveSuccess" xml:space="preserve"><value>Saved successfully</value></data>
+  <data name="Msg_Error" xml:space="preserve"><value>An error occurred</value></data>
+  <data name="Msg_NoDocuments" xml:space="preserve"><value>No documents found</value></data>
+  <data name="Msg_FileNotFound" xml:space="preserve"><value>File not found</value></data>
+  <data name="Msg_RestoreSuccess" xml:space="preserve"><value>Restored successfully</value></data>
+  <data name="Msg_ImportSuccess" xml:space="preserve"><value>Imported successfully</value></data>
+
+  <!-- Dashboard -->
+  <data name="Dashboard_TotalDocuments" xml:space="preserve"><value>Total Documents</value></data>
+  <data name="Dashboard_TotalSubjects" xml:space="preserve"><value>Total Subjects</value></data>
+  <data name="Dashboard_RecentFiles" xml:space="preserve"><value>Recent Files</value></data>
+  <data name="Dashboard_ImportantDocs" xml:space="preserve"><value>Important Documents</value></data>
+
+  <!-- Reports -->
+  <data name="Report_BySubject" xml:space="preserve"><value>By Subject</value></data>
+  <data name="Report_ByType" xml:space="preserve"><value>By Type</value></data>
+  <data name="Report_Timeline" xml:space="preserve"><value>Timeline</value></data>
+  <data name="Report_Unknown" xml:space="preserve"><value>Unknown</value></data>
+
+  <!-- Language Names -->
+  <data name="Lang_Japanese" xml:space="preserve"><value>日本語</value></data>
+  <data name="Lang_English" xml:space="preserve"><value>English</value></data>
+  <data name="Lang_Vietnamese" xml:space="preserve"><value>Tiếng Việt</value></data>
+  <data name="Lang_Chinese" xml:space="preserve"><value>中文</value></data>
+</root>

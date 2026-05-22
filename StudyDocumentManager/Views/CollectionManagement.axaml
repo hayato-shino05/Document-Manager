@@ -1,57 +1,55 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-             xmlns:conv="using:StudyDocumentManager.Converters"
-             xmlns:core="using:StudyDocumentManager.Core.Entities"
              x:Class="StudyDocumentManager.Views.CollectionManagement"
              x:DataType="vm:CollectionManagementModel">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
         <DockPanel>
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,16">
-                <Image Source="{StaticResource IconCollection}" Width="18" Height="18"/>
-                <TextBlock Text="Qu?n l� B? suu t?p" FontSize="{StaticResource FontSizeXl}"
-                           FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-            </StackPanel>
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="{StaticResource IconCollection}" Width="20" Height="20"/>
+                    <TextBlock Text="{Binding [CollectionMgmt_Title], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXl}"
+                               FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
+                    <Button Classes="primary" Command="{Binding CreateCollectionCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconAddWhite}" Width="12" Height="12"/>
+                            <TextBlock Text="{Binding [CollectionMgmt_BtnCreate], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
 
-            <Grid ColumnDefinitions="250,20,*">
+            <Grid ColumnDefinitions="300,16,*">
 
-                <!-- Left: Collection list -->
                 <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
                         BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
                     <DockPanel>
                         <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
-                                CornerRadius="6,6,0,0" Padding="{StaticResource PaddingNavItem}">
-                            <DockPanel LastChildFill="False">
-                                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                    <Image Source="{StaticResource IconCollection}" Width="13" Height="13"/>
-                                    <TextBlock Text="B? suu t?p" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextPrimary}"/>
-                                </StackPanel>
-                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4"
-                                            HorizontalAlignment="Right">
-                                    <Button Classes="primary" Command="{Binding CreateCollectionCommand}" Padding="{StaticResource PaddingSm}">
-                                        <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
-                                            <TextBlock Text="T?o" FontSize="{StaticResource FontSizeSm}" Foreground="White" />
-                                        </StackPanel>
-                                    </Button>
-                                    <Button Classes="danger" Command="{Binding DeleteCollectionCommand}" Padding="{StaticResource PaddingSm}">
-                                        <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
-                                    </Button>
-                                </StackPanel>
-                            </DockPanel>
+                                CornerRadius="6,6,0,0" Padding="{StaticResource PaddingMd}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Source="{StaticResource IconCollection}" Width="14" Height="14"/>
+                                <TextBlock Text="{Binding [CollectionMgmt_ListHeader], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeLg}"
+                                           FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                            </StackPanel>
                         </Border>
 
                         <ListBox ItemsSource="{Binding Collections}"
                                  SelectedItem="{Binding SelectedCollection}"
                                  Padding="{StaticResource PaddingIcon}">
                             <ListBox.ItemTemplate>
-                                <DataTemplate DataType="{x:Type vm:CollectionItem}">
-                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,4">
-                                        <Image Source="{StaticResource IconCollection}" Width="13" Height="13"/>
-                                        <TextBlock Text="{Binding Display}" FontSize="{StaticResource FontSizeMd}"
-                                                   Foreground="{StaticResource TextPrimary}"/>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="6,6">
+                                        <Image Source="{StaticResource IconCollection}" Width="14" Height="14"/>
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMd}"
+                                                       FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
+                                            <TextBlock Text="{Binding Description}" FontSize="{StaticResource FontSizeXs}"
+                                                       Foreground="{StaticResource TextSecondary}" TextTrimming="CharacterEllipsis"
+                                                       MaxWidth="220"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -59,28 +57,31 @@
                     </DockPanel>
                 </Border>
 
-                <!-- Right: Documents in selected collection -->
                 <Border Grid.Column="2" Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
                         BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
                     <DockPanel>
                         <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
                                 CornerRadius="6,6,0,0" Padding="{StaticResource PaddingMd}">
-                            <DockPanel LastChildFill="False">
-                                <TextBlock DockPanel.Dock="Left" Text="T�i li?u trong b? suu t?p" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                            <DockPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <Image Source="{StaticResource IconDocPage}" Width="14" Height="14"/>
+                                    <TextBlock Text="{Binding [CollectionMgmt_DetailHeader], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeLg}"
+                                               FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                </StackPanel>
                                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4"
                                             HorizontalAlignment="Right">
-                                    <Button Classes="primary" Command="{Binding AddDocumentToCollectionCommand}" Padding="{StaticResource PaddingSm}" IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <Button Classes="secondary" Command="{Binding RenameCollectionCommand}" Padding="{StaticResource PaddingSm}"
+                                            IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
-                                            <TextBlock Text="Th�m t�i li?u" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                                            <Image Source="{StaticResource IconEdit}" Width="11" Height="11"/>
+                                            <TextBlock Text="{Binding [CollectionMgmt_BtnRename], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
-                                    <Button Classes="danger" Command="{Binding RemoveSelectedDocumentsCommand}" Padding="{StaticResource PaddingSm}"
-                                            IsEnabled="{Binding SelectedDocumentInCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <Button Classes="danger" Command="{Binding DeleteCollectionCommand}" Padding="{StaticResource PaddingSm}"
+                                            IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
-                                            <TextBlock Text="X�a" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                                            <TextBlock Text="{Binding [CollectionMgmt_BtnDelete], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
@@ -88,35 +89,36 @@
                         </Border>
 
                         <Panel>
-                            <DataGrid x:Name="DocumentGrid"
-                                      ItemsSource="{Binding DocumentsInCollection}"
-                                      SelectedItem="{Binding SelectedDocumentInCollection}"
-                                      SelectionMode="Extended"
-                                      AutoGenerateColumns="False" IsReadOnly="True"
-                                      CanUserSortColumns="True"
-                                      GridLinesVisibility="Horizontal" HeadersVisibility="Column">
-                                <DataGrid.Columns>
-                                    <DataGridTemplateColumn Header="T�n t�i li?u" Width="*" SortMemberPath="Ten">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate x:DataType="core:StudyDocument">
-                                                <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
-                                                    <Image Source="{Binding Loai, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
-                                                           Width="16" Height="16" VerticalAlignment="Center" />
-                                                    <TextBlock Text="{Binding Ten}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="Danh m?c" Binding="{Binding MonHoc}" Width="120"/>
-                                    <DataGridTextColumn Header="Lo?i" Binding="{Binding Loai}" Width="80"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <StackPanel IsVisible="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNull}}"
+                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
+                                <Image Source="{StaticResource IconCollection}" Width="36" Height="36" Opacity="0.4"/>
+                                <TextBlock Text="{Binding [CollectionMgmt_EmptyState], Source={StaticResource Loc}}"
+                                           FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
 
-                            <!-- Empty state -->
-                            <TextBlock Text="Ch?n m?t b? suu t?p d? xem t�i li?u"
-                                       IsVisible="{Binding !DocumentsInCollection.Count}"
-                                       FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <DockPanel IsVisible="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                <Border DockPanel.Dock="Top" Padding="{StaticResource PaddingMd}">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="{Binding SelectedCollection.Name}" FontSize="{StaticResource FontSizeLg}"
+                                                   FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                                        <TextBlock Text="{Binding SelectedCollection.Description}" FontSize="{StaticResource FontSizeSm}"
+                                                   Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <ListBox x:Name="DocumentGrid" ItemsSource="{Binding CollectionDocuments}" Padding="{StaticResource PaddingIcon}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="6,4">
+                                                <Image Source="{StaticResource IconDocPage}" Width="12" Height="12"/>
+                                                <TextBlock Text="{Binding Title}" FontSize="{StaticResource FontSizeMd}"
+                                                           Foreground="{StaticResource TextPrimary}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </DockPanel>
                         </Panel>
                     </DockPanel>
                 </Border>

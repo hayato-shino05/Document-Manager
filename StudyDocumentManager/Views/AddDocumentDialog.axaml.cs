@@ -61,14 +61,14 @@ public partial class AddDocumentDialog : Window
 
         Result = new AddDocumentDraft
         {
-            Ten = name,
-            MonHoc = (cboMonHoc?.SelectedItem as string ?? "").Trim(),
-            Loai = (cboLoai?.SelectedItem as string ?? "").Trim(),
-            DuongDan = _filePath,
-            GhiChu = txtGhiChu?.Text?.Trim() ?? "",
-            TacGia = txtTacGia?.Text?.Trim() ?? "",
+            Name = name,
+            Subject = (cboMonHoc?.SelectedItem as string ?? "").Trim(),
+            Type = (cboLoai?.SelectedItem as string ?? "").Trim(),
+            FilePath = _filePath,
+            Notes = txtGhiChu?.Text?.Trim() ?? "",
+            Author = txtTacGia?.Text?.Trim() ?? "",
             Tags = txtTags?.Text?.Trim() ?? "",
-            QuanTrong = chkQuanTrong?.IsChecked == true,
+            IsImportant = chkQuanTrong?.IsChecked == true,
             Deadline = dpDeadline?.SelectedDate?.DateTime
         };
 

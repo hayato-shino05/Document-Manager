@@ -1,4 +1,4 @@
-﻿using StudyDocumentManager.Core.Interfaces;
+using StudyDocumentManager.Core.Interfaces;
 using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
@@ -16,27 +16,25 @@ public static class UpdateService
     /// <summary>
     /// Show update notification and offer to open release page.
     /// </summary>
-    public static async Task HandleUpdateAsync(UpdateInfo update, IDialogService dialogService)
+    public static async Task HandleUpdateAsync(UpdateInfo update, IDialogService dialogService, ILocalizationService loc)
     {
         if (update == null || !update.HasUpdate) return;
 
-        var message = $"PhiÃªn báº£n má»›i {update.NewVersion} Ä‘Ã£ sáºµn sÃ ng!\n\n";
+        var message = string.Format(loc["Update_NewVersionReady"], update.NewVersion) + "\n\n";
 
         if (!string.IsNullOrEmpty(update.ReleaseNotes))
         {
-            // Trim release notes to first 200 chars
             var notes = update.ReleaseNotes.Length > 200
                 ? update.ReleaseNotes[..200] + "..."
                 : update.ReleaseNotes;
             message += $"Release Notes:\n{notes}\n\n";
         }
 
-        message += "Báº¡n cÃ³ muá»‘n má»Ÿ trang táº£i vá» khÃ´ng?";
+        message += loc["Update_OpenDownloadPage"];
 
-        var confirmed = await dialogService.ShowConfirmAsync("Cáº­p nháº­t cÃ³ sáºµn", message);
+        var confirmed = await dialogService.ShowConfirmAsync(loc["Update_DialogTitle"], message);
         if (!confirmed) return;
 
-        // Open release page in browser
         var url = !string.IsNullOrEmpty(update.ReleasePageUrl)
             ? update.ReleasePageUrl
             : $"https://github.com/hayato-shino05/study-document-manager/releases/latest";
@@ -51,21 +49,21 @@ public static class UpdateService
         }
         catch
         {
-            await dialogService.ShowErrorAsync("Lá»—i",
-                $"KhÃ´ng thá»ƒ má»Ÿ trÃ¬nh duyá»‡t.\nVui lÃ²ng truy cáº­p: {url}");
+            await dialogService.ShowErrorAsync(loc["Update_ErrorTitle"],
+                string.Format(loc["Update_BrowserError"], url));
         }
     }
 
     /// <summary>
     /// Check for updates silently and show toast if available.
     /// </summary>
-    public static async Task CheckSilentlyAsync(IDialogService dialogService)
+    public static async Task CheckSilentlyAsync(IDialogService dialogService, ILocalizationService loc)
     {
         var info = await UpdateChecker.CheckForUpdateAsync();
         if (info is { HasUpdate: true })
         {
             ToastService.Show(
-                $"PhiÃªn báº£n má»›i {info.NewVersion} cÃ³ sáºµn! VÃ o Trá»£ giÃºp â†’ Kiá»ƒm tra cáº­p nháº­t.",
+                string.Format(loc["Update_ToastNewVersion"], info.NewVersion),
                 ToastService.ToastType.Info,
                 5000);
         }

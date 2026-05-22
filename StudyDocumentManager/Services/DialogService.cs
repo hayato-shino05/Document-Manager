@@ -14,6 +14,13 @@ namespace StudyDocumentManager.Services;
 /// </summary>
 public class DialogService : IDialogService, IFileDialogService, ICustomDialogService
 {
+    private readonly ILocalizationService _loc;
+
+    public DialogService(ILocalizationService loc)
+    {
+        _loc = loc;
+    }
+
     private Window? GetMainWindow()
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -100,16 +107,14 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
             Margin = new Thickness(0, 8, 0, 16)
         };
 
-        // Always keep liveText up-to-date as user types
         textBox.TextChanged += (_, _) =>
         {
             liveText = textBox.Text ?? string.Empty;
         };
 
-        // Keep direct references to buttons — do NOT rely on OfType traversal
         var okButton = new Button
         {
-            Content = "Đồng ý",
+            Content = _loc["Action_Save"],
             MinWidth = 80,
             IsDefault = true,
             HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
@@ -117,7 +122,7 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         };
         var cancelButton = new Button
         {
-            Content = "Hủy",
+            Content = _loc["Action_Cancel"],
             MinWidth = 80,
             IsCancel = true,
             HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
@@ -156,17 +161,14 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
             CanResize = false
         };
 
-        // Focus the TextBox once the dialog is fully rendered
         dialog.Opened += (_, _) =>
         {
             textBox.Focus();
-            // Move caret to end so user can append to defaultValue
             textBox.CaretIndex = liveText.Length;
         };
 
         okButton.Click += (_, _) =>
         {
-            // Use liveText (updated by TextChanged) — NOT textBox.Text which may be stale
             result = liveText;
             dialog?.Close();
         };
@@ -187,8 +189,6 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         await dialog.ShowDialog(owner);
         return result;
     }
-
-    // ═══ File/Folder picker dialogs ═══
 
     public async Task<string?> ShowOpenFileAsync(string title, string? filter = null)
     {
@@ -237,8 +237,6 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         return result?.Path.LocalPath;
     }
 
-    // ═══ Category Picker ═══
-
     public async Task<string?> ShowChangeCategoryAsync(string documentName, IList<string> existingCategories, string currentCategory)
     {
         var owner = GetMainWindow();
@@ -259,8 +257,6 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         return result == true ? dialog.Result : null;
     }
 
-    // ═══ Document Picker ═══
-
     public async Task<List<StudyDocument>?> ShowDocumentPickerAsync(
         string collectionName,
         IEnumerable<StudyDocument> allDocuments,
@@ -272,13 +268,12 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         var dialog = new AddToCollectionDialog(
             allDocuments,
             alreadyInCollection,
-            collectionName);
+            collectionName,
+            _loc);
 
         await dialog.ShowDialog(owner);
         return dialog.Result;
     }
-
-    // ═══ Collection Picker ═══
 
     public async Task<int> ShowSelectCollectionAsync(
         string documentName,
@@ -287,19 +282,15 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         var owner = GetMainWindow();
         if (owner == null) return -1;
 
-        var dialog = new SelectCollectionDialog(documentName, collections);
+        var dialog = new SelectCollectionDialog(documentName, collections, _loc);
         await dialog.ShowDialog(owner);
         return dialog.Result;
     }
-
-    // ═══ Helpers ═══
-
 
     private static List<FilePickerFileType>? BuildFileFilter(string? filter)
     {
         if (string.IsNullOrEmpty(filter)) return null;
 
-        // Parse simple filter format: "All Files|*.*|CSV|*.csv"
         var parts = filter.Split('|');
         var types = new List<FilePickerFileType>();
         for (int i = 0; i + 1 < parts.Length; i += 2)
@@ -312,9 +303,11 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         return types.Count > 0 ? types : null;
     }
 
-    private static Window CreateDialog(string title, string message, bool showCancel,
-        string okText = "Đồng ý", bool okIsDanger = false)
+    private Window CreateDialog(string title, string message, bool showCancel,
+        string? okText = null, bool okIsDanger = false)
     {
+        var resolvedOkText = okText ?? _loc["Action_Save"];
+
         var panel = new StackPanel
         {
             Spacing = 8,
@@ -327,7 +320,7 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
                     TextWrapping = Avalonia.Media.TextWrapping.Wrap,
                     MaxWidth = 350
                 },
-                CreateButtonPanel(showCancel, okText, okIsDanger)
+                CreateButtonPanel(showCancel, resolvedOkText, okIsDanger)
             }
         };
 
@@ -354,9 +347,11 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         return dialog;
     }
 
-    private static StackPanel CreateButtonPanel(bool showCancel = true,
-        string okText = "Đồng ý", bool okIsDanger = false)
+    private StackPanel CreateButtonPanel(bool showCancel = true,
+        string? okText = null, bool okIsDanger = false)
     {
+        var resolvedOkText = okText ?? _loc["Action_Save"];
+
         var panel = new StackPanel
         {
             Orientation = Avalonia.Layout.Orientation.Horizontal,
@@ -367,7 +362,7 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
 
         var okBtn = new Button
         {
-            Content = okText,
+            Content = resolvedOkText,
             MinWidth = 80,
             HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
             IsDefault = true
@@ -379,7 +374,7 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         {
             var cancelBtn = new Button
             {
-                Content = "Hủy",
+                Content = _loc["Action_Cancel"],
                 MinWidth = 80,
                 HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 IsCancel = true

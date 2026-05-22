@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter</value></resheader>
+  <data name="Nav_Dashboard" xml:space="preserve"><value>Bảng điều khiển</value></data>
+  <data name="Nav_AddDocument" xml:space="preserve"><value>Thêm tài liệu</value></data>
+  <data name="Nav_Categories" xml:space="preserve"><value>Quản lý danh mục</value></data>
+  <data name="Nav_Collections" xml:space="preserve"><value>Bộ sưu tập</value></data>
+  <data name="Nav_RecycleBin" xml:space="preserve"><value>Thùng rác</value></data>
+  <data name="Nav_Reports" xml:space="preserve"><value>Báo cáo</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Cài đặt</value></data>
+  <data name="Action_Add" xml:space="preserve"><value>Thêm</value></data>
+  <data name="Action_Edit" xml:space="preserve"><value>Sửa</value></data>
+  <data name="Action_Delete" xml:space="preserve"><value>Xóa</value></data>
+  <data name="Action_Save" xml:space="preserve"><value>Lưu</value></data>
+  <data name="Action_Cancel" xml:space="preserve"><value>Hủy</value></data>
+  <data name="Action_Search" xml:space="preserve"><value>Tìm kiếm</value></data>
+  <data name="Action_Filter" xml:space="preserve"><value>Lọc</value></data>
+  <data name="Action_Refresh" xml:space="preserve"><value>Làm mới</value></data>
+  <data name="Action_Close" xml:space="preserve"><value>Đóng</value></data>
+  <data name="Action_Open" xml:space="preserve"><value>Mở</value></data>
+  <data name="Action_Export" xml:space="preserve"><value>Xuất</value></data>
+  <data name="Action_Import" xml:space="preserve"><value>Nhập</value></data>
+  <data name="Action_Restore" xml:space="preserve"><value>Khôi phục</value></data>
+  <data name="Action_SelectAll" xml:space="preserve"><value>Chọn tất cả</value></data>
+  <data name="Action_DeselectAll" xml:space="preserve"><value>Bỏ chọn tất cả</value></data>
+  <data name="Field_Name" xml:space="preserve"><value>Tên</value></data>
+  <data name="Field_Subject" xml:space="preserve"><value>Môn học</value></data>
+  <data name="Field_Type" xml:space="preserve"><value>Loại</value></data>
+  <data name="Field_Author" xml:space="preserve"><value>Tác giả</value></data>
+  <data name="Field_FilePath" xml:space="preserve"><value>Đường dẫn file</value></data>
+  <data name="Field_FileSize" xml:space="preserve"><value>Kích thước</value></data>
+  <data name="Field_CreatedAt" xml:space="preserve"><value>Ngày thêm</value></data>
+  <data name="Field_Notes" xml:space="preserve"><value>Ghi chú</value></data>
+  <data name="Field_Important" xml:space="preserve"><value>Quan trọng</value></data>
+  <data name="Field_Description" xml:space="preserve"><value>Mô tả</value></data>
+  <data name="Filter_All" xml:space="preserve"><value>Tất cả</value></data>
+  <data name="Filter_AllSubjects" xml:space="preserve"><value>Tất cả môn học</value></data>
+  <data name="Filter_AllTypes" xml:space="preserve"><value>Tất cả loại</value></data>
+  <data name="Filter_SearchPlaceholder" xml:space="preserve"><value>Tìm kiếm tài liệu...</value></data>
+  <data name="Msg_ConfirmDelete" xml:space="preserve"><value>Bạn có chắc muốn xóa?</value></data>
+  <data name="Msg_DeleteSuccess" xml:space="preserve"><value>Đã xóa thành công</value></data>
+  <data name="Msg_SaveSuccess" xml:space="preserve"><value>Đã lưu thành công</value></data>
+  <data name="Msg_Error" xml:space="preserve"><value>Đã xảy ra lỗi</value></data>
+  <data name="Msg_NoDocuments" xml:space="preserve"><value>Không có tài liệu nào</value></data>
+  <data name="Msg_FileNotFound" xml:space="preserve"><value>Không tìm thấy file</value></data>
+  <data name="Msg_RestoreSuccess" xml:space="preserve"><value>Đã khôi phục thành công</value></data>
+  <data name="Msg_ImportSuccess" xml:space="preserve"><value>Đã nhập thành công</value></data>
+  <data name="Dashboard_TotalDocuments" xml:space="preserve"><value>Tổng tài liệu</value></data>
+  <data name="Dashboard_TotalSubjects" xml:space="preserve"><value>Tổng môn học</value></data>
+  <data name="Dashboard_RecentFiles" xml:space="preserve"><value>File gần đây</value></data>
+  <data name="Dashboard_ImportantDocs" xml:space="preserve"><value>Tài liệu quan trọng</value></data>
+  <data name="Report_BySubject" xml:space="preserve"><value>Theo môn học</value></data>
+  <data name="Report_ByType" xml:space="preserve"><value>Theo loại</value></data>
+  <data name="Report_Timeline" xml:space="preserve"><value>Dòng thời gian</value></data>
+  <data name="Report_Unknown" xml:space="preserve"><value>Không rõ</value></data>
+  <data name="Lang_Japanese" xml:space="preserve"><value>日本語</value></data>
+  <data name="Lang_English" xml:space="preserve"><value>English</value></data>
+  <data name="Lang_Vietnamese" xml:space="preserve"><value>Tiếng Việt</value></data>
+  <data name="Lang_Chinese" xml:space="preserve"><value>中文</value></data>
+</root>
