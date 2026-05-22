@@ -1,117 +1,130 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-             xmlns:conv="using:StudyDocumentManager.Converters"
              x:Class="StudyDocumentManager.Views.FileIntegrityCheck"
              x:DataType="vm:FileIntegrityCheckModel">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
         <DockPanel>
-            <!-- Header -->
-            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
-                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                    <Image Source="{StaticResource IconWrench}" Width="18" Height="18"/>
-                    <TextBlock Text="Ki?m tra t�nh to�n v?n file" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
-                               Foreground="{StaticResource TextPrimary}"/>
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="{StaticResource IconShield}" Width="20" Height="20"/>
+                    <TextBlock Text="{Binding [FileIntegrity_Title], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXl}"
+                               FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
-                            HorizontalAlignment="Right">
-                    <Button Classes="primary" Command="{Binding CheckIntegrityCommand}" Padding="{StaticResource PaddingBtnPrimary}"
-                            IsEnabled="{Binding !IsChecking}">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
+                    <Button Classes="primary" Command="{Binding RunIntegrityCheckCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconScan}" Width="13" Height="13"/>
-                            <TextBlock Text="Ki?m tra" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
-                        </StackPanel>
-                    </Button>
-                    <Button Classes="danger" Command="{Binding RemoveMissingCommand}" Padding="{StaticResource PaddingBtnPrimary}"
-                            IsVisible="{Binding !!MissingCount}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
-                            <TextBlock Text="X�a file b? thi?u" FontSize="{StaticResource FontSizeMd}"/>
+                            <Image Source="{StaticResource IconSearch}" Width="12" Height="12"/>
+                            <TextBlock Text="{Binding [FileIntegrity_BtnScan], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
             </DockPanel>
 
-            <!-- Stats -->
-            <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                    Padding="{StaticResource PaddingMd}" Margin="0,0,0,12"
-                    IsVisible="{Binding !!TotalChecked}">
-                <StackPanel Orientation="Horizontal" Spacing="20">
-                    <TextBlock FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="�� ki?m tra: {0} t�i li?u">
-                                <Binding Path="TotalChecked"/>
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                    <TextBlock FontSize="{StaticResource FontSizeMd}" Foreground="{DynamicResource ColorDanger}">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="File b? m?t: {0}">
-                                <Binding Path="MissingCount"/>
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
+            <Border DockPanel.Dock="Top" Background="{StaticResource StatBlueBg}"
+                    CornerRadius="{StaticResource RadiusMd}" Padding="{StaticResource PaddingSidebar}" Margin="0,0,0,12"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Image Source="{StaticResource IconInfo}" Width="13" Height="13"/>
+                    <TextBlock Text="{Binding [FileIntegrity_InfoHint], Source={StaticResource Loc}}"
+                               FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
+                               TextWrapping="Wrap"/>
                 </StackPanel>
             </Border>
 
-            <!-- Results DataGrid -->
-            <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1" ClipToBounds="True">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusText}" FontSize="{StaticResource FontSizeXs}"
-                               Foreground="{StaticResource TextMuted}" Margin="8,4"/>
-                    <Panel>
-                        <DataGrid Name="dgvMissingFiles"
-                                  ItemsSource="{Binding Results}"
-                                  AutoGenerateColumns="False" IsReadOnly="True"
-                                  CanUserSortColumns="True"
-                                  GridLinesVisibility="Horizontal" HeadersVisibility="Column">
-
-                            <!-- Per-item context menu -->
-                            <DataGrid.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="Ch?n file m?i..."
-                                              Command="{Binding SelectNewFileCommand}"
-                                              CommandParameter="{Binding #dgvMissingFiles.SelectedItem}"/>
-                                    <MenuItem Header="X�a du?ng d?n (gi? metadata)"
-                                              Command="{Binding ClearFilePathCommand}"
-                                              CommandParameter="{Binding #dgvMissingFiles.SelectedItem}"/>
-                                    <Separator/>
-                                    <MenuItem Header="X�a t�i li?u"
-                                              Command="{Binding DeleteDocumentCommand}"
-                                              CommandParameter="{Binding #dgvMissingFiles.SelectedItem}"/>
-                                </ContextMenu>
-                            </DataGrid.ContextMenu>
-
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Tr?ng th�i" Binding="{Binding Status}" Width="160"/>
-                                <DataGridTemplateColumn Header="T�n t�i li?u" Width="*" MinWidth="200" SortMemberPath="Document.Ten">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate x:DataType="vm:IntegrityResult">
-                                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
-                                                <Image Source="{Binding Document.Loai, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
-                                                       Width="16" Height="16" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding Document.Ten}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="�u?ng d?n" Binding="{Binding FilePath}" Width="350"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-
-                        <StackPanel IsVisible="{Binding !Results.Count}"
-                                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
-                            <Image Source="{StaticResource IconWrench}" Width="36" Height="36"
-                                   HorizontalAlignment="Center" Opacity="0.4"/>
-                            <TextBlock Text="Nh?n &quot;Ki?m tra&quot; d? qu�t to�n b? t�i li?u" FontSize="{StaticResource FontSizeLg}"
-                                       Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Panel>
-                </DockPanel>
+            <Border DockPanel.Dock="Top" IsVisible="{Binding IsChecking}" Margin="0,0,0,10">
+                <StackPanel Spacing="6" HorizontalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True" Width="300"/>
+                    <TextBlock Text="{Binding [FileIntegrity_Checking], Source={StaticResource Loc}}"
+                               FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
             </Border>
+
+            <Grid RowDefinitions="Auto,*" Margin="0,0,0,0">
+
+                <Border IsVisible="{Binding HasResults}" Margin="0,0,0,10">
+                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Border Background="{StaticResource StatGreenBg}" CornerRadius="6" Padding="16,10" Margin="4">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Source="{StaticResource IconCheck}" Width="14" Height="14"/>
+                                <TextBlock FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource StatGreenFg}">
+                                    <Run Text="{Binding [FileIntegrity_StatValid], Source={StaticResource Loc}}"/>
+                                    <Run Text=": "/>
+                                    <Run Text="{Binding ValidCount}" FontWeight="Bold"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{StaticResource StatRedBg}" CornerRadius="6" Padding="16,10" Margin="4">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Source="{StaticResource IconWarning}" Width="14" Height="14"/>
+                                <TextBlock FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource StatRedFg}">
+                                    <Run Text="{Binding [FileIntegrity_StatMissing], Source={StaticResource Loc}}"/>
+                                    <Run Text=": "/>
+                                    <Run Text="{Binding MissingCount}" FontWeight="Bold"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{StaticResource StatYellowBg}" CornerRadius="6" Padding="16,10" Margin="4">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Source="{StaticResource IconWarning}" Width="14" Height="14"/>
+                                <TextBlock FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource StatYellowFg}">
+                                    <Run Text="{Binding [FileIntegrity_StatCorrupted], Source={StaticResource Loc}}"/>
+                                    <Run Text=": "/>
+                                    <Run Text="{Binding CorruptedCount}" FontWeight="Bold"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+                    </WrapPanel>
+                </Border>
+
+                <Border Grid.Row="1" Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
+                                CornerRadius="6,6,0,0" Padding="{StaticResource PaddingMd}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Source="{StaticResource IconDocPage}" Width="14" Height="14"/>
+                                <TextBlock Text="{Binding [FileIntegrity_ResultHeader], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeLg}"
+                                           FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Panel>
+                            <StackPanel IsVisible="{Binding !HasResults}"
+                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="0,40">
+                                <Image Source="{StaticResource IconShield}" Width="36" Height="36" Opacity="0.4"/>
+                                <TextBlock Text="{Binding [FileIntegrity_EmptyState], Source={StaticResource Loc}}"
+                                           FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+
+                            <ListBox IsVisible="{Binding HasResults}"
+                                     ItemsSource="{Binding CheckResults}"
+                                     Padding="{StaticResource PaddingIcon}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="4" Padding="10,8" Margin="2,3"
+                                                Background="{Binding StatusBackground}">
+                                            <DockPanel>
+                                                <Image DockPanel.Dock="Left" Source="{Binding StatusIcon}" Width="14" Height="14"
+                                                       Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="{Binding FileName}" FontSize="{StaticResource FontSizeMd}"
+                                                               FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
+                                                    <TextBlock Text="{Binding StatusMessage}" FontSize="{StaticResource FontSizeXs}"
+                                                               Foreground="{StaticResource TextSecondary}"/>
+                                                </StackPanel>
+                                            </DockPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Panel>
+                    </DockPanel>
+                </Border>
+            </Grid>
         </DockPanel>
     </Border>
 

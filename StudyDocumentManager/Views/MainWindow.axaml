@@ -2,6 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:v="using:StudyDocumentManager.Views"
+        xmlns:core="using:StudyDocumentManager.Core"
+        xmlns:conv="using:StudyDocumentManager.Converters"
         x:Class="StudyDocumentManager.Views.MainWindow"
         x:DataType="vm:MainWindowModel"
         Title="Study Document Manager - Professional Edition"
@@ -10,46 +12,69 @@
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource ContentBackground}">
 
+    <Window.Resources>
+        <conv:LangDisplayConverter x:Key="LangDisplayConverter"/>
+    </Window.Resources>
+
     <DockPanel>
 
         <!-- ═══ MENU BAR ═══ -->
-        <Menu DockPanel.Dock="Top" Background="{StaticResource CardBackground}"
-              Padding="4,0" Height="30">
-            <MenuItem Header="Tệp tin">
-                <MenuItem Header="Thêm tài liệu mới" Command="{Binding NavigateCommand}" CommandParameter="add" InputGesture="Ctrl+N"/>
-                <MenuItem Header="Mở tài liệu" Command="{Binding OpenFileCommand}" InputGesture="Ctrl+O"/>
-                <Separator/>
-                <MenuItem Header="Xuất CSV" Command="{Binding ExportCsvCommand}" InputGesture="Ctrl+E"/>
-                <MenuItem Header="Sao lưu DB" Command="{Binding BackupDatabaseCommand}"/>
-                <MenuItem Header="Khôi phục DB" Command="{Binding RestoreDatabaseCommand}"/>
-                <Separator/>
-                <MenuItem Header="Thoát" Command="{Binding ExitAppCommand}" InputGesture="Alt+F4"/>
-            </MenuItem>
-            <MenuItem Header="Chỉnh sửa">
-                <MenuItem Header="Sửa tài liệu" Command="{Binding EditDocumentCommand}" InputGesture="Ctrl+U"/>
-                <MenuItem Header="Xóa tài liệu" Command="{Binding DeleteDocumentCommand}" InputGesture="Delete"/>
-                <Separator/>
-                <MenuItem Header="Làm mới danh sách" Command="{Binding RefreshCommand}" InputGesture="F5"/>
-            </MenuItem>
-            <MenuItem Header="Công cụ">
-                <MenuItem Header="Quản lý Danh mục" Command="{Binding NavigateCommand}" CommandParameter="categories" InputGesture="Ctrl+M"/>
-                <MenuItem Header="Bộ sưu tập" Command="{Binding NavigateCommand}" CommandParameter="collections"/>
-                <Separator/>
-                <MenuItem Header="Import hàng loạt" Command="{Binding NavigateCommand}" CommandParameter="batch-import"/>
-                <MenuItem Header="Xóa hàng loạt" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
-                <MenuItem Header="Tìm trùng lặp" Command="{Binding NavigateCommand}" CommandParameter="duplicates"/>
-                <MenuItem Header="Kiểm tra file" Command="{Binding NavigateCommand}" CommandParameter="integrity"/>
-                <Separator/>
-                <MenuItem Header="Thống kê" Command="{Binding NavigateCommand}" CommandParameter="report" InputGesture="Ctrl+S"/>
-                <Separator/>
-                <MenuItem Header="Thùng rác" Command="{Binding NavigateCommand}" CommandParameter="recycle"/>
-            </MenuItem>
-            <MenuItem Header="Trợ giúp">
-                <MenuItem Header="Kiểm tra cập nhật" Command="{Binding CheckForUpdateCommand}"/>
-                <Separator/>
-                <MenuItem Header="Giới thiệu" Command="{Binding ShowAboutCommand}"/>
-            </MenuItem>
-        </Menu>
+        <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}"
+                Padding="0" Height="30">
+            <DockPanel>
+                <!-- Language selector (right side of menu bar) -->
+                <ComboBox DockPanel.Dock="Right"
+                          ItemsSource="{Binding AvailableLanguages}"
+                          SelectedItem="{Binding SelectedLanguage}"
+                          FontSize="{StaticResource FontSizeXs}"
+                          Padding="4,1" MinWidth="84" MaxHeight="22"
+                          Margin="4,0,8,0"
+                          VerticalAlignment="Center">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource LangDisplayConverter}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <Menu Background="Transparent" Padding="4,0">
+                    <MenuItem Header="{Binding [Menu_File], Source={StaticResource Loc}}">
+                        <MenuItem Header="{Binding [Menu_AddNewDocument], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="add" InputGesture="Ctrl+N"/>
+                        <MenuItem Header="{Binding [Menu_OpenDocument], Source={StaticResource Loc}}" Command="{Binding OpenFileCommand}" InputGesture="Ctrl+O"/>
+                        <Separator/>
+                        <MenuItem Header="{Binding [Menu_ExportCsv], Source={StaticResource Loc}}" Command="{Binding ExportCsvCommand}" InputGesture="Ctrl+E"/>
+                        <MenuItem Header="{Binding [Menu_BackupDb], Source={StaticResource Loc}}" Command="{Binding BackupDatabaseCommand}"/>
+                        <MenuItem Header="{Binding [Menu_RestoreDb], Source={StaticResource Loc}}" Command="{Binding RestoreDatabaseCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="{Binding [Menu_Exit], Source={StaticResource Loc}}" Command="{Binding ExitAppCommand}" InputGesture="Alt+F4"/>
+                    </MenuItem>
+                    <MenuItem Header="{Binding [Menu_Edit], Source={StaticResource Loc}}">
+                        <MenuItem Header="{Binding [Menu_EditDocument], Source={StaticResource Loc}}" Command="{Binding EditDocumentCommand}" InputGesture="Ctrl+U"/>
+                        <MenuItem Header="{Binding [Menu_DeleteDocument], Source={StaticResource Loc}}" Command="{Binding DeleteDocumentCommand}" InputGesture="Delete"/>
+                        <Separator/>
+                        <MenuItem Header="{Binding [Menu_RefreshList], Source={StaticResource Loc}}" Command="{Binding RefreshCommand}" InputGesture="F5"/>
+                    </MenuItem>
+                    <MenuItem Header="{Binding [Menu_Tools], Source={StaticResource Loc}}">
+                        <MenuItem Header="{Binding [Menu_ManageCategories], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="categories" InputGesture="Ctrl+M"/>
+                        <MenuItem Header="{Binding [Menu_Collections], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="collections"/>
+                        <Separator/>
+                        <MenuItem Header="{Binding [Menu_BatchImport], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="batch-import"/>
+                        <MenuItem Header="{Binding [Menu_BulkDelete], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
+                        <MenuItem Header="{Binding [Menu_FindDuplicates], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="duplicates"/>
+                        <MenuItem Header="{Binding [Menu_FileCheck], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="integrity"/>
+                        <Separator/>
+                        <MenuItem Header="{Binding [Menu_Statistics], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="report" InputGesture="Ctrl+S"/>
+                        <Separator/>
+                        <MenuItem Header="{Binding [Menu_RecycleBin], Source={StaticResource Loc}}" Command="{Binding NavigateCommand}" CommandParameter="recycle"/>
+                    </MenuItem>
+                    <MenuItem Header="{Binding [Menu_Help], Source={StaticResource Loc}}">
+                        <MenuItem Header="{Binding [Menu_CheckUpdate], Source={StaticResource Loc}}" Command="{Binding CheckForUpdateCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="{Binding [Menu_About], Source={StaticResource Loc}}" Command="{Binding ShowAboutCommand}"/>
+                    </MenuItem>
+                </Menu>
+            </DockPanel>
+        </Border>
 
         <!-- ═══ TOOLBAR (like WinForms ToolStrip with many icon buttons) ═══ -->
         <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
@@ -63,19 +88,19 @@
                             FontWeight="SemiBold">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconAdd}" Width="16" Height="16"/>
-                            <TextBlock Text="Thêm" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_Add], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn" Command="{Binding EditDocumentCommand}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconEdit}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="Sửa" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_Edit], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn" Command="{Binding DeleteDocumentCommand}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconDelete}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="Xóa" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_Delete], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
 
@@ -85,13 +110,13 @@
                     <Button Classes="secondary toolbar-btn" Command="{Binding OpenFileCommand}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconOpenFile}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="Mở file" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_OpenFile], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn" Command="{Binding ExportCsvCommand}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconExport}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="Xuất" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_Export], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
 
@@ -113,28 +138,28 @@
                             Command="{Binding NavigateCommand}" CommandParameter="recycle">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconRecycle}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="Thùng rác" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_RecycleBin], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="bulk-delete">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconBulkDelete}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="Hàng loạt" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_Bulk], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="recentfiles">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconClock}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="Gần đây" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_Recent], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn"
                             Command="{Binding BackupDatabaseCommand}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconSave}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="Sao lưu" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_Backup], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
 
@@ -145,14 +170,14 @@
                             Command="{Binding NavigateCommand}" CommandParameter="duplicates">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconDuplicate}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="Trùng lặp" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_Duplicates], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="report">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconReport}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="Thống kê" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_Statistics], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn"
@@ -171,11 +196,9 @@
                             IsVisible="{Binding CanGoBack}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconBack}" Width="12" Height="12"/>
-                            <TextBlock Text="Quay lại" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{Binding [Toolbar_GoBack], Source={StaticResource Loc}}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <TextBlock Text="{Binding AppVersion, StringFormat='v{0}'}" FontSize="{StaticResource FontSizeXs}"
-                               Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -185,9 +208,18 @@
                 BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
                 Padding="12,3" Height="26">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Right" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
-                           VerticalAlignment="Center" HorizontalAlignment="Right"
-                           Text="{Binding StatusText, FallbackValue='Tổng số: 0 tài liệu'}"/>
+                <!-- Version label (right) -->
+                <TextBlock DockPanel.Dock="Right"
+                           Text="{Binding AppVersion, StringFormat='v{0}'}"
+                           FontSize="{StaticResource FontSizeXs}"
+                           Foreground="{StaticResource TextMuted}"
+                           VerticalAlignment="Center" Margin="0,0,4,0"/>
+
+                <!-- Status text (fills left) -->
+                <TextBlock FontSize="{StaticResource FontSizeSm}"
+                           Foreground="{StaticResource TextSecondary}"
+                           VerticalAlignment="Center"
+                           Text="{Binding StatusText}"/>
             </DockPanel>
         </Border>
 
