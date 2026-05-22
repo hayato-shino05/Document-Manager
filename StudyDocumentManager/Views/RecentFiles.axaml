@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
              xmlns:conv="using:StudyDocumentManager.Converters"
@@ -11,10 +11,10 @@
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
                 <StackPanel Classes="page-header-stack" Margin="0">
                     <Image Source="{StaticResource IconCalendar}" Width="18" Height="18"/>
-                    <TextBlock Classes="page-title" Text="Lịch sử file đã mở"/>
+                    <TextBlock Classes="page-title" Text="{Binding [RecentFiles_Title], Source={StaticResource Loc}}"/>
                 </StackPanel>
                 <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center"
-                           Text="{Binding RecentFiles.Count, StringFormat='Tổng: {0} file gần đây'}"
+                           Text="{Binding RecentFiles.Count, StringFormat={}{0}}"
                            FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
             </DockPanel>
 
@@ -24,13 +24,13 @@
                 <Button Classes="secondary" Command="{Binding RefreshCommand}" Padding="12,5">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconRefresh}" Width="12" Height="12"/>
-                        <TextBlock Text="Làm mới" FontSize="{StaticResource FontSizeSm}"/>
+                        <TextBlock Text="{Binding [RecentFiles_BtnRefresh], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
                     </StackPanel>
                 </Button>
                 <Button Classes="danger" Command="{Binding ClearHistoryCommand}" Padding="12,5">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconDelete}" Width="12" Height="12"/>
-                        <TextBlock Text="Xóa lịch sử" FontSize="{StaticResource FontSizeSm}"/>
+                        <TextBlock Text="{Binding [RecentFiles_BtnClear], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -42,7 +42,7 @@
                               ItemsSource="{Binding RecentFiles}"
                               CanUserResizeColumns="True">
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="Tên tài liệu" Width="2*" SortMemberPath="DocumentName">
+                            <DataGridTemplateColumn Header="{Binding [RecentFiles_ColName], Source={StaticResource Loc}}" Width="2*" SortMemberPath="DocumentName">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="vm:RecentFileItem">
                                         <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
@@ -53,15 +53,15 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Danh mục" Binding="{Binding Subject}" Width="*"/>
-                            <DataGridTextColumn Header="Loại" Binding="{Binding FileType}" Width="80"/>
-                            <DataGridTextColumn Header="Mở lúc" Binding="{Binding OpenedAtDisplay}" Width="130"/>
-                            <DataGridTextColumn Header="Trạng thái" Binding="{Binding StatusDisplay}" Width="100"/>
+                            <DataGridTextColumn Header="{Binding [RecentFiles_ColSubject], Source={StaticResource Loc}}" Binding="{Binding Subject}" Width="*"/>
+                            <DataGridTextColumn Header="{Binding [RecentFiles_ColType], Source={StaticResource Loc}}" Binding="{Binding FileType}" Width="80"/>
+                            <DataGridTextColumn Header="{Binding [RecentFiles_ColOpenedAt], Source={StaticResource Loc}}" Binding="{Binding OpenedAtDisplay}" Width="130"/>
+                            <DataGridTextColumn Header="{Binding [RecentFiles_ColStatus], Source={StaticResource Loc}}" Binding="{Binding StatusDisplay}" Width="100"/>
                         </DataGrid.Columns>
                     </DataGrid>
                     <StackPanel Classes="empty-state" IsVisible="{Binding !RecentFiles.Count}">
                         <Image Classes="empty-state-icon" Source="{StaticResource IconCalendar}"/>
-                        <TextBlock Classes="empty-state-text" Text="Chưa có file nào được mở gần đây"/>
+                        <TextBlock Classes="empty-state-text" Text="{Binding [RecentFiles_EmptyState], Source={StaticResource Loc}}"/>
                     </StackPanel>
                 </Panel>
             </Border>

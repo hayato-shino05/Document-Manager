@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
              x:Class="StudyDocumentManager.Views.RelatedDocuments"
@@ -12,12 +12,12 @@
                         VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconBack}" Width="12" Height="12"/>
-                        <TextBlock Text="Quay l?i" FontSize="{StaticResource FontSizeSm}"/>
+                        <TextBlock Text="{Binding [RelatedDocs_BtnBack], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
                     </StackPanel>
                 </Button>
                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="12,0,0,0">
                     <Image Source="{StaticResource IconLink}" Width="18" Height="18"/>
-                    <TextBlock Text="T�i li?u li�n quan" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
+                    <TextBlock Text="{Binding [RelatedDocs_Title], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
                                Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
             </DockPanel>
@@ -26,7 +26,7 @@
             <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}" CornerRadius="{StaticResource RadiusMd}"
                     Padding="{StaticResource PaddingMd}" Margin="0,0,0,12">
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                    <TextBlock Text="T�i li?u ch�nh:" FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
+                    <TextBlock Text="{Binding [RelatedDocs_LblMainDoc], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
                     <TextBlock Text="{Binding DocumentName}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
@@ -42,7 +42,7 @@
                                 CornerRadius="6,6,0,0" Padding="{StaticResource PaddingNavItem}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Image Source="{StaticResource IconLink}" Width="13" Height="13"/>
-                                <TextBlock Text="�ang li�n k?t" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
+                                <TextBlock Text="{Binding [RelatedDocs_HeaderLinked], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
                             </StackPanel>
                         </Border>
@@ -62,12 +62,12 @@
                                                         <Image Source="{StaticResource IconClose}" Width="10" Height="10"/>
                                                     </Button>
                                                     <StackPanel>
-                                                        <TextBlock Text="{Binding Document.Ten}" FontSize="{StaticResource FontSizeMd}"
+                                                        <TextBlock Text="{Binding Document.Name}" FontSize="{StaticResource FontSizeMd}"
                                                                    Foreground="{StaticResource TextPrimary}"/>
                                                         <TextBlock FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}">
                                                             <TextBlock.Text>
                                                                 <MultiBinding StringFormat="{}{0} | {1}">
-                                                                    <Binding Path="Document.MonHoc"/>
+                                                                    <Binding Path="Document.Subject"/>
                                                                     <Binding Path="RelationType"/>
                                                                 </MultiBinding>
                                                             </TextBlock.Text>
@@ -80,7 +80,7 @@
                                 </ItemsControl>
                             </ScrollViewer>
 
-                            <TextBlock Text="Chua c� li�n k?t n�o" FontSize="{StaticResource FontSizeMd}"
+                            <TextBlock Text="{Binding [RelatedDocs_EmptyState], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeMd}"
                                        IsVisible="{Binding !RelatedDocuments.Count}"
                                        Foreground="{StaticResource TextMuted}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -97,14 +97,14 @@
                             <DockPanel>
                                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                                     <Image Source="{StaticResource IconDocPage}" Width="13" Height="13"/>
-                                    <TextBlock Text="T�i li?u kh? d?ng" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
+                                    <TextBlock Text="{Binding [RelatedDocs_HeaderAvailable], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextPrimary}"/>
                                 </StackPanel>
 
                                 <!-- Relation type selector + Add button -->
                                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
                                             HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <TextBlock Text="Lo?i:" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
+                                    <TextBlock Text="{Binding [RelatedDocs_LblRelationType], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
                                                Foreground="{StaticResource TextSecondary}"/>
                                     <ComboBox ItemsSource="{Binding RelationTypes}"
                                               SelectedItem="{Binding SelectedRelationType}"
@@ -113,7 +113,7 @@
                                             Command="{Binding AddRelationCommand}" Padding="{StaticResource PaddingBtnSm}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
-                                            <TextBlock Text="Th�m li�n k?t" FontSize="{StaticResource FontSizeSm}"/>
+                                            <TextBlock Text="{Binding [RelatedDocs_BtnAddLink], Source={StaticResource Loc}}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
