@@ -7,9 +7,7 @@ using StudyDocumentManager.Core.Entities;
 namespace StudyDocumentManager.Data.Helpers;
 
 /// <summary>
-/// Static helper for all SQLite database operations.
-/// Ported from WinForms System.Data.SQLite to Microsoft.Data.Sqlite.
-/// SQL queries and schema preserved for backward compatibility.
+/// SQLiteデータベース操作の静的ヘルパー
 /// </summary>
 public static class DatabaseHelper
 {
@@ -17,7 +15,7 @@ public static class DatabaseHelper
     private static string? _connectionString;
 
     /// <summary>
-    /// Path to SQLite database file
+    /// DBファイルパス
     /// </summary>
     public static string DatabasePath
     {
@@ -33,7 +31,7 @@ public static class DatabaseHelper
     }
 
     /// <summary>
-    /// SQLite connection string (Microsoft.Data.Sqlite format)
+    /// SQLite接続文字列
     /// </summary>
     public static string ConnectionString
     {
@@ -45,8 +43,7 @@ public static class DatabaseHelper
     }
 
     /// <summary>
-    /// Override the database path (useful for testing with isolated temp files).
-    /// Must be called BEFORE InitializeDatabase().
+    /// テスト用パスの差し替え。InitializeDatabase()より前に呼ぶこと
     /// </summary>
     public static void SetDatabasePath(string path)
     {
@@ -54,9 +51,7 @@ public static class DatabaseHelper
         _connectionString = $"Data Source={path}";
     }
 
-    // ═══════════════════════════════════════════════════
-    // Initialization & Migration
-    // ═══════════════════════════════════════════════════
+
 
     public static void InitializeDatabase()
     {
@@ -176,27 +171,30 @@ public static class DatabaseHelper
             cmd.ExecuteNonQuery();
         }
 
-        // 旧スキーマからの移行（ベトナム語テーブル名→英語テーブル名）
-        MigrateToEnglishSchema(conn);
 
-        // Migrations
+
+        // カラム追加マイグレーション
         MigrateAddColumn(conn, "documents", "is_deleted", "INTEGER DEFAULT 0");
         MigrateAddColumn(conn, "documents", "deleted_at", "DATETIME");
 
-        // Seed categories and document_types from existing data
+        // 初期カテゴリ投入
         MigrateSeedCategories(conn);
 
-        // Normalize legacy raw-extension type values
+        // ファイルタイプの正規化
         MigrateNormalizeFileTypes(conn);
+
+        // 旧ラベルを英語へ正規化（冪等）
+        MigrateNeutralizeLabels(conn);
     }
 
+
+
     /// <summary>
-    /// Seed categories/document_types from existing distinct values in documents table.
-    /// Safe to call multiple times — uses INSERT OR IGNORE.
+    /// categoriesとdocument_typesの初期データ投入。INSERT OR IGNOREで冪等
     /// </summary>
     private static void MigrateSeedCategories(SqliteConnection conn)
     {
-        // Seed from existing document data (migration from old schema)
+
         using var cmd1 = new SqliteCommand(
             "INSERT OR IGNORE INTO categories (name) SELECT DISTINCT subject FROM documents WHERE subject IS NOT NULL AND subject != ''", conn);
         cmd1.ExecuteNonQuery();
@@ -205,24 +203,19 @@ public static class DatabaseHelper
             "INSERT OR IGNORE INTO document_types (name) SELECT DISTINCT type FROM documents WHERE type IS NOT NULL AND type != ''", conn);
         cmd2.ExecuteNonQuery();
 
-        // Seed default categories if tables are still empty (fresh install)
+        // 初回インストール時の初期値（英語ラベル）
         var defaultSubjects = new[]
         {
-            "Công việc", "Cá nhân", "Học tập", "Dự án",
-            "Tài chính", "Hợp đồng", "Tham khảo", "Khác"
+            "Work", "Personal", "Study", "Project",
+            "Finance", "Contract", "Reference", "Other"
         };
         var defaultTypes = new[]
         {
-            // Office
             "PDF", "Word", "Excel", "PowerPoint",
-            // Generic document
-            "Tài liệu", "Báo cáo", "Hướng dẫn", "Biểu mẫu",
-            // New specific categories
-            "Dữ liệu", "Code", "Sách", "Thiết kế",
-            // Media & archive
-            "Hình ảnh", "Video", "Audio", "Nén",
-            // Catch-all
-            "Khác"
+            "Document", "Report", "Guide", "Form",
+            "Data", "Code", "Book", "Design",
+            "Image", "Video", "Audio", "Archive",
+            "Other"
         };
 
         foreach (var s in defaultSubjects)
@@ -241,21 +234,18 @@ public static class DatabaseHelper
     }
 
     /// <summary>
-    /// Normalizes legacy raw-extension values stored in loai column.
-    /// Old code stored e.g. 'WEBM', 'CSV', 'XLSX' directly as the type.
-    /// This migration converts them to proper labels matching FileTypeDetector output.
-    /// Safe to call multiple times — each UPDATE only affects matching rows.
+    /// 拡張子ベースのtype値を正規ラベルへ変換する冪等マイグレーション
     /// </summary>
     private static void MigrateNormalizeFileTypes(SqliteConnection conn)
     {
-        // Map: (SQL IN-list of uppercase raw exts) → proper label
+
         var mappings = new (string[] RawExts, string Label)[]
         {
             (new[] { "WEBM", "MP4", "AVI", "MKV", "MOV", "WMV", "FLV", "M4V", "3GP", "MPG", "MPEG", "TS" },
                 "Video"),
             (new[] { "MP3", "WAV", "FLAC", "M4A", "AAC", "OGG", "WMA", "OPUS", "APE" },
                 "Audio"),
-            // CSV goes to Excel group (same as FileTypeDetector)
+
             (new[] { "XLS", "XLSX", "ODS", "CSV" },
                 "Excel"),
             (new[] { "DOC", "DOCX", "ODT" },
@@ -263,28 +253,27 @@ public static class DatabaseHelper
             (new[] { "PPT", "PPTX", "ODP" },
                 "PowerPoint"),
             (new[] { "JSON", "XML", "YAML", "YML", "TSV" },
-                "Dữ liệu"),
+                "Data"),
             (new[] { "PY", "IPYNB", "JS", "HTML", "HTM", "CSS", "JAVA", "CS", "GO",
                      "RS", "PHP", "SH", "BAT", "PS1", "SQL", "CPP", "C", "VB", "KT", "RB" },
                 "Code"),
             (new[] { "EPUB", "MOBI", "AZW", "AZW3", "FB2" },
-                "Sách"),
+                "Book"),
             (new[] { "JPG", "JPEG", "PNG", "GIF", "BMP", "ICO", "TIFF", "TIF", "WEBP", "SVG", "RAW", "HEIC", "HEIF" },
-                "Hình ảnh"),
+                "Image"),
             (new[] { "ZIP", "RAR", "7Z", "TAR", "GZ", "BZ2", "XZ", "ZST" },
-                "Nén"),
+                "Archive"),
             (new[] { "PSD", "AI", "XD", "FIG", "SKETCH", "INDD" },
-                "Thiết kế"),
+                "Design"),
         };
 
         foreach (var (rawExts, label) in mappings)
         {
-            // Build parameterized IN clause
+
             var paramNames = rawExts.Select((_, i) => $"@ext{i}").ToList();
             var inClause = string.Join(", ", paramNames);
 
-            // Match both bare uppercase extensions (e.g. 'WEBM') and
-            // dot-prefixed lowercase forms (e.g. '.webm') that may have been stored
+
             var sql = $"""
                 UPDATE documents
                 SET type = @label
@@ -299,18 +288,16 @@ public static class DatabaseHelper
             cmd.Parameters.AddWithValue("@label", label);
             for (int i = 0; i < rawExts.Length; i++)
             {
-                cmd.Parameters.AddWithValue($"@ext{i}", rawExts[i]);           // UPPERCASE
-                cmd.Parameters.AddWithValue($"@extL{i}", rawExts[i].ToLowerInvariant()); // lowercase
+                cmd.Parameters.AddWithValue($"@ext{i}", rawExts[i]);
+                cmd.Parameters.AddWithValue($"@extL{i}", rawExts[i].ToLowerInvariant());
             }
             cmd.ExecuteNonQuery();
         }
 
-        // ── Phase 2: Re-detect from duong_dan file path extension ────────────
-        // Fixes records where loai is ANY wrong value (e.g. 'Audio' for a .csv or .webm).
-        // This is the authoritative pass — file path determines type.
+        // file_path拡張子で再判定（拡張子が最終的な判定基準）
         var pathMappings = new (string[] Exts, string Label)[]
         {
-            // Video checked first — .webm never misclassified as audio
+
             (new[] { ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".webm",
                      ".flv", ".m4v", ".3gp", ".mpg", ".mpeg" },       "Video"),
             (new[] { ".mp3", ".wav", ".flac", ".m4a", ".aac",
@@ -319,19 +306,19 @@ public static class DatabaseHelper
             (new[] { ".doc", ".docx", ".odt" },                        "Word"),
             (new[] { ".xls", ".xlsx", ".ods", ".csv" },                "Excel"),
             (new[] { ".ppt", ".pptx", ".odp" },                        "PowerPoint"),
-            (new[] { ".txt", ".md", ".rtf" },                          "Tài liệu"),
-            (new[] { ".json", ".xml", ".yaml", ".yml", ".tsv" },       "Dữ liệu"),
+            (new[] { ".txt", ".md", ".rtf" },                          "Document"),
+            (new[] { ".json", ".xml", ".yaml", ".yml", ".tsv" },       "Data"),
             (new[] { ".py", ".ipynb", ".js", ".html", ".htm", ".css",
                      ".java", ".cs", ".go", ".rs", ".php",
                      ".sh", ".bat", ".ps1", ".sql", ".cpp", ".c",
                      ".vb", ".kt", ".rb" },                             "Code"),
-            (new[] { ".epub", ".mobi", ".azw", ".azw3", ".fb2" },      "Sách"),
+            (new[] { ".epub", ".mobi", ".azw", ".azw3", ".fb2" },      "Book"),
             (new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".ico",
                      ".tiff", ".tif", ".webp", ".svg", ".raw",
-                     ".heic", ".heif" },                                "Hình ảnh"),
+                     ".heic", ".heif" },                                "Image"),
             (new[] { ".zip", ".rar", ".7z", ".tar", ".gz",
-                     ".bz2", ".xz", ".zst" },                           "Nén"),
-            (new[] { ".psd", ".ai", ".xd", ".fig", ".sketch", ".indd" }, "Thiết kế"),
+                     ".bz2", ".xz", ".zst" },                           "Archive"),
+            (new[] { ".psd", ".ai", ".xd", ".fig", ".sketch", ".indd" }, "Design"),
         };
 
         int pIdx = 0;
@@ -370,7 +357,7 @@ public static class DatabaseHelper
             pIdx++;
         }
 
-        // Re-seed lookup table with any newly produced label values
+
         using var reseed = new SqliteCommand(
             "INSERT OR IGNORE INTO document_types (name) SELECT DISTINCT type FROM documents WHERE type IS NOT NULL AND type != ''",
             conn);
@@ -386,13 +373,11 @@ public static class DatabaseHelper
         }
         catch (SqliteException)
         {
-            // Column already exists — ignore
+
         }
     }
 
-    // ═══════════════════════════════════════════════════
-    // Document CRUD
-    // ═══════════════════════════════════════════════════
+
 
     public static List<StudyDocument> GetAllDocuments()
     {
@@ -527,9 +512,7 @@ public static class DatabaseHelper
         return ExecuteNonQuery(query, new SqliteParameter("@id", id)) > 0;
     }
 
-    // ═══════════════════════════════════════════════════
-    // Distinct Values & Statistics
-    // ═══════════════════════════════════════════════════
+
 
     public static List<string> GetDistinctSubjects()
     {
@@ -612,9 +595,7 @@ public static class DatabaseHelper
     }
 
 
-    // ═══════════════════════════════════════════════════
-    // Recycle Bin
-    // ═══════════════════════════════════════════════════
+
 
     public static List<StudyDocument> GetDeletedDocuments()
     {
@@ -634,9 +615,7 @@ public static class DatabaseHelper
         return ExecuteNonQuery(query, new SqliteParameter("@id", id)) > 0;
     }
 
-    // ═══════════════════════════════════════════════════
-    // Backup
-    // ═══════════════════════════════════════════════════
+
 
     public static bool BackupDatabase(string destPath)
     {
@@ -651,9 +630,7 @@ public static class DatabaseHelper
         }
     }
 
-    // ═══════════════════════════════════════════════════
-    // Internal Helpers
-    // ═══════════════════════════════════════════════════
+
 
     private static List<StudyDocument> ExecuteReader(string query, params SqliteParameter[] parameters)
     {
@@ -748,9 +725,7 @@ public static class DatabaseHelper
         ];
     }
 
-    // ═══════════════════════════════════════════════════
-    // Personal Notes
-    // ═══════════════════════════════════════════════════
+
 
     public static string? GetPersonalNote(int documentId)
     {
@@ -800,9 +775,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    // ═══════════════════════════════════════════════════
-    // Related Documents
-    // ═══════════════════════════════════════════════════
+
 
     public static void AddDocumentRelation(int docId1, int docId2, string relationType = "related")
     {
@@ -861,9 +834,7 @@ public static class DatabaseHelper
         cmd.ExecuteNonQuery();
     }
 
-    // ═══════════════════════════════════════════════════
-    // Report Data — Charts
-    // ═══════════════════════════════════════════════════
+
 
     public static List<(string Label, int Count)> GetDocumentsByDay(int days = 7)
     {
@@ -967,9 +938,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    // ═══════════════════════════════════════════════════
-    // Collection CRUD
-    // ═══════════════════════════════════════════════════
+
 
     public static List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetCollections()
     {
@@ -1026,14 +995,14 @@ public static class DatabaseHelper
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
-        // Delete items first
+
         using (var delItems = conn.CreateCommand())
         {
             delItems.CommandText = "DELETE FROM collection_items WHERE collection_id = @id";
             delItems.Parameters.AddWithValue("@id", collectionId);
             delItems.ExecuteNonQuery();
         }
-        // Delete collection
+
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "DELETE FROM collections WHERE id = @id";
         cmd.Parameters.AddWithValue("@id", collectionId);
@@ -1065,7 +1034,7 @@ public static class DatabaseHelper
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
-        // Check existing
+
         using (var check = conn.CreateCommand())
         {
             check.CommandText = "SELECT COUNT(*) FROM collection_items WHERE collection_id = @colId AND document_id = @docId";
@@ -1073,7 +1042,7 @@ public static class DatabaseHelper
             check.Parameters.AddWithValue("@docId", documentId);
             var exists = check.ExecuteScalar();
             if (exists != null && Convert.ToInt32(exists) > 0)
-                return false; // Already exists
+                return false;
         }
 
         using var cmd = conn.CreateCommand();
@@ -1094,9 +1063,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    // ═══════════════════════════════════════════════════
-    // Category Management
-    // ═══════════════════════════════════════════════════
+
 
     public static List<(string Name, int Count)> GetSubjectsWithCount()
     {
@@ -1155,13 +1122,13 @@ public static class DatabaseHelper
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
         using var tx = conn.BeginTransaction();
-        // Update documents
+
         using var cmd1 = conn.CreateCommand();
         cmd1.CommandText = "UPDATE documents SET subject = @newName WHERE subject = @oldName AND (is_deleted IS NULL OR is_deleted = 0)";
         cmd1.Parameters.AddWithValue("@oldName", oldName);
         cmd1.Parameters.AddWithValue("@newName", newName);
         cmd1.ExecuteNonQuery();
-        // Update lookup table
+
         using var cmd2 = conn.CreateCommand();
         cmd2.CommandText = "UPDATE categories SET name = @newName WHERE name = @oldName";
         cmd2.Parameters.AddWithValue("@oldName", oldName);
@@ -1224,7 +1191,7 @@ public static class DatabaseHelper
         return true;
     }
 
-    // ═══ Category CRUD ═══
+
 
     public static bool AddSubject(string name)
     {
@@ -1290,16 +1257,14 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    // ═══════════════════════════════════════════════════
-    // Bulk Operations
-    // ═══════════════════════════════════════════════════
+
 
     public static int BulkSoftDelete(List<int> ids)
     {
         if (ids == null || ids.Count == 0) return 0;
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
-        // Use parameterized IN clause
+
         var paramNames = new List<string>();
         using var cmd = conn.CreateCommand();
         for (int i = 0; i < ids.Count; i++)
@@ -1345,9 +1310,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery();
     }
 
-    // ═══════════════════════════════════════════════════
-    // Recycle Bin — Extras
-    // ═══════════════════════════════════════════════════
+
 
     public static int EmptyRecycleBin()
     {
@@ -1368,9 +1331,7 @@ public static class DatabaseHelper
         return result != null ? Convert.ToInt32(result) : 0;
     }
 
-    // ═══════════════════════════════════════════════════
-    // Recent Files
-    // ═══════════════════════════════════════════════════
+
 
     public static void AddRecentFile(int documentId)
     {
@@ -1383,7 +1344,7 @@ public static class DatabaseHelper
             cmd.Parameters.AddWithValue("@docId", documentId);
             cmd.ExecuteNonQuery();
         }
-        // Keep only 20 most recent
+        // 直近20件のみ保持
         using (var trim = conn.CreateCommand())
         {
             trim.CommandText = @"DELETE FROM recent_files WHERE id NOT IN
@@ -1438,9 +1399,7 @@ public static class DatabaseHelper
         cmd.ExecuteNonQuery();
     }
 
-    // ═══════════════════════════════════════════════════
-    // Misc
-    // ═══════════════════════════════════════════════════
+
 
     public static int GetTotalDocumentCount()
     {
@@ -1452,12 +1411,10 @@ public static class DatabaseHelper
         return result != null ? Convert.ToInt32(result) : 0;
     }
 
-    // ═══════════════════════════════════════════════════
-    // File Integrity helpers
-    // ═══════════════════════════════════════════════════
+
 
     /// <summary>
-    /// Update the file path for a document (used when replacing a missing file).
+    /// ファイルパスの差し替え
     /// </summary>
     public static bool UpdateDocumentPath(int id, string newPath)
     {
@@ -1471,23 +1428,167 @@ public static class DatabaseHelper
     }
 
     /// <summary>
-    /// Clear the file path for a document (keep metadata, remove broken path).
+    /// 壊れたパスをクリアしてメタデータのみ残す
     /// </summary>
     public static bool ClearDocumentPath(int id)
     {
         return UpdateDocumentPath(id, "");
     }
 
-    // ═══════════════════════════════════════════════════
-    // Test Helpers
-    // ═══════════════════════════════════════════════════
+
 
     /// <summary>
-    /// Clears the SQLite connection pool for the current database path.
-    /// Required in unit tests to release file locks before deleting the temp DB file.
+    /// テスト用：接続プールを解放してDBファイルを削除可能にする
     /// </summary>
     public static void CloseAllConnections()
     {
         SqliteConnection.ClearAllPools();
+    }
+
+    /// <summary>
+    /// app_settings テーブルから設定値を取得
+    /// </summary>
+    public static string? GetSetting(string key)
+    {
+        using var conn = new SqliteConnection(ConnectionString);
+        conn.Open();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT value FROM app_settings WHERE key = @key";
+        cmd.Parameters.AddWithValue("@key", key);
+        var result = cmd.ExecuteScalar();
+        return result == null || result == DBNull.Value ? null : result.ToString();
+    }
+
+    /// <summary>
+    /// app_settings テーブルへ設定値をUPSERT
+    /// </summary>
+    public static void SetSetting(string key, string value)
+    {
+        using var conn = new SqliteConnection(ConnectionString);
+        conn.Open();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "INSERT OR REPLACE INTO app_settings (key, value) VALUES (@key, @value)";
+        cmd.Parameters.AddWithValue("@key", key);
+        cmd.Parameters.AddWithValue("@value", value);
+        cmd.ExecuteNonQuery();
+    }
+
+    /// <summary>
+    /// 旧ラベルを英語ラベルへ統合する冪等マイグレーション。
+    /// schema_version < 3 の場合のみ実行
+    /// </summary>
+    private static void MigrateNeutralizeLabels(SqliteConnection conn)
+    {
+        using var checkCmd = conn.CreateCommand();
+        checkCmd.CommandText = "SELECT value FROM app_settings WHERE key = 'schema_version'";
+        var currentVersion = checkCmd.ExecuteScalar()?.ToString();
+        if (int.TryParse(currentVersion, out var ver) && ver >= 3)
+            return;
+
+        var categoryMap = new (string Old, string New)[]
+        {
+            ("Công việc", "Work"), ("Cá nhân", "Personal"),
+            ("Học tập", "Study"), ("Dự án", "Project"),
+            ("Tài chính", "Finance"), ("Hợp đồng", "Contract"),
+            ("Tham khảo", "Reference"), ("Khác", "Other")
+        };
+
+        var typeMap = new (string Old, string New)[]
+        {
+            ("Tài liệu", "Document"), ("Báo cáo", "Report"),
+            ("Hướng dẫn", "Guide"), ("Biểu mẫu", "Form"),
+            ("Dữ liệu", "Data"), ("Sách", "Book"),
+            ("Thiết kế", "Design"), ("Hình ảnh", "Image"),
+            ("Nén", "Archive"), ("Khác", "Other")
+        };
+
+        using var tx = conn.BeginTransaction();
+        try
+        {
+            // categories: 旧ラベルを英語名へ統合（UNIQUE衝突を回避）
+            foreach (var (oldVal, newVal) in categoryMap)
+            {
+                // 先に documents.subject を更新
+                using var docCmd = conn.CreateCommand();
+                docCmd.Transaction = tx;
+                docCmd.CommandText = "UPDATE documents SET subject = @new WHERE subject = @old";
+                docCmd.Parameters.AddWithValue("@old", oldVal);
+                docCmd.Parameters.AddWithValue("@new", newVal);
+                docCmd.ExecuteNonQuery();
+
+                // 英語名が既にあれば旧行を消す、なければリネーム
+                using var chk = conn.CreateCommand();
+                chk.Transaction = tx;
+                chk.CommandText = "SELECT COUNT(*) FROM categories WHERE name = @new";
+                chk.Parameters.AddWithValue("@new", newVal);
+                var exists = Convert.ToInt64(chk.ExecuteScalar()) > 0;
+
+                if (exists)
+                {
+                    using var del = conn.CreateCommand();
+                    del.Transaction = tx;
+                    del.CommandText = "DELETE FROM categories WHERE name = @old";
+                    del.Parameters.AddWithValue("@old", oldVal);
+                    del.ExecuteNonQuery();
+                }
+                else
+                {
+                    using var ren = conn.CreateCommand();
+                    ren.Transaction = tx;
+                    ren.CommandText = "UPDATE categories SET name = @new WHERE name = @old";
+                    ren.Parameters.AddWithValue("@old", oldVal);
+                    ren.Parameters.AddWithValue("@new", newVal);
+                    ren.ExecuteNonQuery();
+                }
+            }
+
+            // document_types: 同じ統合ロジック
+            foreach (var (oldVal, newVal) in typeMap)
+            {
+                using var docCmd = conn.CreateCommand();
+                docCmd.Transaction = tx;
+                docCmd.CommandText = "UPDATE documents SET type = @new WHERE type = @old";
+                docCmd.Parameters.AddWithValue("@old", oldVal);
+                docCmd.Parameters.AddWithValue("@new", newVal);
+                docCmd.ExecuteNonQuery();
+
+                using var chk = conn.CreateCommand();
+                chk.Transaction = tx;
+                chk.CommandText = "SELECT COUNT(*) FROM document_types WHERE name = @new";
+                chk.Parameters.AddWithValue("@new", newVal);
+                var exists = Convert.ToInt64(chk.ExecuteScalar()) > 0;
+
+                if (exists)
+                {
+                    using var del = conn.CreateCommand();
+                    del.Transaction = tx;
+                    del.CommandText = "DELETE FROM document_types WHERE name = @old";
+                    del.Parameters.AddWithValue("@old", oldVal);
+                    del.ExecuteNonQuery();
+                }
+                else
+                {
+                    using var ren = conn.CreateCommand();
+                    ren.Transaction = tx;
+                    ren.CommandText = "UPDATE document_types SET name = @new WHERE name = @old";
+                    ren.Parameters.AddWithValue("@old", oldVal);
+                    ren.Parameters.AddWithValue("@new", newVal);
+                    ren.ExecuteNonQuery();
+                }
+            }
+
+            // schema_version を 3 に更新
+            using var verCmd = conn.CreateCommand();
+            verCmd.Transaction = tx;
+            verCmd.CommandText = "INSERT OR REPLACE INTO app_settings (key, value) VALUES ('schema_version', '3')";
+            verCmd.ExecuteNonQuery();
+
+            tx.Commit();
+        }
+        catch
+        {
+            tx.Rollback();
+            throw;
+        }
     }
 }

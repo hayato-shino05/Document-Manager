@@ -1,4 +1,4 @@
-using StudyDocumentManager.Services;
+using StudyDocumentManager.Core.DTOs;
 using Xunit;
 
 namespace StudyDocumentManager.Tests;
@@ -10,29 +10,29 @@ public class AddDocumentDraftTests
     {
         var draft = new AddDocumentDraft
         {
-            Ten = "Giáo trình Toán",
-            MonHoc = "Học tập",
-            Loai = "PDF",
-            DuongDan = @"C:\docs\math.pdf",
-            GhiChu = "Ghi chú",
-            TacGia = "Hayato",
+            Name = "Math Textbook",
+            Subject = "Study",
+            Type = "PDF",
+            FilePath = @"C:\docs\math.pdf",
+            Notes = "Important notes",
+            Author = "Hayato",
             Tags = "math,pdf",
-            QuanTrong = true,
+            IsImportant = true,
             Deadline = new DateTime(2026, 4, 30),
-            KichThuoc = 1.25
+            FileSize = 1.25
         };
 
         var document = draft.ToStudyDocument();
 
-        Assert.Equal("Giáo trình Toán", document.Ten);
-        Assert.Equal("Học tập", document.MonHoc);
-        Assert.Equal("PDF", document.Loai);
-        Assert.Equal(@"C:\docs\math.pdf", document.DuongDan);
-        Assert.Equal("Ghi chú", document.GhiChu);
-        Assert.Equal("Hayato", document.TacGia);
+        Assert.Equal("Math Textbook", document.Name);
+        Assert.Equal("Study", document.Subject);
+        Assert.Equal("PDF", document.Type);
+        Assert.Equal(@"C:\docs\math.pdf", document.FilePath);
+        Assert.Equal("Important notes", document.Notes);
+        Assert.Equal("Hayato", document.Author);
         Assert.Equal("math,pdf", document.Tags);
-        Assert.True(document.QuanTrong);
+        Assert.True(document.IsImportant);
         Assert.Equal(new DateTime(2026, 4, 30), document.Deadline);
-        Assert.Equal(1.25, document.KichThuoc);
+        Assert.Equal(1.25, document.FileSize);
     }
 }

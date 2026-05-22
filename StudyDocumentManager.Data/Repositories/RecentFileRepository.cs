@@ -1,11 +1,11 @@
-﻿using StudyDocumentManager.Core.Interfaces;
+using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Data.Helpers;
 
 namespace StudyDocumentManager.Data.Repositories;
 
 public class RecentFileRepository : IRecentFile
 {
-    public List<(int Id, string Ten, string? MonHoc, string? Loai, string? DuongDan, DateTime OpenedAt)> GetAll()
+    public List<(int Id, string Name, string? Subject, string? Type, string? FilePath, DateTime OpenedAt)> GetAll()
         => DatabaseHelper.GetRecentFiles();
 
     public void Add(int documentId) => DatabaseHelper.AddRecentFile(documentId);

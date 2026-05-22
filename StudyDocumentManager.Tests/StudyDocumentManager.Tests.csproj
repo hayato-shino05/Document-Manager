@@ -26,9 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\StudyDocumentManager.Core\StudyDocumentManager.Core.csproj" />
-    <ProjectReference Include="..\..\src\StudyDocumentManager.Data\StudyDocumentManager.Data.csproj" />
-    <ProjectReference Include="..\..\src\StudyDocumentManager\StudyDocumentManager.csproj" />
+    <ProjectReference Include="..\StudyDocumentManager.Core\StudyDocumentManager.Core.csproj" />
+    <ProjectReference Include="..\StudyDocumentManager.Data\StudyDocumentManager.Data.csproj" />
+    <ProjectReference Include="..\StudyDocumentManager\StudyDocumentManager.csproj" />
   </ItemGroup>
 
 </Project>

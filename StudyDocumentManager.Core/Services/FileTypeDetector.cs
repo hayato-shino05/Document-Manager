@@ -15,11 +15,11 @@ public static class FileTypeDetector
         ".doc"  or ".docx" or ".odt"   => "Word",
         ".ppt"  or ".pptx" or ".odp"   => "PowerPoint",
         ".xls"  or ".xlsx" or ".ods" or ".csv" => "Excel",
-        ".txt"  or ".md"  or ".rtf"    => "Tài liệu",
+        ".txt"  or ".md"  or ".rtf"    => "Document",
 
         ".tsv" or
         ".json" or ".xml" or
-        ".yaml" or ".yml"              => "Dữ liệu",
+        ".yaml" or ".yml"              => "Data",
 
         ".py" or ".ipynb" or
         ".js" or ".ts" or
@@ -32,14 +32,14 @@ public static class FileTypeDetector
         ".sql" or ".r" or ".m"         => "Code",
 
         ".epub" or ".mobi" or
-        ".azw" or ".azw3" or ".fb2"   => "Sách",
+        ".azw" or ".azw3" or ".fb2"   => "Book",
 
         ".jpg"  or ".jpeg" or
         ".png"  or ".gif"  or
         ".bmp"  or ".ico"  or
         ".tiff" or ".tif"  or
         ".webp" or ".svg"  or
-        ".raw"  or ".heic" or ".heif" => "Hình ảnh",
+        ".raw"  or ".heic" or ".heif" => "Image",
 
         ".mp4" or ".avi" or ".mkv" or
         ".mov" or ".wmv" or ".webm" or
@@ -52,12 +52,12 @@ public static class FileTypeDetector
 
         ".zip" or ".rar" or ".7z" or
         ".tar" or ".gz" or ".bz2" or
-        ".xz"  or ".zst"              => "Nén",
+        ".xz"  or ".zst"              => "Archive",
 
         ".psd" or ".ai" or ".xd" or
-        ".fig" or ".sketch" or ".indd" => "Thiết kế",
+        ".fig" or ".sketch" or ".indd" => "Design",
 
-        _                              => "Khác"
+        _                              => "Other"
     };
 
     /// <summary>
