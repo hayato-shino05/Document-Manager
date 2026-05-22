@@ -14,6 +14,7 @@ public partial class BatchImportModel : ModelBase
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
     private readonly INavigationService _navigationService;
+    private readonly ILocalizationService _loc;
 
     [ObservableProperty] private string _folderPath = string.Empty;
     [ObservableProperty] private string _defaultSubject = string.Empty;
@@ -21,18 +22,19 @@ public partial class BatchImportModel : ModelBase
     [ObservableProperty] private int _importedCount;
     [ObservableProperty] private bool _isImporting;
 
-    public BatchImportModel(IDocument repository, IDialogService dialogService, IFileDialogService fileDialogService, INavigationService navigationService)
+    public BatchImportModel(IDocument repository, IDialogService dialogService, IFileDialogService fileDialogService, INavigationService navigationService, ILocalizationService loc)
     {
         _repository = repository;
         _dialogService = dialogService;
         _fileDialogService = fileDialogService;
         _navigationService = navigationService;
+        _loc = loc;
     }
 
     [RelayCommand]
     private async Task BrowseFolderAsync()
     {
-        var path = await _fileDialogService.ShowOpenFolderAsync("Chọn thư mục chứa tài liệu");
+        var path = await _fileDialogService.ShowOpenFolderAsync(_loc["Import_SelectFolder"]);
         if (!string.IsNullOrEmpty(path))
         {
             FolderPath = path;
@@ -72,7 +74,7 @@ public partial class BatchImportModel : ModelBase
         var selected = Files.Where(f => f.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            await _dialogService.ShowErrorAsync("Lỗi", "Không có file nào được chọn để import.");
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Import_NoFileSelected"]);
             return;
         }
 
@@ -83,11 +85,11 @@ public partial class BatchImportModel : ModelBase
         {
             var doc = new StudyDocument
             {
-                Ten = item.FileName,
-                MonHoc = DefaultSubject,
-                Loai = item.FileType,
-                DuongDan = item.FilePath,
-                KichThuoc = item.FileSizeMB
+                Name = item.FileName,
+                Subject = DefaultSubject,
+                Type = item.FileType,
+                FilePath = item.FilePath,
+                FileSize = item.FileSizeMB
             };
 
             if (_repository.Add(doc))
@@ -97,7 +99,8 @@ public partial class BatchImportModel : ModelBase
         }
 
         IsImporting = false;
-        await _dialogService.ShowMessageAsync("Hoàn tất", $"Đã import thành công {ImportedCount}/{selected.Count} tài liệu!");
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
+            string.Format(_loc["Import_Done"], ImportedCount, selected.Count));
         _navigationService.NavigateTo("dashboard");
     }
 

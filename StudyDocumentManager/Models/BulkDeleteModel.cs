@@ -13,31 +13,31 @@ public partial class BulkDeleteModel : ModelBase
     private readonly ICategory _categoryRepo;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
+    private readonly ILocalizationService _loc;
 
-    // Use List<T> instead of ObservableCollection to prevent binding-engine re-render loops
+    private const string AllFilter = "All";
+
     [ObservableProperty] private List<SelectableDocument> _documents = new();
     [ObservableProperty] private string _searchKeyword = string.Empty;
 
-    // Filter dropdowns — List<string> to avoid Clear()+Add() loop
     [ObservableProperty] private List<string> _subjects = new();
     [ObservableProperty] private List<string> _types = new();
-    [ObservableProperty] private string _selectedSubject = "Tất cả";
-    [ObservableProperty] private string _selectedType = "Tất cả";
+    [ObservableProperty] private string _selectedSubject = AllFilter;
+    [ObservableProperty] private string _selectedType = AllFilter;
 
-    // For ChangeSubject dialog
     [ObservableProperty] private List<string> _availableSubjects = new();
     [ObservableProperty] private string? _newSubjectValue;
 
-    // Status
     [ObservableProperty] private string _statusText = "";
     public int SelectedCount => Documents.Count(d => d.IsSelected);
 
-    public BulkDeleteModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService, INavigationService navigationService)
+    public BulkDeleteModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
         _repository = repository;
         _categoryRepo = categoryRepo;
         _dialogService = dialogService;
         _navigationService = navigationService;
+        _loc = loc;
     }
 
     /// <summary>
@@ -54,14 +54,16 @@ public partial class BulkDeleteModel : ModelBase
         var subjects = _categoryRepo.GetAllSubjects();
         var types = _categoryRepo.GetAllTypes();
 
-        // Assign new List references instead of Clear()+Add()
-        var subjectList = new List<string> { "Tất cả" };
+        var subjectList = new List<string> { _loc["Filter_AllItems"] };
         subjectList.AddRange(subjects);
         Subjects = subjectList;
 
-        var typeList = new List<string> { "Tất cả" };
+        var typeList = new List<string> { _loc["Filter_AllItems"] };
         typeList.AddRange(types);
         Types = typeList;
+
+        SelectedSubject = _loc["Filter_AllItems"];
+        SelectedType = _loc["Filter_AllItems"];
 
         AvailableSubjects = new List<string>(subjects);
     }
@@ -70,18 +72,17 @@ public partial class BulkDeleteModel : ModelBase
     {
         var docs = _repository.GetAll();
 
-        // Apply filters
-        if (SelectedSubject != "Tất cả")
+        var allLabel = _loc["Filter_AllItems"];
+        if (SelectedSubject != allLabel)
             docs = docs.Where(d => d.Subject == SelectedSubject).ToList();
-        if (SelectedType != "Tất cả")
+        if (SelectedType != allLabel)
             docs = docs.Where(d => d.Type == SelectedType).ToList();
         if (!string.IsNullOrWhiteSpace(SearchKeyword))
             docs = docs.Where(d => d.Name.Contains(SearchKeyword, StringComparison.OrdinalIgnoreCase)
                 || (d.Notes ?? "").Contains(SearchKeyword, StringComparison.OrdinalIgnoreCase)).ToList();
 
-        // Assign new List reference (not Clear+Add on ObservableCollection)
         Documents = docs.Select(d => new SelectableDocument { Document = d, IsSelected = false }).ToList();
-        StatusText = $"Hiển thị {Documents.Count} tài liệu";
+        StatusText = string.Format(_loc["Status_Showing"], Documents.Count);
     }
 
     [RelayCommand]
@@ -90,72 +91,72 @@ public partial class BulkDeleteModel : ModelBase
     partial void OnSelectedSubjectChanged(string value) => LoadData();
     partial void OnSelectedTypeChanged(string value) => LoadData();
 
-    // ═══ Bulk Delete (existing) ═══
     [RelayCommand]
     private async Task DeleteSelectedAsync()
     {
         var selected = Documents.Where(d => d.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            await _dialogService.ShowErrorAsync("Lỗi", "Chưa chọn tài liệu nào để xóa.");
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Bulk_NoDocSelected"]);
             return;
         }
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận xóa",
-            $"Bạn có chắc muốn xóa {selected.Count} tài liệu? (Có thể khôi phục từ Thùng rác)",
-            "Xoá", isDanger: true);
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+            string.Format(_loc["Bulk_ConfirmDelete"], selected.Count),
+            _loc["Action_Delete"], isDanger: true);
         if (!confirmed) return;
 
         var ids = selected.Select(s => s.Document.Id).ToList();
         int deleted = _repository.BulkSoftDelete(ids);
 
-        await _dialogService.ShowMessageAsync("Hoàn tất", $"Đã xóa {deleted} tài liệu vào Thùng rác.");
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
+            string.Format(_loc["Bulk_DeleteDone"], deleted));
         _navigationService.NavigateTo("dashboard");
     }
 
-    // ═══ Bulk Mark Important (NEW) ═══
     [RelayCommand]
     private async Task MarkImportantAsync()
     {
         var selected = Documents.Where(d => d.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            await _dialogService.ShowErrorAsync("Lỗi", "Chưa chọn tài liệu nào.");
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Bulk_NoDocSelected"]);
             return;
         }
 
         var ids = selected.Select(s => s.Document.Id).ToList();
         int updated = _repository.BulkToggleImportant(ids, true);
 
-        await _dialogService.ShowMessageAsync("Hoàn tất", $"Đã đánh dấu {updated} tài liệu là quan trọng.");
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
+            string.Format(_loc["Bulk_MarkImportantDone"], updated));
         LoadData();
     }
 
-    // ═══ Bulk Change Subject (NEW) ═══
     [RelayCommand]
     private async Task ChangeSubjectAsync()
     {
         var selected = Documents.Where(d => d.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            await _dialogService.ShowErrorAsync("Lỗi", "Chưa chọn tài liệu nào.");
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Bulk_NoDocSelected"]);
             return;
         }
 
         if (string.IsNullOrWhiteSpace(NewSubjectValue))
         {
-            await _dialogService.ShowErrorAsync("Lỗi", "Vui lòng chọn danh mục mới từ dropdown bên cạnh.");
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Bulk_SelectNewSubject"]);
             return;
         }
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Đổi danh mục",
-            $"Đổi danh mục của {selected.Count} tài liệu thành '{NewSubjectValue}'?");
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Bulk_ChangeSubjectTitle"],
+            string.Format(_loc["Bulk_ConfirmChangeSubject"], selected.Count, NewSubjectValue));
         if (!confirmed) return;
 
         var ids = selected.Select(s => s.Document.Id).ToList();
         int updated = _repository.BulkUpdateSubject(ids, NewSubjectValue);
 
-        await _dialogService.ShowMessageAsync("Hoàn tất", $"Đã cập nhật danh mục cho {updated} tài liệu.");
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
+            string.Format(_loc["Bulk_ChangeSubjectDone"], updated));
         LoadData();
     }
 
@@ -163,7 +164,6 @@ public partial class BulkDeleteModel : ModelBase
     private void SelectAll()
     {
         foreach (var d in Documents) d.IsSelected = true;
-        // Force re-bind since List<T> doesn't notify
         OnPropertyChanged(nameof(Documents));
     }
 

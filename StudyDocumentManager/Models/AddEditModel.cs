@@ -15,6 +15,7 @@ public partial class AddEditModel : ModelBase
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
     private readonly INavigationService _navigationService;
+    private readonly ILocalizationService _loc;
     private int? _editingId;
 
     [ObservableProperty] private string _name = string.Empty;
@@ -26,20 +27,22 @@ public partial class AddEditModel : ModelBase
     [ObservableProperty] private string _tags = string.Empty;
     [ObservableProperty] private bool _isImportant;
     [ObservableProperty] private DateTimeOffset? _deadline;
-    [ObservableProperty] private string _pageTitle = "Thêm tài liệu mới";
+    [ObservableProperty] private string _pageTitle = string.Empty;
     [ObservableProperty] private bool _isEditing;
 
     [ObservableProperty] private ObservableCollection<string> _subjects = new();
     [ObservableProperty] private ObservableCollection<string> _types = new();
 
-    public AddEditModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService, IFileDialogService fileDialogService, INavigationService navigationService)
+    public AddEditModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService, IFileDialogService fileDialogService, INavigationService navigationService, ILocalizationService loc)
     {
         _repository = repository;
         _categoryRepo = categoryRepo;
         _dialogService = dialogService;
         _fileDialogService = fileDialogService;
         _navigationService = navigationService;
+        _loc = loc;
 
+        PageTitle = _loc["AddEdit_PageTitleAdd"];
         Subjects = new ObservableCollection<string>(_categoryRepo.GetAllSubjects());
         Types = new ObservableCollection<string>(_categoryRepo.GetAllTypes());
     }
@@ -51,7 +54,7 @@ public partial class AddEditModel : ModelBase
 
         _editingId = doc.Id;
         IsEditing = true;
-        PageTitle = "Chỉnh sửa tài liệu";
+        PageTitle = _loc["AddEdit_PageTitleEdit"];
 
         Name = doc.Name;
         Subject = doc.Subject;
@@ -69,7 +72,7 @@ public partial class AddEditModel : ModelBase
     {
         if (string.IsNullOrWhiteSpace(Name))
         {
-            await _dialogService.ShowErrorAsync("Lỗi", "Tên tài liệu không được để trống!");
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["AddEdit_NameRequired"]);
             return;
         }
 
@@ -100,19 +103,18 @@ public partial class AddEditModel : ModelBase
 
         if (success)
         {
-            // Sync new categories to lookup tables
             if (!string.IsNullOrWhiteSpace(doc.Subject))
                 _categoryRepo.AddSubject(doc.Subject);
             if (!string.IsNullOrWhiteSpace(doc.Type))
                 _categoryRepo.AddType(doc.Type);
 
-            await _dialogService.ShowMessageAsync("Thành công",
-                IsEditing ? "Đã cập nhật tài liệu!" : "Đã thêm tài liệu mới!");
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
+                IsEditing ? _loc["AddEdit_SaveUpdated"] : _loc["AddEdit_SaveAdded"]);
             _navigationService.NavigateTo("dashboard");
         }
         else
         {
-            await _dialogService.ShowErrorAsync("Lỗi", "Không thể lưu tài liệu. Vui lòng thử lại.");
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["AddEdit_SaveError"]);
         }
     }
 
@@ -125,8 +127,7 @@ public partial class AddEditModel : ModelBase
     [RelayCommand]
     private async Task BrowseFileAsync()
     {
-        var path = await _fileDialogService.ShowOpenFileAsync("Chọn tài liệu",
-            "All Files|*.*|PDF|*.pdf|Word|*.doc;*.docx|Excel|*.xls;*.xlsx|Image|*.png;*.jpg;*.jpeg;*.gif;*.bmp");
+        var path = await _fileDialogService.ShowOpenFileAsync(_loc["AddEdit_BrowseFile"], _loc["AddEdit_FileFilter"]);
         if (string.IsNullOrEmpty(path)) return;
 
         FilePath = path;
@@ -136,13 +137,11 @@ public partial class AddEditModel : ModelBase
             Name = Path.GetFileNameWithoutExtension(path);
         }
 
-        // Auto-detect file type using shared helper
         if (string.IsNullOrWhiteSpace(Type))
         {
             var ext = Path.GetExtension(path);
             Type = FileTypeDetector.Detect(ext);
 
-            // Ensure detected type is available in the ComboBox dropdown
             if (!string.IsNullOrWhiteSpace(Type) && !Types.Contains(Type))
             {
                 Types.Add(Type);
@@ -156,7 +155,7 @@ public partial class AddEditModel : ModelBase
         {
             if (!string.IsNullOrEmpty(path) && File.Exists(path))
             {
-                return new FileInfo(path).Length / (1024.0 * 1024.0); // MB
+                return new FileInfo(path).Length / (1024.0 * 1024.0);
             }
         }
         catch { /* ignore */ }

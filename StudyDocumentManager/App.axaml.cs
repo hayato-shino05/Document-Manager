@@ -29,11 +29,13 @@ public partial class App : Application
 
         DatabaseHelper.InitializeDatabase();
 
+        // AXAML側で{StaticResource Loc}として使えるよう登録
+        Resources["Loc"] = Services.GetRequiredService<ILocalizationService>();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var mainModel = Services.GetRequiredService<MainWindowModel>();
 
-            // NavigationServiceのSetMainModelはDIコンテナ側で実行する
             var navService = Services.GetRequiredService<NavigationService>();
             navService.SetMainModel(mainModel);
 
@@ -69,6 +71,8 @@ public partial class App : Application
         services.AddSingleton<IApplicationLifecycleService, ApplicationLifecycleService>();
         services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<IProcessLauncherService, ProcessLauncherService>();
+        services.AddSingleton<LocalizationService>();
+        services.AddSingleton<ILocalizationService>(sp => sp.GetRequiredService<LocalizationService>());
 
         // Models â€” Main
         services.AddSingleton<MainWindowModel>();

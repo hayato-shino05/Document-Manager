@@ -14,6 +14,7 @@ public partial class CollectionManagementModel : ModelBase
     private readonly Core.Interfaces.ICollection _collectionRepo;
     private readonly IDialogService _dialogService;
     private readonly ICustomDialogService _customDialogService;
+    private readonly ILocalizationService _loc;
 
     [ObservableProperty] private ObservableCollection<CollectionItem> _collections = [];
     [ObservableProperty] private CollectionItem? _selectedCollection;
@@ -22,12 +23,13 @@ public partial class CollectionManagementModel : ModelBase
     [ObservableProperty] private ObservableCollection<StudyDocument> _allDocuments = [];
     [ObservableProperty] private IList _selectedDocumentsInCollection = new List<StudyDocument>();
 
-    public CollectionManagementModel(IDocument repository, Core.Interfaces.ICollection collectionRepo, IDialogService dialogService, ICustomDialogService customDialogService)
+    public CollectionManagementModel(IDocument repository, Core.Interfaces.ICollection collectionRepo, IDialogService dialogService, ICustomDialogService customDialogService, ILocalizationService loc)
     {
         _repository = repository;
         _collectionRepo = collectionRepo;
         _dialogService = dialogService;
         _customDialogService = customDialogService;
+        _loc = loc;
         LoadCollections();
     }
 
@@ -47,7 +49,8 @@ public partial class CollectionManagementModel : ModelBase
         }
         catch (Exception ex)
         {
-            _ = _dialogService.ShowErrorAsync("Lỗi", $"Không thể tải bộ sưu tập: {ex.Message}");
+            _ = _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                string.Format(_loc["Collection_LoadError"], ex.Message));
         }
     }
 
@@ -69,18 +72,20 @@ public partial class CollectionManagementModel : ModelBase
     {
         try
         {
-            var name = await _dialogService.ShowInputAsync("Tạo bộ sưu tập", "Tên bộ sưu tập:");
+            var name = await _dialogService.ShowInputAsync(_loc["Collection_CreateTitle"], _loc["Collection_CreateLabel"]);
 
             if (!string.IsNullOrWhiteSpace(name))
             {
                 _collectionRepo.Create(name);
                 LoadCollections();
-                await _dialogService.ShowMessageAsync("Thành công", $"Đã tạo bộ sưu tập '{name}'");
+                await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
+                    string.Format(_loc["Collection_Created"], name));
             }
         }
         catch (Exception ex)
         {
-            await _dialogService.ShowErrorAsync("Lỗi", $"Không thể tạo bộ sưu tập: {ex.Message}");
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                string.Format(_loc["Collection_CreateError"], ex.Message));
         }
     }
 
@@ -89,7 +94,7 @@ public partial class CollectionManagementModel : ModelBase
     {
         if (SelectedCollection == null) return;
 
-        var newName = await _dialogService.ShowInputAsync("Đổi tên", "Tên mới:", SelectedCollection.Name);
+        var newName = await _dialogService.ShowInputAsync(_loc["Collection_RenameTitle"], _loc["Category_NewNameLabel"], SelectedCollection.Name);
         if (!string.IsNullOrWhiteSpace(newName) && newName != SelectedCollection.Name)
         {
             _collectionRepo.Update(SelectedCollection.Id, newName);
@@ -102,9 +107,9 @@ public partial class CollectionManagementModel : ModelBase
     {
         if (SelectedCollection == null) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận",
-            $"Bạn có chắc muốn xóa bộ sưu tập '{SelectedCollection.Name}'?",
-            "Xoá", isDanger: true);
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+            string.Format(_loc["Collection_ConfirmDelete"], SelectedCollection.Name),
+            _loc["Action_Delete"], isDanger: true);
         if (confirmed)
         {
             _collectionRepo.Delete(SelectedCollection.Id);
@@ -128,8 +133,8 @@ public partial class CollectionManagementModel : ModelBase
             if (allDocs.Count == alreadyIn.Count)
             {
                 await _dialogService.ShowMessageAsync(
-                    "Thông báo",
-                    "Tất cả tài liệu đã có trong bộ sưu tập này.");
+                    _loc["Dialog_Notice"],
+                    _loc["Collection_AllDocsAlreadyIn"]);
                 return;
             }
 
@@ -155,14 +160,13 @@ public partial class CollectionManagementModel : ModelBase
             LoadCollections();
             SelectedCollection = Collections.FirstOrDefault(c => c.Id == selectedId);
 
-            string msg = addedCount == 1
-                ? $"Đã thêm 1 tài liệu vào '{collectionName}'"
-                : $"Đã thêm {addedCount} tài liệu vào '{collectionName}'";
-            await _dialogService.ShowMessageAsync("Thành công", msg);
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
+                string.Format(_loc["Collection_AddedDocs"], addedCount, collectionName));
         }
         catch (Exception ex)
         {
-            await _dialogService.ShowErrorAsync("Lỗi", $"Không thể thêm tài liệu: {ex.Message}");
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                string.Format(_loc["Collection_AddError"], ex.Message));
         }
     }
 
@@ -171,8 +175,8 @@ public partial class CollectionManagementModel : ModelBase
     {
         if (SelectedCollection == null || doc == null) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận",
-            $"Gỡ '{doc.Name}' khỏi bộ sưu tập?");
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+            string.Format(_loc["Collection_ConfirmRemoveDoc"], doc.Name));
         if (confirmed)
         {
             int selectedId = SelectedCollection.Id;
@@ -192,10 +196,10 @@ public partial class CollectionManagementModel : ModelBase
         if (targets.Count == 0) return;
 
         string confirmMsg = targets.Count == 1
-            ? $"Gỡ '{targets[0].Name}' khỏi bộ sưu tập?"
-            : $"Gỡ {targets.Count} tài liệu khỏi bộ sưu tập?";
+            ? string.Format(_loc["Collection_ConfirmRemoveDoc"], targets[0].Name)
+            : string.Format(_loc["Collection_ConfirmRemoveDocs"], targets.Count);
 
-        bool confirmed = await _dialogService.ShowConfirmAsync("Xác nhận", confirmMsg);
+        bool confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"], confirmMsg);
         if (!confirmed) return;
 
         int selectedId = SelectedCollection.Id;

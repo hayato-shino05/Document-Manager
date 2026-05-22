@@ -365,3 +365,6 @@ FodyWeavers.xsd
 # Redistributable installers (binary, do not commit)
 redist/
 .gitnexus
+.harness-backup/
+docs/
+scripts/

@@ -11,15 +11,17 @@ public partial class DuplicateDetectionModel : ModelBase
 {
     private readonly IDocument _repository;
     private readonly IDialogService _dialogService;
+    private readonly ILocalizationService _loc;
 
     [ObservableProperty] private ObservableCollection<DuplicateGroup> _duplicateGroups = new();
     [ObservableProperty] private bool _isScanning;
     [ObservableProperty] private int _totalGroups;
 
-    public DuplicateDetectionModel(IDocument repository, IDialogService dialogService)
+    public DuplicateDetectionModel(IDocument repository, IDialogService dialogService, ILocalizationService loc)
     {
         _repository = repository;
         _dialogService = dialogService;
+        _loc = loc;
     }
 
     [RelayCommand]
@@ -30,7 +32,6 @@ public partial class DuplicateDetectionModel : ModelBase
 
         var docs = _repository.GetAll();
 
-        // Group by name (case-insensitive)
         var groups = docs
             .GroupBy(d => d.Name.Trim().ToLowerInvariant())
             .Where(g => g.Count() > 1)
@@ -51,7 +52,7 @@ public partial class DuplicateDetectionModel : ModelBase
 
         if (TotalGroups == 0)
         {
-            await _dialogService.ShowMessageAsync("Kết quả", "Không tìm thấy tài liệu trùng lặp! ✅");
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Result"], _loc["Duplicate_NoDuplicates"]);
         }
     }
 
@@ -60,14 +61,12 @@ public partial class DuplicateDetectionModel : ModelBase
     {
         if (doc == null) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync("Xác nhận",
-            $"Xóa tài liệu '{doc.Name}' (ID: {doc.Id})?",
-            "Xoá", isDanger: true);
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+            string.Format(_loc["Duplicate_ConfirmDelete"], doc.Name, doc.Id),
+            _loc["Action_Delete"], isDanger: true);
         if (!confirmed) return;
 
         _repository.Delete(doc.Id);
-
-        // Refresh scan
         await ScanDuplicatesAsync();
     }
 }

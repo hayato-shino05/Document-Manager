@@ -13,31 +13,28 @@ public partial class CategoryManagementModel : ModelBase
     private readonly IDocument _repository;
     private readonly ICategory _categoryRepo;
     private readonly IDialogService _dialogService;
+    private readonly ILocalizationService _loc;
 
     [ObservableProperty] private ObservableCollection<CategoryItem> _subjects = new();
     [ObservableProperty] private ObservableCollection<CategoryItem> _types = new();
 
-    // Single selection (for Rename & single-delete fallback)
     [ObservableProperty] private CategoryItem? _selectedSubject;
     [ObservableProperty] private CategoryItem? _selectedType;
 
-    // Multi-selection (bound to ListBox.SelectedItems)
     [ObservableProperty] private IList _selectedSubjects = new List<CategoryItem>();
     [ObservableProperty] private IList _selectedTypes = new List<CategoryItem>();
 
     [ObservableProperty] private int _selectedTabIndex;
-
-    // Total document count in DB (not sum of category counts, which misses uncategorised docs)
     [ObservableProperty] private int _totalDocumentCount;
 
-    /// <summary>Status bar text for the main window footer.</summary>
-    public string StatusText => $"Tổng số: {TotalDocumentCount} tài liệu | Danh mục: {Subjects.Count} | Loại: {Types.Count}";
+    public string StatusText => string.Format(_loc["Status_CategorySummary"], TotalDocumentCount, Subjects.Count, Types.Count);
 
-    public CategoryManagementModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService)
+    public CategoryManagementModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService, ILocalizationService loc)
     {
         _repository = repository;
         _categoryRepo = categoryRepo;
         _dialogService = dialogService;
+        _loc = loc;
         LoadData();
     }
 
@@ -55,19 +52,18 @@ public partial class CategoryManagementModel : ModelBase
         OnPropertyChanged(nameof(StatusText));
     }
 
-    // ─── Rename ──────────────────────────────────────────────────────
-
     [RelayCommand]
     private async Task RenameSubjectAsync()
     {
         if (SelectedSubject == null) return;
 
-        var newName = await _dialogService.ShowInputAsync("Đổi tên danh mục", "Tên mới:", SelectedSubject.Name);
+        var newName = await _dialogService.ShowInputAsync(_loc["Category_RenameSubjectTitle"], _loc["Category_NewNameLabel"], SelectedSubject.Name);
         if (!string.IsNullOrWhiteSpace(newName) && newName != SelectedSubject.Name)
         {
             _categoryRepo.UpdateSubjectName(SelectedSubject.Name, newName);
             LoadData();
-            await _dialogService.ShowMessageAsync("Thành công", $"Đã đổi tên danh mục thành '{newName}'");
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
+                string.Format(_loc["Category_RenameSubjectDone"], newName));
         }
     }
 
@@ -76,16 +72,15 @@ public partial class CategoryManagementModel : ModelBase
     {
         if (SelectedType == null) return;
 
-        var newName = await _dialogService.ShowInputAsync("Đổi tên loại", "Tên mới:", SelectedType.Name);
+        var newName = await _dialogService.ShowInputAsync(_loc["Category_RenameTypeTitle"], _loc["Category_NewNameLabel"], SelectedType.Name);
         if (!string.IsNullOrWhiteSpace(newName) && newName != SelectedType.Name)
         {
             _categoryRepo.UpdateTypeName(SelectedType.Name, newName);
             LoadData();
-            await _dialogService.ShowMessageAsync("Thành công", $"Đã đổi tên loại thành '{newName}'");
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
+                string.Format(_loc["Category_RenameTypeDone"], newName));
         }
     }
-
-    // ─── Delete (multi-select aware) ─────────────────────────────────
 
     [RelayCommand]
     private async Task DeleteSubjectAsync()
@@ -100,14 +95,14 @@ public partial class CategoryManagementModel : ModelBase
         int totalDocs = targets.Sum(t => t.Count);
         string namesStr = targets.Count == 1
             ? $"'{targets[0].Name}'"
-            : $"{targets.Count} danh mục đã chọn";
+            : string.Format(_loc["Category_SelectedCount"], targets.Count);
 
         string confirmMsg = totalDocs == 0
-            ? $"Xóa {namesStr}?"
-            : $"Xóa {namesStr}?\n\n{totalDocs} tài liệu liên quan sẽ được chuyển vào Thùng rác.";
+            ? string.Format(_loc["Category_DeleteConfirmMsg"], namesStr)
+            : string.Format(_loc["Category_DeleteWithDocsMsg"], namesStr, totalDocs);
 
-        bool confirm = await _dialogService.ShowConfirmAsync("Xóa danh mục", confirmMsg,
-            "Xoá", isDanger: true);
+        bool confirm = await _dialogService.ShowConfirmAsync(_loc["Category_ConfirmDeleteSubject"], confirmMsg,
+            _loc["Action_Delete"], isDanger: true);
         if (!confirm) return;
 
         foreach (var item in targets)
@@ -117,9 +112,9 @@ public partial class CategoryManagementModel : ModelBase
         SelectedSubjects = new List<CategoryItem>();
 
         string doneMsg = targets.Count == 1
-            ? $"Đã xóa danh mục '{targets[0].Name}'"
-            : $"Đã xóa {targets.Count} danh mục";
-        await _dialogService.ShowMessageAsync("Thành công", doneMsg);
+            ? string.Format(_loc["Category_DeletedSubject"], targets[0].Name)
+            : string.Format(_loc["Category_DeletedSubjects"], targets.Count);
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], doneMsg);
     }
 
     [RelayCommand]
@@ -135,14 +130,14 @@ public partial class CategoryManagementModel : ModelBase
         int totalDocs = targets.Sum(t => t.Count);
         string namesStr = targets.Count == 1
             ? $"'{targets[0].Name}'"
-            : $"{targets.Count} loại đã chọn";
+            : string.Format(_loc["Category_SelectedCount"], targets.Count);
 
         string confirmMsg = totalDocs == 0
-            ? $"Xóa {namesStr}?"
-            : $"Xóa {namesStr}?\n\n{totalDocs} tài liệu liên quan sẽ được chuyển vào Thùng rác.";
+            ? string.Format(_loc["Category_DeleteConfirmMsg"], namesStr)
+            : string.Format(_loc["Category_DeleteWithDocsMsg"], namesStr, totalDocs);
 
-        bool confirm = await _dialogService.ShowConfirmAsync("Xóa loại tài liệu", confirmMsg,
-            "Xoá", isDanger: true);
+        bool confirm = await _dialogService.ShowConfirmAsync(_loc["Category_ConfirmDeleteType"], confirmMsg,
+            _loc["Action_Delete"], isDanger: true);
         if (!confirm) return;
 
         foreach (var item in targets)
@@ -152,46 +147,48 @@ public partial class CategoryManagementModel : ModelBase
         SelectedTypes = new List<CategoryItem>();
 
         string doneMsg = targets.Count == 1
-            ? $"Đã xóa loại '{targets[0].Name}'"
-            : $"Đã xóa {targets.Count} loại tài liệu";
-        await _dialogService.ShowMessageAsync("Thành công", doneMsg);
+            ? string.Format(_loc["Category_DeletedType"], targets[0].Name)
+            : string.Format(_loc["Category_DeletedTypes"], targets.Count);
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], doneMsg);
     }
-
-    // ─── Add ─────────────────────────────────────────────────────────
 
     [RelayCommand]
     private async Task AddSubjectAsync()
     {
-        var name = await _dialogService.ShowInputAsync("Thêm danh mục", "Tên danh mục mới:", "");
+        var name = await _dialogService.ShowInputAsync(_loc["Category_AddSubjectTitle"], _loc["Category_AddSubjectLabel"], "");
         if (!string.IsNullOrWhiteSpace(name))
         {
             var trimmed = name.Trim();
             if (Subjects.Any(s => s.Name.Equals(trimmed, StringComparison.OrdinalIgnoreCase)))
             {
-                await _dialogService.ShowMessageAsync("Lỗi", $"Danh mục '{trimmed}' đã tồn tại.");
+                await _dialogService.ShowMessageAsync(_loc["Dialog_Error"],
+                    string.Format(_loc["Category_AlreadyExists"], trimmed));
                 return;
             }
             _categoryRepo.AddSubject(trimmed);
             LoadData();
-            await _dialogService.ShowMessageAsync("Thành công", $"Đã thêm danh mục '{trimmed}'");
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
+                string.Format(_loc["Category_AddedSubject"], trimmed));
         }
     }
 
     [RelayCommand]
     private async Task AddTypeAsync()
     {
-        var name = await _dialogService.ShowInputAsync("Thêm loại tài liệu", "Tên loại mới:", "");
+        var name = await _dialogService.ShowInputAsync(_loc["Category_AddTypeTitle"], _loc["Category_AddTypeLabel"], "");
         if (!string.IsNullOrWhiteSpace(name))
         {
             var trimmed = name.Trim();
             if (Types.Any(t => t.Name.Equals(trimmed, StringComparison.OrdinalIgnoreCase)))
             {
-                await _dialogService.ShowMessageAsync("Lỗi", $"Loại '{trimmed}' đã tồn tại.");
+                await _dialogService.ShowMessageAsync(_loc["Dialog_Error"],
+                    string.Format(_loc["Category_AlreadyExists"], trimmed));
                 return;
             }
             _categoryRepo.AddType(trimmed);
             LoadData();
-            await _dialogService.ShowMessageAsync("Thành công", $"Đã thêm loại '{trimmed}'");
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
+                string.Format(_loc["Category_AddedType"], trimmed));
         }
     }
 
