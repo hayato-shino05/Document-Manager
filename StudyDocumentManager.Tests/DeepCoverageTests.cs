@@ -54,8 +54,8 @@ public class CollectionTupleTests : DatabaseTestBase
     public void GetCollections_ItemCount_ReflectsActualItems()
     {
         var repo = new DocumentRepository();
-        repo.Add(new StudyDocument { Ten = "A" });
-        repo.Add(new StudyDocument { Ten = "B" });
+        repo.Add(new StudyDocument { Name = "A" });
+        repo.Add(new StudyDocument { Name = "B" });
         var docs = repo.GetAll();
 
         int colId = DatabaseHelper.CreateCollection("Counted Collection");
@@ -70,7 +70,7 @@ public class CollectionTupleTests : DatabaseTestBase
     public void GetCollections_ItemCountDecreases_AfterRemovingDocument()
     {
         var repo = new DocumentRepository();
-        repo.Add(new StudyDocument { Ten = "Remove Me" });
+        repo.Add(new StudyDocument { Name = "Remove Me" });
         int docId = repo.GetAll()[0].Id;
         int colId = DatabaseHelper.CreateCollection("Dynamic Count");
         DatabaseHelper.AddDocumentToCollection(colId, docId);
@@ -128,7 +128,7 @@ public class CollectionTupleTests : DatabaseTestBase
     public void DeleteCollection_RemovesAllItems_ButNotDocuments()
     {
         var repo = new DocumentRepository();
-        repo.Add(new StudyDocument { Ten = "StillActive" });
+        repo.Add(new StudyDocument { Name = "StillActive" });
         int docId = repo.GetAll()[0].Id;
 
         int colId = DatabaseHelper.CreateCollection("DeleteMe");
@@ -150,8 +150,8 @@ public class PersonalNotesFullCycleTests : DatabaseTestBase
     private int CreateDoc(string name = "Note Doc")
     {
         var repo = new DocumentRepository();
-        repo.Add(new StudyDocument { Ten = name });
-        return repo.GetAll().First(d => d.Ten == name).Id;
+        repo.Add(new StudyDocument { Name = name });
+        return repo.GetAll().First(d => d.Name == name).Id;
     }
 
     [Fact]
@@ -246,7 +246,7 @@ public class PersonalNotesFullCycleTests : DatabaseTestBase
     public void SavePersonalNote_WithUnicodeContent_PersistedCorrectly()
     {
         int docId = CreateDoc();
-        string unicode = "Ghi chú: 日本語 한국어 العربية 🎯";
+        string unicode = "Note: 日本語 한국어 العربية 🎯";
         DatabaseHelper.SavePersonalNote(docId, unicode);
         Assert.Equal(unicode, DatabaseHelper.GetPersonalNote(docId));
     }
@@ -274,7 +274,7 @@ public class MultiRelationGraphTests : DatabaseTestBase
     {
         var repo = new DocumentRepository();
         for (int i = 1; i <= count; i++)
-            repo.Add(new StudyDocument { Ten = $"Node{i:D2}" });
+            repo.Add(new StudyDocument { Name = $"Node{i:D2}" });
         return repo.GetAll().OrderBy(d => d.Id).Select(d => d.Id).ToList();
     }
 
@@ -378,9 +378,9 @@ public class TagSearchTests : DatabaseTestBase
     [Fact]
     public void Search_SingleTag_ReturnsMatchingDocuments()
     {
-        _repo.Add(new StudyDocument { Ten = "D1", Tags = "python;algorithm" });
-        _repo.Add(new StudyDocument { Ten = "D2", Tags = "java;oop" });
-        _repo.Add(new StudyDocument { Ten = "D3", Tags = "python;ml" });
+        _repo.Add(new StudyDocument { Name = "D1", Tags = "python;algorithm" });
+        _repo.Add(new StudyDocument { Name = "D2", Tags = "java;oop" });
+        _repo.Add(new StudyDocument { Name = "D3", Tags = "python;ml" });
 
         var results = DatabaseHelper.SearchDocuments("python");
         Assert.Equal(2, results.Count);
@@ -389,8 +389,8 @@ public class TagSearchTests : DatabaseTestBase
     [Fact]
     public void Search_TagPartialMatch_ReturnsDocuments()
     {
-        _repo.Add(new StudyDocument { Ten = "D1", Tags = "machine-learning;deep-learning" });
-        _repo.Add(new StudyDocument { Ten = "D2", Tags = "java;oop" });
+        _repo.Add(new StudyDocument { Name = "D1", Tags = "machine-learning;deep-learning" });
+        _repo.Add(new StudyDocument { Name = "D2", Tags = "java;oop" });
 
         var results = DatabaseHelper.SearchDocuments("learning");
         Assert.Single(results);
@@ -399,7 +399,7 @@ public class TagSearchTests : DatabaseTestBase
     [Fact]
     public void Search_TagNotPresent_ReturnsEmpty()
     {
-        _repo.Add(new StudyDocument { Ten = "D1", Tags = "python;code" });
+        _repo.Add(new StudyDocument { Name = "D1", Tags = "python;code" });
         var results = DatabaseHelper.SearchDocuments("javascript");
         Assert.Empty(results);
     }
@@ -407,8 +407,8 @@ public class TagSearchTests : DatabaseTestBase
     [Fact]
     public void GetDistinctTags_SemicalonDelimited_SplitsCorrectly()
     {
-        _repo.Add(new StudyDocument { Ten = "D1", Tags = "math;physics;chemistry" });
-        _repo.Add(new StudyDocument { Ten = "D2", Tags = "math;biology" });
+        _repo.Add(new StudyDocument { Name = "D1", Tags = "math;physics;chemistry" });
+        _repo.Add(new StudyDocument { Name = "D2", Tags = "math;biology" });
 
         var tags = DatabaseHelper.GetDistinctTags();
         Assert.Contains("math", tags);
@@ -422,9 +422,9 @@ public class TagSearchTests : DatabaseTestBase
     [Fact]
     public void GetDistinctTags_NullAndEmptyTags_Excluded()
     {
-        _repo.Add(new StudyDocument { Ten = "D1", Tags = null });
-        _repo.Add(new StudyDocument { Ten = "D2", Tags = "" });
-        _repo.Add(new StudyDocument { Ten = "D3", Tags = "valid" });
+        _repo.Add(new StudyDocument { Name = "D1", Tags = null });
+        _repo.Add(new StudyDocument { Name = "D2", Tags = "" });
+        _repo.Add(new StudyDocument { Name = "D3", Tags = "valid" });
 
         var tags = DatabaseHelper.GetDistinctTags();
         Assert.Single(tags);
@@ -434,11 +434,11 @@ public class TagSearchTests : DatabaseTestBase
     [Fact]
     public void GetDistinctTags_ExcludesSoftDeletedDocuments()
     {
-        _repo.Add(new StudyDocument { Ten = "D1", Tags = "deleted-tag" });
+        _repo.Add(new StudyDocument { Name = "D1", Tags = "deleted-tag" });
         int id = _repo.GetAll()[0].Id;
         _repo.Delete(id);
 
-        _repo.Add(new StudyDocument { Ten = "D2", Tags = "active-tag" });
+        _repo.Add(new StudyDocument { Name = "D2", Tags = "active-tag" });
 
         var tags = DatabaseHelper.GetDistinctTags();
         Assert.DoesNotContain("deleted-tag", tags);
@@ -457,40 +457,40 @@ public class DeadlineEdgeCaseTests : DatabaseTestBase
     [Fact]
     public void GetUpcomingDeadlines_7Days_IncludesDeadlineInRange()
     {
-        _repo.Add(new StudyDocument { Ten = "Due in 3 days", Deadline = DateTime.Today.AddDays(3) });
-        _repo.Add(new StudyDocument { Ten = "Due in 10 days", Deadline = DateTime.Today.AddDays(10) });
+        _repo.Add(new StudyDocument { Name = "Due in 3 days", Deadline = DateTime.Today.AddDays(3) });
+        _repo.Add(new StudyDocument { Name = "Due in 10 days", Deadline = DateTime.Today.AddDays(10) });
 
         var results = _repo.GetUpcomingDeadlines(7);
         Assert.Single(results);
-        Assert.Equal("Due in 3 days", results[0].Ten);
+        Assert.Equal("Due in 3 days", results[0].Name);
     }
 
     [Fact]
     public void GetUpcomingDeadlines_0Days_OnlyToday()
     {
-        _repo.Add(new StudyDocument { Ten = "Due today", Deadline = DateTime.Today });
-        _repo.Add(new StudyDocument { Ten = "Due tomorrow", Deadline = DateTime.Today.AddDays(1) });
+        _repo.Add(new StudyDocument { Name = "Due today", Deadline = DateTime.Today });
+        _repo.Add(new StudyDocument { Name = "Due tomorrow", Deadline = DateTime.Today.AddDays(1) });
 
         var results = _repo.GetUpcomingDeadlines(0);
         Assert.Single(results);
-        Assert.Equal("Due today", results[0].Ten);
+        Assert.Equal("Due today", results[0].Name);
     }
 
     [Fact]
     public void GetOverdueDocuments_PastDeadline_Included()
     {
-        _repo.Add(new StudyDocument { Ten = "Overdue!",  Deadline = DateTime.Today.AddDays(-1) });
-        _repo.Add(new StudyDocument { Ten = "Not overdue", Deadline = DateTime.Today.AddDays(1) });
+        _repo.Add(new StudyDocument { Name = "Overdue!",  Deadline = DateTime.Today.AddDays(-1) });
+        _repo.Add(new StudyDocument { Name = "Not overdue", Deadline = DateTime.Today.AddDays(1) });
 
         var results = _repo.GetOverdueDocuments();
         Assert.Single(results);
-        Assert.Equal("Overdue!", results[0].Ten);
+        Assert.Equal("Overdue!", results[0].Name);
     }
 
     [Fact]
     public void GetOverdueDocuments_NullDeadline_Excluded()
     {
-        _repo.Add(new StudyDocument { Ten = "No deadline", Deadline = null });
+        _repo.Add(new StudyDocument { Name = "No deadline", Deadline = null });
         var results = _repo.GetOverdueDocuments();
         Assert.Empty(results);
     }
@@ -498,7 +498,7 @@ public class DeadlineEdgeCaseTests : DatabaseTestBase
     [Fact]
     public void GetOverdueDocuments_SoftDeleted_Excluded()
     {
-        _repo.Add(new StudyDocument { Ten = "Deleted Overdue", Deadline = DateTime.Today.AddDays(-2) });
+        _repo.Add(new StudyDocument { Name = "Deleted Overdue", Deadline = DateTime.Today.AddDays(-2) });
         int id = _repo.GetAll()[0].Id;
         _repo.Delete(id);
 
@@ -509,11 +509,11 @@ public class DeadlineEdgeCaseTests : DatabaseTestBase
     [Fact]
     public void DashboardStats_NearDeadlineDocuments_CorrectCount()
     {
-        _repo.Add(new StudyDocument { Ten = "Near1", Deadline = DateTime.Today.AddDays(2) });
-        _repo.Add(new StudyDocument { Ten = "Near2", Deadline = DateTime.Today.AddDays(6) });
-        _repo.Add(new StudyDocument { Ten = "Far", Deadline = DateTime.Today.AddDays(30) });
-        _repo.Add(new StudyDocument { Ten = "Overdue", Deadline = DateTime.Today.AddDays(-1) });
-        _repo.Add(new StudyDocument { Ten = "NoDeadline", Deadline = null });
+        _repo.Add(new StudyDocument { Name = "Near1", Deadline = DateTime.Today.AddDays(2) });
+        _repo.Add(new StudyDocument { Name = "Near2", Deadline = DateTime.Today.AddDays(6) });
+        _repo.Add(new StudyDocument { Name = "Far", Deadline = DateTime.Today.AddDays(30) });
+        _repo.Add(new StudyDocument { Name = "Overdue", Deadline = DateTime.Today.AddDays(-1) });
+        _repo.Add(new StudyDocument { Name = "NoDeadline", Deadline = null });
 
         var stats = DatabaseHelper.GetDashboardStatistics();
 
@@ -525,21 +525,21 @@ public class DeadlineEdgeCaseTests : DatabaseTestBase
     [Fact]
     public void GetUpcomingDeadlines_ExcludesOverdue()
     {
-        _repo.Add(new StudyDocument { Ten = "Already overdue", Deadline = DateTime.Today.AddDays(-1) });
-        _repo.Add(new StudyDocument { Ten = "Upcoming", Deadline = DateTime.Today.AddDays(3) });
+        _repo.Add(new StudyDocument { Name = "Already overdue", Deadline = DateTime.Today.AddDays(-1) });
+        _repo.Add(new StudyDocument { Name = "Upcoming", Deadline = DateTime.Today.AddDays(3) });
 
         var results = _repo.GetUpcomingDeadlines(7);
         Assert.Single(results);
-        Assert.Equal("Upcoming", results[0].Ten);
+        Assert.Equal("Upcoming", results[0].Name);
     }
 
     [Fact]
     public void GetUpcomingDeadlines_30Days_ReturnsMultiple()
     {
-        _repo.Add(new StudyDocument { Ten = "D1", Deadline = DateTime.Today.AddDays(5)  });
-        _repo.Add(new StudyDocument { Ten = "D2", Deadline = DateTime.Today.AddDays(15) });
-        _repo.Add(new StudyDocument { Ten = "D3", Deadline = DateTime.Today.AddDays(25) });
-        _repo.Add(new StudyDocument { Ten = "D4", Deadline = DateTime.Today.AddDays(40) });
+        _repo.Add(new StudyDocument { Name = "D1", Deadline = DateTime.Today.AddDays(5)  });
+        _repo.Add(new StudyDocument { Name = "D2", Deadline = DateTime.Today.AddDays(15) });
+        _repo.Add(new StudyDocument { Name = "D3", Deadline = DateTime.Today.AddDays(25) });
+        _repo.Add(new StudyDocument { Name = "D4", Deadline = DateTime.Today.AddDays(40) });
 
         var results = _repo.GetUpcomingDeadlines(30);
         Assert.Equal(3, results.Count);
@@ -557,9 +557,9 @@ public class ConsistencyTests : DatabaseTestBase
     [Fact]
     public void GetTotalDocumentCount_MatchesGetAllCount()
     {
-        _repo.Add(new StudyDocument { Ten = "A" });
-        _repo.Add(new StudyDocument { Ten = "B" });
-        _repo.Add(new StudyDocument { Ten = "C" });
+        _repo.Add(new StudyDocument { Name = "A" });
+        _repo.Add(new StudyDocument { Name = "B" });
+        _repo.Add(new StudyDocument { Name = "C" });
 
         int countHelper = DatabaseHelper.GetTotalDocumentCount();
         int countRepo = _repo.GetAll().Count;
@@ -569,10 +569,10 @@ public class ConsistencyTests : DatabaseTestBase
     [Fact]
     public void GetTotalDocumentCount_AfterDelete_Consistent()
     {
-        _repo.Add(new StudyDocument { Ten = "Keep" });
-        _repo.Add(new StudyDocument { Ten = "Delete" });
+        _repo.Add(new StudyDocument { Name = "Keep" });
+        _repo.Add(new StudyDocument { Name = "Delete" });
 
-        int id = _repo.GetAll().First(d => d.Ten == "Delete").Id;
+        int id = _repo.GetAll().First(d => d.Name == "Delete").Id;
         _repo.Delete(id);
 
         Assert.Equal(_repo.GetAll().Count, DatabaseHelper.GetTotalDocumentCount());
@@ -581,8 +581,8 @@ public class ConsistencyTests : DatabaseTestBase
     [Fact]
     public void DashboardStats_TotalDocuments_MatchesGetAll()
     {
-        _repo.Add(new StudyDocument { Ten = "X" });
-        _repo.Add(new StudyDocument { Ten = "Y" });
+        _repo.Add(new StudyDocument { Name = "X" });
+        _repo.Add(new StudyDocument { Name = "Y" });
 
         var stats = DatabaseHelper.GetDashboardStatistics();
         Assert.Equal(_repo.GetAll().Count, stats.TotalDocuments);
@@ -591,9 +591,9 @@ public class ConsistencyTests : DatabaseTestBase
     [Fact]
     public void DashboardStats_TotalCategories_CountsDistinctActiveSubjects()
     {
-        _repo.Add(new StudyDocument { Ten = "A", MonHoc = "Cat1" });
-        _repo.Add(new StudyDocument { Ten = "B", MonHoc = "Cat1" }); // same cat
-        _repo.Add(new StudyDocument { Ten = "C", MonHoc = "Cat2" });
+        _repo.Add(new StudyDocument { Name = "A", Subject = "Cat1" });
+        _repo.Add(new StudyDocument { Name = "B", Subject = "Cat1" }); // same cat
+        _repo.Add(new StudyDocument { Name = "C", Subject = "Cat2" });
 
         var stats = DatabaseHelper.GetDashboardStatistics();
         Assert.Equal(2, stats.TotalCategories); // Cat1, Cat2
@@ -612,24 +612,24 @@ public class ConsistencyTests : DatabaseTestBase
     [Fact]
     public void DashboardStats_ImportantDocuments_MatchesManualCount()
     {
-        _repo.Add(new StudyDocument { Ten = "Imp1", QuanTrong = true });
-        _repo.Add(new StudyDocument { Ten = "Imp2", QuanTrong = true });
-        _repo.Add(new StudyDocument { Ten = "Normal", QuanTrong = false });
+        _repo.Add(new StudyDocument { Name = "Imp1", IsImportant = true });
+        _repo.Add(new StudyDocument { Name = "Imp2", IsImportant = true });
+        _repo.Add(new StudyDocument { Name = "Normal", IsImportant = false });
 
         var stats = DatabaseHelper.GetDashboardStatistics();
-        int manualCount = _repo.GetAll().Count(d => d.QuanTrong);
+        int manualCount = _repo.GetAll().Count(d => d.IsImportant);
         Assert.Equal(manualCount, stats.ImportantDocuments);
     }
 
     [Fact]
     public void DashboardStats_NoFileDocuments_MatchesManualCount()
     {
-        _repo.Add(new StudyDocument { Ten = "WithFile", DuongDan = @"C:\file.pdf" });
-        _repo.Add(new StudyDocument { Ten = "NoFile1", DuongDan = null });
-        _repo.Add(new StudyDocument { Ten = "NoFile2", DuongDan = "" });
+        _repo.Add(new StudyDocument { Name = "WithFile", FilePath = @"C:\file.pdf" });
+        _repo.Add(new StudyDocument { Name = "NoFile1", FilePath = null });
+        _repo.Add(new StudyDocument { Name = "NoFile2", FilePath = "" });
 
         var stats = DatabaseHelper.GetDashboardStatistics();
-        int manualCount = _repo.GetAll().Count(d => string.IsNullOrEmpty(d.DuongDan));
+        int manualCount = _repo.GetAll().Count(d => string.IsNullOrEmpty(d.FilePath));
         Assert.Equal(manualCount, stats.NoFileDocuments);
     }
 }
@@ -647,10 +647,10 @@ public class StressTests : DatabaseTestBase
         for (int i = 1; i <= 100; i++)
             repo.Add(new StudyDocument
             {
-                Ten = $"Stress Doc {i:D3}",
-                MonHoc = i % 2 == 0 ? "Math" : "Physics",
-                Loai = i % 3 == 0 ? "PDF" : "Word",
-                QuanTrong = i % 5 == 0,
+                Name = $"Stress Doc {i:D3}",
+                Subject = i % 2 == 0 ? "Math" : "Physics",
+                Type = i % 3 == 0 ? "PDF" : "Word",
+                IsImportant = i % 5 == 0,
                 Tags = $"tag{i % 10};stress"
             });
 
@@ -669,8 +669,8 @@ public class StressTests : DatabaseTestBase
             if (isImportant) importantCount++;
             repo.Add(new StudyDocument
             {
-                Ten = $"StressDoc{i}",
-                QuanTrong = isImportant
+                Name = $"StressDoc{i}",
+                IsImportant = isImportant
             });
         }
 
@@ -684,7 +684,7 @@ public class StressTests : DatabaseTestBase
     {
         var repo = new DocumentRepository();
         for (int i = 1; i <= 50; i++)
-            repo.Add(new StudyDocument { Ten = $"BulkDoc{i}" });
+            repo.Add(new StudyDocument { Name = $"BulkDoc{i}" });
 
         var ids = repo.GetAll().Select(d => d.Id).Take(25).ToList();
         int deleted = DatabaseHelper.BulkSoftDelete(ids);
@@ -699,12 +699,12 @@ public class StressTests : DatabaseTestBase
     {
         var repo = new DocumentRepository();
         for (int i = 1; i <= 20; i++)
-            repo.Add(new StudyDocument { Ten = $"Active{i}" });
+            repo.Add(new StudyDocument { Name = $"Active{i}" });
 
         for (int i = 1; i <= 10; i++)
-            repo.Add(new StudyDocument { Ten = $"Delete{i}" });
+            repo.Add(new StudyDocument { Name = $"Delete{i}" });
 
-        var toDelete = repo.GetAll().Where(d => d.Ten.StartsWith("Delete")).Select(d => d.Id).ToList();
+        var toDelete = repo.GetAll().Where(d => d.Name.StartsWith("Delete")).Select(d => d.Id).ToList();
         DatabaseHelper.BulkSoftDelete(toDelete);
 
         int emptied = DatabaseHelper.EmptyRecycleBin();
@@ -720,7 +720,7 @@ public class StressTests : DatabaseTestBase
     {
         var repo = new DocumentRepository();
         for (int i = 1; i <= 100; i++)
-            repo.Add(new StudyDocument { Ten = i % 10 == 0 ? $"SpecialDoc{i}" : $"NormalDoc{i}" });
+            repo.Add(new StudyDocument { Name = i % 10 == 0 ? $"SpecialDoc{i}" : $"NormalDoc{i}" });
 
         var results = DatabaseHelper.SearchDocuments("SpecialDoc");
         Assert.Equal(10, results.Count); // i=10,20,...,100
@@ -731,7 +731,7 @@ public class StressTests : DatabaseTestBase
     {
         var repo = new DocumentRepository();
         for (int i = 1; i <= 50; i++)
-            repo.Add(new StudyDocument { Ten = $"ChartDoc{i}" });
+            repo.Add(new StudyDocument { Name = $"ChartDoc{i}" });
 
         var dayData = DatabaseHelper.GetDocumentsByDay(7);
         var today = dayData.Last();
@@ -743,7 +743,7 @@ public class StressTests : DatabaseTestBase
     {
         var repo = new DocumentRepository();
         for (int i = 1; i <= 50; i++)
-            repo.Add(new StudyDocument { Ten = $"ToggleDoc{i}", QuanTrong = false });
+            repo.Add(new StudyDocument { Name = $"ToggleDoc{i}", IsImportant = false });
 
         var ids = repo.GetAll().Select(d => d.Id).ToList();
         int updated = DatabaseHelper.BulkToggleImportant(ids, true);
@@ -751,7 +751,7 @@ public class StressTests : DatabaseTestBase
         Assert.Equal(50, updated);
 
         var all = repo.GetAll();
-        Assert.All(all, d => Assert.True(d.QuanTrong));
+        Assert.All(all, d => Assert.True(d.IsImportant));
     }
 
     [Fact]
@@ -759,13 +759,13 @@ public class StressTests : DatabaseTestBase
     {
         var repo = new DocumentRepository();
         for (int i = 1; i <= 25; i++)
-            repo.Add(new StudyDocument { Ten = $"ReassignDoc{i}", MonHoc = "OldSubject" });
+            repo.Add(new StudyDocument { Name = $"ReassignDoc{i}", Subject = "OldSubject" });
 
         var ids = repo.GetAll().Select(d => d.Id).ToList();
         int count = DatabaseHelper.BulkUpdateSubject(ids, "NewSubject");
 
         Assert.Equal(25, count);
-        Assert.All(repo.GetAll(), d => Assert.Equal("NewSubject", d.MonHoc));
+        Assert.All(repo.GetAll(), d => Assert.Equal("NewSubject", d.Subject));
     }
 }
 
@@ -780,8 +780,8 @@ public class FilterEdgeCaseTests : DatabaseTestBase
     [Fact]
     public void FilterDocuments_EmptySubjectAndType_ReturnsAll()
     {
-        _repo.Add(new StudyDocument { Ten = "A", MonHoc = "Math", Loai = "PDF" });
-        _repo.Add(new StudyDocument { Ten = "B", MonHoc = "Physics", Loai = "Word" });
+        _repo.Add(new StudyDocument { Name = "A", Subject = "Math", Type = "PDF" });
+        _repo.Add(new StudyDocument { Name = "B", Subject = "Physics", Type = "Word" });
 
         var results = DatabaseHelper.FilterDocuments("", "");
         Assert.Equal(2, results.Count);
@@ -790,56 +790,56 @@ public class FilterEdgeCaseTests : DatabaseTestBase
     [Fact]
     public void FilterDocuments_BySubjectOnly_ReturnsMatching()
     {
-        _repo.Add(new StudyDocument { Ten = "M1", MonHoc = "Math" });
-        _repo.Add(new StudyDocument { Ten = "P1", MonHoc = "Physics" });
-        _repo.Add(new StudyDocument { Ten = "M2", MonHoc = "Math" });
+        _repo.Add(new StudyDocument { Name = "M1", Subject = "Math" });
+        _repo.Add(new StudyDocument { Name = "P1", Subject = "Physics" });
+        _repo.Add(new StudyDocument { Name = "M2", Subject = "Math" });
 
         var results = DatabaseHelper.FilterDocuments("Math", "");
         Assert.Equal(2, results.Count);
-        Assert.All(results, d => Assert.Equal("Math", d.MonHoc));
+        Assert.All(results, d => Assert.Equal("Math", d.Subject));
     }
 
     [Fact]
     public void FilterDocuments_ByTypeOnly_ReturnsMatching()
     {
-        _repo.Add(new StudyDocument { Ten = "P1", Loai = "PDF" });
-        _repo.Add(new StudyDocument { Ten = "W1", Loai = "Word" });
-        _repo.Add(new StudyDocument { Ten = "P2", Loai = "PDF" });
+        _repo.Add(new StudyDocument { Name = "P1", Type = "PDF" });
+        _repo.Add(new StudyDocument { Name = "W1", Type = "Word" });
+        _repo.Add(new StudyDocument { Name = "P2", Type = "PDF" });
 
         var results = DatabaseHelper.FilterDocuments("", "PDF");
         Assert.Equal(2, results.Count);
-        Assert.All(results, d => Assert.Equal("PDF", d.Loai));
+        Assert.All(results, d => Assert.Equal("PDF", d.Type));
     }
 
     [Fact]
     public void FilterDocuments_BySubjectAndType_NarrowsDown()
     {
-        _repo.Add(new StudyDocument { Ten = "Match", MonHoc = "Math", Loai = "PDF" });
-        _repo.Add(new StudyDocument { Ten = "SubjectOnly", MonHoc = "Math", Loai = "Word" });
-        _repo.Add(new StudyDocument { Ten = "TypeOnly", MonHoc = "Physics", Loai = "PDF" });
+        _repo.Add(new StudyDocument { Name = "Match", Subject = "Math", Type = "PDF" });
+        _repo.Add(new StudyDocument { Name = "SubjectOnly", Subject = "Math", Type = "Word" });
+        _repo.Add(new StudyDocument { Name = "TypeOnly", Subject = "Physics", Type = "PDF" });
 
         var results = DatabaseHelper.FilterDocuments("Math", "PDF");
         Assert.Single(results);
-        Assert.Equal("Match", results[0].Ten);
+        Assert.Equal("Match", results[0].Name);
     }
 
     [Fact]
     public void FilterDocuments_SoftDeletedExcluded()
     {
-        _repo.Add(new StudyDocument { Ten = "Active", MonHoc = "Math" });
-        _repo.Add(new StudyDocument { Ten = "Deleted", MonHoc = "Math" });
-        int id = _repo.GetAll().First(d => d.Ten == "Deleted").Id;
+        _repo.Add(new StudyDocument { Name = "Active", Subject = "Math" });
+        _repo.Add(new StudyDocument { Name = "Deleted", Subject = "Math" });
+        int id = _repo.GetAll().First(d => d.Name == "Deleted").Id;
         _repo.Delete(id);
 
         var results = DatabaseHelper.FilterDocuments("Math", "");
         Assert.Single(results);
-        Assert.Equal("Active", results[0].Ten);
+        Assert.Equal("Active", results[0].Name);
     }
 
     [Fact]
     public void SearchDocuments_CaseInsensitive_FindsMatch()
     {
-        _repo.Add(new StudyDocument { Ten = "UPPERCASE DOC" });
+        _repo.Add(new StudyDocument { Name = "UPPERCASE DOC" });
         var lower = DatabaseHelper.SearchDocuments("uppercase");
         var upper = DatabaseHelper.SearchDocuments("UPPERCASE");
         var mixed = DatabaseHelper.SearchDocuments("Uppercase");
@@ -852,8 +852,8 @@ public class FilterEdgeCaseTests : DatabaseTestBase
     [Fact]
     public void SearchDocuments_WhitespaceKeyword_ReturnsAll()
     {
-        _repo.Add(new StudyDocument { Ten = "Alpha" });
-        _repo.Add(new StudyDocument { Ten = "Beta" });
+        _repo.Add(new StudyDocument { Name = "Alpha" });
+        _repo.Add(new StudyDocument { Name = "Beta" });
 
         // Whitespace/empty search — returns all active docs
         var results = DatabaseHelper.SearchDocuments("  ");
@@ -864,12 +864,12 @@ public class FilterEdgeCaseTests : DatabaseTestBase
     [Fact]
     public void SearchDocuments_ByNotes_FindsDocByGhiChu()
     {
-        _repo.Add(new StudyDocument { Ten = "Doc1", GhiChu = "Tài liệu quan trọng về thuật toán" });
-        _repo.Add(new StudyDocument { Ten = "Doc2", GhiChu = "Ghi chú thông thường" });
+        _repo.Add(new StudyDocument { Name = "Doc1", Notes = "Important document about algorithms" });
+        _repo.Add(new StudyDocument { Name = "Doc2", Notes = "Regular notes" });
 
-        var results = DatabaseHelper.SearchDocuments("thuật toán");
+        var results = DatabaseHelper.SearchDocuments("algorithms");
         Assert.Single(results);
-        Assert.Equal("Doc1", results[0].Ten);
+        Assert.Equal("Doc1", results[0].Name);
     }
 }
 
@@ -885,44 +885,44 @@ public class DataIntegrityTests : DatabaseTestBase
     public void Document_WithMaxLengthName_PersistsCorrectly()
     {
         string longName = new string('A', 500);
-        _repo.Add(new StudyDocument { Ten = longName });
+        _repo.Add(new StudyDocument { Name = longName });
         var doc = _repo.GetAll()[0];
-        Assert.Equal(longName, doc.Ten);
+        Assert.Equal(longName, doc.Name);
     }
 
     [Fact]
     public void Document_WithZeroSize_PersistsCorrectly()
     {
-        _repo.Add(new StudyDocument { Ten = "ZeroSize", KichThuoc = 0.0 });
+        _repo.Add(new StudyDocument { Name = "ZeroSize", FileSize = 0.0 });
         var doc = _repo.GetAll()[0];
-        Assert.Equal(0.0, doc.KichThuoc);
+        Assert.Equal(0.0, doc.FileSize);
     }
 
     [Fact]
     public void Document_WithLargeSize_PersistsCorrectly()
     {
         double largeSize = 99999.999;
-        _repo.Add(new StudyDocument { Ten = "LargeFile", KichThuoc = largeSize });
+        _repo.Add(new StudyDocument { Name = "LargeFile", FileSize = largeSize });
         var doc = _repo.GetAll()[0];
-        Assert.Equal(largeSize, doc.KichThuoc!.Value, 2); // 2 decimal precision
+        Assert.Equal(largeSize, doc.FileSize!.Value, 2); // 2 decimal precision
     }
 
     [Fact]
     public void Document_NgayThem_IsAutoSetToNow()
     {
         var before = DateTime.Now.AddSeconds(-1);
-        _repo.Add(new StudyDocument { Ten = "AutoDate" });
+        _repo.Add(new StudyDocument { Name = "AutoDate" });
         var doc = _repo.GetAll()[0];
         var after = DateTime.Now.AddSeconds(1);
 
-        Assert.True(doc.NgayThem >= before && doc.NgayThem <= after);
+        Assert.True(doc.CreatedAt >= before && doc.CreatedAt <= after);
     }
 
     [Fact]
     public void Document_DeadlinePreservesTimeComponent()
     {
         var deadline = new DateTime(2027, 6, 15, 23, 59, 0);
-        _repo.Add(new StudyDocument { Ten = "Deadline Test", Deadline = deadline });
+        _repo.Add(new StudyDocument { Name = "Deadline Test", Deadline = deadline });
         var doc = _repo.GetAll()[0];
 
         Assert.NotNull(doc.Deadline);
@@ -934,42 +934,42 @@ public class DataIntegrityTests : DatabaseTestBase
     {
         _repo.Add(new StudyDocument
         {
-            Ten = "Original",
-            MonHoc = "Math",
-            TacGia = "Author",
-            KichThuoc = 1.5,
-            QuanTrong = true
+            Name = "Original",
+            Subject = "Math",
+            Author = "Author",
+            FileSize = 1.5,
+            IsImportant = true
         });
 
         var doc = _repo.GetAll()[0];
-        doc.Ten = "Changed Name Only";
+        doc.Name = "Changed Name Only";
         _repo.Update(doc);
 
         var updated = _repo.GetAll()[0];
-        Assert.Equal("Changed Name Only", updated.Ten);
-        Assert.Equal("Math", updated.MonHoc);     // unchanged
-        Assert.Equal("Author", updated.TacGia);   // unchanged
-        Assert.Equal(1.5, updated.KichThuoc);     // unchanged
-        Assert.True(updated.QuanTrong);           // unchanged
+        Assert.Equal("Changed Name Only", updated.Name);
+        Assert.Equal("Math", updated.Subject);     // unchanged
+        Assert.Equal("Author", updated.Author);   // unchanged
+        Assert.Equal(1.5, updated.FileSize);     // unchanged
+        Assert.True(updated.IsImportant);           // unchanged
     }
 
     [Fact]
     public void Delete_SetDeletedAt_IsNotNull()
     {
-        _repo.Add(new StudyDocument { Ten = "CheckDeletedAt" });
+        _repo.Add(new StudyDocument { Name = "CheckDeletedAt" });
         int id = _repo.GetAll()[0].Id;
         _repo.Delete(id);
 
         var deleted = DatabaseHelper.GetDeletedDocuments();
         Assert.Single(deleted);
         // Verify doc is in recycle bin (deleted_at is set in DB — accessible via GetDeletedDocuments)
-        Assert.Equal("CheckDeletedAt", deleted[0].Ten);
+        Assert.Equal("CheckDeletedAt", deleted[0].Name);
     }
 
     [Fact]
     public void Restore_ClearsDeletedAt_AppearsInActive()
     {
-        _repo.Add(new StudyDocument { Ten = "Restore Test" });
+        _repo.Add(new StudyDocument { Name = "Restore Test" });
         int id = _repo.GetAll()[0].Id;
         _repo.Delete(id);
 

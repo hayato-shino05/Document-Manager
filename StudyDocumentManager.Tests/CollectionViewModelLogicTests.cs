@@ -75,13 +75,13 @@ public class CollectionViewModelLogicTests : DatabaseTestBase
     public void CreateCollection_WithVietnameseName_Succeeds()
     {
         _out.WriteLine("[Test] CreateCollection with Vietnamese chars");
-        int id = DatabaseHelper.CreateCollection("Bộ sưu tập học tập 2024");
+        int id = DatabaseHelper.CreateCollection("Study Collection 2024");
         _out.WriteLine($"[Result] id={id}");
         Assert.True(id > 0);
 
         var list = DatabaseHelper.GetCollections();
         _out.WriteLine($"[Result] count={list.Count}, name='{list[0].Name}'");
-        Assert.Equal("Bộ sưu tập học tập 2024", list[0].Name);
+        Assert.Equal("Study Collection 2024", list[0].Name);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class CollectionViewModelLogicTests : DatabaseTestBase
         _out.WriteLine("[Test] GetCollections ItemCount after adding docs to collection");
 
         // Create a document
-        var doc = new StudyDocument { Ten = "Doc A", MonHoc = "Test", Loai = "PDF" };
+        var doc = new StudyDocument { Name = "Doc A", Subject = "Test", Type = "PDF" };
         bool inserted = DatabaseHelper.InsertDocument(doc);
         _out.WriteLine($"[Step 1] InsertDocument result={inserted}");
 

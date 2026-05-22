@@ -19,11 +19,11 @@ public class DroppedFileImportServiceTests
 
             var document = service.BuildDocumentFromPath(tempFile);
 
-            Assert.Equal(Path.GetFileNameWithoutExtension(tempFile), document.Ten);
-            Assert.Equal(tempFile, document.DuongDan);
-            Assert.Equal("PDF", document.Loai);
-            Assert.NotNull(document.KichThuoc);
-            Assert.True(document.KichThuoc > 0);
+            Assert.Equal(Path.GetFileNameWithoutExtension(tempFile), document.Name);
+            Assert.Equal(tempFile, document.FilePath);
+            Assert.Equal("PDF", document.Type);
+            Assert.NotNull(document.FileSize);
+            Assert.True(document.FileSize > 0);
         }
         finally
         {
@@ -49,5 +49,17 @@ public class DroppedFileImportServiceTests
         public List<StudyDocument> GetOverdueDocuments() => throw new NotImplementedException();
         public void EnsureSubjectExists(string subject) => throw new NotImplementedException();
         public void EnsureTypeExists(string type) => throw new NotImplementedException();
+        public List<StudyDocument> GetDeletedDocuments() => throw new NotImplementedException();
+        public bool RestoreDocument(int id) => throw new NotImplementedException();
+        public bool PermanentDeleteDocument(int id) => throw new NotImplementedException();
+        public int EmptyRecycleBin() => throw new NotImplementedException();
+        public int GetDeletedDocumentCount() => throw new NotImplementedException();
+        public int BulkSoftDelete(List<int> ids) => throw new NotImplementedException();
+        public int BulkUpdateSubject(List<int> ids, string subject) => throw new NotImplementedException();
+        public int BulkToggleImportant(List<int> ids, bool important) => throw new NotImplementedException();
+        public bool BackupDatabase(string destPath) => throw new NotImplementedException();
+        public string DatabasePath => throw new NotImplementedException();
+        public bool UpdateDocumentPath(int id, string newPath) => throw new NotImplementedException();
+        public bool ClearDocumentPath(int id) => throw new NotImplementedException();
     }
 }
