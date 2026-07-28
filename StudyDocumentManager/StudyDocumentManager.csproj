@@ -11,6 +11,7 @@
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <RootNamespace>StudyDocumentManager</RootNamespace>
     <AssemblyName>StudyDocumentManager</AssemblyName>
+    <NeutralResourcesLanguage>ja</NeutralResourcesLanguage>
   </PropertyGroup>
 
   <ItemGroup>

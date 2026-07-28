@@ -10,8 +10,8 @@ namespace StudyDocumentManager.Models;
 
 public partial class AddEditModel : ModelBase
 {
-    private readonly IDocument _repository;
-    private readonly ICategory _categoryRepo;
+    private readonly IDocumentRepository _repository;
+    private readonly ICategoryRepository _categoryRepo;
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
     private readonly INavigationService _navigationService;
@@ -33,7 +33,7 @@ public partial class AddEditModel : ModelBase
     [ObservableProperty] private ObservableCollection<string> _subjects = new();
     [ObservableProperty] private ObservableCollection<string> _types = new();
 
-    public AddEditModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService, IFileDialogService fileDialogService, INavigationService navigationService, ILocalizationService loc)
+    public AddEditModel(IDocumentRepository repository, ICategoryRepository categoryRepo, IDialogService dialogService, IFileDialogService fileDialogService, INavigationService navigationService, ILocalizationService loc)
     {
         _repository = repository;
         _categoryRepo = categoryRepo;

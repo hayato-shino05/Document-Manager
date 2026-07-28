@@ -10,7 +10,7 @@ public partial class RecentFilesModel : ModelBase
 {
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
-    private readonly IRecentFile _recentRepo;
+    private readonly IRecentFileRepository _recentRepo;
     private readonly IProcessLauncherService _processLauncher;
     private readonly ILocalizationService _loc;
 
@@ -19,7 +19,7 @@ public partial class RecentFilesModel : ModelBase
     public RecentFilesModel(
         IDialogService dialogService,
         INavigationService navigationService,
-        IRecentFile recentRepo,
+        IRecentFileRepository recentRepo,
         IProcessLauncherService processLauncher,
         ILocalizationService loc)
     {

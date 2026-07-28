@@ -39,10 +39,15 @@ public class LocalizeExtension : MarkupExtension
 
             loc.LanguageChanged += OnLanguageChanged;
 
-            // ビジュアルツリーから切り離されたら購読解除（メモリリーク防止）
             if (ao is Control ctrl)
             {
                 ctrl.DetachedFromVisualTree += (_, _) => loc.LanguageChanged -= OnLanguageChanged;
+                ctrl.AttachedToVisualTree += (_, _) =>
+                {
+                    loc.LanguageChanged -= OnLanguageChanged;
+                    loc.LanguageChanged += OnLanguageChanged;
+                    ao.SetValue(ap, (object)loc[Key]);
+                };
             }
         }
 

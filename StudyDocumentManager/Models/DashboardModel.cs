@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Core.Services;
+using StudyDocumentManager.Models.Items;
 using StudyDocumentManager.Services;
 
 
@@ -13,16 +14,19 @@ public partial class DashboardModel : ModelBase
 {
     private const string FILTER_ALL_SENTINEL = "__ALL__";
 
-    private readonly IDocument _repository;
-    private readonly ICategory _categoryRepo;
-    private readonly ICollection _collectionRepo;
-    private readonly IRecentFile _recentFileRepo;
+    private readonly IDocumentRepository _repository;
+    private readonly IRecycleBinRepository _recycleBinRepo;
+    private readonly ICategoryRepository _categoryRepo;
+    private readonly ICollectionRepository _collectionRepo;
+    private readonly IRecentFileRepository _recentFileRepo;
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
     private readonly ICustomDialogService _customDialogService;
     private readonly INavigationService _navigationService;
     private readonly IClipboardService _clipboardService;
     private readonly IProcessLauncherService _processLauncher;
+    private readonly IExportService _exportService;
+    private readonly IBackupService _backupService;
     private readonly ILocalizationService _loc;
     private bool _isLoadingData;
     private bool _isApplyingFilters;
@@ -48,10 +52,16 @@ public partial class DashboardModel : ModelBase
 
     partial void OnSelectedDocumentChanged(StudyDocument? value)
     {
-        // Skip property change notifications during bulk updates to prevent
-        // re-entrant rendering loops that cause StackOverflowException
         if (_isLoadingData || _isApplyingFilters) return;
         OnPropertyChanged(nameof(PreviewIcon));
+    }
+
+    partial void OnDocumentsChanged(List<StudyDocument> value)
+    {
+        if (_isLoadingData) return;
+
+        if (SelectedDocument != null && !value.Any(d => d.Id == SelectedDocument.Id))
+            SelectedDocument = null;
     }
 
     // ——— Stats ——— 
@@ -105,19 +115,23 @@ public partial class DashboardModel : ModelBase
     private ObservableCollection<CategoryTreeItem> _categoryTreeItems = new();
 
     public DashboardModel(
-        IDocument repository,
-        ICategory categoryRepo,
-        ICollection collectionRepo,
-        IRecentFile recentFileRepo,
+        IDocumentRepository repository,
+        IRecycleBinRepository recycleBinRepo,
+        ICategoryRepository categoryRepo,
+        ICollectionRepository collectionRepo,
+        IRecentFileRepository recentFileRepo,
         IDialogService dialogService,
         IFileDialogService fileDialogService,
         ICustomDialogService customDialogService,
         INavigationService navigationService,
         IClipboardService clipboardService,
         IProcessLauncherService processLauncher,
+        IExportService exportService,
+        IBackupService backupService,
         ILocalizationService localizationService)
     {
         _repository = repository;
+        _recycleBinRepo = recycleBinRepo;
         _categoryRepo = categoryRepo;
         _collectionRepo = collectionRepo;
         _recentFileRepo = recentFileRepo;
@@ -127,6 +141,8 @@ public partial class DashboardModel : ModelBase
         _navigationService = navigationService;
         _clipboardService = clipboardService;
         _processLauncher = processLauncher;
+        _exportService = exportService;
+        _backupService = backupService;
         _loc = localizationService;
         _statusText = _loc["Status_Ready"];
         // DO NOT call LoadData() here — it causes StackOverflowException
@@ -147,8 +163,8 @@ public partial class DashboardModel : ModelBase
     private void LoadData()
     {
         _isLoadingData = true;
+        SelectedDocument = null;
 
-        // Load documents
         var docs = _repository.GetAll();
 
         // Stats
@@ -157,7 +173,7 @@ public partial class DashboardModel : ModelBase
         OverdueDocuments = _repository.GetOverdueDocuments().Count;
         NoFileDocuments = docs.Count(d => string.IsNullOrEmpty(d.FilePath));
         TotalCategories = _categoryRepo.GetAllSubjects().Count;
-        DeletedCount = _repository.GetDeletedDocumentCount();
+        DeletedCount = _recycleBinRepo.GetDeletedDocumentCount();
 
         // Load filter dropdowns — clear and re-populate EXISTING collections
         // to avoid replacing the ObservableCollection reference which causes
@@ -360,6 +376,7 @@ public partial class DashboardModel : ModelBase
                         _isApplyingFilters = true;
                         try
                         {
+                            SelectedDocument = null;
                             Documents = colDocs;
                             TotalDocuments = colDocs.Count;
                             ImportantDocuments = colDocs.Count(d => d.IsImportant);
@@ -519,93 +536,36 @@ public partial class DashboardModel : ModelBase
     [RelayCommand]
     private async Task BackupDatabaseAsync()
     {
-        var path = await _fileDialogService.ShowSaveFileAsync(_loc["Dashboard_BackupTitle"], "backup_study_docs.db", _loc["Dashboard_BackupFileFilter"]);
-        if (!string.IsNullOrWhiteSpace(path))
-        {
-            try
-            {
-                _repository.BackupDatabase(path);
-                await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], string.Format(_loc["Dashboard_BackupDone"], path));
-            }
-            catch (Exception ex)
-            {
-                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_BackupError"], ex.Message));
-            }
-        }
+        var (success, path, error) = await _backupService.BackupAsync();
+        if (success)
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], string.Format(_loc["Dashboard_BackupDone"], path));
+        else if (error != null)
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_BackupError"], error));
     }
 
     [RelayCommand]
     private async Task ExportCsvAsync()
     {
-        var path = await _fileDialogService.ShowSaveFileAsync(_loc["Dashboard_ExportTitle"], "documents_export.csv", _loc["Dashboard_CsvFileFilter"]);
-        if (string.IsNullOrWhiteSpace(path)) return;
+        var result = await _exportService.ExportCsvAsync(Documents, "documents_export.csv");
 
-        try
-        {
-            var docs = Documents;
-            using var writer = new StreamWriter(path, false, System.Text.Encoding.UTF8);
-            await writer.WriteLineAsync("ID,Name,Subject,Type,FilePath,Author,Tags,IsImportant,FileSize (MB),CreatedAt,Deadline,Notes");
-            foreach (var doc in docs)
-            {
-                string line = string.Join(",",
-                    doc.Id,
-                    EscapeCsv(doc.Name),
-                    EscapeCsv(doc.Subject),
-                    EscapeCsv(doc.Type),
-                    EscapeCsv(doc.FilePath),
-                    EscapeCsv(doc.Author),
-                    EscapeCsv(doc.Tags),
-                    doc.IsImportant ? _loc["Dashboard_CsvYes"] : _loc["Dashboard_CsvNo"],
-                    doc.FileSize?.ToString("F2") ?? "",
-                    doc.CreatedAt.ToString("dd/MM/yyyy"),
-                    doc.Deadline?.ToString("dd/MM/yyyy") ?? "",
-                    EscapeCsv(doc.Notes)
-                );
-                await writer.WriteLineAsync(line);
-            }
-            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], string.Format(_loc["Dashboard_ExportDone"], docs.Count, path));
-        }
-        catch (Exception ex)
-        {
-            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_ExportError"], ex.Message));
-        }
-    }
-
-    private static string EscapeCsv(string? value)
-    {
-        if (string.IsNullOrEmpty(value)) return "";
-        if (value.Contains(',') || value.Contains('"') || value.Contains('\n'))
-            return $"\"{value.Replace("\"", "\"\"")}\"";
-        return value;
+        if (result.Success)
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], string.Format(_loc["Dashboard_ExportDone"], result.Count, result.FilePath));
+        else if (result.Error != null)
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_ExportError"], result.Error));
     }
 
     [RelayCommand]
     private async Task RestoreDatabaseAsync()
     {
-        var path = await _fileDialogService.ShowOpenFileAsync(_loc["Dashboard_SelectBackup"], _loc["Dashboard_BackupOpenFilter"]);
-        if (string.IsNullOrWhiteSpace(path)) return;
-
-        if (!File.Exists(path))
+        var (success, error) = await _backupService.RestoreAsync();
+        if (success)
         {
-            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Dashboard_BackupNotExist"]);
-            return;
+            LoadData();
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Dashboard_RestoreDone"]);
         }
-
-        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dashboard_ConfirmRestore"],
-            _loc["Dashboard_RestoreWarning"],
-            _loc["Btn_OverwriteRestore"], isDanger: true);
-        if (confirmed)
+        else if (error != null)
         {
-            try
-            {
-                File.Copy(path, _repository.DatabasePath, overwrite: true);
-                LoadData();
-                await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Dashboard_RestoreDone"]);
-            }
-            catch (Exception ex)
-            {
-                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_RestoreError"], ex.Message));
-            }
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_RestoreError"], error));
         }
     }
 

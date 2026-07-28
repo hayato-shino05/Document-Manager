@@ -1,56 +1,63 @@
 # Database Schema
 
-Tài liệu này mô tả schema SQLite hiện tại của source Avalonia/.NET 9. Nguồn sự thật là `StudyDocumentManager.Data/Helpers/DatabaseHelper.cs`, đặc biệt `CreateTables()` và các migration chạy trong `InitializeDatabase()`.
+This document describes the current SQLite schema used by the Avalonia and .NET 9 application.
 
-## Tổng quan
+The implementation authority is:
 
-- Engine: SQLite qua `Microsoft.Data.Sqlite`.
-- File mặc định: `AppDomain.CurrentDomain.BaseDirectory/data/study_documents.db`.
-- Test có thể override bằng `DatabaseHelper.SetDatabasePath(path)` trước `InitializeDatabase()`.
-- Schema hiện tại dùng tên bảng/cột tiếng Anh. App vẫn có migration từ schema WinForms cũ (`tai_lieu`, `mon_hoc`, `loai`, `duong_dan`, v.v.) sang schema mới.
+- `StudyDocumentManager.Data/Helpers/DatabaseHelper.cs`
+- `StudyDocumentManager.Data/Helpers/DatabaseMigrator.cs`
+
+## Overview
+
+- Engine: SQLite through `Microsoft.Data.Sqlite`
+- Default file: `AppDomain.CurrentDomain.BaseDirectory/data/study_documents.db`
+- Tests can override the path through `DatabaseHelper.SetDatabasePath(path)` before `InitializeDatabase()`
+- Schema and migrations are orchestrated by `DatabaseHelper.InitializeDatabase()` which calls `DatabaseMigrator.RunMigrations()`
+- Legacy WinForms schema names remain relevant only as migration compatibility input
 
 ## Tables
 
 ### `documents`
 
 | Column | Type | Notes |
-|---|---|---|
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Khóa chính |
-| `name` | TEXT NOT NULL | Tên tài liệu |
-| `subject` | TEXT | Danh mục/môn học |
-| `type` | TEXT | Loại tài liệu đã chuẩn hóa |
-| `file_path` | TEXT | Đường dẫn file trên máy |
-| `notes` | TEXT | Ghi chú chung |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Ngày thêm |
-| `file_size` | REAL | Dung lượng MB |
-| `author` | TEXT | Tác giả |
-| `is_important` | INTEGER DEFAULT 0 | Cờ quan trọng |
-| `tags` | TEXT | Tags dạng text |
-| `deadline` | DATETIME | Hạn chót tùy chọn |
-| `is_deleted` | INTEGER DEFAULT 0 | Soft delete |
-| `deleted_at` | DATETIME | Thời điểm đưa vào thùng rác |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
+| `name` | TEXT NOT NULL | Document name |
+| `subject` | TEXT | Category or subject label |
+| `type` | TEXT | Normalized document type |
+| `file_path` | TEXT | File path on disk |
+| `notes` | TEXT | General notes |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
+| `file_size` | REAL | Size in MB |
+| `author` | TEXT | Author |
+| `is_important` | INTEGER DEFAULT 0 | Important flag |
+| `tags` | TEXT | Comma-separated tags |
+| `deadline` | DATETIME | Optional deadline |
+| `is_deleted` | INTEGER DEFAULT 0 | Soft-delete flag |
+| `deleted_at` | DATETIME | Soft-delete timestamp |
 
 ### `collections`
 
 | Column | Type | Notes |
-|---|---|---|
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Khóa chính |
-| `name` | TEXT NOT NULL | Tên bộ sưu tập |
-| `description` | TEXT | Mô tả tùy chọn |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Ngày tạo |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
+| `name` | TEXT NOT NULL | Collection name |
+| `description` | TEXT | Optional description |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
 
 ### `collection_items`
 
-Bảng nối many-to-many giữa `collections` và `documents`.
+Many-to-many link between `collections` and `documents`.
 
 | Column | Type | Notes |
-|---|---|---|
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Khóa chính |
-| `collection_id` | INTEGER NOT NULL | FK đến `collections(id)` |
-| `document_id` | INTEGER NOT NULL | FK đến `documents(id)` |
-| `added_at` | DATETIME DEFAULT `datetime('now','localtime')` | Ngày thêm vào bộ sưu tập |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
+| `collection_id` | INTEGER NOT NULL | FK to `collections(id)` |
+| `document_id` | INTEGER NOT NULL | FK to `documents(id)` |
+| `added_at` | DATETIME DEFAULT `datetime('now','localtime')` | Added timestamp |
 
 Constraints:
+
 - `FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE`
 - `FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE`
 - `UNIQUE(collection_id, document_id)`
@@ -58,114 +65,127 @@ Constraints:
 ### `personal_notes`
 
 | Column | Type | Notes |
-|---|---|---|
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Khóa chính |
-| `document_id` | INTEGER NOT NULL | FK đến `documents(id)` |
-| `content` | TEXT | Nội dung ghi chú |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Ngày tạo |
-| `updated_at` | DATETIME DEFAULT `datetime('now','localtime')` | Ngày cập nhật |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
+| `document_id` | INTEGER NOT NULL | FK to `documents(id)` |
+| `content` | TEXT | Note content |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
+| `updated_at` | DATETIME DEFAULT `datetime('now','localtime')` | Last update timestamp |
 
-Constraint: `FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE`.
+Constraint:
+
+- `FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE`
 
 ### `recent_files`
 
 | Column | Type | Notes |
-|---|---|---|
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Khóa chính |
-| `document_id` | INTEGER NOT NULL UNIQUE | Mỗi tài liệu có tối đa một bản ghi recent |
-| `opened_at` | DATETIME DEFAULT `datetime('now','localtime')` | Lần mở gần nhất |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
+| `document_id` | INTEGER NOT NULL UNIQUE | One recent-file row per document |
+| `opened_at` | DATETIME DEFAULT `datetime('now','localtime')` | Last-opened timestamp |
 
-Constraint: `FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE`.
+Constraint:
+
+- `FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE`
 
 ### `document_relations`
 
-Liên kết tài liệu liên quan, lưu theo cặp bidirectional.
+Stores related-document links by normalized pair.
 
 | Column | Type | Notes |
-|---|---|---|
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Khóa chính |
-| `doc_id_1` | INTEGER NOT NULL | ID nhỏ hơn trong cặp |
-| `doc_id_2` | INTEGER NOT NULL | ID lớn hơn trong cặp |
-| `relation_type` | TEXT DEFAULT `'related'` | Loại quan hệ |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Ngày tạo |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
+| `doc_id_1` | INTEGER NOT NULL | Lower document id in the pair |
+| `doc_id_2` | INTEGER NOT NULL | Higher document id in the pair |
+| `relation_type` | TEXT DEFAULT `'related'` | Relation label |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
 
 Constraints:
+
 - `FOREIGN KEY (doc_id_1) REFERENCES documents(id) ON DELETE CASCADE`
 - `FOREIGN KEY (doc_id_2) REFERENCES documents(id) ON DELETE CASCADE`
 - `UNIQUE(doc_id_1, doc_id_2)`
 
 ### `categories`
 
-Lookup table cho danh mục.
+Lookup table for categories.
 
 | Column | Type | Notes |
-|---|---|---|
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Khóa chính |
-| `name` | TEXT NOT NULL UNIQUE | Tên danh mục |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Ngày tạo |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
+| `name` | TEXT NOT NULL UNIQUE | Category name |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
 
 ### `document_types`
 
-Lookup table cho loại tài liệu.
+Lookup table for document types.
 
 | Column | Type | Notes |
-|---|---|---|
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Khóa chính |
-| `name` | TEXT NOT NULL UNIQUE | Tên loại |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Ngày tạo |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
+| `name` | TEXT NOT NULL UNIQUE | Type name |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
 
 ### `app_settings`
 
 | Column | Type | Notes |
-|---|---|---|
-| `key` | TEXT PRIMARY KEY | Tên setting |
-| `value` | TEXT | Giá trị |
+| --- | --- | --- |
+| `key` | TEXT PRIMARY KEY | Setting key |
+| `value` | TEXT | Setting value |
 
 ## Indexes
 
-- `idx_documents_subject` trên `documents(subject)`
-- `idx_documents_type` trên `documents(type)`
-- `idx_documents_created_at` trên `documents(created_at)`
-- `idx_documents_deadline` trên `documents(deadline)`
-- `idx_collection_items_collection` trên `collection_items(collection_id)`
-- `idx_collection_items_document` trên `collection_items(document_id)`
-- `idx_documents_deleted` trên `documents(is_deleted)`
-- `idx_documents_important` trên `documents(is_important)`
+- `idx_documents_subject` on `documents(subject)`
+- `idx_documents_type` on `documents(type)`
+- `idx_documents_created_at` on `documents(created_at)`
+- `idx_documents_deadline` on `documents(deadline)`
+- `idx_collection_items_collection` on `collection_items(collection_id)`
+- `idx_collection_items_document` on `collection_items(document_id)`
+- `idx_documents_deleted` on `documents(is_deleted)`
+- `idx_documents_important` on `documents(is_important)`
 
-## Migration rules
+## Migration Behavior
 
-`DatabaseHelper.InitializeDatabase()` gọi `CreateTables()`, sau đó chạy các bước:
+`DatabaseMigrator.RunMigrations()` currently performs the following current-state flow:
 
-1. Tạo bảng và index nếu chưa tồn tại.
-2. `MigrateToEnglishSchema(conn)`: chuyển dữ liệu từ schema WinForms cũ sang bảng/cột tiếng Anh.
-3. `MigrateAddColumn(conn, "documents", "is_deleted", "INTEGER DEFAULT 0")`.
-4. `MigrateAddColumn(conn, "documents", "deleted_at", "DATETIME")`.
-5. `MigrateSeedCategories(conn)`: seed `categories` và `document_types` từ dữ liệu hiện có, rồi thêm default values cho fresh install.
-6. `MigrateNormalizeFileTypes(conn)`: chuẩn hóa `type` từ extension cũ và từ `file_path`.
+1. Creates the current tables and indexes if they do not exist.
+2. Adds `is_deleted` and `deleted_at` idempotently when upgrading older databases.
+3. Seeds `categories` and `document_types` from existing document data, then adds default values for fresh installs.
+4. Normalizes file-type labels based on existing values and file extensions.
+5. Neutralizes legacy catalog labels through schema version `3` using `app_settings`.
 
-## Soft delete và thùng rác
+Legacy table and column names from the retired WinForms implementation are preserved only as migration compatibility context. They are not the active schema contract.
 
-- Xóa thông thường dùng `documents.is_deleted = 1` và set `deleted_at`.
-- Query danh sách chính lọc `(is_deleted IS NULL OR is_deleted = 0)`.
-- Restore set `is_deleted = 0`, `deleted_at = NULL`.
-- Permanent delete dùng `DELETE` thật trên `documents`.
-- Empty recycle bin xóa toàn bộ documents có `is_deleted = 1`.
+## Soft Delete and Recycle Bin
 
-## Repository mapping
+- Normal deletion marks `documents.is_deleted = 1` and sets `deleted_at`.
+- Main document lists filter for records where `is_deleted` is null or `0`.
+- Restore sets `is_deleted = 0` and `deleted_at = NULL`.
+- Permanent delete removes rows from `documents`.
+- Empty recycle bin permanently deletes all soft-deleted document rows.
 
-| Interface | Repository | Backing helper |
-|---|---|---|
-| `IDocument` | `DocumentRepository` | `DatabaseHelper` document CRUD, recycle bin, bulk, backup, file integrity |
-| `ICategory` | `CategoryRepository` | category/type lookup methods |
-| `ICollection` | `CollectionRepository` | collections và collection_items |
-| `IPersonalNote` | `PersonalNoteRepository` | personal_notes |
-| `IRecentFile` | `RecentFileRepository` | recent_files |
-| `IRelatedDocument` | `RelatedDocumentRepository` | document_relations |
-| `IReport` | `ReportRepository` | report aggregate queries |
+## Repository Mapping
 
-## Quy tắc khi sửa schema
+| Contract | Implementation | Main backing helper |
+| --- | --- | --- |
+| `IDocumentRepository` | `DocumentRepository` | document CRUD, search, filters, deadlines |
+| `IRecycleBinRepository` | `DocumentRepository` | recycle-bin behavior |
+| `IBulkOperationRepository` | `DocumentRepository` | bulk delete, subject update, important toggle |
+| `IFileIntegrityRepository` | `DocumentRepository` | path updates, backup, database path |
+| `ICategoryRepository` | `CategoryRepository` | categories and document types |
+| `ICollectionRepository` | `CollectionRepository` | collections and collection items |
+| `IPersonalNoteRepository` | `PersonalNoteRepository` | personal notes |
+| `IRecentFileRepository` | `RecentFileRepository` | recent files |
+| `IRelatedDocumentRepository` | `RelatedDocumentRepository` | document relations |
+| `IReportRepository` | `ReportRepository` | aggregate report queries |
+| `ISettingsService` | `SettingsRepository` | key-value settings |
 
-- Sửa `CreateTables()` trước, sau đó thêm migration idempotent nếu cần nâng cấp DB cũ.
-- Cập nhật entity/DTO trong `StudyDocumentManager.Core` và repository contract tương ứng.
-- Cập nhật tests database trong `StudyDocumentManager.Tests`; các test DB dùng file SQLite tạm qua `DatabaseTestBase`.
-- Không quay lại tên bảng/cột tiếng Việt trong code mới; chỉ giữ migration cho tương thích dữ liệu cũ.
+## Rules for Schema Changes
+
+When changing schema or persistence behavior:
+
+- Update the current schema and migration flow together.
+- Keep repository contracts, implementations, and entity or DTO mappings aligned.
+- Update database-backed tests in `StudyDocumentManager.Tests`.
+- Update this document when the active schema contract changes.
+- Keep new code on English schema names only. Legacy Vietnamese names belong only to migration compatibility logic.

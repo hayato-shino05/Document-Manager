@@ -102,7 +102,14 @@ public partial class Dashboard : UserControl
             switch (args.PropertyName)
             {
                 case nameof(DashboardModel.Documents):
-                    if (dgv != null) dgv.ItemsSource = vm.Documents;
+                    if (dgv != null)
+                    {
+                        dgv.ItemsSource = vm.Documents;
+                        dgv.SelectedItem = vm.SelectedDocument;
+                    }
+                    break;
+                case nameof(DashboardModel.SelectedDocument):
+                    if (dgv != null) dgv.SelectedItem = vm.SelectedDocument;
                     break;
                 case nameof(DashboardModel.Subjects):
                     SyncComboBox(cboSubject, vm.Subjects, vm.SelectedSubject);

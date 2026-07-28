@@ -10,8 +10,8 @@ namespace StudyDocumentManager.Models;
 
 public partial class CollectionManagementModel : ModelBase
 {
-    private readonly IDocument _repository;
-    private readonly Core.Interfaces.ICollection _collectionRepo;
+    private readonly IDocumentRepository _repository;
+    private readonly ICollectionRepository _collectionRepo;
     private readonly IDialogService _dialogService;
     private readonly ICustomDialogService _customDialogService;
     private readonly ILocalizationService _loc;
@@ -23,7 +23,7 @@ public partial class CollectionManagementModel : ModelBase
     [ObservableProperty] private ObservableCollection<StudyDocument> _allDocuments = [];
     [ObservableProperty] private IList _selectedDocumentsInCollection = new List<StudyDocument>();
 
-    public CollectionManagementModel(IDocument repository, Core.Interfaces.ICollection collectionRepo, IDialogService dialogService, ICustomDialogService customDialogService, ILocalizationService loc)
+    public CollectionManagementModel(IDocumentRepository repository, ICollectionRepository collectionRepo, IDialogService dialogService, ICustomDialogService customDialogService, ILocalizationService loc)
     {
         _repository = repository;
         _collectionRepo = collectionRepo;

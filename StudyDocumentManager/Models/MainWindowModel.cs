@@ -1,11 +1,10 @@
 using StudyDocumentManager.Core;
 using StudyDocumentManager.Core.Interfaces;
+using StudyDocumentManager.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Services;
-using StudyDocumentManager.Data.Helpers;
-using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
 
@@ -33,6 +32,8 @@ public partial class MainWindowModel : ModelBase
     private readonly IDroppedFileImportService _droppedFileImportService;
     private readonly IApplicationLifecycleService _lifecycleService;
     private readonly ILocalizationService _loc;
+    private readonly ISettingsService _settingsService;
+    private readonly IUpdateService _updateService;
 
     public MainWindowModel(
         DashboardModel dashboardModel,
@@ -41,7 +42,9 @@ public partial class MainWindowModel : ModelBase
         ICustomDialogService customDialogService,
         IDroppedFileImportService droppedFileImportService,
         IApplicationLifecycleService lifecycleService,
-        ILocalizationService loc)
+        ILocalizationService loc,
+        ISettingsService settingsService,
+        IUpdateService updateService)
     {
         _navigationService = navigationService;
         _dialogService = dialogService;
@@ -49,17 +52,17 @@ public partial class MainWindowModel : ModelBase
         _droppedFileImportService = droppedFileImportService;
         _lifecycleService = lifecycleService;
         _loc = loc;
+        _settingsService = settingsService;
+        _updateService = updateService;
         _currentView = dashboardModel;
         _statusText = string.Format(_loc["Status_TotalDocs"], 0);
 
-        // DB保存済み言語をロード
         LoadLanguageFromSettings();
 
-        // 起動後3秒でサイレント更新チェック
         _ = Task.Run(async () =>
         {
             await Task.Delay(3000);
-            await UpdateService.CheckSilentlyAsync(_dialogService, _loc);
+            await _updateService.CheckSilentlyAsync();
         });
     }
 
@@ -67,7 +70,7 @@ public partial class MainWindowModel : ModelBase
     private async Task CheckForUpdateAsync()
     {
         StatusText = _loc["Status_CheckingUpdate"];
-        var info = await UpdateChecker.CheckForUpdateAsync();
+        var info = await _updateService.CheckForUpdateAsync();
         if (info == null)
         {
             await _dialogService.ShowMessageAsync(_loc["Main_UpdateTitle"], _loc["Main_CannotConnect"]);
@@ -81,7 +84,7 @@ public partial class MainWindowModel : ModelBase
         }
         else
         {
-            await UpdateService.HandleUpdateAsync(info, _dialogService, _loc);
+            await _updateService.HandleUpdateAsync(info);
             StatusText = string.Format(_loc["Status_NewVersionAvailable"], info.NewVersion);
         }
     }
@@ -235,15 +238,15 @@ public partial class MainWindowModel : ModelBase
 
     private void LoadLanguageFromSettings()
     {
-        var saved = DatabaseHelper.GetSetting("language");
+        var saved = _settingsService.GetSetting("language");
         if (Enum.TryParse<SupportedLanguage>(saved, out var lang))
         {
             _loc.SetLanguage(lang);
-            _selectedLanguage = lang;
+            SelectedLanguage = lang;
         }
         else
         {
-            _selectedLanguage = _loc.CurrentLanguage;
+            SelectedLanguage = _loc.CurrentLanguage;
         }
     }
 
@@ -251,7 +254,7 @@ public partial class MainWindowModel : ModelBase
     {
         System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] OnSelectedLanguageChanged fired: value={value}");
         _loc.SetLanguage(value);
-        DatabaseHelper.SetSetting("language", value.ToString());
+        _settingsService.SetSetting("language", value.ToString());
         System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] Language persisted to DB: {value}");
     }
 

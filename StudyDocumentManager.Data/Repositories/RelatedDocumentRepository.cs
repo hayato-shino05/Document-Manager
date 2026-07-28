@@ -4,14 +4,18 @@ using StudyDocumentManager.Data.Helpers;
 
 namespace StudyDocumentManager.Data.Repositories;
 
-public class RelatedDocumentRepository : IRelatedDocument
+public class RelatedDocumentRepository : IRelatedDocumentRepository
 {
+    private readonly DatabaseHelper _db;
+
+    public RelatedDocumentRepository(DatabaseHelper db) => _db = db;
+
     public List<(StudyDocument Doc, int RelationId, string RelationType)> GetRelated(int docId)
-        => DatabaseHelper.GetRelatedDocuments(docId);
+        => _db.GetRelatedDocuments(docId);
 
     public void AddRelation(int docId1, int docId2, string relationType = "related")
-        => DatabaseHelper.AddDocumentRelation(docId1, docId2, relationType);
+        => _db.AddDocumentRelation(docId1, docId2, relationType);
 
     public void RemoveRelation(int relationId)
-        => DatabaseHelper.RemoveDocumentRelation(relationId);
+        => _db.RemoveDocumentRelation(relationId);
 }

@@ -9,8 +9,8 @@ namespace StudyDocumentManager.Models;
 
 public partial class RelatedDocumentsModel : ModelBase
 {
-    private readonly IDocument _repository;
-    private readonly IRelatedDocument _relatedDocRepo;
+    private readonly IDocumentRepository _repository;
+    private readonly IRelatedDocumentRepository _relatedDocRepo;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
@@ -32,7 +32,7 @@ public partial class RelatedDocumentsModel : ModelBase
         "sequel"
     };
 
-    public RelatedDocumentsModel(IDocument repository, IRelatedDocument relatedDocRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
+    public RelatedDocumentsModel(IDocumentRepository repository, IRelatedDocumentRepository relatedDocRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
         _repository = repository;
         _relatedDocRepo = relatedDocRepo;

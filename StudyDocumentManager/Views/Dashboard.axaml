@@ -1,6 +1,7 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
+             xmlns:items="using:StudyDocumentManager.Models.Items"
              xmlns:conv="using:StudyDocumentManager.Converters"
              xmlns:core="using:StudyDocumentManager.Core.Entities"
         xmlns:loc="using:StudyDocumentManager.Markup"
@@ -198,7 +199,7 @@
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <ItemsControl ItemsSource="{Binding CategoryTreeItems}">
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="vm:CategoryTreeItem">
+                                <DataTemplate x:DataType="items:CategoryTreeItem">
                                     <Panel>
                                         <!-- Section headers: muted uppercase label, NOT clickable -->
                                         <Border IsVisible="{Binding IsHeader}"

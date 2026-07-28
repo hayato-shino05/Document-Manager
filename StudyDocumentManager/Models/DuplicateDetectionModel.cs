@@ -9,7 +9,7 @@ namespace StudyDocumentManager.Models;
 
 public partial class DuplicateDetectionModel : ModelBase
 {
-    private readonly IDocument _repository;
+    private readonly IDocumentRepository _repository;
     private readonly IDialogService _dialogService;
     private readonly ILocalizationService _loc;
 
@@ -17,7 +17,7 @@ public partial class DuplicateDetectionModel : ModelBase
     [ObservableProperty] private bool _isScanning;
     [ObservableProperty] private int _totalGroups;
 
-    public DuplicateDetectionModel(IDocument repository, IDialogService dialogService, ILocalizationService loc)
+    public DuplicateDetectionModel(IDocumentRepository repository, IDialogService dialogService, ILocalizationService loc)
     {
         _repository = repository;
         _dialogService = dialogService;

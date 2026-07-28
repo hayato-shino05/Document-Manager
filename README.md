@@ -1,143 +1,104 @@
 <div align="center">
 
-![Study Document Manager](study-document-manager/assets/logo/hero-banner.png)
+# Study Document Manager
 
-> **Quản lý tài liệu cá nhân - Đơn giản, Hiệu quả, Riêng tư**
+学習資料と業務文書をローカルで整理する Avalonia デスクトップアプリケーションです。
 
-[![.NET Framework](https://img.shields.io/badge/.NET_Framework-4.8-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![Avalonia](https://img.shields.io/badge/Avalonia-11.2.7-7C3AED?style=for-the-badge)](https://avaloniaui.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-Local_DB-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
-[![C#](https://img.shields.io/badge/C%23-Windows_Forms-239120?style=for-the-badge&logo=csharp&logoColor=white)](https://docs.microsoft.com/dotnet/desktop/winforms/)
-[![Windows](https://img.shields.io/badge/Platform-Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://www.microsoft.com/windows)
+[![Desktop](https://img.shields.io/badge/Platform-Desktop-0F172A?style=for-the-badge)](https://github.com/hayato-shino05/study-document-manager)
 
-[![Version](https://img.shields.io/badge/Version-3.1.2-14B8A6?style=for-the-badge&logo=semver&logoColor=white)](https://github.com/hayato-shino05/study-document-manager/releases)
+[![Version](https://img.shields.io/badge/Version-4.0.0-14B8A6?style=for-the-badge)](https://github.com/hayato-shino05/study-document-manager/releases)
 [![Downloads](https://img.shields.io/github/downloads/hayato-shino05/study-document-manager/total?style=for-the-badge&color=10B981&logo=github&logoColor=white&label=Downloads)](https://github.com/hayato-shino05/study-document-manager/releases)
 [![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/hayato-shino05/study-document-manager?style=for-the-badge&color=EF4444&logo=github&logoColor=white)](https://github.com/hayato-shino05/study-document-manager)
 
 </div>
 
-## Giới thiệu
+## 目次
 
-**Study Document Manager** là ứng dụng Windows Forms (C#) giúp bạn tổ chức tài liệu học tập và công việc theo phong cách **Personal Mode** (cá nhân hóa).
+- [概要](#概要)
+- [主な機能](#主な機能)
+- [技術スタック](#技術スタック)
+- [セットアップ](#セットアップ)
+- [ビルドとテスト](#ビルドとテスト)
+- [プロジェクト構成](#プロジェクト構成)
+- [貢献](#貢献)
+- [ライセンス](#ライセンス)
 
-Ứng dụng hoạt động hoàn toàn **Offline**, sử dụng **SQLite** làm cơ sở dữ liệu cục bộ, không yêu cầu cài đặt SQL Server phức tạp và không cần đăng nhập. Chỉ cần tải về và chạy!
+## 概要
 
-> 📂 [Xem cấu trúc dự án](PROJECT_STRUCTURE.md) | 🗄️ [Xem Database Schema](DATABASE.md)
+Study Document Manager は、ローカルの SQLite データベースを使って文書を整理するデスクトップアプリケーションです。検索、分類、期限管理、コレクション管理、レポート表示までを 1 つのアプリケーションで扱えます。
 
-### Tính năng nổi bật
+現在の実装は Avalonia 11.2.7 と .NET 9.0 をベースにしており、表示層は MVVM、データ永続化は `Microsoft.Data.Sqlite` を使っています。
 
-- 🚀 **Portable & Offline**: Chạy ngay không cần cài đặt database server. Dữ liệu lưu trong file `.db` cục bộ.
-- 📂 **Quản lý tài liệu**: Thêm, sửa, xóa, tìm kiếm nhanh theo tên, danh mục, loại.
-- 🎨 **Giao diện hiện đại**: Theme Teal/Emerald phẳng, đẹp mắt, Toast Notification mượt mà.
-- 🏷️ **Phân loại thông minh**: Sắp xếp theo Danh mục (Subject), Loại file (PDF, Word...), Bộ sưu tập (Collections).
-- 🌳 **Cây phân loại (Sidebar)**: Sidebar dạng cây cho phép duyệt tài liệu theo Danh mục, Loại file, Bộ sưu tập, Quan trọng — hiển thị số lượng từng nhóm, click để lọc nhanh.
-- ⭐ **Đánh dấu quan trọng**: Ghim các tài liệu ưu tiên.
-- 🔍 **Bộ lọc mạnh mẽ**: Lọc theo ngày, dung lượng, trạng thái, từ khóa.
-- 📊 **Thống kê trực quan**: Biểu đồ phân bố tài liệu, timeline hoạt động.
-- 🗺️ **TreeMap**: Hiển thị phân bố tài liệu theo danh mục hoặc loại file dưới dạng bản đồ TreeMap trực quan, hỗ trợ hover và click tương tác.
-- 📤 **Xuất dữ liệu**: Xuất danh sách tài liệu ra file CSV.
-- 📝 **Ghi chú cá nhân**: Thêm ghi chú và trạng thái riêng cho từng tài liệu.
-- ⏰ **Quản lý Deadline**: Theo dõi tài liệu sắp đến hạn và quá hạn.
-- 🔄 **Tự động cập nhật**: Kiểm tra phiên bản mới từ GitHub Releases.
-- 🧹 **Kiểm tra file rác**: Tự động phát hiện các liên kết file bị hỏng (file đã xóa khỏi ổ cứng).
-- 📥 **Import hàng loạt**: Chọn thư mục → quét tất cả file hỗ trợ → tự động điền thông tin (tên, loại, dung lượng) → import vào DB cùng lúc. Hỗ trợ lọc theo loại file và xem trước danh sách trước khi import.
-- 🗑️ **Thùng rác (Recycle Bin)**: Xóa mềm (soft delete) tài liệu, không ảnh hưởng file thật trên ổ cứng. Hỗ trợ khôi phục từng tài liệu hoặc xóa vĩnh viễn, dọn sạch thùng rác.
-- ⌨️ **Phím tắt**: `Ctrl+N` thêm mới, `Ctrl+F` tìm kiếm, `Del` xóa, `F5` làm mới, `Ctrl+E` xuất CSV, `Ctrl+O` mở file.
-- ☑️ **Quản lý hàng loạt**: Form riêng biệt cho phép tìm kiếm, lọc theo danh mục/loại, chọn nhiều tài liệu bằng checkbox → xóa hàng loạt / đổi danh mục / đánh dấu quan trọng cùng lúc.
-- 📄 **Xem trước**: Panel xem trước nội dung file ngay trong ứng dụng (hỗ trợ hình ảnh). Không cần mở ứng dụng ngoài để kiểm tra nhanh.
-- 🕐 **Lịch sử mở gần đây**: Tự động ghi nhận file đã mở, hiển thị danh sách 20 file gần nhất. Hỗ trợ mở lại nhanh hoặc xóa lịch sử.
-- 💾 **Backup & Restore Database**: Sao lưu toàn bộ database ra file `.db` và khôi phục khi cần. Bảo vệ dữ liệu trước rủi ro mất mát.
-- 🔗 **Liên kết tài liệu liên quan**: Tạo liên kết giữa các tài liệu có nội dung liên quan. Dễ dàng tìm thấy tài liệu tham khảo từ tài liệu hiện tại.
-- 🔍 **Phát hiện file trùng lặp**: Quét và phát hiện các tài liệu có cùng tên hoặc đường dẫn file trùng nhau. Hỗ trợ xử lý nhanh (xóa, giữ lại).
-- 📎 **Drag & Drop**: Kéo thả file trực tiếp vào bảng danh sách để thêm tài liệu nhanh chóng.
+## 主な機能
 
----
+- 文書の追加、編集、削除、検索、複合フィルター
+- カテゴリ、文書タイプ、コレクション、関連文書による整理
+- 重要フラグ、期限、個人メモ、ごみ箱による管理
+- 一括インポート、重複検出、ファイル整合性確認
+- 最近開いた文書、CSV エクスポート、データベースのバックアップと復元
+- レポート画面と TreeMap による可視化
+- 日本語、英語、ベトナム語、中国語の UI 切り替え
 
-## Giao diện & Trải nghiệm
+## 技術スタック
 
-![Dashboard chính](study-document-manager/assets/example/1.png)
+| 項目 | 内容 |
+| --- | --- |
+| UI | Avalonia 11.2.7 |
+| Runtime | .NET 9.0 |
+| Pattern | MVVM (`CommunityToolkit.Mvvm`) |
+| DI | `Microsoft.Extensions.DependencyInjection` |
+| Database | SQLite (`Microsoft.Data.Sqlite`) |
+| Tests | xUnit |
 
-![Hiển thị Preview](study-document-manager/assets/example/2.png)
+## セットアップ
 
-### Dashboard chính
-- Menu bar và Toolbar truy cập nhanh (Thêm, Sửa, Xóa, Mở file, Import, Thùng rác).
-- Danh sách tài liệu dạng lưới (Grid) với icon trực quan theo loại file.
-- Sidebar cây phân loại: duyệt theo Danh mục, Loại file, Bộ sưu tập, Quan trọng — hiển thị badge số lượng.
-- Panel tìm kiếm và bộ lọc (Filter) tiện lợi bên trái.
-- Phím tắt nhanh: `Ctrl+N`, `Ctrl+F`, `Del`, `F5`, `Ctrl+E`.
-- Truy cập nhanh "Quản lý hàng loạt" qua menu Công cụ.
+### 前提条件
 
-### Quản lý hàng loạt
-- Form riêng biệt với bảng danh sách checkbox.
-- Tìm kiếm theo tên, lọc theo danh mục và loại tài liệu.
-- Chọn tất cả / Bỏ chọn tất cả nhanh chóng.
-- Các thao tác: Xóa hàng loạt, Đánh dấu quan trọng, Đổi danh mục.
+- .NET 9 SDK
+- Git
+- `.NET` デスクトップアプリを扱える開発環境、または `dotnet` CLI
 
-### Thêm/Sửa tài liệu
-- Tự động điền tên và tính dung lượng file khi chọn file từ máy tính.
-- Gắn thẻ (Tag), chọn danh mục, thêm ghi chú cá nhân.
+### 取得
 
-### Thống kê (Reports)
-- Tổng quan số lượng tài liệu.
-- Biểu đồ tròn (Pie Chart) phân bố theo danh mục/loại.
-- Biểu đồ cột (Bar Chart) timeline thêm tài liệu.
-- TreeMap phân bố tài liệu tương tác (hover, click).
+```bash
+git clone https://github.com/hayato-shino05/study-document-manager.git
+cd study-document-manager
+```
 
-### Notification System
-- Hệ thống thông báo **Toast** hiện đại, không làm gián đoạn công việc (Non-blocking).
-- 4 trạng thái: Success (Xanh), Error (Đỏ), Warning (Cam), Info (Lam).
+### 起動
 
----
+```powershell
+dotnet run --project "StudyDocumentManager\StudyDocumentManager.csproj"
+```
 
-## Cài đặt và Chạy
+## ビルドとテスト
 
-### Yêu cầu hệ thống
-- Windows 7/8/10/11.
-- .NET Framework 4.8 Runtime.
+```powershell
+dotnet build "StudyDocumentManager.sln" -c Debug
+dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c Debug
+```
 
-### Hướng dẫn chạy (Run)
-1. **Clone repository**:
-   ```bash
-   git clone https://github.com/hayato-shino05/study-document-manager.git
-   cd study-document-manager
-   ```
-2. **Mở project**:
-   - Mở file `study-document-manager.sln` bằng Visual Studio 2019/2022.
-3. **Build & Run**:
-   - Nhấn `F5` hoặc nút **Start**.
-   - Database SQLite sẽ tự động được khởi tạo tại `bin/Debug/data/study_documents.db`.
+現行のテストスイートは xUnit ベースで、614 件のテストを含みます。CI はビルドとアーティファクト生成を実行しますが、テスト実行はローカル確認に委ねています。
 
----
+## プロジェクト構成
 
-## Công nghệ sử dụng
+| プロジェクト | 役割 |
+| --- | --- |
+| `StudyDocumentManager` | Avalonia UI、画面モデル、サービス、テーマ |
+| `StudyDocumentManager.Core` | エンティティ、DTO、契約、共通ロジック |
+| `StudyDocumentManager.Data` | SQLite、スキーマ、マイグレーション、リポジトリ |
+| `StudyDocumentManager.Tests` | xUnit テスト |
 
-- **Ngôn ngữ**: C# (.NET Framework 4.8)
-- **UI Framework**: Windows Forms (WinForms)
-- **Database**: SQLite (System.Data.SQLite)
-- **Biểu đồ**: System.Windows.Forms.DataVisualization
-- **Architecture**: MVP (Model-View-Presenter), Repository Pattern
+詳細な構成とデータベース仕様は、[PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)、[DATABASE.md](./DATABASE.md)、[CONTRIBUTING.md](./CONTRIBUTING.md) を参照してください。
 
----
+## 貢献
 
-## Đóng góp
+開発フロー、ビルド、テスト、PR 作成のガイドは [CONTRIBUTING.md](./CONTRIBUTING.md) を参照してください。
 
-Mọi đóng góp đều được chào đón!
-1. Fork dự án.
-2. Tạo branch mới (`git checkout -b feature/AmazingFeature`).
-3. Commit thay đổi (`git commit -m 'Add some AmazingFeature'`).
-4. Push lên branch (`git push origin feature/AmazingFeature`).
-5. Tạo Pull Request.
+## ライセンス
 
----
-
-## Tác giả
-
-**hayato-shino05**
-- Email: [hayatoshino05@gmail.com](mailto:hayatoshino05@gmail.com)
-- GitHub: [@hayato-shino05](https://github.com/hayato-shino05)
-
----
-
-<div align="center">
-Made with ❤️ by hayato-shino05 | © 2025
-</div>
+このプロジェクトは [MIT License](./LICENSE) の下で公開しています。

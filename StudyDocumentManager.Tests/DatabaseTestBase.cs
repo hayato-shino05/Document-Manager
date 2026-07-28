@@ -1,4 +1,5 @@
 using StudyDocumentManager.Data.Helpers;
+using StudyDocumentManager.Data.Repositories;
 
 namespace StudyDocumentManager.Tests;
 
@@ -13,19 +14,21 @@ namespace StudyDocumentManager.Tests;
 public abstract class DatabaseTestBase : IDisposable
 {
     protected readonly string DbPath;
+    protected readonly DatabaseHelper Db;
+    protected readonly DocumentRepository Repo;
 
     protected DatabaseTestBase()
     {
-        // Give each test class instance its own unique temp DB
         DbPath = Path.Combine(Path.GetTempPath(), $"sdm_test_{Guid.NewGuid():N}.db");
-        DatabaseHelper.SetDatabasePath(DbPath);
-        DatabaseHelper.InitializeDatabase();
+        Db = new DatabaseHelper();
+        Db.SetDatabasePath(DbPath);
+        Db.InitializeDatabase();
+        Repo = new DocumentRepository(Db);
     }
 
     public void Dispose()
     {
-        // Close all connections before deleting
-        DatabaseHelper.CloseAllConnections();
+        Db.CloseAllConnections();
         try { if (File.Exists(DbPath)) File.Delete(DbPath); }
         catch { /* ignore cleanup errors */ }
     }

@@ -27,7 +27,8 @@ public partial class App : Application
         ConfigureServices(services);
         Services = services.BuildServiceProvider();
 
-        DatabaseHelper.InitializeDatabase();
+        var db = Services.GetRequiredService<DatabaseHelper>();
+        db.InitializeDatabase();
 
         // Avalonia needs the concrete type (implements INotifyPropertyChanged) for indexer binding refresh
         Resources["Loc"] = Services.GetRequiredService<LocalizationService>();
@@ -50,14 +51,22 @@ public partial class App : Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
+        // Infrastructure
+        services.AddSingleton<DatabaseHelper>();
+
         // Repositories
-        services.AddSingleton<IDocument, DocumentRepository>();
-        services.AddSingleton<ICategory, CategoryRepository>();
-        services.AddSingleton<ICollection, CollectionRepository>();
-        services.AddSingleton<IPersonalNote, PersonalNoteRepository>();
-        services.AddSingleton<IRelatedDocument, RelatedDocumentRepository>();
-        services.AddSingleton<IRecentFile, RecentFileRepository>();
-        services.AddSingleton<IReport, ReportRepository>();
+        services.AddSingleton<DocumentRepository>();
+        services.AddSingleton<IDocumentRepository>(sp => sp.GetRequiredService<DocumentRepository>());
+        services.AddSingleton<IRecycleBinRepository>(sp => sp.GetRequiredService<DocumentRepository>());
+        services.AddSingleton<IBulkOperationRepository>(sp => sp.GetRequiredService<DocumentRepository>());
+        services.AddSingleton<IFileIntegrityRepository>(sp => sp.GetRequiredService<DocumentRepository>());
+        services.AddSingleton<ICategoryRepository, CategoryRepository>();
+        services.AddSingleton<ICollectionRepository, CollectionRepository>();
+        services.AddSingleton<IPersonalNoteRepository, PersonalNoteRepository>();
+        services.AddSingleton<IRelatedDocumentRepository, RelatedDocumentRepository>();
+        services.AddSingleton<IRecentFileRepository, RecentFileRepository>();
+        services.AddSingleton<IReportRepository, ReportRepository>();
+        services.AddSingleton<ISettingsService, SettingsRepository>();
 
         // Services
         services.AddSingleton<NavigationService>();
@@ -71,8 +80,12 @@ public partial class App : Application
         services.AddSingleton<IApplicationLifecycleService, ApplicationLifecycleService>();
         services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<IProcessLauncherService, ProcessLauncherService>();
+        services.AddSingleton<IExportService, CsvExportService>();
+        services.AddSingleton<IBackupService, DatabaseBackupService>();
         services.AddSingleton<LocalizationService>();
         services.AddSingleton<ILocalizationService>(sp => sp.GetRequiredService<LocalizationService>());
+        services.AddSingleton<IUpdateService, Services.UpdateService>();
+        services.AddSingleton<IToastService, Services.ToastService>();
 
         // Models â€” Main
         services.AddSingleton<MainWindowModel>();

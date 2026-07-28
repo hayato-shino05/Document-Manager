@@ -18,7 +18,7 @@ public class CollectionViewModelLogicTests : DatabaseTestBase
     public CollectionViewModelLogicTests(ITestOutputHelper output)
     {
         _out = output;
-        _repo = new DocumentRepository();
+        _repo = new DocumentRepository(Db);
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -31,10 +31,10 @@ public class CollectionViewModelLogicTests : DatabaseTestBase
         if (!string.IsNullOrWhiteSpace(dialogResult))
         {
             _out.WriteLine($"[Simulate] Calling CreateCollection('{dialogResult}')");
-            int id = DatabaseHelper.CreateCollection(dialogResult);
+            int id = Db.CreateCollection(dialogResult);
             _out.WriteLine($"[Simulate] CreateCollection returned id={id}");
 
-            var collections = DatabaseHelper.GetCollections();
+            var collections = Db.GetCollections();
             _out.WriteLine($"[Simulate] GetCollections count={collections.Count}");
             return (id, collections.Count);
         }
@@ -75,11 +75,11 @@ public class CollectionViewModelLogicTests : DatabaseTestBase
     public void CreateCollection_WithVietnameseName_Succeeds()
     {
         _out.WriteLine("[Test] CreateCollection with Vietnamese chars");
-        int id = DatabaseHelper.CreateCollection("Study Collection 2024");
+        int id = Db.CreateCollection("Study Collection 2024");
         _out.WriteLine($"[Result] id={id}");
         Assert.True(id > 0);
 
-        var list = DatabaseHelper.GetCollections();
+        var list = Db.GetCollections();
         _out.WriteLine($"[Result] count={list.Count}, name='{list[0].Name}'");
         Assert.Equal("Study Collection 2024", list[0].Name);
     }
@@ -89,11 +89,11 @@ public class CollectionViewModelLogicTests : DatabaseTestBase
     {
         var longName = new string('A', 500);
         _out.WriteLine($"[Test] CreateCollection with 500-char name");
-        int id = DatabaseHelper.CreateCollection(longName);
+        int id = Db.CreateCollection(longName);
         _out.WriteLine($"[Result] id={id}");
         Assert.True(id > 0);
 
-        var list = DatabaseHelper.GetCollections();
+        var list = Db.GetCollections();
         Assert.Equal(longName, list[0].Name);
     }
 
@@ -105,11 +105,11 @@ public class CollectionViewModelLogicTests : DatabaseTestBase
 
         foreach (var n in names)
         {
-            int id = DatabaseHelper.CreateCollection(n);
+            int id = Db.CreateCollection(n);
             _out.WriteLine($"  → Created '{n}' id={id}");
         }
 
-        var list = DatabaseHelper.GetCollections();
+        var list = Db.GetCollections();
         _out.WriteLine($"[Result] count={list.Count}");
         foreach (var c in list)
             _out.WriteLine($"  → id={c.Id} name='{c.Name}'");
@@ -125,9 +125,9 @@ public class CollectionViewModelLogicTests : DatabaseTestBase
     public void DatabaseHelper_ConnectionString_MatchesDbPath()
     {
         _out.WriteLine($"[Test] DbPath={DbPath}");
-        _out.WriteLine($"[Test] DatabaseHelper.DatabasePath={DatabaseHelper.DatabasePath}");
-        Assert.Equal(DbPath, DatabaseHelper.DatabasePath);
-        Assert.Contains(DbPath, DatabaseHelper.ConnectionString);
+        _out.WriteLine($"[Test] Db.DatabasePath={Db.DatabasePath}");
+        Assert.Equal(DbPath, Db.DatabasePath);
+        Assert.Contains(DbPath, Db.ConnectionString);
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -140,26 +140,26 @@ public class CollectionViewModelLogicTests : DatabaseTestBase
 
         // Create a document
         var doc = new StudyDocument { Name = "Doc A", Subject = "Test", Type = "PDF" };
-        bool inserted = DatabaseHelper.InsertDocument(doc);
+        bool inserted = Db.InsertDocument(doc);
         _out.WriteLine($"[Step 1] InsertDocument result={inserted}");
 
         // Get the inserted doc's ID
-        var docs = DatabaseHelper.GetAllDocuments();
+        var docs = Db.GetAllDocuments();
         _out.WriteLine($"[Step 1] GetAllDocuments count={docs.Count}");
         Assert.Single(docs);
         int docId = docs[0].Id;
 
         // Create collection
-        int colId = DatabaseHelper.CreateCollection("My Playlist");
+        int colId = Db.CreateCollection("My Playlist");
         _out.WriteLine($"[Step 2] CreateCollection id={colId}");
 
         // Add doc to collection
-        bool added = DatabaseHelper.AddDocumentToCollection(colId, docId);
+        bool added = Db.AddDocumentToCollection(colId, docId);
         _out.WriteLine($"[Step 3] AddDocumentToCollection result={added}");
         Assert.True(added);
 
         // Verify ItemCount
-        var collections = DatabaseHelper.GetCollections();
+        var collections = Db.GetCollections();
         _out.WriteLine($"[Step 4] GetCollections count={collections.Count}");
         _out.WriteLine($"[Step 4] ItemCount={collections[0].ItemCount}");
 

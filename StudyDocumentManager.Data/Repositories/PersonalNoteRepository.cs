@@ -3,11 +3,15 @@ using StudyDocumentManager.Data.Helpers;
 
 namespace StudyDocumentManager.Data.Repositories;
 
-public class PersonalNoteRepository : IPersonalNote
+public class PersonalNoteRepository : IPersonalNoteRepository
 {
-    public string? GetNote(int documentId) => DatabaseHelper.GetPersonalNote(documentId);
+    private readonly DatabaseHelper _db;
 
-    public bool SaveNote(int documentId, string content) => DatabaseHelper.SavePersonalNote(documentId, content);
+    public PersonalNoteRepository(DatabaseHelper db) => _db = db;
 
-    public bool DeleteNote(int documentId) => DatabaseHelper.DeletePersonalNote(documentId);
+    public string? GetNote(int documentId) => _db.GetPersonalNote(documentId);
+
+    public bool SaveNote(int documentId, string content) => _db.SavePersonalNote(documentId, content);
+
+    public bool DeleteNote(int documentId) => _db.DeletePersonalNote(documentId);
 }

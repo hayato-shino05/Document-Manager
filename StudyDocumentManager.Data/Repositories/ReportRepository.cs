@@ -3,13 +3,17 @@ using StudyDocumentManager.Data.Helpers;
 
 namespace StudyDocumentManager.Data.Repositories;
 
-public class ReportRepository : IReport
+public class ReportRepository : IReportRepository
 {
-    public List<(string Label, int Count)> GetBySubject() => DatabaseHelper.GetDocumentsBySubject();
+    private readonly DatabaseHelper _db;
 
-    public List<(string Label, int Count)> GetByType() => DatabaseHelper.GetDocumentsByType();
+    public ReportRepository(DatabaseHelper db) => _db = db;
 
-    public List<(string Label, int Count)> GetByDay(int days = 7) => DatabaseHelper.GetDocumentsByDay(days);
+    public List<(string Label, int Count)> GetBySubject() => _db.GetDocumentsBySubject();
 
-    public List<(string Label, int Count)> GetByMonth(int months = 12) => DatabaseHelper.GetDocumentsByMonth(months);
+    public List<(string Label, int Count)> GetByType() => _db.GetDocumentsByType();
+
+    public List<(string Label, int Count)> GetByDay(int days = 7) => _db.GetDocumentsByDay(days);
+
+    public List<(string Label, int Count)> GetByMonth(int months = 12) => _db.GetDocumentsByMonth(months);
 }

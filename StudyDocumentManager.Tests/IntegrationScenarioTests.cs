@@ -63,7 +63,7 @@ public class DatabaseSchemaSeedingTests : DatabaseTestBase
     public void InitializeDatabase_SeedsDefaultSubjects()
     {
         // 初期化後のデフォルトカテゴリ確認
-        var subjects = DatabaseHelper.GetAllSubjects();
+        var subjects = Db.GetAllSubjects();
         Assert.Contains("Study", subjects);
         Assert.Contains("Work", subjects);
         Assert.Contains("Personal", subjects);
@@ -74,7 +74,7 @@ public class DatabaseSchemaSeedingTests : DatabaseTestBase
     public void InitializeDatabase_SeedsDefaultTypes()
     {
         // 初期化後のデフォルトタイプ確認
-        var types = DatabaseHelper.GetAllTypes();
+        var types = Db.GetAllTypes();
         Assert.Contains("Document", types);
         Assert.Contains("Report", types);
         Assert.Contains("Image", types);
@@ -86,7 +86,7 @@ public class DatabaseSchemaSeedingTests : DatabaseTestBase
     public void InitializeDatabase_DefaultSubjectCount_AtLeast8()
     {
         // FEATURES_OLD.md specifies 8 default subject categories
-        var subjects = DatabaseHelper.GetAllSubjects();
+        var subjects = Db.GetAllSubjects();
         Assert.True(subjects.Count >= 8, $"Expected >= 8 default subjects, got {subjects.Count}");
     }
 
@@ -94,7 +94,7 @@ public class DatabaseSchemaSeedingTests : DatabaseTestBase
     public void InitializeDatabase_DefaultTypeCount_AtLeast7()
     {
         // Default types: Document, Report, Guide, Form, Image, Video, Other
-        var types = DatabaseHelper.GetAllTypes();
+        var types = Db.GetAllTypes();
         Assert.True(types.Count >= 7, $"Expected >= 7 default types, got {types.Count}");
     }
 
@@ -105,12 +105,12 @@ public class DatabaseSchemaSeedingTests : DatabaseTestBase
         // If tables didn't exist these would throw SqliteException
         var ex = Record.Exception(() =>
         {
-            DatabaseHelper.GetAllDocuments();
-            DatabaseHelper.GetCollections();
-            DatabaseHelper.GetRecentFiles();
-            DatabaseHelper.GetDeletedDocuments();
-            DatabaseHelper.GetAllSubjects();
-            DatabaseHelper.GetAllTypes();
+            Db.GetAllDocuments();
+            Db.GetCollections();
+            Db.GetRecentFiles();
+            Db.GetDeletedDocuments();
+            Db.GetAllSubjects();
+            Db.GetAllTypes();
         });
         Assert.Null(ex);
     }
@@ -124,7 +124,7 @@ public class FullDocumentLifecycleTests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
 
-    public FullDocumentLifecycleTests() { _repo = new DocumentRepository(); }
+    public FullDocumentLifecycleTests() { _repo = new DocumentRepository(Db); }
 
     [Fact]
     public void FullLifecycle_CreateUpdateSearchDeleteRestore()
@@ -171,21 +171,21 @@ public class FullDocumentLifecycleTests : DatabaseTestBase
         Assert.Empty(_repo.GetAll());
 
         // 6. VERIFY IN RECYCLE BIN
-        var bin = DatabaseHelper.GetDeletedDocuments();
+        var bin = Db.GetDeletedDocuments();
         Assert.Single(bin);
         Assert.Equal("Updated Lifecycle", bin[0].Name);
-        Assert.Equal(1, DatabaseHelper.GetDeletedDocumentCount());
+        Assert.Equal(1, Db.GetDeletedDocumentCount());
 
         // 7. RESTORE
-        DatabaseHelper.RestoreDocument(id);
+        Db.RestoreDocument(id);
         Assert.Single(_repo.GetAll());
-        Assert.Empty(DatabaseHelper.GetDeletedDocuments());
+        Assert.Empty(Db.GetDeletedDocuments());
 
         // 8. PERMANENT DELETE
         _repo.Delete(id);
-        DatabaseHelper.PermanentDeleteDocument(id);
+        Db.PermanentDeleteDocument(id);
         Assert.Empty(_repo.GetAll());
-        Assert.Empty(DatabaseHelper.GetDeletedDocuments());
+        Assert.Empty(Db.GetDeletedDocuments());
     }
 
     [Fact]
@@ -201,40 +201,40 @@ public class FullDocumentLifecycleTests : DatabaseTestBase
         int relatedId = docs[1].Id;
 
         // Add personal note to main doc
-        DatabaseHelper.SavePersonalNote(mainId, "Note for main document");
-        Assert.Equal("Note for main document", DatabaseHelper.GetPersonalNote(mainId));
+        Db.SavePersonalNote(mainId, "Note for main document");
+        Assert.Equal("Note for main document", Db.GetPersonalNote(mainId));
 
         // Link as related documents
-        DatabaseHelper.AddDocumentRelation(mainId, relatedId, "Exercise");
-        var related = DatabaseHelper.GetRelatedDocuments(mainId);
+        Db.AddDocumentRelation(mainId, relatedId, "Exercise");
+        var related = Db.GetRelatedDocuments(mainId);
         Assert.Single(related);
         Assert.Equal("Exercise", related[0].RelationType);
 
         // Create collection and add both
-        int colId = DatabaseHelper.CreateCollection("My Study Collection");
-        DatabaseHelper.AddDocumentToCollection(colId, mainId);
-        DatabaseHelper.AddDocumentToCollection(colId, relatedId);
-        Assert.Equal(2, DatabaseHelper.GetDocumentsInCollection(colId).Count);
+        int colId = Db.CreateCollection("My Study Collection");
+        Db.AddDocumentToCollection(colId, mainId);
+        Db.AddDocumentToCollection(colId, relatedId);
+        Assert.Equal(2, Db.GetDocumentsInCollection(colId).Count);
 
         // Track as recently opened
-        DatabaseHelper.AddRecentFile(mainId);
-        Assert.Single(DatabaseHelper.GetRecentFiles());
+        Db.AddRecentFile(mainId);
+        Assert.Single(Db.GetRecentFiles());
 
         // Now soft-delete the related doc
         _repo.Delete(relatedId);
 
         // Recent files only shows active docs
-        Assert.Single(DatabaseHelper.GetRecentFiles());
+        Assert.Single(Db.GetRecentFiles());
 
         // Related docs also excludes soft-deleted
-        var stillRelated = DatabaseHelper.GetRelatedDocuments(mainId);
+        var stillRelated = Db.GetRelatedDocuments(mainId);
         Assert.Empty(stillRelated); // related doc was deleted
 
         // Collection also excludes soft-deleted
-        Assert.Single(DatabaseHelper.GetDocumentsInCollection(colId));
+        Assert.Single(Db.GetDocumentsInCollection(colId));
 
         // Stats reflect changes
-        var stats = DatabaseHelper.GetDashboardStatistics();
+        var stats = Db.GetDashboardStatistics();
         Assert.Equal(1, stats.TotalDocuments);
     }
 }
@@ -247,19 +247,19 @@ public class CategoryManagementE2ETests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
 
-    public CategoryManagementE2ETests() { _repo = new DocumentRepository(); }
+    public CategoryManagementE2ETests() { _repo = new DocumentRepository(Db); }
 
     [Fact]
     public void RenameSubject_UpdatesAllDocuments_AndLookupTable()
     {
         // Setup: add subject and assign to docs
-        DatabaseHelper.AddSubject("Old Category");
+        Db.AddSubject("Old Category");
         _repo.Add(new StudyDocument { Name = "Doc A", Subject = "Old Category" });
         _repo.Add(new StudyDocument { Name = "Doc B", Subject = "Old Category" });
         _repo.Add(new StudyDocument { Name = "Doc C", Subject = "Different" });
 
         // Action: rename
-        DatabaseHelper.UpdateSubjectName("Old Category", "New Category");
+        Db.UpdateSubjectName("Old Category", "New Category");
 
         // Verify: all docs with old name updated
         var docs = _repo.GetAll();
@@ -267,7 +267,7 @@ public class CategoryManagementE2ETests : DatabaseTestBase
         Assert.Equal(1, docs.Count(d => d.Subject == "Different"));
 
         // Lookup table updated
-        var subjects = DatabaseHelper.GetAllSubjects();
+        var subjects = Db.GetAllSubjects();
         Assert.Contains("New Category", subjects);
         Assert.DoesNotContain("Old Category", subjects);
 
@@ -279,12 +279,12 @@ public class CategoryManagementE2ETests : DatabaseTestBase
     [Fact]
     public void DeleteDocumentsBySubject_MovesToRecycleBin_NotPermanent()
     {
-        DatabaseHelper.AddSubject("Xóa danh mục này");
+        Db.AddSubject("Xóa danh mục này");
         _repo.Add(new StudyDocument { Name = "Subject Doc 1", Subject = "Xóa danh mục này" });
         _repo.Add(new StudyDocument { Name = "Subject Doc 2", Subject = "Xóa danh mục này" });
         _repo.Add(new StudyDocument { Name = "Keep This", Subject = "Giữ lại" });
 
-        DatabaseHelper.DeleteDocumentsBySubject("Xóa danh mục này");
+        Db.DeleteDocumentsBySubject("Xóa danh mục này");
 
         // Active docs: only "Keep This"
         var active = _repo.GetAll();
@@ -292,7 +292,7 @@ public class CategoryManagementE2ETests : DatabaseTestBase
         Assert.Equal("Keep This", active[0].Name);
 
         // Deleted docs in bin: the 2 subject docs
-        var bin = DatabaseHelper.GetDeletedDocuments();
+        var bin = Db.GetDeletedDocuments();
         Assert.Equal(2, bin.Count);
     }
 
@@ -308,17 +308,17 @@ public class CategoryManagementE2ETests : DatabaseTestBase
         var mathIds = all.Where(d => d.Subject == "Math").Select(d => d.Id).ToList();
 
         // Step 1: Mark math docs as important
-        int marked = DatabaseHelper.BulkToggleImportant(mathIds, true);
+        int marked = Db.BulkToggleImportant(mathIds, true);
         Assert.Equal(2, marked);
         Assert.Equal(2, _repo.GetAll().Count(d => d.IsImportant));
 
         // Step 2: Move math docs to different subject
-        DatabaseHelper.BulkUpdateSubject(mathIds, "Physics");
+        Db.BulkUpdateSubject(mathIds, "Physics");
         Assert.Equal(2, _repo.GetAll().Count(d => d.Subject == "Physics"));
         Assert.Equal(0, _repo.GetAll().Count(d => d.Subject == "Math"));
 
         // Step 3: Bulk soft delete the physics docs
-        int deleted = DatabaseHelper.BulkSoftDelete(mathIds);
+        int deleted = Db.BulkSoftDelete(mathIds);
         Assert.Equal(2, deleted);
         Assert.Single(_repo.GetAll());
         Assert.Equal("C", _repo.GetAll()[0].Name);
@@ -334,7 +334,7 @@ public class DuplicateDetectionDataTests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
 
-    public DuplicateDetectionDataTests() { _repo = new DocumentRepository(); }
+    public DuplicateDetectionDataTests() { _repo = new DocumentRepository(Db); }
 
     [Fact]
     public void SamePath_MultipleDocuments_CanBeIdentified()
@@ -369,7 +369,7 @@ public class DuplicateDetectionDataTests : DatabaseTestBase
         var keepId = all.First(d => d.Name == "Original").Id;
         var dupId = all.First(d => d.Name == "Duplicate").Id;
 
-        DatabaseHelper.BulkSoftDelete(new List<int> { dupId });
+        Db.BulkSoftDelete(new List<int> { dupId });
 
         var remaining = _repo.GetAll();
         Assert.Single(remaining);
@@ -386,7 +386,7 @@ public class BatchImportSimulationTests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
 
-    public BatchImportSimulationTests() { _repo = new DocumentRepository(); }
+    public BatchImportSimulationTests() { _repo = new DocumentRepository(Db); }
 
     [Fact]
     public void BatchInsert_MultipleDocuments_AllImported()
@@ -416,11 +416,11 @@ public class BatchImportSimulationTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "F2", Subject = "Study", Type = "Video" });
         _repo.Add(new StudyDocument { Name = "F3", Subject = "Work", Type = "Document" });
 
-        var stats = DatabaseHelper.GetDashboardStatistics();
+        var stats = Db.GetDashboardStatistics();
         Assert.Equal(3, stats.TotalDocuments);
         Assert.Equal(2, stats.TotalCategories); // Study, Work
 
-        var bySubject = DatabaseHelper.GetDocumentsBySubject();
+        var bySubject = Db.GetDocumentsBySubject();
         var studySubject = bySubject.FirstOrDefault(s => s.Label == "Study");
         Assert.Equal(2, studySubject.Count);
     }
@@ -476,7 +476,7 @@ public class SearchFilterPipelineTests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
 
-    public SearchFilterPipelineTests() { _repo = new DocumentRepository(); }
+    public SearchFilterPipelineTests() { _repo = new DocumentRepository(Db); }
 
     private void SeedComplexData()
     {
@@ -601,7 +601,7 @@ public class RecycleBinBulkInteractionTests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
 
-    public RecycleBinBulkInteractionTests() { _repo = new DocumentRepository(); }
+    public RecycleBinBulkInteractionTests() { _repo = new DocumentRepository(Db); }
 
     [Fact]
     public void BulkDelete_ThenRestoreSelectively_ThenEmptyBin()
@@ -614,21 +614,21 @@ public class RecycleBinBulkInteractionTests : DatabaseTestBase
         var deleteIds = all.Where(d => d.Name != "Keep A").Select(d => d.Id).ToList();
 
         // Bulk delete B, C
-        int deleted = DatabaseHelper.BulkSoftDelete(deleteIds);
+        int deleted = Db.BulkSoftDelete(deleteIds);
         Assert.Equal(2, deleted);
         Assert.Single(_repo.GetAll());
-        Assert.Equal(2, DatabaseHelper.GetDeletedDocumentCount());
+        Assert.Equal(2, Db.GetDeletedDocumentCount());
 
         // Restore B only
         int bId = all.First(d => d.Name == "Delete B").Id;
-        DatabaseHelper.RestoreDocument(bId);
+        Db.RestoreDocument(bId);
         Assert.Equal(2, _repo.GetAll().Count);
-        Assert.Equal(1, DatabaseHelper.GetDeletedDocumentCount());
+        Assert.Equal(1, Db.GetDeletedDocumentCount());
 
         // Empty remaining bin (only C)
-        int emptied = DatabaseHelper.EmptyRecycleBin();
+        int emptied = Db.EmptyRecycleBin();
         Assert.Equal(1, emptied);
-        Assert.Equal(0, DatabaseHelper.GetDeletedDocumentCount());
+        Assert.Equal(0, Db.GetDeletedDocumentCount());
 
         // Final active count
         Assert.Equal(2, _repo.GetAll().Count);
@@ -642,11 +642,11 @@ public class RecycleBinBulkInteractionTests : DatabaseTestBase
 
         // First soft delete
         _repo.Delete(id);
-        Assert.Equal(1, DatabaseHelper.GetDeletedDocumentCount());
+        Assert.Equal(1, Db.GetDeletedDocumentCount());
 
         // Second soft delete — should be no-op (already deleted)
         _repo.Delete(id);
-        Assert.Equal(1, DatabaseHelper.GetDeletedDocumentCount()); // Still just 1
+        Assert.Equal(1, Db.GetDeletedDocumentCount()); // Still just 1
     }
 }
 
@@ -658,7 +658,7 @@ public class CollectionIsolationTests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
 
-    public CollectionIsolationTests() { _repo = new DocumentRepository(); }
+    public CollectionIsolationTests() { _repo = new DocumentRepository(Db); }
 
     [Fact]
     public void TwoCollections_DoNotShareDocuments()
@@ -667,15 +667,15 @@ public class CollectionIsolationTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "Exclusive" });
         var docs = _repo.GetAll().OrderBy(d => d.Id).ToList();
 
-        int col1 = DatabaseHelper.CreateCollection("Collection Alpha");
-        int col2 = DatabaseHelper.CreateCollection("Collection Beta");
+        int col1 = Db.CreateCollection("Collection Alpha");
+        int col2 = Db.CreateCollection("Collection Beta");
 
         // Add doc[0] to col1 only, doc[1] to col2 only
-        DatabaseHelper.AddDocumentToCollection(col1, docs[0].Id);
-        DatabaseHelper.AddDocumentToCollection(col2, docs[1].Id);
+        Db.AddDocumentToCollection(col1, docs[0].Id);
+        Db.AddDocumentToCollection(col2, docs[1].Id);
 
-        var col1Docs = DatabaseHelper.GetDocumentsInCollection(col1);
-        var col2Docs = DatabaseHelper.GetDocumentsInCollection(col2);
+        var col1Docs = Db.GetDocumentsInCollection(col1);
+        var col2Docs = Db.GetDocumentsInCollection(col2);
 
         Assert.Single(col1Docs);
         Assert.Single(col2Docs);
@@ -689,14 +689,14 @@ public class CollectionIsolationTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "Multi-Collection Doc" });
         int docId = _repo.GetAll()[0].Id;
 
-        int col1 = DatabaseHelper.CreateCollection("Alpha");
-        int col2 = DatabaseHelper.CreateCollection("Beta");
+        int col1 = Db.CreateCollection("Alpha");
+        int col2 = Db.CreateCollection("Beta");
 
-        DatabaseHelper.AddDocumentToCollection(col1, docId);
-        DatabaseHelper.AddDocumentToCollection(col2, docId);
+        Db.AddDocumentToCollection(col1, docId);
+        Db.AddDocumentToCollection(col2, docId);
 
-        Assert.Single(DatabaseHelper.GetDocumentsInCollection(col1));
-        Assert.Single(DatabaseHelper.GetDocumentsInCollection(col2));
+        Assert.Single(Db.GetDocumentsInCollection(col1));
+        Assert.Single(Db.GetDocumentsInCollection(col2));
     }
 
     [Fact]
@@ -705,13 +705,13 @@ public class CollectionIsolationTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "Safe Doc" });
         int docId = _repo.GetAll()[0].Id;
 
-        int colId = DatabaseHelper.CreateCollection("To Delete");
-        DatabaseHelper.AddDocumentToCollection(colId, docId);
+        int colId = Db.CreateCollection("To Delete");
+        Db.AddDocumentToCollection(colId, docId);
 
-        DatabaseHelper.DeleteCollection(colId);
+        Db.DeleteCollection(colId);
 
         // Collection gone
-        Assert.Empty(DatabaseHelper.GetCollections());
+        Assert.Empty(Db.GetCollections());
         // Document still exists
         Assert.Single(_repo.GetAll());
         Assert.Equal("Safe Doc", _repo.GetAll()[0].Name);
@@ -722,14 +722,14 @@ public class CollectionIsolationTests : DatabaseTestBase
     {
         _repo.Add(new StudyDocument { Name = "Dup Test" });
         int docId = _repo.GetAll()[0].Id;
-        int colId = DatabaseHelper.CreateCollection("DupCheck");
+        int colId = Db.CreateCollection("DupCheck");
 
-        bool first = DatabaseHelper.AddDocumentToCollection(colId, docId);
-        bool second = DatabaseHelper.AddDocumentToCollection(colId, docId); // duplicate
+        bool first = Db.AddDocumentToCollection(colId, docId);
+        bool second = Db.AddDocumentToCollection(colId, docId); // duplicate
 
         Assert.True(first);
         Assert.False(second); // Duplicate returns false
-        Assert.Single(DatabaseHelper.GetDocumentsInCollection(colId));
+        Assert.Single(Db.GetDocumentsInCollection(colId));
     }
 }
 
@@ -741,13 +741,13 @@ public class StatisticsConsistencyTests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
 
-    public StatisticsConsistencyTests() { _repo = new DocumentRepository(); }
+    public StatisticsConsistencyTests() { _repo = new DocumentRepository(Db); }
 
     [Fact]
     public void Stats_ReflectImmediate_AfterEachOperation()
     {
         // Empty state
-        var s0 = DatabaseHelper.GetDashboardStatistics();
+        var s0 = Db.GetDashboardStatistics();
         Assert.Equal(0, s0.TotalDocuments);
         Assert.Equal(0, s0.ImportantDocuments);
         Assert.Equal(0, s0.NoFileDocuments);
@@ -757,7 +757,7 @@ public class StatisticsConsistencyTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "B", IsImportant = true, FilePath = @"C:\b.pdf" });
         _repo.Add(new StudyDocument { Name = "C", IsImportant = false, FilePath = "" }); // no file
 
-        var s1 = DatabaseHelper.GetDashboardStatistics();
+        var s1 = Db.GetDashboardStatistics();
         Assert.Equal(3, s1.TotalDocuments);
         Assert.Equal(2, s1.ImportantDocuments);
         Assert.Equal(1, s1.NoFileDocuments);
@@ -766,13 +766,13 @@ public class StatisticsConsistencyTests : DatabaseTestBase
         int aId = _repo.GetAll().First(d => d.Name == "A").Id;
         _repo.Delete(aId);
 
-        var s2 = DatabaseHelper.GetDashboardStatistics();
+        var s2 = Db.GetDashboardStatistics();
         Assert.Equal(2, s2.TotalDocuments);
         Assert.Equal(1, s2.ImportantDocuments);
 
         // Add collection
-        DatabaseHelper.CreateCollection("My Col");
-        var s3 = DatabaseHelper.GetDashboardStatistics();
+        Db.CreateCollection("My Col");
+        var s3 = Db.GetDashboardStatistics();
         Assert.Equal(1, s3.TotalCollections);
     }
 
@@ -782,8 +782,8 @@ public class StatisticsConsistencyTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "X" });
         _repo.Add(new StudyDocument { Name = "Y" });
 
-        var stats = DatabaseHelper.GetDashboardStatistics();
-        int countMethod = DatabaseHelper.GetTotalDocumentCount();
+        var stats = Db.GetDashboardStatistics();
+        int countMethod = Db.GetTotalDocumentCount();
 
         Assert.Equal(stats.TotalDocuments, countMethod);
     }
@@ -794,7 +794,7 @@ public class StatisticsConsistencyTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "Overdue", Deadline = DateTime.Today.AddDays(-2) });
         int id = _repo.GetAll()[0].Id;
 
-        var s1 = DatabaseHelper.GetDashboardStatistics();
+        var s1 = Db.GetDashboardStatistics();
         Assert.Equal(1, s1.OverdueDocuments);
 
         // Remove deadline by update
@@ -802,7 +802,7 @@ public class StatisticsConsistencyTests : DatabaseTestBase
         doc.Deadline = null;
         _repo.Update(doc);
 
-        var s2 = DatabaseHelper.GetDashboardStatistics();
+        var s2 = Db.GetDashboardStatistics();
         Assert.Equal(0, s2.OverdueDocuments);
     }
 }
@@ -815,7 +815,7 @@ public class TagsNormalizationTests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
 
-    public TagsNormalizationTests() { _repo = new DocumentRepository(); }
+    public TagsNormalizationTests() { _repo = new DocumentRepository(Db); }
 
     [Fact]
     public void GetDistinctTags_CaseInsensitive_Deduped()
@@ -865,7 +865,7 @@ public class RecentFilesLimitTests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
 
-    public RecentFilesLimitTests() { _repo = new DocumentRepository(); }
+    public RecentFilesLimitTests() { _repo = new DocumentRepository(Db); }
 
     [Fact]
     public void RecentFiles_CapAt20_OldestRemoved()
@@ -879,15 +879,15 @@ public class RecentFilesLimitTests : DatabaseTestBase
         // Add first 5 docs with a 1.2s gap so they get an older timestamp
         // SQLite datetime resolution is 1 second, so we need >1s between batches
         foreach (var doc in allDocs.Take(5))
-            DatabaseHelper.AddRecentFile(doc.Id);
+            Db.AddRecentFile(doc.Id);
 
         System.Threading.Thread.Sleep(1200); // Ensure 2nd batch has newer timestamp
 
         // Add the remaining 20 docs (these should be kept)
         foreach (var doc in allDocs.Skip(5))
-            DatabaseHelper.AddRecentFile(doc.Id);
+            Db.AddRecentFile(doc.Id);
 
-        var recent = DatabaseHelper.GetRecentFiles();
+        var recent = Db.GetRecentFiles();
 
         // Should be capped at 20 (LIMIT 20 in SQL)
         Assert.Equal(20, recent.Count);
@@ -907,9 +907,9 @@ public class RecentFilesLimitTests : DatabaseTestBase
         // Verify the tuple structure returned by GetRecentFiles
         _repo.Add(new StudyDocument { Name = "Test File", Subject = "Study", Type = "PDF", FilePath = @"C:\test.pdf" });
         int docId = _repo.GetAll()[0].Id;
-        DatabaseHelper.AddRecentFile(docId);
+        Db.AddRecentFile(docId);
 
-        var recent = DatabaseHelper.GetRecentFiles();
+        var recent = Db.GetRecentFiles();
         Assert.Single(recent);
 
         var item = recent[0];
@@ -931,11 +931,11 @@ public class RecentFilesLimitTests : DatabaseTestBase
 
 public class DocumentRepositoryContractTests : DatabaseTestBase
 {
-    private readonly IDocument _repo;
+    private readonly IDocumentRepository _repo;
 
     public DocumentRepositoryContractTests()
     {
-        _repo = new DocumentRepository();
+        _repo = new DocumentRepository(Db);
     }
 
     [Fact]

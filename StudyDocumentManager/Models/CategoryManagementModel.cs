@@ -10,8 +10,8 @@ namespace StudyDocumentManager.Models;
 
 public partial class CategoryManagementModel : ModelBase
 {
-    private readonly IDocument _repository;
-    private readonly ICategory _categoryRepo;
+    private readonly IDocumentRepository _repository;
+    private readonly ICategoryRepository _categoryRepo;
     private readonly IDialogService _dialogService;
     private readonly ILocalizationService _loc;
 
@@ -29,7 +29,7 @@ public partial class CategoryManagementModel : ModelBase
 
     public string StatusText => string.Format(_loc["Status_CategorySummary"], TotalDocumentCount, Subjects.Count, Types.Count);
 
-    public CategoryManagementModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService, ILocalizationService loc)
+    public CategoryManagementModel(IDocumentRepository repository, ICategoryRepository categoryRepo, IDialogService dialogService, ILocalizationService loc)
     {
         _repository = repository;
         _categoryRepo = categoryRepo;

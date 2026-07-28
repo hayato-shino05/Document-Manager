@@ -2,7 +2,7 @@ using StudyDocumentManager.Core.Entities;
 
 namespace StudyDocumentManager.Core.Interfaces;
 
-public interface ICollection
+public interface ICollectionRepository
 {
     List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetAll();
     int Create(string name, string? description = null);

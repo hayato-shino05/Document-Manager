@@ -10,8 +10,11 @@
 *.env
 .claude/
 rule/
-.agent/
+.codegraph/
+.agents/
 gemini.md
+.harness-core/
+codegrove.sqlite
 # User-specific files
 *.rsuser
 *.suo

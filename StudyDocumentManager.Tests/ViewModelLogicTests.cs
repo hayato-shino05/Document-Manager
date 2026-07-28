@@ -19,59 +19,33 @@ public class DatabaseHelperDefaultPathTests
     [Fact]
     public void DatabasePath_WhenNotSet_ReturnsDefaultAppBaseDir()
     {
-        // Save current path
-        string? original = null;
-        try
-        {
-            // Use reflection to reset the private static field so the property takes the default branch
-            var field = typeof(DatabaseHelper).GetField("_databasePath",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            original = (string?)field!.GetValue(null);
-            field.SetValue(null, null);
+        var db = new DatabaseHelper();
 
-            // Also reset the connection string
-            var csField = typeof(DatabaseHelper).GetField("_connectionString",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            csField!.SetValue(null, null);
+        var path = db.DatabasePath;
 
-            var path = DatabaseHelper.DatabasePath;
-
-            // Should be a path ending in data/study_documents.db relative to base dir
-            Assert.False(string.IsNullOrEmpty(path));
-            Assert.EndsWith("study_documents.db", path);
-            Assert.Contains("data", path);
-        }
-        finally
-        {
-            // Restore the field so subsequent tests are not broken
-            var field = typeof(DatabaseHelper).GetField("_databasePath",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            field!.SetValue(null, original);
-
-            var csField = typeof(DatabaseHelper).GetField("_connectionString",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            csField!.SetValue(null, null);
-        }
+        Assert.False(string.IsNullOrEmpty(path));
+        Assert.EndsWith("study_documents.db", path);
+        Assert.Contains("data", path);
     }
 
     [Fact]
     public void InitializeDatabase_WhenDataFolderMissing_CreatesIt()
     {
-        // Use a brand-new GUID temp dir that definitely doesn't exist yet
         var tempRoot = Path.Combine(Path.GetTempPath(), $"sdm_mkdirtest_{Guid.NewGuid():N}");
         var dbPath = Path.Combine(tempRoot, "data", "study_documents.db");
+        var db = new DatabaseHelper();
 
         try
         {
-            DatabaseHelper.SetDatabasePath(dbPath);
-            DatabaseHelper.InitializeDatabase(); // Should create tempRoot/data/
+            db.SetDatabasePath(dbPath);
+            db.InitializeDatabase();
 
             Assert.True(File.Exists(dbPath), "DB file should exist after InitializeDatabase");
             Assert.True(Directory.Exists(Path.GetDirectoryName(dbPath)!));
         }
         finally
         {
-            DatabaseHelper.CloseAllConnections();
+            db.CloseAllConnections();
             try { Directory.Delete(tempRoot, recursive: true); } catch { }
         }
     }
@@ -91,7 +65,7 @@ public class DashboardFlowTests : DatabaseTestBase
 
     public DashboardFlowTests()
     {
-        _repo = new DocumentRepository();
+        _repo = new DocumentRepository(Db);
     }
 
     [Fact]
@@ -229,12 +203,12 @@ public class DashboardFlowTests : DatabaseTestBase
     {
         _repo.Add(new StudyDocument { Name = "ColDoc" });
         var doc = _repo.GetAll().First();
-        DatabaseHelper.CreateCollection("My Collection");
-        var col = DatabaseHelper.GetCollections().First(c => c.Name == "My Collection");
+        Db.CreateCollection("My Collection");
+        var col = Db.GetCollections().First(c => c.Name == "My Collection");
 
-        DatabaseHelper.AddDocumentToCollection(col.Id, doc.Id);
+        Db.AddDocumentToCollection(col.Id, doc.Id);
 
-        var colDocs = DatabaseHelper.GetDocumentsInCollection(col.Id)!;
+        var colDocs = Db.GetDocumentsInCollection(col.Id)!;
         Assert.Single(colDocs);
     }
 }
@@ -253,7 +227,7 @@ public class AddEditLogicTests : DatabaseTestBase
 
     public AddEditLogicTests()
     {
-        _repo = new DocumentRepository();
+        _repo = new DocumentRepository(Db);
     }
 
     // ─── DetectFileType equivalents ───
@@ -362,12 +336,12 @@ public class AddEditLogicTests : DatabaseTestBase
         // 1. Add document
         _repo.Add(new StudyDocument { Name = "New Doc", Subject = "TestSubject", Type = "TestType" });
         // 2. AddSubject / AddType are called
-        DatabaseHelper.AddSubject("TestSubject");
-        DatabaseHelper.AddType("TestType");
+        Db.AddSubject("TestSubject");
+        Db.AddType("TestType");
 
         // Verify lookup tables contain the new values
-        var subjects = DatabaseHelper.GetAllSubjects();
-        var types = DatabaseHelper.GetAllTypes();
+        var subjects = Db.GetAllSubjects();
+        var types = Db.GetAllTypes();
         Assert.Contains("TestSubject", subjects);
         Assert.Contains("TestType", types);
     }
@@ -425,7 +399,7 @@ public class BulkDeleteFlowTests : DatabaseTestBase
 
     public BulkDeleteFlowTests()
     {
-        _repo = new DocumentRepository();
+        _repo = new DocumentRepository(Db);
     }
 
     [Fact]
@@ -490,7 +464,7 @@ public class BulkDeleteFlowTests : DatabaseTestBase
         var selected = new List<int>(); // none selected
 
         // If no items selected, BulkSoftDelete with empty list returns 0
-        int deleted = DatabaseHelper.BulkSoftDelete(selected);
+        int deleted = Db.BulkSoftDelete(selected);
         Assert.Equal(0, deleted);
 
         // Data intact
@@ -503,10 +477,10 @@ public class BulkDeleteFlowTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "Delete Me" });
         var doc = _repo.GetAll().First();
 
-        int deleted = DatabaseHelper.BulkSoftDelete(new List<int> { doc.Id });
+        int deleted = Db.BulkSoftDelete(new List<int> { doc.Id });
         Assert.Equal(1, deleted);
         Assert.Empty(_repo.GetAll());
-        Assert.Single(DatabaseHelper.GetDeletedDocuments());
+        Assert.Single(Db.GetDeletedDocuments());
     }
 
     [Fact]
@@ -515,7 +489,7 @@ public class BulkDeleteFlowTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "A", IsImportant = false });
         var doc = _repo.GetAll().First();
 
-        DatabaseHelper.BulkToggleImportant(new List<int> { doc.Id }, true);
+        Db.BulkToggleImportant(new List<int> { doc.Id }, true);
 
         var updated = _repo.GetAll().First();
         Assert.True(updated.IsImportant);
@@ -537,7 +511,7 @@ public class BulkDeleteFlowTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "Doc2", Subject = "Old" });
 
         var ids = _repo.GetAll().Select(d => d.Id).ToList();
-        int updated = DatabaseHelper.BulkUpdateSubject(ids, "New Subject");
+        int updated = Db.BulkUpdateSubject(ids, "New Subject");
 
         Assert.Equal(2, updated);
         Assert.All(_repo.GetAll(), d => Assert.Equal("New Subject", d.Subject));
@@ -554,25 +528,25 @@ public class CategoryManagementFlowTests : DatabaseTestBase
     [Fact]
     public void AddSubject_NewName_AppearsInList()
     {
-        DatabaseHelper.AddSubject("NewSubject");
-        Assert.Contains("NewSubject", DatabaseHelper.GetAllSubjects());
+        Db.AddSubject("NewSubject");
+        Assert.Contains("NewSubject", Db.GetAllSubjects());
     }
 
     [Fact]
     public void AddSubject_Duplicate_DeduplicatedByHelper()
     {
-        DatabaseHelper.AddSubject("DupSubject");
-        DatabaseHelper.AddSubject("DupSubject"); // AddSubject is idempotent (INSERT OR IGNORE)
+        Db.AddSubject("DupSubject");
+        Db.AddSubject("DupSubject"); // AddSubject is idempotent (INSERT OR IGNORE)
 
-        Assert.Single(DatabaseHelper.GetAllSubjects(), s => s == "DupSubject");
+        Assert.Single(Db.GetAllSubjects(), s => s == "DupSubject");
     }
 
     [Fact]
     public void AddSubject_AlreadyExistsCheck_InViewModel()
     {
         // Simulate CategoryManagementViewModel.AddSubjectAsync validation
-        DatabaseHelper.AddSubject("ExistingCategory");
-        var subjects = DatabaseHelper.GetAllSubjects();
+        Db.AddSubject("ExistingCategory");
+        var subjects = Db.GetAllSubjects();
 
         bool alreadyExists = subjects.Any(s => s.Equals("ExistingCategory", StringComparison.OrdinalIgnoreCase));
         Assert.True(alreadyExists);
@@ -581,11 +555,11 @@ public class CategoryManagementFlowTests : DatabaseTestBase
     [Fact]
     public void RenameSubject_UpdatesDocuments()
     {
-        DatabaseHelper.AddSubject("OldName");
-        var repo = new DocumentRepository();
+        Db.AddSubject("OldName");
+        var repo = new DocumentRepository(Db);
         repo.Add(new StudyDocument { Name = "Test", Subject = "OldName" });
 
-        DatabaseHelper.UpdateSubjectName("OldName", "NewName");
+        Db.UpdateSubjectName("OldName", "NewName");
 
         var docs = repo.GetAll();
         Assert.Single(docs);
@@ -595,33 +569,33 @@ public class CategoryManagementFlowTests : DatabaseTestBase
     [Fact]
     public void DeleteSubject_CascadesDocuments()
     {
-        DatabaseHelper.AddSubject("ToDelete");
-        var repo = new DocumentRepository();
+        Db.AddSubject("ToDelete");
+        var repo = new DocumentRepository(Db);
         repo.Add(new StudyDocument { Name = "Victim", Subject = "ToDelete" });
 
         // Simulate delete via soft-delete (VM uses DeleteDocumentsBySubject → soft-deletes docs)
-        DatabaseHelper.DeleteDocumentsBySubject("ToDelete");
-        DatabaseHelper.DeleteSubject("ToDelete");
+        Db.DeleteDocumentsBySubject("ToDelete");
+        Db.DeleteSubject("ToDelete");
 
         Assert.Empty(repo.GetAll());
-        Assert.DoesNotContain("ToDelete", DatabaseHelper.GetAllSubjects());
+        Assert.DoesNotContain("ToDelete", Db.GetAllSubjects());
     }
 
     [Fact]
     public void AddType_NewType_AppearsInList()
     {
-        DatabaseHelper.AddType("NewType");
-        Assert.Contains("NewType", DatabaseHelper.GetAllTypes());
+        Db.AddType("NewType");
+        Assert.Contains("NewType", Db.GetAllTypes());
     }
 
     [Fact]
     public void RenameType_UpdatesDocuments()
     {
-        DatabaseHelper.AddType("OldType");
-        var repo = new DocumentRepository();
+        Db.AddType("OldType");
+        var repo = new DocumentRepository(Db);
         repo.Add(new StudyDocument { Name = "TypeDoc", Type = "OldType" });
 
-        DatabaseHelper.UpdateTypeName("OldType", "NewType");
+        Db.UpdateTypeName("OldType", "NewType");
 
         var docs = repo.GetAll();
         Assert.Equal("NewType", docs[0].Type);
@@ -630,26 +604,26 @@ public class CategoryManagementFlowTests : DatabaseTestBase
     [Fact]
     public void DeleteType_CascadesDocuments()
     {
-        DatabaseHelper.AddType("ToDeleteType");
-        var repo = new DocumentRepository();
+        Db.AddType("ToDeleteType");
+        var repo = new DocumentRepository(Db);
         repo.Add(new StudyDocument { Name = "TypeVictim", Type = "ToDeleteType" });
 
-        DatabaseHelper.DeleteDocumentsByType("ToDeleteType");
-        DatabaseHelper.DeleteType("ToDeleteType");
+        Db.DeleteDocumentsByType("ToDeleteType");
+        Db.DeleteType("ToDeleteType");
 
         Assert.Empty(repo.GetAll());
-        Assert.DoesNotContain("ToDeleteType", DatabaseHelper.GetAllTypes());
+        Assert.DoesNotContain("ToDeleteType", Db.GetAllTypes());
     }
 
     [Fact]
     public void GetSubjectsWithCount_ReturnsCounts()
     {
-        DatabaseHelper.AddSubject("CountTest");
-        var repo = new DocumentRepository();
+        Db.AddSubject("CountTest");
+        var repo = new DocumentRepository(Db);
         repo.Add(new StudyDocument { Name = "A", Subject = "CountTest" });
         repo.Add(new StudyDocument { Name = "B", Subject = "CountTest" });
 
-        var withCounts = DatabaseHelper.GetSubjectsWithCount();
+        var withCounts = Db.GetSubjectsWithCount();
         var entry = withCounts.FirstOrDefault(x => x.Name == "CountTest");
 
         Assert.True(entry.Name == "CountTest", "CountTest subject should be found");
@@ -666,7 +640,7 @@ public class RecycleBinFlowTests : DatabaseTestBase
 
     public RecycleBinFlowTests()
     {
-        _repo = new DocumentRepository();
+        _repo = new DocumentRepository(Db);
     }
 
     [Fact]
@@ -676,7 +650,7 @@ public class RecycleBinFlowTests : DatabaseTestBase
         var doc = _repo.GetAll().First();
         _repo.Delete(doc.Id);
 
-        var deleted = DatabaseHelper.GetDeletedDocuments();
+        var deleted = Db.GetDeletedDocuments();
         Assert.Single(deleted);
         Assert.Equal("Gone", deleted[0].Name);
     }
@@ -688,9 +662,9 @@ public class RecycleBinFlowTests : DatabaseTestBase
         var doc = _repo.GetAll().First();
         _repo.Delete(doc.Id);
 
-        DatabaseHelper.RestoreDocument(doc.Id);
+        Db.RestoreDocument(doc.Id);
 
-        Assert.Empty(DatabaseHelper.GetDeletedDocuments());
+        Assert.Empty(Db.GetDeletedDocuments());
         Assert.Single(_repo.GetAll());
     }
 
@@ -701,9 +675,9 @@ public class RecycleBinFlowTests : DatabaseTestBase
         var doc = _repo.GetAll().First();
         _repo.Delete(doc.Id);
 
-        DatabaseHelper.PermanentDeleteDocument(doc.Id);
+        Db.PermanentDeleteDocument(doc.Id);
 
-        Assert.Empty(DatabaseHelper.GetDeletedDocuments());
+        Assert.Empty(Db.GetDeletedDocuments());
         Assert.Empty(_repo.GetAll());
     }
 
@@ -716,17 +690,17 @@ public class RecycleBinFlowTests : DatabaseTestBase
         foreach (var doc in _repo.GetAll())
             _repo.Delete(doc.Id);
 
-        Assert.Equal(2, DatabaseHelper.GetDeletedDocuments().Count);
+        Assert.Equal(2, Db.GetDeletedDocuments().Count);
 
-        int count = DatabaseHelper.EmptyRecycleBin();
+        int count = Db.EmptyRecycleBin();
         Assert.Equal(2, count);
-        Assert.Empty(DatabaseHelper.GetDeletedDocuments());
+        Assert.Empty(Db.GetDeletedDocuments());
     }
 
     [Fact]
     public void EmptyTrash_WhenAlreadyEmpty_Returns0()
     {
-        int count = DatabaseHelper.EmptyRecycleBin();
+        int count = Db.EmptyRecycleBin();
         Assert.Equal(0, count);
     }
 
@@ -739,8 +713,8 @@ public class RecycleBinFlowTests : DatabaseTestBase
         foreach (var doc in _repo.GetAll())
             _repo.Delete(doc.Id);
 
-        int countInt = DatabaseHelper.GetDeletedDocumentCount();
-        int listCount = DatabaseHelper.GetDeletedDocuments().Count;
+        int countInt = Db.GetDeletedDocumentCount();
+        int listCount = Db.GetDeletedDocuments().Count;
 
         Assert.Equal(listCount, countInt);
     }
@@ -755,7 +729,7 @@ public class DuplicateDetectionFlowTests : DatabaseTestBase
 
     public DuplicateDetectionFlowTests()
     {
-        _repo = new DocumentRepository();
+        _repo = new DocumentRepository(Db);
     }
 
     [Fact]
@@ -851,7 +825,7 @@ public class FileIntegrityFlowTests : DatabaseTestBase
 
     public FileIntegrityFlowTests()
     {
-        _repo = new DocumentRepository();
+        _repo = new DocumentRepository(Db);
     }
 
     [Fact]
@@ -929,7 +903,7 @@ public class FileIntegrityFlowTests : DatabaseTestBase
         });
 
         var doc = _repo.GetAll().First();
-        DatabaseHelper.ClearDocumentPath(doc.Id);
+        Db.ClearDocumentPath(doc.Id);
 
         var updated = _repo.GetAll().First();
         Assert.Equal("PathOnly", updated.Name);
@@ -946,7 +920,7 @@ public class PersonalNoteFlowTests : DatabaseTestBase
 
     public PersonalNoteFlowTests()
     {
-        _repo = new DocumentRepository();
+        _repo = new DocumentRepository(Db);
     }
 
     [Fact]
@@ -955,7 +929,7 @@ public class PersonalNoteFlowTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "NoNote" });
         var doc = _repo.GetAll().First();
 
-        var note = DatabaseHelper.GetPersonalNote(doc.Id);
+        var note = Db.GetPersonalNote(doc.Id);
         Assert.True(string.IsNullOrEmpty(note));
     }
 
@@ -965,9 +939,9 @@ public class PersonalNoteFlowTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "HasNote" });
         var doc = _repo.GetAll().First();
 
-        DatabaseHelper.SavePersonalNote(doc.Id, "My important note");
+        Db.SavePersonalNote(doc.Id, "My important note");
 
-        var loaded = DatabaseHelper.GetPersonalNote(doc.Id);
+        var loaded = Db.GetPersonalNote(doc.Id);
         Assert.Equal("My important note", loaded);
     }
 
@@ -977,10 +951,10 @@ public class PersonalNoteFlowTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "UpdateNote" });
         var doc = _repo.GetAll().First();
 
-        DatabaseHelper.SavePersonalNote(doc.Id, "Old note");
-        DatabaseHelper.SavePersonalNote(doc.Id, "New note"); // Upsert
+        Db.SavePersonalNote(doc.Id, "Old note");
+        Db.SavePersonalNote(doc.Id, "New note"); // Upsert
 
-        Assert.Equal("New note", DatabaseHelper.GetPersonalNote(doc.Id));
+        Assert.Equal("New note", Db.GetPersonalNote(doc.Id));
     }
 
     [Fact]
@@ -989,10 +963,10 @@ public class PersonalNoteFlowTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "DeleteNote" });
         var doc = _repo.GetAll().First();
 
-        DatabaseHelper.SavePersonalNote(doc.Id, "To be deleted");
-        DatabaseHelper.DeletePersonalNote(doc.Id);
+        Db.SavePersonalNote(doc.Id, "To be deleted");
+        Db.DeletePersonalNote(doc.Id);
 
-        var result = DatabaseHelper.GetPersonalNote(doc.Id);
+        var result = Db.GetPersonalNote(doc.Id);
         Assert.True(string.IsNullOrEmpty(result));
     }
 
@@ -1004,9 +978,9 @@ public class PersonalNoteFlowTests : DatabaseTestBase
 
         // Simulate: user opens note, types content, clicks Cancel (does NOT call SavePersonalNote)
         // Verify original note is unchanged
-        var before = DatabaseHelper.GetPersonalNote(doc.Id);
+        var before = Db.GetPersonalNote(doc.Id);
         // No save call happens
-        var after = DatabaseHelper.GetPersonalNote(doc.Id);
+        var after = Db.GetPersonalNote(doc.Id);
 
         Assert.Equal(before, after);
     }
@@ -1021,7 +995,7 @@ public class RelatedDocumentsFlowTests : DatabaseTestBase
 
     public RelatedDocumentsFlowTests()
     {
-        _repo = new DocumentRepository();
+        _repo = new DocumentRepository(Db);
     }
 
     [Fact]
@@ -1030,7 +1004,7 @@ public class RelatedDocumentsFlowTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "Standalone" });
         var doc = _repo.GetAll().First();
 
-        var related = DatabaseHelper.GetRelatedDocuments(doc.Id);
+        var related = Db.GetRelatedDocuments(doc.Id);
         Assert.Empty(related);
     }
 
@@ -1044,10 +1018,10 @@ public class RelatedDocumentsFlowTests : DatabaseTestBase
         var a = docs.First(d => d.Name == "DocA");
         var b = docs.First(d => d.Name == "DocB");
 
-        DatabaseHelper.AddDocumentRelation(a.Id, b.Id);
+        Db.AddDocumentRelation(a.Id, b.Id);
 
-        var relatedFromA = DatabaseHelper.GetRelatedDocuments(a.Id);
-        var relatedFromB = DatabaseHelper.GetRelatedDocuments(b.Id);
+        var relatedFromA = Db.GetRelatedDocuments(a.Id);
+        var relatedFromB = Db.GetRelatedDocuments(b.Id);
 
         Assert.Single(relatedFromA);
         Assert.Single(relatedFromB);
@@ -1063,13 +1037,13 @@ public class RelatedDocumentsFlowTests : DatabaseTestBase
         var x = docs.First(d => d.Name == "X");
         var y = docs.First(d => d.Name == "Y");
 
-        DatabaseHelper.AddDocumentRelation(x.Id, y.Id);
-        var relations = DatabaseHelper.GetRelatedDocuments(x.Id);
+        Db.AddDocumentRelation(x.Id, y.Id);
+        var relations = Db.GetRelatedDocuments(x.Id);
         var rel = relations.First();
 
-        DatabaseHelper.RemoveDocumentRelation(rel.RelationId);
+        Db.RemoveDocumentRelation(rel.RelationId);
 
-        Assert.Empty(DatabaseHelper.GetRelatedDocuments(x.Id));
+        Assert.Empty(Db.GetRelatedDocuments(x.Id));
     }
 
     [Fact]
@@ -1082,10 +1056,10 @@ public class RelatedDocumentsFlowTests : DatabaseTestBase
         var live = docs.First(d => d.Name == "Live");
         var del = docs.First(d => d.Name == "Deleted");
 
-        DatabaseHelper.AddDocumentRelation(live.Id, del.Id);
+        Db.AddDocumentRelation(live.Id, del.Id);
         _repo.Delete(del.Id); // Soft-delete the related doc
 
-        var related = DatabaseHelper.GetRelatedDocuments(live.Id);
+        var related = Db.GetRelatedDocuments(live.Id);
         // GetRelatedDocuments filters out is_deleted
         Assert.Empty(related);
     }

@@ -32,7 +32,7 @@ public class DroppedFileImportServiceTests
         }
     }
 
-    private sealed class FakeDocumentRepository : IDocument
+    private sealed class FakeDocumentRepository : IDocumentRepository
     {
         public List<StudyDocument> GetAll() => throw new NotImplementedException();
         public StudyDocument? GetById(int id) => throw new NotImplementedException();
@@ -49,17 +49,5 @@ public class DroppedFileImportServiceTests
         public List<StudyDocument> GetOverdueDocuments() => throw new NotImplementedException();
         public void EnsureSubjectExists(string subject) => throw new NotImplementedException();
         public void EnsureTypeExists(string type) => throw new NotImplementedException();
-        public List<StudyDocument> GetDeletedDocuments() => throw new NotImplementedException();
-        public bool RestoreDocument(int id) => throw new NotImplementedException();
-        public bool PermanentDeleteDocument(int id) => throw new NotImplementedException();
-        public int EmptyRecycleBin() => throw new NotImplementedException();
-        public int GetDeletedDocumentCount() => throw new NotImplementedException();
-        public int BulkSoftDelete(List<int> ids) => throw new NotImplementedException();
-        public int BulkUpdateSubject(List<int> ids, string subject) => throw new NotImplementedException();
-        public int BulkToggleImportant(List<int> ids, bool important) => throw new NotImplementedException();
-        public bool BackupDatabase(string destPath) => throw new NotImplementedException();
-        public string DatabasePath => throw new NotImplementedException();
-        public bool UpdateDocumentPath(int id, string newPath) => throw new NotImplementedException();
-        public bool ClearDocumentPath(int id) => throw new NotImplementedException();
     }
 }

@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using Microsoft.Data.Sqlite;
 using StudyDocumentManager.Core.DTOs;
@@ -9,15 +9,15 @@ namespace StudyDocumentManager.Data.Helpers;
 /// <summary>
 /// SQLiteデータベース操作の静的ヘルパー
 /// </summary>
-public static class DatabaseHelper
+public class DatabaseHelper
 {
-    private static string? _databasePath;
-    private static string? _connectionString;
+    private string? _databasePath;
+    private string? _connectionString;
 
     /// <summary>
     /// DBファイルパス
     /// </summary>
-    public static string DatabasePath
+    public string DatabasePath
     {
         get
         {
@@ -33,7 +33,7 @@ public static class DatabaseHelper
     /// <summary>
     /// SQLite接続文字列
     /// </summary>
-    public static string ConnectionString
+    public string ConnectionString
     {
         get
         {
@@ -45,7 +45,7 @@ public static class DatabaseHelper
     /// <summary>
     /// テスト用パスの差し替え。InitializeDatabase()より前に呼ぶこと
     /// </summary>
-    public static void SetDatabasePath(string path)
+    public void SetDatabasePath(string path)
     {
         _databasePath = path;
         _connectionString = $"Data Source={path}";
@@ -53,7 +53,7 @@ public static class DatabaseHelper
 
 
 
-    public static void InitializeDatabase()
+    public void InitializeDatabase()
     {
         try
         {
@@ -63,7 +63,7 @@ public static class DatabaseHelper
                 Directory.CreateDirectory(dataFolder);
             }
 
-            CreateTables();
+            DatabaseMigrator.RunMigrations(ConnectionString);
         }
         catch (Exception ex)
         {
@@ -72,327 +72,23 @@ public static class DatabaseHelper
         }
     }
 
-    private static void CreateTables()
-    {
-        const string createTablesQuery = """
-            CREATE TABLE IF NOT EXISTS documents (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                subject TEXT,
-                type TEXT,
-                file_path TEXT,
-                notes TEXT,
-                created_at DATETIME DEFAULT (datetime('now', 'localtime')),
-                file_size REAL,
-                author TEXT,
-                is_important INTEGER DEFAULT 0,
-                tags TEXT,
-                deadline DATETIME,
-                is_deleted INTEGER DEFAULT 0,
-                deleted_at DATETIME
-            );
-
-            CREATE TABLE IF NOT EXISTS collections (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                description TEXT,
-                created_at DATETIME DEFAULT (datetime('now', 'localtime'))
-            );
-
-            CREATE TABLE IF NOT EXISTS collection_items (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                collection_id INTEGER NOT NULL,
-                document_id INTEGER NOT NULL,
-                added_at DATETIME DEFAULT (datetime('now', 'localtime')),
-                FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE,
-                FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE,
-                UNIQUE(collection_id, document_id)
-            );
-
-            CREATE TABLE IF NOT EXISTS personal_notes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                document_id INTEGER NOT NULL,
-                content TEXT,
-                created_at DATETIME DEFAULT (datetime('now', 'localtime')),
-                updated_at DATETIME DEFAULT (datetime('now', 'localtime')),
-                FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS recent_files (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                document_id INTEGER NOT NULL UNIQUE,
-                opened_at DATETIME DEFAULT (datetime('now','localtime')),
-                FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
-            );
-
-            CREATE TABLE IF NOT EXISTS document_relations (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                doc_id_1 INTEGER NOT NULL,
-                doc_id_2 INTEGER NOT NULL,
-                relation_type TEXT DEFAULT 'related',
-                created_at DATETIME DEFAULT (datetime('now','localtime')),
-                FOREIGN KEY (doc_id_1) REFERENCES documents(id) ON DELETE CASCADE,
-                FOREIGN KEY (doc_id_2) REFERENCES documents(id) ON DELETE CASCADE,
-                UNIQUE(doc_id_1, doc_id_2)
-            );
-
-            CREATE TABLE IF NOT EXISTS categories (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL UNIQUE,
-                created_at DATETIME DEFAULT (datetime('now','localtime'))
-            );
-
-            CREATE TABLE IF NOT EXISTS document_types (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL UNIQUE,
-                created_at DATETIME DEFAULT (datetime('now','localtime'))
-            );
-
-            CREATE TABLE IF NOT EXISTS app_settings (
-                key TEXT PRIMARY KEY,
-                value TEXT
-            );
-
-            CREATE INDEX IF NOT EXISTS idx_documents_subject ON documents(subject);
-            CREATE INDEX IF NOT EXISTS idx_documents_type ON documents(type);
-            CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at);
-            CREATE INDEX IF NOT EXISTS idx_documents_deadline ON documents(deadline);
-            CREATE INDEX IF NOT EXISTS idx_collection_items_collection ON collection_items(collection_id);
-            CREATE INDEX IF NOT EXISTS idx_collection_items_document ON collection_items(document_id);
-            CREATE INDEX IF NOT EXISTS idx_documents_deleted ON documents(is_deleted);
-            CREATE INDEX IF NOT EXISTS idx_documents_important ON documents(is_important);
-            """;
-
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
-
-        using (var cmd = new SqliteCommand(createTablesQuery, conn))
-        {
-            cmd.ExecuteNonQuery();
-        }
 
 
 
-        // カラム追加マイグレーション
-        MigrateAddColumn(conn, "documents", "is_deleted", "INTEGER DEFAULT 0");
-        MigrateAddColumn(conn, "documents", "deleted_at", "DATETIME");
-
-        // 初期カテゴリ投入
-        MigrateSeedCategories(conn);
-
-        // ファイルタイプの正規化
-        MigrateNormalizeFileTypes(conn);
-
-        // 旧ラベルを英語へ正規化（冪等）
-        MigrateNeutralizeLabels(conn);
-    }
-
-
-
-    /// <summary>
-    /// categoriesとdocument_typesの初期データ投入。INSERT OR IGNOREで冪等
-    /// </summary>
-    private static void MigrateSeedCategories(SqliteConnection conn)
-    {
-
-        using var cmd1 = new SqliteCommand(
-            "INSERT OR IGNORE INTO categories (name) SELECT DISTINCT subject FROM documents WHERE subject IS NOT NULL AND subject != ''", conn);
-        cmd1.ExecuteNonQuery();
-
-        using var cmd2 = new SqliteCommand(
-            "INSERT OR IGNORE INTO document_types (name) SELECT DISTINCT type FROM documents WHERE type IS NOT NULL AND type != ''", conn);
-        cmd2.ExecuteNonQuery();
-
-        // 初回インストール時の初期値（英語ラベル）
-        var defaultSubjects = new[]
-        {
-            "Work", "Personal", "Study", "Project",
-            "Finance", "Contract", "Reference", "Other"
-        };
-        var defaultTypes = new[]
-        {
-            "PDF", "Word", "Excel", "PowerPoint",
-            "Document", "Report", "Guide", "Form",
-            "Data", "Code", "Book", "Design",
-            "Image", "Video", "Audio", "Archive",
-            "Other"
-        };
-
-        foreach (var s in defaultSubjects)
-        {
-            using var ins = new SqliteCommand("INSERT OR IGNORE INTO categories (name) VALUES (@name)", conn);
-            ins.Parameters.AddWithValue("@name", s);
-            ins.ExecuteNonQuery();
-        }
-
-        foreach (var t in defaultTypes)
-        {
-            using var ins = new SqliteCommand("INSERT OR IGNORE INTO document_types (name) VALUES (@name)", conn);
-            ins.Parameters.AddWithValue("@name", t);
-            ins.ExecuteNonQuery();
-        }
-    }
-
-    /// <summary>
-    /// 拡張子ベースのtype値を正規ラベルへ変換する冪等マイグレーション
-    /// </summary>
-    private static void MigrateNormalizeFileTypes(SqliteConnection conn)
-    {
-
-        var mappings = new (string[] RawExts, string Label)[]
-        {
-            (new[] { "WEBM", "MP4", "AVI", "MKV", "MOV", "WMV", "FLV", "M4V", "3GP", "MPG", "MPEG", "TS" },
-                "Video"),
-            (new[] { "MP3", "WAV", "FLAC", "M4A", "AAC", "OGG", "WMA", "OPUS", "APE" },
-                "Audio"),
-
-            (new[] { "XLS", "XLSX", "ODS", "CSV" },
-                "Excel"),
-            (new[] { "DOC", "DOCX", "ODT" },
-                "Word"),
-            (new[] { "PPT", "PPTX", "ODP" },
-                "PowerPoint"),
-            (new[] { "JSON", "XML", "YAML", "YML", "TSV" },
-                "Data"),
-            (new[] { "PY", "IPYNB", "JS", "HTML", "HTM", "CSS", "JAVA", "CS", "GO",
-                     "RS", "PHP", "SH", "BAT", "PS1", "SQL", "CPP", "C", "VB", "KT", "RB" },
-                "Code"),
-            (new[] { "EPUB", "MOBI", "AZW", "AZW3", "FB2" },
-                "Book"),
-            (new[] { "JPG", "JPEG", "PNG", "GIF", "BMP", "ICO", "TIFF", "TIF", "WEBP", "SVG", "RAW", "HEIC", "HEIF" },
-                "Image"),
-            (new[] { "ZIP", "RAR", "7Z", "TAR", "GZ", "BZ2", "XZ", "ZST" },
-                "Archive"),
-            (new[] { "PSD", "AI", "XD", "FIG", "SKETCH", "INDD" },
-                "Design"),
-        };
-
-        foreach (var (rawExts, label) in mappings)
-        {
-
-            var paramNames = rawExts.Select((_, i) => $"@ext{i}").ToList();
-            var inClause = string.Join(", ", paramNames);
-
-
-            var sql = $"""
-                UPDATE documents
-                SET type = @label
-                WHERE (is_deleted IS NULL OR is_deleted = 0)
-                  AND (
-                    UPPER(type) IN ({inClause})
-                    OR LOWER(type) IN ({string.Join(", ", rawExts.Select((e, i) => $"@extL{i}"))})
-                  )
-                """;
-
-            using var cmd = new SqliteCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@label", label);
-            for (int i = 0; i < rawExts.Length; i++)
-            {
-                cmd.Parameters.AddWithValue($"@ext{i}", rawExts[i]);
-                cmd.Parameters.AddWithValue($"@extL{i}", rawExts[i].ToLowerInvariant());
-            }
-            cmd.ExecuteNonQuery();
-        }
-
-        // file_path拡張子で再判定（拡張子が最終的な判定基準）
-        var pathMappings = new (string[] Exts, string Label)[]
-        {
-
-            (new[] { ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".webm",
-                     ".flv", ".m4v", ".3gp", ".mpg", ".mpeg" },       "Video"),
-            (new[] { ".mp3", ".wav", ".flac", ".m4a", ".aac",
-                     ".ogg", ".wma", ".opus", ".ape" },                "Audio"),
-            (new[] { ".pdf" },                                          "PDF"),
-            (new[] { ".doc", ".docx", ".odt" },                        "Word"),
-            (new[] { ".xls", ".xlsx", ".ods", ".csv" },                "Excel"),
-            (new[] { ".ppt", ".pptx", ".odp" },                        "PowerPoint"),
-            (new[] { ".txt", ".md", ".rtf" },                          "Document"),
-            (new[] { ".json", ".xml", ".yaml", ".yml", ".tsv" },       "Data"),
-            (new[] { ".py", ".ipynb", ".js", ".html", ".htm", ".css",
-                     ".java", ".cs", ".go", ".rs", ".php",
-                     ".sh", ".bat", ".ps1", ".sql", ".cpp", ".c",
-                     ".vb", ".kt", ".rb" },                             "Code"),
-            (new[] { ".epub", ".mobi", ".azw", ".azw3", ".fb2" },      "Book"),
-            (new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".ico",
-                     ".tiff", ".tif", ".webp", ".svg", ".raw",
-                     ".heic", ".heif" },                                "Image"),
-            (new[] { ".zip", ".rar", ".7z", ".tar", ".gz",
-                     ".bz2", ".xz", ".zst" },                           "Archive"),
-            (new[] { ".psd", ".ai", ".xd", ".fig", ".sketch", ".indd" }, "Design"),
-        };
-
-        int pIdx = 0;
-        foreach (var (exts, label) in pathMappings)
-        {
-            var likeParams = new List<string>();
-            var likeValues = new List<string>();
-            foreach (var ext in exts)
-            {
-                likeParams.Add($"@pp{pIdx}");
-                likeValues.Add($"%{ext}");
-                pIdx++;
-            }
-
-            var whereLike = string.Join(" OR ",
-                likeParams.Select(p => $"LOWER(file_path) LIKE {p}"));
-
-            var labelParam = $"@plbl{pIdx}";
-
-            var pathSql = $"""
-                UPDATE documents
-                SET type = {labelParam}
-                WHERE (is_deleted IS NULL OR is_deleted = 0)
-                  AND file_path IS NOT NULL
-                  AND file_path != ''
-                  AND ({whereLike})
-                """;
-
-            using var pathCmd = new SqliteCommand(pathSql, conn);
-            pathCmd.Parameters.AddWithValue(labelParam, label);
-            int startIdx = pIdx - exts.Length;
-            for (int i = 0; i < exts.Length; i++)
-                pathCmd.Parameters.AddWithValue($"@pp{startIdx + i}", likeValues[i]);
-
-            pathCmd.ExecuteNonQuery();
-            pIdx++;
-        }
-
-
-        using var reseed = new SqliteCommand(
-            "INSERT OR IGNORE INTO document_types (name) SELECT DISTINCT type FROM documents WHERE type IS NOT NULL AND type != ''",
-            conn);
-        reseed.ExecuteNonQuery();
-    }
-
-    private static void MigrateAddColumn(SqliteConnection conn, string table, string column, string type)
-    {
-        try
-        {
-            using var cmd = new SqliteCommand($"ALTER TABLE {table} ADD COLUMN {column} {type}", conn);
-            cmd.ExecuteNonQuery();
-        }
-        catch (SqliteException)
-        {
-
-        }
-    }
-
-
-
-    public static List<StudyDocument> GetAllDocuments()
+    public List<StudyDocument> GetAllDocuments()
     {
         const string query = "SELECT * FROM documents WHERE (is_deleted IS NULL OR is_deleted = 0) ORDER BY created_at DESC";
         return ExecuteReader(query);
     }
 
-    public static StudyDocument? GetDocumentById(int id)
+    public StudyDocument? GetDocumentById(int id)
     {
         const string query = "SELECT * FROM documents WHERE id = @id";
         var results = ExecuteReader(query, new SqliteParameter("@id", id));
         return results.Count > 0 ? results[0] : null;
     }
 
-    public static List<StudyDocument> SearchDocuments(string keyword)
+    public List<StudyDocument> SearchDocuments(string keyword)
     {
         const string query = """
             SELECT * FROM documents
@@ -403,7 +99,7 @@ public static class DatabaseHelper
         return ExecuteReader(query, new SqliteParameter("@keyword", $"%{keyword}%"));
     }
 
-    public static List<StudyDocument> FilterDocuments(string subject, string type)
+    public List<StudyDocument> FilterDocuments(string subject, string type)
     {
         var query = "SELECT * FROM documents WHERE (is_deleted IS NULL OR is_deleted = 0)";
         var parameters = new List<SqliteParameter>();
@@ -424,7 +120,7 @@ public static class DatabaseHelper
         return ExecuteReader(query, parameters.ToArray());
     }
 
-    public static List<StudyDocument> SearchDocumentsAdvanced(
+    public List<StudyDocument> SearchDocumentsAdvanced(
         string? keyword, string? subject, string? type,
         DateTime? fromDate, DateTime? toDate,
         double? minSize, double? maxSize, bool? isImportant)
@@ -483,7 +179,7 @@ public static class DatabaseHelper
         return ExecuteReader(query, parameters.ToArray());
     }
 
-    public static bool InsertDocument(StudyDocument doc)
+    public bool InsertDocument(StudyDocument doc)
     {
         const string query = """
             INSERT INTO documents (name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline)
@@ -492,7 +188,7 @@ public static class DatabaseHelper
         return ExecuteNonQuery(query, BuildDocumentParameters(doc)) > 0;
     }
 
-    public static bool UpdateDocument(StudyDocument doc)
+    public bool UpdateDocument(StudyDocument doc)
     {
         const string query = """
             UPDATE documents SET
@@ -506,7 +202,7 @@ public static class DatabaseHelper
         return ExecuteNonQuery(query, parameters.ToArray()) > 0;
     }
 
-    public static bool DeleteDocument(int id)
+    public bool DeleteDocument(int id)
     {
         const string query = "UPDATE documents SET is_deleted = 1, deleted_at = datetime('now','localtime') WHERE id = @id";
         return ExecuteNonQuery(query, new SqliteParameter("@id", id)) > 0;
@@ -514,19 +210,19 @@ public static class DatabaseHelper
 
 
 
-    public static List<string> GetDistinctSubjects()
+    public List<string> GetDistinctSubjects()
     {
         const string query = "SELECT DISTINCT subject FROM documents WHERE subject IS NOT NULL AND subject != '' AND (is_deleted IS NULL OR is_deleted = 0) ORDER BY subject";
         return ExecuteStringList(query, "subject");
     }
 
-    public static List<string> GetDistinctTypes()
+    public List<string> GetDistinctTypes()
     {
         const string query = "SELECT DISTINCT type FROM documents WHERE type IS NOT NULL AND type != '' AND (is_deleted IS NULL OR is_deleted = 0) ORDER BY type";
         return ExecuteStringList(query, "type");
     }
 
-    public static List<string> GetDistinctTags()
+    public List<string> GetDistinctTags()
     {
         const string query = "SELECT DISTINCT tags FROM documents WHERE tags IS NOT NULL AND tags != '' AND (is_deleted IS NULL OR is_deleted = 0)";
         var allTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -552,7 +248,7 @@ public static class DatabaseHelper
         return sortedTags;
     }
 
-    public static List<StudyDocument> GetUpcomingDeadlines(int days = 7)
+    public List<StudyDocument> GetUpcomingDeadlines(int days = 7)
     {
         const string query = """
             SELECT * FROM documents
@@ -565,7 +261,7 @@ public static class DatabaseHelper
         return ExecuteReader(query, new SqliteParameter("@days", days));
     }
 
-    public static List<StudyDocument> GetOverdueDocuments()
+    public List<StudyDocument> GetOverdueDocuments()
     {
         const string query = """
             SELECT * FROM documents
@@ -577,7 +273,7 @@ public static class DatabaseHelper
         return ExecuteReader(query);
     }
 
-    public static DashboardStats GetDashboardStatistics()
+    public DashboardStats GetDashboardStatistics()
     {
         var stats = new DashboardStats();
         using var conn = new SqliteConnection(ConnectionString);
@@ -597,19 +293,19 @@ public static class DatabaseHelper
 
 
 
-    public static List<StudyDocument> GetDeletedDocuments()
+    public List<StudyDocument> GetDeletedDocuments()
     {
         const string query = "SELECT * FROM documents WHERE is_deleted = 1 ORDER BY deleted_at DESC";
         return ExecuteReader(query);
     }
 
-    public static bool RestoreDocument(int id)
+    public bool RestoreDocument(int id)
     {
         const string query = "UPDATE documents SET is_deleted = 0, deleted_at = NULL WHERE id = @id";
         return ExecuteNonQuery(query, new SqliteParameter("@id", id)) > 0;
     }
 
-    public static bool PermanentDeleteDocument(int id)
+    public bool PermanentDeleteDocument(int id)
     {
         const string query = "DELETE FROM documents WHERE id = @id";
         return ExecuteNonQuery(query, new SqliteParameter("@id", id)) > 0;
@@ -617,7 +313,7 @@ public static class DatabaseHelper
 
 
 
-    public static bool BackupDatabase(string destPath)
+    public bool BackupDatabase(string destPath)
     {
         try
         {
@@ -632,7 +328,7 @@ public static class DatabaseHelper
 
 
 
-    private static List<StudyDocument> ExecuteReader(string query, params SqliteParameter[] parameters)
+    private List<StudyDocument> ExecuteReader(string query, params SqliteParameter[] parameters)
     {
         var documents = new List<StudyDocument>();
 
@@ -652,7 +348,7 @@ public static class DatabaseHelper
         return documents;
     }
 
-    private static int ExecuteNonQuery(string query, params SqliteParameter[] parameters)
+    private int ExecuteNonQuery(string query, params SqliteParameter[] parameters)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -664,7 +360,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery();
     }
 
-    private static List<string> ExecuteStringList(string query, string columnName)
+    private List<string> ExecuteStringList(string query, string columnName)
     {
         var result = new List<string>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -682,14 +378,14 @@ public static class DatabaseHelper
         return result;
     }
 
-    private static int GetScalarInt(SqliteConnection conn, string query)
+    private int GetScalarInt(SqliteConnection conn, string query)
     {
         using var cmd = new SqliteCommand(query, conn);
         var result = cmd.ExecuteScalar();
         return result != null ? Convert.ToInt32(result) : 0;
     }
 
-    private static StudyDocument MapToDocument(SqliteDataReader reader)
+    private StudyDocument MapToDocument(SqliteDataReader reader)
     {
         return new StudyDocument
         {
@@ -708,7 +404,7 @@ public static class DatabaseHelper
         };
     }
 
-    private static SqliteParameter[] BuildDocumentParameters(StudyDocument doc)
+    private SqliteParameter[] BuildDocumentParameters(StudyDocument doc)
     {
         return
         [
@@ -727,7 +423,7 @@ public static class DatabaseHelper
 
 
 
-    public static string? GetPersonalNote(int documentId)
+    public string? GetPersonalNote(int documentId)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -738,7 +434,7 @@ public static class DatabaseHelper
         return result == null || result == DBNull.Value ? null : result.ToString();
     }
 
-    public static bool SavePersonalNote(int documentId, string content)
+    public bool SavePersonalNote(int documentId, string content)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -765,7 +461,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    public static bool DeletePersonalNote(int documentId)
+    public bool DeletePersonalNote(int documentId)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -777,7 +473,7 @@ public static class DatabaseHelper
 
 
 
-    public static void AddDocumentRelation(int docId1, int docId2, string relationType = "related")
+    public void AddDocumentRelation(int docId1, int docId2, string relationType = "related")
     {
         int lo = Math.Min(docId1, docId2);
         int hi = Math.Max(docId1, docId2);
@@ -792,7 +488,7 @@ public static class DatabaseHelper
         cmd.ExecuteNonQuery();
     }
 
-    public static List<(StudyDocument Doc, int RelationId, string RelationType)> GetRelatedDocuments(int docId)
+    public List<(StudyDocument Doc, int RelationId, string RelationType)> GetRelatedDocuments(int docId)
     {
         var results = new List<(StudyDocument, int, string)>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -824,7 +520,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    public static void RemoveDocumentRelation(int relationId)
+    public void RemoveDocumentRelation(int relationId)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -836,7 +532,7 @@ public static class DatabaseHelper
 
 
 
-    public static List<(string Label, int Count)> GetDocumentsByDay(int days = 7)
+    public List<(string Label, int Count)> GetDocumentsByDay(int days = 7)
     {
         var results = new List<(string, int)>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -868,7 +564,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    public static List<(string Label, int Count)> GetDocumentsByMonth(int months = 12)
+    public List<(string Label, int Count)> GetDocumentsByMonth(int months = 12)
     {
         var results = new List<(string, int)>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -900,7 +596,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    public static List<(string Label, int Count)> GetDocumentsBySubject()
+    public List<(string Label, int Count)> GetDocumentsBySubject()
     {
         var results = new List<(string, int)>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -919,7 +615,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    public static List<(string Label, int Count)> GetDocumentsByType()
+    public List<(string Label, int Count)> GetDocumentsByType()
     {
         var results = new List<(string, int)>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -940,7 +636,7 @@ public static class DatabaseHelper
 
 
 
-    public static List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetCollections()
+    public List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetCollections()
     {
         var results = new List<(int, string, string?, DateTime, int)>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -964,7 +660,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    public static int CreateCollection(string name, string? description = null)
+    public int CreateCollection(string name, string? description = null)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -978,7 +674,7 @@ public static class DatabaseHelper
         return result != null ? Convert.ToInt32(result) : 0;
     }
 
-    public static bool UpdateCollection(int collectionId, string name, string? description = null)
+    public bool UpdateCollection(int collectionId, string name, string? description = null)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -991,7 +687,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    public static bool DeleteCollection(int collectionId)
+    public bool DeleteCollection(int collectionId)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1009,7 +705,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    public static List<StudyDocument> GetDocumentsInCollection(int collectionId)
+    public List<StudyDocument> GetDocumentsInCollection(int collectionId)
     {
         var results = new List<StudyDocument>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -1030,7 +726,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    public static bool AddDocumentToCollection(int collectionId, int documentId)
+    public bool AddDocumentToCollection(int collectionId, int documentId)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1052,7 +748,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    public static bool RemoveDocumentFromCollection(int collectionId, int documentId)
+    public bool RemoveDocumentFromCollection(int collectionId, int documentId)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1065,7 +761,7 @@ public static class DatabaseHelper
 
 
 
-    public static List<(string Name, int Count)> GetSubjectsWithCount()
+    public List<(string Name, int Count)> GetSubjectsWithCount()
     {
         var results = new List<(string, int)>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -1091,7 +787,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    public static List<(string Name, int Count)> GetTypesWithCount()
+    public List<(string Name, int Count)> GetTypesWithCount()
     {
         var results = new List<(string, int)>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -1117,7 +813,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    public static bool UpdateSubjectName(string oldName, string newName)
+    public bool UpdateSubjectName(string oldName, string newName)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1138,7 +834,7 @@ public static class DatabaseHelper
         return true;
     }
 
-    public static bool UpdateTypeName(string oldName, string newName)
+    public bool UpdateTypeName(string oldName, string newName)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1157,7 +853,7 @@ public static class DatabaseHelper
         return true;
     }
 
-    public static bool DeleteDocumentsBySubject(string subjectName)
+    public bool DeleteDocumentsBySubject(string subjectName)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1174,7 +870,7 @@ public static class DatabaseHelper
         return true;
     }
 
-    public static bool DeleteDocumentsByType(string typeName)
+    public bool DeleteDocumentsByType(string typeName)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1193,7 +889,7 @@ public static class DatabaseHelper
 
 
 
-    public static bool AddSubject(string name)
+    public bool AddSubject(string name)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1203,7 +899,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    public static bool AddType(string name)
+    public bool AddType(string name)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1213,7 +909,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    public static List<string> GetAllSubjects()
+    public List<string> GetAllSubjects()
     {
         var results = new List<string>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -1225,7 +921,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    public static List<string> GetAllTypes()
+    public List<string> GetAllTypes()
     {
         var results = new List<string>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -1237,7 +933,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    public static bool DeleteSubject(string name)
+    public bool DeleteSubject(string name)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1247,7 +943,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    public static bool DeleteType(string name)
+    public bool DeleteType(string name)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1259,7 +955,7 @@ public static class DatabaseHelper
 
 
 
-    public static int BulkSoftDelete(List<int> ids)
+    public int BulkSoftDelete(List<int> ids)
     {
         if (ids == null || ids.Count == 0) return 0;
         using var conn = new SqliteConnection(ConnectionString);
@@ -1276,7 +972,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery();
     }
 
-    public static int BulkUpdateSubject(List<int> ids, string subject)
+    public int BulkUpdateSubject(List<int> ids, string subject)
     {
         if (ids == null || ids.Count == 0) return 0;
         using var conn = new SqliteConnection(ConnectionString);
@@ -1293,7 +989,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery();
     }
 
-    public static int BulkToggleImportant(List<int> ids, bool important)
+    public int BulkToggleImportant(List<int> ids, bool important)
     {
         if (ids == null || ids.Count == 0) return 0;
         using var conn = new SqliteConnection(ConnectionString);
@@ -1312,7 +1008,7 @@ public static class DatabaseHelper
 
 
 
-    public static int EmptyRecycleBin()
+    public int EmptyRecycleBin()
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1321,7 +1017,7 @@ public static class DatabaseHelper
         return cmd.ExecuteNonQuery();
     }
 
-    public static int GetDeletedDocumentCount()
+    public int GetDeletedDocumentCount()
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1333,7 +1029,7 @@ public static class DatabaseHelper
 
 
 
-    public static void AddRecentFile(int documentId)
+    public void AddRecentFile(int documentId)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1353,7 +1049,7 @@ public static class DatabaseHelper
         }
     }
 
-    public static List<(int Id, string Name, string? Subject, string? Type, string? FilePath, DateTime OpenedAt)> GetRecentFiles()
+    public List<(int Id, string Name, string? Subject, string? Type, string? FilePath, DateTime OpenedAt)> GetRecentFiles()
     {
         var results = new List<(int, string, string?, string?, string?, DateTime)>();
         using var conn = new SqliteConnection(ConnectionString);
@@ -1380,7 +1076,7 @@ public static class DatabaseHelper
         return results;
     }
 
-    public static void RemoveRecentFile(int documentId)
+    public void RemoveRecentFile(int documentId)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1390,7 +1086,7 @@ public static class DatabaseHelper
         cmd.ExecuteNonQuery();
     }
 
-    public static void ClearRecentFiles()
+    public void ClearRecentFiles()
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1401,7 +1097,7 @@ public static class DatabaseHelper
 
 
 
-    public static int GetTotalDocumentCount()
+    public int GetTotalDocumentCount()
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1416,7 +1112,7 @@ public static class DatabaseHelper
     /// <summary>
     /// ファイルパスの差し替え
     /// </summary>
-    public static bool UpdateDocumentPath(int id, string newPath)
+    public bool UpdateDocumentPath(int id, string newPath)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1430,7 +1126,7 @@ public static class DatabaseHelper
     /// <summary>
     /// 壊れたパスをクリアしてメタデータのみ残す
     /// </summary>
-    public static bool ClearDocumentPath(int id)
+    public bool ClearDocumentPath(int id)
     {
         return UpdateDocumentPath(id, "");
     }
@@ -1440,7 +1136,7 @@ public static class DatabaseHelper
     /// <summary>
     /// テスト用：接続プールを解放してDBファイルを削除可能にする
     /// </summary>
-    public static void CloseAllConnections()
+    public void CloseAllConnections()
     {
         SqliteConnection.ClearAllPools();
     }
@@ -1448,7 +1144,7 @@ public static class DatabaseHelper
     /// <summary>
     /// app_settings テーブルから設定値を取得
     /// </summary>
-    public static string? GetSetting(string key)
+    public string? GetSetting(string key)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1462,7 +1158,7 @@ public static class DatabaseHelper
     /// <summary>
     /// app_settings テーブルへ設定値をUPSERT
     /// </summary>
-    public static void SetSetting(string key, string value)
+    public void SetSetting(string key, string value)
     {
         using var conn = new SqliteConnection(ConnectionString);
         conn.Open();
@@ -1473,122 +1169,4 @@ public static class DatabaseHelper
         cmd.ExecuteNonQuery();
     }
 
-    /// <summary>
-    /// 旧ラベルを英語ラベルへ統合する冪等マイグレーション。
-    /// schema_version < 3 の場合のみ実行
-    /// </summary>
-    private static void MigrateNeutralizeLabels(SqliteConnection conn)
-    {
-        using var checkCmd = conn.CreateCommand();
-        checkCmd.CommandText = "SELECT value FROM app_settings WHERE key = 'schema_version'";
-        var currentVersion = checkCmd.ExecuteScalar()?.ToString();
-        if (int.TryParse(currentVersion, out var ver) && ver >= 3)
-            return;
-
-        var categoryMap = new (string Old, string New)[]
-        {
-            ("Công việc", "Work"), ("Cá nhân", "Personal"),
-            ("Học tập", "Study"), ("Dự án", "Project"),
-            ("Tài chính", "Finance"), ("Hợp đồng", "Contract"),
-            ("Tham khảo", "Reference"), ("Khác", "Other")
-        };
-
-        var typeMap = new (string Old, string New)[]
-        {
-            ("Tài liệu", "Document"), ("Báo cáo", "Report"),
-            ("Hướng dẫn", "Guide"), ("Biểu mẫu", "Form"),
-            ("Dữ liệu", "Data"), ("Sách", "Book"),
-            ("Thiết kế", "Design"), ("Hình ảnh", "Image"),
-            ("Nén", "Archive"), ("Khác", "Other")
-        };
-
-        using var tx = conn.BeginTransaction();
-        try
-        {
-            // categories: 旧ラベルを英語名へ統合（UNIQUE衝突を回避）
-            foreach (var (oldVal, newVal) in categoryMap)
-            {
-                // 先に documents.subject を更新
-                using var docCmd = conn.CreateCommand();
-                docCmd.Transaction = tx;
-                docCmd.CommandText = "UPDATE documents SET subject = @new WHERE subject = @old";
-                docCmd.Parameters.AddWithValue("@old", oldVal);
-                docCmd.Parameters.AddWithValue("@new", newVal);
-                docCmd.ExecuteNonQuery();
-
-                // 英語名が既にあれば旧行を消す、なければリネーム
-                using var chk = conn.CreateCommand();
-                chk.Transaction = tx;
-                chk.CommandText = "SELECT COUNT(*) FROM categories WHERE name = @new";
-                chk.Parameters.AddWithValue("@new", newVal);
-                var exists = Convert.ToInt64(chk.ExecuteScalar()) > 0;
-
-                if (exists)
-                {
-                    using var del = conn.CreateCommand();
-                    del.Transaction = tx;
-                    del.CommandText = "DELETE FROM categories WHERE name = @old";
-                    del.Parameters.AddWithValue("@old", oldVal);
-                    del.ExecuteNonQuery();
-                }
-                else
-                {
-                    using var ren = conn.CreateCommand();
-                    ren.Transaction = tx;
-                    ren.CommandText = "UPDATE categories SET name = @new WHERE name = @old";
-                    ren.Parameters.AddWithValue("@old", oldVal);
-                    ren.Parameters.AddWithValue("@new", newVal);
-                    ren.ExecuteNonQuery();
-                }
-            }
-
-            // document_types: 同じ統合ロジック
-            foreach (var (oldVal, newVal) in typeMap)
-            {
-                using var docCmd = conn.CreateCommand();
-                docCmd.Transaction = tx;
-                docCmd.CommandText = "UPDATE documents SET type = @new WHERE type = @old";
-                docCmd.Parameters.AddWithValue("@old", oldVal);
-                docCmd.Parameters.AddWithValue("@new", newVal);
-                docCmd.ExecuteNonQuery();
-
-                using var chk = conn.CreateCommand();
-                chk.Transaction = tx;
-                chk.CommandText = "SELECT COUNT(*) FROM document_types WHERE name = @new";
-                chk.Parameters.AddWithValue("@new", newVal);
-                var exists = Convert.ToInt64(chk.ExecuteScalar()) > 0;
-
-                if (exists)
-                {
-                    using var del = conn.CreateCommand();
-                    del.Transaction = tx;
-                    del.CommandText = "DELETE FROM document_types WHERE name = @old";
-                    del.Parameters.AddWithValue("@old", oldVal);
-                    del.ExecuteNonQuery();
-                }
-                else
-                {
-                    using var ren = conn.CreateCommand();
-                    ren.Transaction = tx;
-                    ren.CommandText = "UPDATE document_types SET name = @new WHERE name = @old";
-                    ren.Parameters.AddWithValue("@old", oldVal);
-                    ren.Parameters.AddWithValue("@new", newVal);
-                    ren.ExecuteNonQuery();
-                }
-            }
-
-            // schema_version を 3 に更新
-            using var verCmd = conn.CreateCommand();
-            verCmd.Transaction = tx;
-            verCmd.CommandText = "INSERT OR REPLACE INTO app_settings (key, value) VALUES ('schema_version', '3')";
-            verCmd.ExecuteNonQuery();
-
-            tx.Commit();
-        }
-        catch
-        {
-            tx.Rollback();
-            throw;
-        }
-    }
 }

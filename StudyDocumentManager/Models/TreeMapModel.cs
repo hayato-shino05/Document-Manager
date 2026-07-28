@@ -9,7 +9,7 @@ namespace StudyDocumentManager.Models;
 public partial class TreeMapModel : ModelBase
 {
     private readonly INavigationService _navigationService;
-    private readonly IReport _reportRepo;
+    private readonly IReportRepository _reportRepo;
 
     [ObservableProperty] private ObservableCollection<TreeMapItem> _items = new();
     [ObservableProperty] private string _selectedMode = "subject"; // "subject" or "type"
@@ -23,7 +23,7 @@ public partial class TreeMapModel : ModelBase
         "#84cc16", "#e11d48", "#0ea5e9", "#a855f7", "#eab308"
     };
 
-    public TreeMapModel(INavigationService navigationService, IReport reportRepo)
+    public TreeMapModel(INavigationService navigationService, IReportRepository reportRepo)
     {
         _navigationService = navigationService;
         _reportRepo = reportRepo;

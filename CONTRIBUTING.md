@@ -1,128 +1,118 @@
-# Đóng góp cho Study Document Manager
+# Contributing to Study Document Manager
 
-Chào mừng bạn đến với dự án **Study Document Manager**! Chúng tôi rất vui vì bạn quan tâm và muốn đóng góp để làm cho ứng dụng quản lý tài liệu cá nhân này trở nên tốt hơn. Dù là sửa lỗi nhỏ, bổ sung tính năng hay cải thiện tài liệu, mọi đóng góp đều được trân trọng.
+Thank you for contributing to Study Document Manager. This guide covers the current development workflow for the Avalonia and .NET 9 codebase.
 
-## Mục lục
+## Table of Contents
 
-- [Chuẩn bị môi trường](#chuẩn-bị-môi-trường)
-- [Quy trình đóng góp](#quy-trình-đóng-góp)
-- [Quy ước Code](#quy-ước-code)
-- [Báo cáo lỗi](#báo-cáo-lỗi)
-- [Đề xuất tính năng](#đề-xuất-tính-năng)
-- [Liên hệ](#liên-hệ)
+- [Prerequisites](#prerequisites)
+- [Repository Setup](#repository-setup)
+- [Build and Test](#build-and-test)
+- [Development Notes](#development-notes)
+- [Pull Requests](#pull-requests)
+- [Bug Reports and Feature Requests](#bug-reports-and-feature-requests)
+- [Related Documentation](#related-documentation)
 
----
+## Prerequisites
 
-## Chuẩn bị môi trường
+- .NET 9 SDK
+- Git
+- An editor or IDE that supports .NET desktop development
 
-Để bắt đầu phát triển, bạn cần chuẩn bị môi trường như sau:
+SQLite is created locally by the application. No separate database server setup is required.
 
-1.  **IDE**: Cài đặt [Visual Studio 2019](https://visualstudio.microsoft.com/vs/older-downloads/) hoặc [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) (Khuyên dùng bản 2022 Community).
-2.  **Workload**: Khi cài đặt Visual Studio, hãy chọn workload **.NET Desktop Development**.
-3.  **Runtime**: Đảm bảo đã cài đặt **.NET Framework 4.8** Developer Pack.
-4.  **Database**: Dự án sử dụng **SQLite** (Local DB) nên bạn **KHÔNG** cần cài đặt SQL Server. Database sẽ được tự động khởi tạo khi chạy ứng dụng lần đầu.
-
----
-
-## Quy trình đóng góp
-
-Chúng tôi tuân theo quy trình GitHub Flow cơ bản:
-
-### 1. Fork và Clone
-Fork repository này về tài khoản GitHub của bạn, sau đó clone về máy:
+## Repository Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/study-document-manager.git
+git clone https://github.com/hayato-shino05/study-document-manager.git
 cd study-document-manager
 ```
 
-### 2. Tạo Branch
-Luôn tạo branch mới cho mỗi tính năng hoặc bản sửa lỗi. Đặt tên branch rõ ràng theo quy ước:
+Create a focused branch for each change.
 
-- Tính năng mới: `feature/ten-tinh-nang` (ví dụ: `feature/dark-mode`, `feature/export-pdf`)
-- Sửa lỗi: `fix/ten-loi` (ví dụ: `fix/login-crash`, `fix/typo-readme`)
+- New feature: `feature/short-description`
+- Bug fix: `fix/short-description`
+- Documentation: `docs/short-description`
 
-```bash
-git checkout -b feature/them-chuc-nang-moi
-```
-
-### 3. Code và Commit
-- Viết code rõ ràng, tuân thủ [Quy ước Code](#quy-ước-code).
-- Commit message cần ngắn gọn nhưng đầy đủ ý nghĩa (khuyên dùng tiếng Anh theo chuẩn Conventional Commits):
-  - `feat: Add dark mode toggle`
-  - `fix: Resolve database connection issue`
-  - `docs: Update installation guide`
-
-### 4. Push và tạo Pull Request (PR)
-Đẩy branch của bạn lên GitHub:
+Example:
 
 ```bash
-git push origin feature/them-chuc-nang-moi
+git checkout -b feature/language-menu-polish
 ```
 
-Sau đó truy cập repository gốc và tạo Pull Request. Vui lòng mô tả chi tiết những thay đổi bạn đã thực hiện trong PR.
+## Build and Test
 
----
+Use the verified local commands below.
 
-## Quy ước Code
-
-### Code Style (Clean Code)
-- **Giữ code sạch sẽ**: Xóa các đoạn code thừa, code bị comment không dùng đến.
-- **Comment**: Thêm comment cho các đoạn logic phức tạp để người khác dễ hiểu.
-- **Naming**:
-  - Class, Method, Property: `PascalCase` (ví dụ: `UserManager`, `GetData`)
-  - Variable, Parameter: `camelCase` (ví dụ: `userList`, `documentId`)
-  - Private field: `_camelCase` (ví dụ: `_connectionString`)
-
-### UI Theme (Quan trọng)
-Dự án sử dụng bộ màu sắc hiện đại (Teal/Emerald) được định nghĩa tập trung trong `UI/AppTheme.cs`. **Tuyệt đối không hardcode màu sắc** trong Form designer trừ khi cần thiết. Hãy sử dụng các biến từ `AppTheme`.
-
-Ví dụ các màu chủ đạo:
-
-```csharp
-// Sử dụng AppTheme để đảm bảo tính nhất quán
-btnSave.BackColor = AppTheme.Primary;        // Teal (#14b8a6)
-btnCancel.BackColor = AppTheme.Secondary;    // Emerald (#10b981)
-lblError.ForeColor = AppTheme.StatusError;   // Red (#ef4444)
-this.BackColor = AppTheme.BackgroundMain;    // White (#ffffff)
+```powershell
+dotnet build "StudyDocumentManager.sln" -c Debug
+dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c Debug
 ```
 
-Một số màu thường dùng:
-- **Primary**: Teal (`#14b8a6`) - Dùng cho nút chính, highlight.
-- **Secondary**: Emerald (`#10b981`) - Dùng cho các hành động phụ hoặc trạng thái thành công.
-- **Background**: White (`#ffffff`) hoặc Soft Gray (`#f8fafc`).
-- **Text**: Primary Dark (`#0f172a`) cho nội dung chính.
+If your change affects startup, routing, schema, localization, or theme resources, read the project guidance files before editing.
 
----
+## Development Notes
 
-## Báo cáo lỗi
+### Architecture boundaries
 
-Nếu bạn phát hiện lỗi, hãy tạo Issue trên GitHub với các thông tin sau:
+- `StudyDocumentManager` contains Avalonia views, models, services, and themes.
+- `StudyDocumentManager.Core` contains entities, DTOs, and service or repository contracts.
+- `StudyDocumentManager.Data` contains SQLite schema, migrations, and repository implementations.
+- `StudyDocumentManager.Tests` contains xUnit coverage.
 
-1.  **Mô tả lỗi**: Chuyện gì đã xảy ra?
-2.  **Môi trường**: Windows version (10/11), .NET Framework version.
-3.  **Các bước tái hiện**: Làm thế nào để gặp lỗi này?
-4.  **Kết quả mong đợi**: Điều gì nên xảy ra?
-5.  **Screenshot**: Ảnh chụp màn hình lỗi (nếu có).
+### UI and theme work
 
----
+Do not hardcode shared colors or brushes in views. Use the existing theme resources instead.
 
-## Đề xuất tính năng
+- `StudyDocumentManager/Themes/ColorTokens.axaml`
+- `StudyDocumentManager/Themes/AppTheme.axaml`
+- `StudyDocumentManager/Themes/SharedStyles.axaml`
 
-Bạn có ý tưởng hay? Hãy kiểm tra xem tính năng đó đã có trong [Roadmap](FEATURES.md) chưa. Nếu chưa, hãy tạo Issue mới với nhãn `enhancement` và mô tả:
+Keep view state in `Models/*Model.cs`. Use code-behind only when Avalonia event bridging or control lifecycle work requires it.
 
-- Tính năng này giải quyết vấn đề gì?
-- Nó hoạt động như thế nào?
-- Tại sao nó hữu ích cho người dùng cá nhân?
+### Data and schema work
 
----
+When changing schema or repository behavior, keep these surfaces in sync.
 
-## Liên hệ
+- `StudyDocumentManager.Data/Helpers/DatabaseHelper.cs`
+- `StudyDocumentManager.Data/Helpers/DatabaseMigrator.cs`
+- `StudyDocumentManager.Core/Interfaces/*.cs`
+- `StudyDocumentManager.Data/Repositories/*.cs`
+- `DATABASE.md`
+- affected tests in `StudyDocumentManager.Tests`
 
-Nếu cần hỗ trợ thêm, bạn có thể liên hệ với maintainer:
+### Localization work
 
-- **Maintainer**: hayato-shino05
-- **Email**: hayatoshino05@gmail.com
-- **GitHub**: [@hayato-shino05](https://github.com/hayato-shino05)
+Current localization is implemented through `.resx` resources, `LocalizationService`, and `LocalizeExtension`. If you touch labels, menus, or dialogs, verify both the resource keys and the runtime language-switching behavior.
 
-Cảm ơn bạn đã đóng góp cho cộng đồng!
+## Pull Requests
+
+Before opening a pull request:
+
+1. Keep the diff focused on one task.
+2. Run the relevant build and test commands.
+3. Update documentation when the contract or workflow changes.
+4. Summarize what changed, how it was verified, and any remaining limitation.
+
+Recommended commit message style:
+
+- `feat: add collection filter shortcut`
+- `fix: preserve selection after dashboard refresh`
+- `docs: rewrite readme for avalonia app`
+
+## Bug Reports and Feature Requests
+
+When opening an issue, include:
+
+- a short summary
+- the affected screen, service, or workflow
+- reproduction steps
+- expected behavior
+- actual behavior
+- screenshots or logs when relevant
+
+For feature requests, describe the user problem first, then the proposed behavior.
+
+## Related Documentation
+
+- [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)
+- [DATABASE.md](./DATABASE.md)

@@ -17,7 +17,7 @@ public class CollectionDebugTests : DatabaseTestBase
         _out = output;
         _out.WriteLine($"[Setup] DB path: {DbPath}");
         _out.WriteLine($"[Setup] DB file exists: {File.Exists(DbPath)}");
-        _out.WriteLine($"[Setup] ConnectionString: {DatabaseHelper.ConnectionString}");
+        _out.WriteLine($"[Setup] ConnectionString: {Db.ConnectionString}");
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -28,7 +28,7 @@ public class CollectionDebugTests : DatabaseTestBase
     {
         _out.WriteLine("[Test] CreateCollection_BasicInsert_ReturnsPositiveId");
 
-        int id = DatabaseHelper.CreateCollection("Test Collection");
+        int id = Db.CreateCollection("Test Collection");
         _out.WriteLine($"[Result] returned id = {id}");
 
         Assert.True(id > 0, $"Expected id > 0 but got {id}");
@@ -39,10 +39,10 @@ public class CollectionDebugTests : DatabaseTestBase
     {
         _out.WriteLine("[Test] CreateCollection_ThenGetCollections_ReturnsIt");
 
-        int id = DatabaseHelper.CreateCollection("My Collection");
+        int id = Db.CreateCollection("My Collection");
         _out.WriteLine($"[Result] CreateCollection id = {id}");
 
-        var list = DatabaseHelper.GetCollections();
+        var list = Db.GetCollections();
         _out.WriteLine($"[Result] GetCollections count = {list.Count}");
         foreach (var c in list)
             _out.WriteLine($"  → id={c.Id} name='{c.Name}' desc='{c.Description}' count={c.ItemCount}");
@@ -57,7 +57,7 @@ public class CollectionDebugTests : DatabaseTestBase
     {
         _out.WriteLine("[Test] CreateCollection_EmptyDb_GetCollectionsReturnsEmpty");
 
-        var list = DatabaseHelper.GetCollections();
+        var list = Db.GetCollections();
         _out.WriteLine($"[Result] GetCollections count = {list.Count}");
 
         Assert.Empty(list);
@@ -71,11 +71,11 @@ public class CollectionDebugTests : DatabaseTestBase
     {
         _out.WriteLine("[Test] ConnectionString_IsSetCorrectly_ForThisTestInstance");
         _out.WriteLine($"[Result] DbPath = {DbPath}");
-        _out.WriteLine($"[Result] DatabaseHelper.DatabasePath = {DatabaseHelper.DatabasePath}");
-        _out.WriteLine($"[Result] Match = {DatabaseHelper.DatabasePath == DbPath}");
+        _out.WriteLine($"[Result] Db.DatabasePath = {Db.DatabasePath}");
+        _out.WriteLine($"[Result] Match = {Db.DatabasePath == DbPath}");
 
         // If this fails → SetDatabasePath() is not thread-safe (parallel tests clobber each other)
-        Assert.Equal(DbPath, DatabaseHelper.DatabasePath);
+        Assert.Equal(DbPath, Db.DatabasePath);
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -86,12 +86,12 @@ public class CollectionDebugTests : DatabaseTestBase
     {
         _out.WriteLine("[Test] CreateCollection_DuplicateName_ThrowsOrReturnsZero");
 
-        int id1 = DatabaseHelper.CreateCollection("Dupe");
+        int id1 = Db.CreateCollection("Dupe");
         _out.WriteLine($"[Result] First insert id = {id1}");
 
         try
         {
-            int id2 = DatabaseHelper.CreateCollection("Dupe");
+            int id2 = Db.CreateCollection("Dupe");
             _out.WriteLine($"[Result] Second insert id = {id2}  ← no exception thrown");
             // Either it returned 0 or a new id (depends on DB constraint)
             _out.WriteLine(id2 == 0
@@ -121,11 +121,11 @@ public class CollectionDebugTests : DatabaseTestBase
         if (!string.IsNullOrWhiteSpace(simulatedDialogResult))
         {
             _out.WriteLine("[Step 2] Calling CreateCollection...");
-            var newId = DatabaseHelper.CreateCollection(simulatedDialogResult);
+            var newId = Db.CreateCollection(simulatedDialogResult);
             _out.WriteLine($"[Step 2] CreateCollection returned id={newId}");
 
             _out.WriteLine("[Step 3] Calling GetCollections (LoadCollections equivalent)...");
-            var data = DatabaseHelper.GetCollections();
+            var data = Db.GetCollections();
             _out.WriteLine($"[Step 3] GetCollections count={data.Count}");
             foreach (var c in data)
                 _out.WriteLine($"  → id={c.Id} name='{c.Name}' itemCount={c.ItemCount}");
@@ -148,7 +148,7 @@ public class CollectionDebugTests : DatabaseTestBase
     {
         _out.WriteLine("[Test] Schema_CollectionsTable_Exists");
 
-        using var conn = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseHelper.ConnectionString);
+        using var conn = new Microsoft.Data.Sqlite.SqliteConnection(Db.ConnectionString);
         conn.Open();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "SELECT name FROM sqlite_master WHERE type='table' AND name='collections'";
@@ -163,7 +163,7 @@ public class CollectionDebugTests : DatabaseTestBase
     {
         _out.WriteLine("[Test] Schema_CollectionsTable_HasExpectedColumns");
 
-        using var conn = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseHelper.ConnectionString);
+        using var conn = new Microsoft.Data.Sqlite.SqliteConnection(Db.ConnectionString);
         conn.Open();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "PRAGMA table_info(collections)";
@@ -192,11 +192,11 @@ public class CollectionDebugTests : DatabaseTestBase
         _out.WriteLine("[Test] GetCollections_AfterInsert_RawSqlConfirms");
 
         // Insert via helper
-        DatabaseHelper.CreateCollection("Alpha");
-        DatabaseHelper.CreateCollection("Beta");
+        Db.CreateCollection("Alpha");
+        Db.CreateCollection("Beta");
 
         // Read back directly with raw SQL (bypass helper to isolate)
-        using var conn = new Microsoft.Data.Sqlite.SqliteConnection(DatabaseHelper.ConnectionString);
+        using var conn = new Microsoft.Data.Sqlite.SqliteConnection(Db.ConnectionString);
         conn.Open();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "SELECT id, name FROM collections ORDER BY name";
@@ -215,7 +215,7 @@ public class CollectionDebugTests : DatabaseTestBase
         Assert.Equal("Beta", rows[1].name);
 
         // Now confirm via helper
-        var helperResult = DatabaseHelper.GetCollections();
+        var helperResult = Db.GetCollections();
         _out.WriteLine($"[Result] GetCollections() count = {helperResult.Count}");
         Assert.Equal(2, helperResult.Count);
     }

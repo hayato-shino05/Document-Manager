@@ -1,108 +1,190 @@
 using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Avalonia.Threading;
+using StudyDocumentManager.Core.Interfaces;
 
 namespace StudyDocumentManager.Services;
 
-/// <summary>
-/// Non-blocking toast notification system for Avalonia.
-/// Shows a temporary message overlay at the top-right of the main window.
-/// </summary>
-public static class ToastService
+public sealed class ToastService : IToastService
 {
-    public enum ToastType { Success, Error, Warning, Info }
+    private Panel? _container;
+    private readonly Queue<ToastEntry> _queue = new();
+    private const int MaxVisible = 3;
+    private int _visibleCount;
 
-    public static void Show(string message, ToastType type = ToastType.Info, int durationMs = 3000)
+    public void Show(string message, ToastType type = ToastType.Info, int durationMs = 3000)
     {
         Dispatcher.UIThread.Post(() => ShowInternal(message, type, durationMs));
     }
 
-    private static void ShowInternal(string message, ToastType type, int durationMs)
+    private void ShowInternal(string message, ToastType type, int durationMs)
     {
+        EnsureContainer();
+        if (_container == null) return;
+
+        if (_visibleCount >= MaxVisible)
+        {
+            _queue.Enqueue(new ToastEntry(message, type, durationMs));
+            return;
+        }
+
+        Present(message, type, durationMs);
+    }
+
+    private void Present(string message, ToastType type, int durationMs)
+    {
+        if (_container == null) return;
+        _visibleCount++;
+
+        var (bg, fg, icon) = ResolveVisuals(type);
+
+        var iconBlock = new TextBlock
+        {
+            Text = icon,
+            FontSize = 14,
+            FontWeight = FontWeight.Bold,
+            Foreground = fg,
+            VerticalAlignment = VerticalAlignment.Center,
+            Width = 20,
+            TextAlignment = TextAlignment.Center
+        };
+
+        var messageBlock = new TextBlock
+        {
+            Text = message,
+            Foreground = fg,
+            FontSize = 12.5,
+            FontWeight = FontWeight.Medium,
+            TextWrapping = TextWrapping.Wrap,
+            MaxWidth = 300,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+
+        var content = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 10,
+            Children = { iconBlock, messageBlock }
+        };
+
+        var toast = new Border
+        {
+            Background = bg,
+            CornerRadius = new CornerRadius(10),
+            Padding = new Thickness(14, 10, 16, 10),
+            Margin = new Thickness(0, 0, 0, 6),
+            HorizontalAlignment = HorizontalAlignment.Right,
+            BoxShadow = new BoxShadows(new BoxShadow
+            {
+                OffsetX = 0,
+                OffsetY = 2,
+                Blur = 16,
+                Spread = -2,
+                Color = Color.FromArgb(40, 0, 0, 0)
+            }),
+            MaxWidth = 380,
+            Opacity = 0,
+            RenderTransform = new TranslateTransform(24, 0),
+            Child = content
+        };
+
+        _container.Children.Add(toast);
+        AnimateIn(toast, durationMs);
+    }
+
+    private async void AnimateIn(Border toast, int durationMs)
+    {
+        await Dispatcher.UIThread.InvokeAsync(async () =>
+        {
+            var slideIn = new Animation
+            {
+                Duration = TimeSpan.FromMilliseconds(280),
+                Easing = new CubicEaseOut(),
+                Children =
+                {
+                    new KeyFrame { Cue = new Cue(0), Setters = { new Setter(Visual.OpacityProperty, 0.0), new Setter(TranslateTransform.XProperty, 24.0) } },
+                    new KeyFrame { Cue = new Cue(1), Setters = { new Setter(Visual.OpacityProperty, 1.0), new Setter(TranslateTransform.XProperty, 0.0) } }
+                }
+            };
+
+            await slideIn.RunAsync(toast);
+
+            await Task.Delay(durationMs);
+
+            var fadeOut = new Animation
+            {
+                Duration = TimeSpan.FromMilliseconds(220),
+                Easing = new CubicEaseIn(),
+                Children =
+                {
+                    new KeyFrame { Cue = new Cue(0), Setters = { new Setter(Visual.OpacityProperty, 1.0), new Setter(TranslateTransform.XProperty, 0.0) } },
+                    new KeyFrame { Cue = new Cue(1), Setters = { new Setter(Visual.OpacityProperty, 0.0), new Setter(TranslateTransform.XProperty, 16.0) } }
+                }
+            };
+
+            await fadeOut.RunAsync(toast);
+
+            _container?.Children.Remove(toast);
+            _visibleCount--;
+
+            if (_queue.Count > 0)
+            {
+                var next = _queue.Dequeue();
+                Present(next.Message, next.Type, next.DurationMs);
+            }
+        });
+    }
+
+    private void EnsureContainer()
+    {
+        if (_container != null) return;
+
         if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
             return;
 
         var window = desktop.MainWindow;
-        if (window == null) return;
+        if (window?.Content is not Panel rootPanel) return;
 
-        var backgroundBrushKey = type switch
+        _container = new StackPanel
         {
-            ToastType.Success => "ToastSuccessBrush",
-            ToastType.Error => "ToastErrorBrush",
-            ToastType.Warning => "ToastWarningBrush",
-            _ => "ToastInfoBrush",
-        };
-
-        var backgroundBrush = (IBrush?)Application.Current?.FindResource(backgroundBrushKey)
-            ?? Brushes.Transparent;
-        var foregroundBrush = (IBrush?)Application.Current?.FindResource("ToastForegroundBrush")
-            ?? Brushes.White;
-
-        var icon = type switch
-        {
-            ToastType.Success => "✓",
-            ToastType.Error => "✕",
-            ToastType.Warning => "⚠",
-            _ => "ℹ",
-        };
-
-        var border = new Border
-        {
-            Background = backgroundBrush,
-            CornerRadius = new CornerRadius(8),
-            Padding = new Thickness(16, 10),
-            Margin = new Thickness(16),
             HorizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment = VerticalAlignment.Top,
-            BoxShadow = new BoxShadows(new BoxShadow
-            {
-                OffsetX = 0, OffsetY = 4, Blur = 12,
-                Color = Color.FromArgb(80, 0, 0, 0)
-            }),
-            Opacity = 0.95,
-            MaxWidth = 400,
-            Child = new StackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                Spacing = 8,
-                Children =
-                {
-                    new TextBlock
-                    {
-                        Text = icon,
-                        Foreground = foregroundBrush,
-                        FontSize = 16,
-                        VerticalAlignment = VerticalAlignment.Center
-                    },
-                    new TextBlock
-                    {
-                        Text = message,
-                        Foreground = foregroundBrush,
-                        FontSize = 13,
-                        TextWrapping = TextWrapping.Wrap,
-                        MaxWidth = 320,
-                        VerticalAlignment = VerticalAlignment.Center
-                    }
-                }
-            }
+            Margin = new Thickness(0, 48, 16, 0),
+            Spacing = 0,
+            IsHitTestVisible = false
         };
 
-        // Add to window's overlay layer via AdornerLayer or Panel
-        if (window.Content is Panel panel)
-        {
-            panel.Children.Add(border);
-
-            // Auto-remove after duration
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(durationMs) };
-            timer.Tick += (_, _) =>
-            {
-                panel.Children.Remove(border);
-                timer.Stop();
-            };
-            timer.Start();
-        }
+        rootPanel.Children.Add(_container);
     }
+
+    private static (IBrush bg, IBrush fg, string icon) ResolveVisuals(ToastType type)
+    {
+        return type switch
+        {
+            ToastType.Success => (
+                new SolidColorBrush(Color.Parse("#F0FDF4")),
+                new SolidColorBrush(Color.Parse("#166534")),
+                "✓"),
+            ToastType.Error => (
+                new SolidColorBrush(Color.Parse("#FEF2F2")),
+                new SolidColorBrush(Color.Parse("#991B1B")),
+                "✕"),
+            ToastType.Warning => (
+                new SolidColorBrush(Color.Parse("#FFFBEB")),
+                new SolidColorBrush(Color.Parse("#92400E")),
+                "⚠"),
+            _ => (
+                new SolidColorBrush(Color.Parse("#EFF6FF")),
+                new SolidColorBrush(Color.Parse("#1E40AF")),
+                "ℹ"),
+        };
+    }
+
+    private sealed record ToastEntry(string Message, ToastType Type, int DurationMs);
 }

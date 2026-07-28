@@ -623,78 +623,57 @@
   <data name="FileIntegrity_StatMissing" xml:space="preserve"><value>欠損</value></data>
   <data name="FileIntegrity_StatCorrupted" xml:space="preserve"><value>破損</value></data>
 
-  <!-- AddEdit View -->
-  <data name="AddEdit_LblDocName" xml:space="preserve"><value>Document Name *</value></data>
-  <data name="AddEdit_PlaceholderDocName" xml:space="preserve"><value>Enter document name...</value></data>
-  <data name="AddEdit_LblCategory" xml:space="preserve"><value>Category (Subject)</value></data>
-  <data name="AddEdit_PlaceholderCategory" xml:space="preserve"><value>Select category...</value></data>
-  <data name="AddEdit_LblDocType" xml:space="preserve"><value>Document Type</value></data>
-  <data name="AddEdit_PlaceholderDocType" xml:space="preserve"><value>Select type...</value></data>
-  <data name="AddEdit_LblFilePath" xml:space="preserve"><value>File Path</value></data>
-  <data name="AddEdit_PlaceholderFilePath" xml:space="preserve"><value>Path to file...</value></data>
-  <data name="AddEdit_BtnBrowse" xml:space="preserve"><value>Browse</value></data>
-  <data name="AddEdit_LblAuthor" xml:space="preserve"><value>Author</value></data>
-  <data name="AddEdit_PlaceholderAuthor" xml:space="preserve"><value>Author name...</value></data>
-  <data name="AddEdit_LblTags" xml:space="preserve"><value>Tags (comma-separated)</value></data>
-  <data name="AddEdit_LblNotes" xml:space="preserve"><value>Notes</value></data>
-  <data name="AddEdit_PlaceholderNotes" xml:space="preserve"><value>Additional notes...</value></data>
-  <data name="AddEdit_LblDeadline" xml:space="preserve"><value>Deadline</value></data>
-  <data name="AddEdit_ChkImportant" xml:space="preserve"><value>Mark as important</value></data>
-  <data name="AddEdit_BtnSave" xml:space="preserve"><value>Save</value></data>
-  <data name="AddEdit_TipSave" xml:space="preserve"><value>Save document (Ctrl+S)</value></data>
-  <data name="AddEdit_BtnCancel" xml:space="preserve"><value>Cancel</value></data>
-  <data name="AddEdit_TipCancel" xml:space="preserve"><value>Cancel and go back (Escape)</value></data>
+  <!-- AddEdit View (additional) -->
+  <data name="AddEdit_LblDocName" xml:space="preserve"><value>文書名 *</value></data>
+  <data name="AddEdit_PlaceholderDocName" xml:space="preserve"><value>文書名を入力...</value></data>
+  <data name="AddEdit_LblCategory" xml:space="preserve"><value>カテゴリ（科目）</value></data>
+  <data name="AddEdit_PlaceholderCategory" xml:space="preserve"><value>カテゴリを選択...</value></data>
+  <data name="AddEdit_LblDocType" xml:space="preserve"><value>文書種類</value></data>
+  <data name="AddEdit_PlaceholderDocType" xml:space="preserve"><value>種類を選択...</value></data>
+  <data name="AddEdit_PlaceholderFilePath" xml:space="preserve"><value>ファイルパス...</value></data>
+  <data name="AddEdit_PlaceholderAuthor" xml:space="preserve"><value>著者名...</value></data>
+  <data name="AddEdit_PlaceholderNotes" xml:space="preserve"><value>メモを入力...</value></data>
+  <data name="AddEdit_ChkImportant" xml:space="preserve"><value>重要としてマーク</value></data>
+  <data name="AddEdit_TipSave" xml:space="preserve"><value>文書を保存 (Ctrl+S)</value></data>
+  <data name="AddEdit_TipCancel" xml:space="preserve"><value>キャンセルして戻る (Escape)</value></data>
 
-  <!-- RelatedDocuments View -->
-  <data name="RelatedDocs_BtnBack" xml:space="preserve"><value>Back</value></data>
-  <data name="RelatedDocs_Title" xml:space="preserve"><value>Related Documents</value></data>
-  <data name="RelatedDocs_LblMainDoc" xml:space="preserve"><value>Main document:</value></data>
-  <data name="RelatedDocs_HeaderLinked" xml:space="preserve"><value>Currently Linked</value></data>
-  <data name="RelatedDocs_EmptyState" xml:space="preserve"><value>No links yet</value></data>
-  <data name="RelatedDocs_HeaderAvailable" xml:space="preserve"><value>Available Documents</value></data>
-  <data name="RelatedDocs_LblRelationType" xml:space="preserve"><value>Type:</value></data>
-  <data name="RelatedDocs_BtnAddLink" xml:space="preserve"><value>Add Link</value></data>
+  <!-- RelatedDocuments View (additional) -->
+  <data name="RelatedDocs_BtnBack" xml:space="preserve"><value>戻る</value></data>
+  <data name="RelatedDocs_LblMainDoc" xml:space="preserve"><value>メイン文書:</value></data>
+  <data name="RelatedDocs_HeaderLinked" xml:space="preserve"><value>リンク済み</value></data>
+  <data name="RelatedDocs_HeaderAvailable" xml:space="preserve"><value>利用可能な文書</value></data>
+  <data name="RelatedDocs_LblRelationType" xml:space="preserve"><value>種類:</value></data>
+  <data name="RelatedDocs_BtnAddLink" xml:space="preserve"><value>リンク追加</value></data>
 
-  <!-- TreeMap View -->
-  <data name="TreeMap_Title" xml:space="preserve"><value>TreeMap — Document Distribution</value></data>
-  <data name="TreeMap_LblGroupBy" xml:space="preserve"><value>Group by:</value></data>
-  <data name="TreeMap_BtnByCategory" xml:space="preserve"><value>Category</value></data>
-  <data name="TreeMap_BtnByType" xml:space="preserve"><value>Document Type</value></data>
-  <data name="TreeMap_StatTotal" xml:space="preserve"><value>Total: {0} documents</value></data>
-  <data name="TreeMap_ItemCount" xml:space="preserve"><value>{0} documents</value></data>
+  <!-- TreeMap View (additional) -->
+  <data name="TreeMap_LblGroupBy" xml:space="preserve"><value>グループ:</value></data>
+  <data name="TreeMap_BtnByCategory" xml:space="preserve"><value>カテゴリ別</value></data>
+  <data name="TreeMap_BtnByType" xml:space="preserve"><value>種類別</value></data>
+  <data name="TreeMap_StatTotal" xml:space="preserve"><value>合計: {0}件</value></data>
+  <data name="TreeMap_ItemCount" xml:space="preserve"><value>{0}件</value></data>
 
-  <!-- Dashboard Tooltips -->
-  <data name="Dashboard_TipSearch" xml:space="preserve"><value>Start search</value></data>
-  <data name="Dashboard_TipAdvancedFilter" xml:space="preserve"><value>Toggle advanced filter panel</value></data>
-  <data name="Dashboard_TipApplyFilter" xml:space="preserve"><value>Apply filter conditions</value></data>
-  <data name="Dashboard_TipClearFilter" xml:space="preserve"><value>Clear all filter conditions</value></data>
-  <data name="Dashboard_TipCategoryItem" xml:space="preserve"><value>Click to filter by this item</value></data>
-  <data name="Dashboard_TipRefresh" xml:space="preserve"><value>Refresh document list (F5)</value></data>
-  <data name="Dashboard_TipUpcoming" xml:space="preserve"><value>View documents with upcoming deadlines</value></data>
-  <data name="Dashboard_TipOverdue" xml:space="preserve"><value>View overdue documents</value></data>
-  <data name="Dashboard_TipCopyPath" xml:space="preserve"><value>Copy selected document path</value></data>
-  <data name="Dashboard_TipOpenFolder" xml:space="preserve"><value>Open folder of selected document</value></data>
-  <data name="Dashboard_TipAbout" xml:space="preserve"><value>About this software</value></data>
-  <data name="Dashboard_TipEditTags" xml:space="preserve"><value>Tags are not shown directly in the table — quick edit here</value></data>
-  <data name="Dashboard_TipEditNotes" xml:space="preserve"><value>Internal notes are not shown directly in the table — quick edit here</value></data>
-  <data name="Dashboard_TipPersonalNote" xml:space="preserve"><value>Private, stored separately from internal notes above</value></data>
-  <data name="Dashboard_PreviewDeadline" xml:space="preserve"><value>Deadline: {0:dd/MM/yyyy}</value></data>
+  <!-- Dashboard Tooltips (additional) -->
+  <data name="Dashboard_TipCategoryItem" xml:space="preserve"><value>この項目でフィルタ</value></data>
+  <data name="Dashboard_TipCopyPath" xml:space="preserve"><value>選択した文書のパスをコピー</value></data>
+  <data name="Dashboard_TipOpenFolder" xml:space="preserve"><value>選択した文書のフォルダを開く</value></data>
+  <data name="Dashboard_TipAbout" xml:space="preserve"><value>このソフトウェアについて</value></data>
+  <data name="Dashboard_PreviewDeadline" xml:space="preserve"><value>期限: {0:dd/MM/yyyy}</value></data>
 
-  <!-- UpdateService -->
-  <data name="Update_NewVersionReady" xml:space="preserve"><value>New version {0} is ready!</value></data>
-  <data name="Update_OpenDownloadPage" xml:space="preserve"><value>Would you like to open the download page?</value></data>
-  <data name="Update_DialogTitle" xml:space="preserve"><value>Update Available</value></data>
-  <data name="Update_ErrorTitle" xml:space="preserve"><value>Error</value></data>
-  <data name="Update_BrowserError" xml:space="preserve"><value>Cannot open browser.\nPlease visit: {0}</value></data>
-  <data name="Update_ToastNewVersion" xml:space="preserve"><value>New version {0} available! Go to Help → Check for updates.</value></data>
+  <!-- UpdateService (additional) -->
+  <data name="Update_NewVersionReady" xml:space="preserve"><value>新バージョン {0} が利用可能です！</value></data>
+  <data name="Update_OpenDownloadPage" xml:space="preserve"><value>ダウンロードページを開きますか？</value></data>
+  <data name="Update_DialogTitle" xml:space="preserve"><value>アップデートあり</value></data>
+  <data name="Update_ErrorTitle" xml:space="preserve"><value>エラー</value></data>
+  <data name="Update_BrowserError" xml:space="preserve"><value>ブラウザを開けません。\nアクセス先: {0}</value></data>
+  <data name="Update_ToastNewVersion" xml:space="preserve"><value>新バージョン {0} が利用可能！ ヘルプ → アップデート確認</value></data>
 
-
-  <!-- AddToCollectionDialog -->
-  <data name="Collection_DocCount" xml:space="preserve"><value>{0} documents</value></data>
-  <data name="Collection_DocCountFiltered" xml:space="preserve"><value>{0} / {1} documents</value></data>
-  <data name="Collection_SelectAll" xml:space="preserve"><value>Select All</value></data>
-  <data name="Collection_DeselectAll" xml:space="preserve"><value>Deselect All</value></data>
-  <data name="Collection_AddToTitle" xml:space="preserve"><value>Add documents to "{0}"</value></data>
+  <!-- AddToCollectionDialog (additional) -->
+  <data name="Collection_DocCount" xml:space="preserve"><value>{0}件の文書</value></data>
+  <data name="Collection_DocCountFiltered" xml:space="preserve"><value>{0} / {1}件の文書</value></data>
+  <data name="Collection_SelectAll" xml:space="preserve"><value>すべて選択</value></data>
+  <data name="Collection_DeselectAll" xml:space="preserve"><value>すべて解除</value></data>
+  <data name="Collection_AddToTitle" xml:space="preserve"><value>"{0}" に文書を追加</value></data>
 
 </root>
+
 

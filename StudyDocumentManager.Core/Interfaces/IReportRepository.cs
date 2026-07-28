@@ -1,6 +1,6 @@
 namespace StudyDocumentManager.Core.Interfaces;
 
-public interface IReport
+public interface IReportRepository
 {
     List<(string Label, int Count)> GetBySubject();
     List<(string Label, int Count)> GetByType();

@@ -9,8 +9,9 @@ namespace StudyDocumentManager.Models;
 
 public partial class BulkDeleteModel : ModelBase
 {
-    private readonly IDocument _repository;
-    private readonly ICategory _categoryRepo;
+    private readonly IDocumentRepository _repository;
+    private readonly IBulkOperationRepository _bulkRepo;
+    private readonly ICategoryRepository _categoryRepo;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
@@ -31,9 +32,10 @@ public partial class BulkDeleteModel : ModelBase
     [ObservableProperty] private string _statusText = "";
     public int SelectedCount => Documents.Count(d => d.IsSelected);
 
-    public BulkDeleteModel(IDocument repository, ICategory categoryRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
+    public BulkDeleteModel(IDocumentRepository repository, IBulkOperationRepository bulkRepo, ICategoryRepository categoryRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
         _repository = repository;
+        _bulkRepo = bulkRepo;
         _categoryRepo = categoryRepo;
         _dialogService = dialogService;
         _navigationService = navigationService;
@@ -107,7 +109,7 @@ public partial class BulkDeleteModel : ModelBase
         if (!confirmed) return;
 
         var ids = selected.Select(s => s.Document.Id).ToList();
-        int deleted = _repository.BulkSoftDelete(ids);
+        int deleted = _bulkRepo.BulkSoftDelete(ids);
 
         await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
             string.Format(_loc["Bulk_DeleteDone"], deleted));
@@ -125,7 +127,7 @@ public partial class BulkDeleteModel : ModelBase
         }
 
         var ids = selected.Select(s => s.Document.Id).ToList();
-        int updated = _repository.BulkToggleImportant(ids, true);
+        int updated = _bulkRepo.BulkToggleImportant(ids, true);
 
         await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
             string.Format(_loc["Bulk_MarkImportantDone"], updated));
@@ -153,7 +155,7 @@ public partial class BulkDeleteModel : ModelBase
         if (!confirmed) return;
 
         var ids = selected.Select(s => s.Document.Id).ToList();
-        int updated = _repository.BulkUpdateSubject(ids, NewSubjectValue);
+        int updated = _bulkRepo.BulkUpdateSubject(ids, NewSubjectValue);
 
         await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
             string.Format(_loc["Bulk_ChangeSubjectDone"], updated));

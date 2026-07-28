@@ -2,7 +2,7 @@ namespace StudyDocumentManager.Core.Services;
 
 /// <summary>
 /// ファイル拡張子からドキュメント種別ラベルを判定するユーティリティ
-/// DB (loai列) に格納する種別名を返す — プラットフォーム非依存
+/// DB に格納する種別名を返す — プラットフォーム非依存
 /// </summary>
 public static class FileTypeDetector
 {

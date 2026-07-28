@@ -16,9 +16,9 @@ public partial class ReportModel : ModelBase
 
     [ObservableProperty] private string _selectedTab = "subject";
 
-    private readonly IReport _reportRepo;
+    private readonly IReportRepository _reportRepo;
 
-    public ReportModel(IReport reportRepo)
+    public ReportModel(IReportRepository reportRepo)
     {
         _reportRepo = reportRepo;
         LoadAllData();

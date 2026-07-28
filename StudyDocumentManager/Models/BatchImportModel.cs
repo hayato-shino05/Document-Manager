@@ -10,7 +10,7 @@ namespace StudyDocumentManager.Models;
 
 public partial class BatchImportModel : ModelBase
 {
-    private readonly IDocument _repository;
+    private readonly IDocumentRepository _repository;
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
     private readonly INavigationService _navigationService;
@@ -22,7 +22,7 @@ public partial class BatchImportModel : ModelBase
     [ObservableProperty] private int _importedCount;
     [ObservableProperty] private bool _isImporting;
 
-    public BatchImportModel(IDocument repository, IDialogService dialogService, IFileDialogService fileDialogService, INavigationService navigationService, ILocalizationService loc)
+    public BatchImportModel(IDocumentRepository repository, IDialogService dialogService, IFileDialogService fileDialogService, INavigationService navigationService, ILocalizationService loc)
     {
         _repository = repository;
         _dialogService = dialogService;

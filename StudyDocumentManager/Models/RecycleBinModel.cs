@@ -9,14 +9,14 @@ namespace StudyDocumentManager.Models;
 
 public partial class RecycleBinModel : ModelBase
 {
-    private readonly IDocument _docRepo;
+    private readonly IRecycleBinRepository _docRepo;
     private readonly IDialogService _dialogService;
     private readonly ILocalizationService _loc;
 
     [ObservableProperty] private ObservableCollection<StudyDocument> _deletedDocuments = new();
     [ObservableProperty] private StudyDocument? _selectedDocument;
 
-    public RecycleBinModel(IDocument docRepo, IDialogService dialogService, ILocalizationService loc)
+    public RecycleBinModel(IRecycleBinRepository docRepo, IDialogService dialogService, ILocalizationService loc)
     {
         _docRepo = docRepo;
         _dialogService = dialogService;

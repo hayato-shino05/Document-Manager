@@ -5,77 +5,80 @@ using StudyDocumentManager.Data.Helpers;
 namespace StudyDocumentManager.Data.Repositories;
 
 /// <summary>
-/// IDocumentRepository implementation using DatabaseHelper.
+/// Implements all document-related repository interfaces using DatabaseHelper.
 /// </summary>
-public class DocumentRepository : IDocument
+public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IBulkOperationRepository, IFileIntegrityRepository
 {
-    public List<StudyDocument> GetAll() => DatabaseHelper.GetAllDocuments();
+    private readonly DatabaseHelper _db;
 
-    public StudyDocument? GetById(int id) => DatabaseHelper.GetDocumentById(id);
+    public DocumentRepository(DatabaseHelper db) => _db = db;
 
-    public List<StudyDocument> Search(string keyword) => DatabaseHelper.SearchDocuments(keyword);
+    public List<StudyDocument> GetAll() => _db.GetAllDocuments();
 
-    public List<StudyDocument> Filter(string subject, string type) => DatabaseHelper.FilterDocuments(subject, type);
+    public StudyDocument? GetById(int id) => _db.GetDocumentById(id);
+
+    public List<StudyDocument> Search(string keyword) => _db.SearchDocuments(keyword);
+
+    public List<StudyDocument> Filter(string subject, string type) => _db.FilterDocuments(subject, type);
 
     public List<StudyDocument> SearchAdvanced(
         string keyword, string subject, string type,
         DateTime? fromDate, DateTime? toDate,
         double? minSize, double? maxSize, bool? isImportant)
-        => DatabaseHelper.SearchDocumentsAdvanced(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant);
+        => _db.SearchDocumentsAdvanced(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant);
 
-    public bool Add(StudyDocument document) => DatabaseHelper.InsertDocument(document);
+    public bool Add(StudyDocument document) => _db.InsertDocument(document);
 
-    public bool Update(StudyDocument document) => DatabaseHelper.UpdateDocument(document);
+    public bool Update(StudyDocument document) => _db.UpdateDocument(document);
 
-    public bool Delete(int id) => DatabaseHelper.DeleteDocument(id);
+    public bool Delete(int id) => _db.DeleteDocument(id);
 
-    public List<string> GetDistinctSubjects() => DatabaseHelper.GetDistinctSubjects();
+    public List<string> GetDistinctSubjects() => _db.GetDistinctSubjects();
 
-    public List<string> GetDistinctTypes() => DatabaseHelper.GetDistinctTypes();
+    public List<string> GetDistinctTypes() => _db.GetDistinctTypes();
 
-    public List<string> GetDistinctTags() => DatabaseHelper.GetDistinctTags();
+    public List<string> GetDistinctTags() => _db.GetDistinctTags();
 
-    public List<StudyDocument> GetUpcomingDeadlines(int days) => DatabaseHelper.GetUpcomingDeadlines(days);
+    public List<StudyDocument> GetUpcomingDeadlines(int days) => _db.GetUpcomingDeadlines(days);
 
-    public List<StudyDocument> GetOverdueDocuments() => DatabaseHelper.GetOverdueDocuments();
+    public List<StudyDocument> GetOverdueDocuments() => _db.GetOverdueDocuments();
 
     public void EnsureSubjectExists(string subject)
     {
         if (!string.IsNullOrWhiteSpace(subject))
-            DatabaseHelper.AddSubject(subject);
+            _db.AddSubject(subject);
     }
 
     public void EnsureTypeExists(string type)
     {
         if (!string.IsNullOrWhiteSpace(type))
-            DatabaseHelper.AddType(type);
+            _db.AddType(type);
     }
 
-    // â”€â”€â”€ RecycleBin â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    public List<StudyDocument> GetDeletedDocuments() => DatabaseHelper.GetDeletedDocuments();
+    // ——— RecycleBin ———————————————————————————————————————————
+    public List<StudyDocument> GetDeletedDocuments() => _db.GetDeletedDocuments();
 
-    public bool RestoreDocument(int id) => DatabaseHelper.RestoreDocument(id);
+    public bool RestoreDocument(int id) => _db.RestoreDocument(id);
 
-    public bool PermanentDeleteDocument(int id) => DatabaseHelper.PermanentDeleteDocument(id);
+    public bool PermanentDeleteDocument(int id) => _db.PermanentDeleteDocument(id);
 
-    public int EmptyRecycleBin() => DatabaseHelper.EmptyRecycleBin();
+    public int EmptyRecycleBin() => _db.EmptyRecycleBin();
 
-    public int GetDeletedDocumentCount() => DatabaseHelper.GetDeletedDocumentCount();
+    public int GetDeletedDocumentCount() => _db.GetDeletedDocumentCount();
 
-    // â”€â”€â”€ Bulk operations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    public int BulkSoftDelete(List<int> ids) => DatabaseHelper.BulkSoftDelete(ids);
+    // ——— Bulk operations ——————————————————————————————————————
+    public int BulkSoftDelete(List<int> ids) => _db.BulkSoftDelete(ids);
 
-    public int BulkUpdateSubject(List<int> ids, string subject) => DatabaseHelper.BulkUpdateSubject(ids, subject);
+    public int BulkUpdateSubject(List<int> ids, string subject) => _db.BulkUpdateSubject(ids, subject);
 
-    public int BulkToggleImportant(List<int> ids, bool important) => DatabaseHelper.BulkToggleImportant(ids, important);
+    public int BulkToggleImportant(List<int> ids, bool important) => _db.BulkToggleImportant(ids, important);
 
-    // â”€â”€â”€ Backup & Restore â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    public bool BackupDatabase(string destPath) => DatabaseHelper.BackupDatabase(destPath);
+    // ——— File integrity ———————————————————————————————————————
+    public bool UpdateDocumentPath(int id, string newPath) => _db.UpdateDocumentPath(id, newPath);
 
-    public string DatabasePath => DatabaseHelper.DatabasePath;
+    public bool ClearDocumentPath(int id) => _db.ClearDocumentPath(id);
 
-    // â”€â”€â”€ File integrity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    public bool UpdateDocumentPath(int id, string newPath) => DatabaseHelper.UpdateDocumentPath(id, newPath);
+    public bool BackupDatabase(string destPath) => _db.BackupDatabase(destPath);
 
-    public bool ClearDocumentPath(int id) => DatabaseHelper.ClearDocumentPath(id);
+    public string DatabasePath => _db.DatabasePath;
 }

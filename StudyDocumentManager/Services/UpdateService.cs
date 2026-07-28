@@ -1,26 +1,73 @@
-using StudyDocumentManager.Core.Interfaces;
 using System.Diagnostics;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using StudyDocumentManager.Core.DTOs;
+using StudyDocumentManager.Core.Interfaces;
+using StudyDocumentManager.Core.Services;
 namespace StudyDocumentManager.Services;
 
-/// <summary>
-/// Handles update download and installation for Avalonia app.
-/// Unlike WinForms version, this opens the browser to download page
-/// instead of downloading Setup.exe directly (cross-platform friendly).
-/// </summary>
-public static class UpdateService
+public class UpdateService : IUpdateService
 {
-    /// <summary>
-    /// Show update notification and offer to open release page.
-    /// </summary>
-    public static async Task HandleUpdateAsync(UpdateInfo update, IDialogService dialogService, ILocalizationService loc)
+    private const string RepoOwner = "hayato-shino05";
+    private const string RepoName = "study-document-manager";
+    private static readonly string ApiUrl =
+        $"https://api.github.com/repos/{RepoOwner}/{RepoName}/releases/latest";
+
+    private static readonly HttpClient HttpClient = CreateHttpClient();
+
+    private readonly IDialogService _dialogService;
+    private readonly ILocalizationService _loc;
+    private readonly IToastService _toast;
+
+    public UpdateService(IDialogService dialogService, ILocalizationService loc, IToastService toast)
+    {
+        _dialogService = dialogService;
+        _loc = loc;
+        _toast = toast;
+    }
+
+    private static HttpClient CreateHttpClient()
+    {
+        var client = new HttpClient();
+        client.DefaultRequestHeaders.UserAgent.Add(
+            new ProductInfoHeaderValue("StudyDocumentManager", AppVersion.Current));
+        client.DefaultRequestHeaders.Accept.Add(
+            new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
+        client.Timeout = TimeSpan.FromSeconds(10);
+        return client;
+    }
+
+    public async Task<UpdateInfo?> CheckForUpdateAsync()
+    {
+        try
+        {
+            var json = await HttpClient.GetStringAsync(ApiUrl);
+            return ParseResponse(json);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task CheckSilentlyAsync()
+    {
+        var info = await CheckForUpdateAsync();
+        if (info is { HasUpdate: true })
+        {
+            _toast.Show(
+                string.Format(_loc["Update_ToastNewVersion"], info.NewVersion),
+                ToastType.Info,
+                5000);
+        }
+    }
+
+    public async Task HandleUpdateAsync(UpdateInfo update)
     {
         if (update == null || !update.HasUpdate) return;
 
-        var message = string.Format(loc["Update_NewVersionReady"], update.NewVersion) + "\n\n";
+        var message = string.Format(_loc["Update_NewVersionReady"], update.NewVersion) + "\n\n";
 
         if (!string.IsNullOrEmpty(update.ReleaseNotes))
         {
@@ -30,14 +77,14 @@ public static class UpdateService
             message += $"Release Notes:\n{notes}\n\n";
         }
 
-        message += loc["Update_OpenDownloadPage"];
+        message += _loc["Update_OpenDownloadPage"];
 
-        var confirmed = await dialogService.ShowConfirmAsync(loc["Update_DialogTitle"], message);
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Update_DialogTitle"], message);
         if (!confirmed) return;
 
         var url = !string.IsNullOrEmpty(update.ReleasePageUrl)
             ? update.ReleasePageUrl
-            : $"https://github.com/hayato-shino05/study-document-manager/releases/latest";
+            : $"https://github.com/{RepoOwner}/{RepoName}/releases/latest";
 
         try
         {
@@ -49,23 +96,54 @@ public static class UpdateService
         }
         catch
         {
-            await dialogService.ShowErrorAsync(loc["Update_ErrorTitle"],
-                string.Format(loc["Update_BrowserError"], url));
+            await _dialogService.ShowErrorAsync(_loc["Update_ErrorTitle"],
+                string.Format(_loc["Update_BrowserError"], url));
         }
     }
 
-    /// <summary>
-    /// Check for updates silently and show toast if available.
-    /// </summary>
-    public static async Task CheckSilentlyAsync(IDialogService dialogService, ILocalizationService loc)
+    private static UpdateInfo? ParseResponse(string json)
     {
-        var info = await UpdateChecker.CheckForUpdateAsync();
-        if (info is { HasUpdate: true })
+        try
         {
-            ToastService.Show(
-                string.Format(loc["Update_ToastNewVersion"], info.NewVersion),
-                ToastService.ToastType.Info,
-                5000);
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            var tagName = root.TryGetProperty("tag_name", out var tagProp)
+                ? tagProp.GetString() ?? "" : "";
+            var body = root.TryGetProperty("body", out var bodyProp)
+                ? bodyProp.GetString() ?? "" : "";
+            var htmlUrl = root.TryGetProperty("html_url", out var urlProp)
+                ? urlProp.GetString() ?? "" : "";
+
+            string? setupUrl = null;
+            if (root.TryGetProperty("assets", out var assets) && assets.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var asset in assets.EnumerateArray())
+                {
+                    var name = asset.TryGetProperty("name", out var nameProp)
+                        ? nameProp.GetString() ?? "" : "";
+                    if (name.EndsWith("_Setup.exe", StringComparison.OrdinalIgnoreCase) ||
+                        name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                    {
+                        setupUrl = asset.TryGetProperty("browser_download_url", out var dlProp)
+                            ? dlProp.GetString() : null;
+                        break;
+                    }
+                }
+            }
+
+            return new UpdateInfo
+            {
+                HasUpdate = AppVersion.IsNewer(tagName),
+                NewVersion = tagName,
+                DownloadUrl = setupUrl ?? "",
+                ReleasePageUrl = htmlUrl,
+                ReleaseNotes = body
+            };
+        }
+        catch
+        {
+            return null;
         }
     }
 }

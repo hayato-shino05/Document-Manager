@@ -1,6 +1,6 @@
 namespace StudyDocumentManager.Core.Interfaces;
 
-public interface ICategory
+public interface ICategoryRepository
 {
     List<string> GetAllSubjects();
     List<string> GetAllTypes();

@@ -3,12 +3,16 @@ using StudyDocumentManager.Data.Helpers;
 
 namespace StudyDocumentManager.Data.Repositories;
 
-public class RecentFileRepository : IRecentFile
+public class RecentFileRepository : IRecentFileRepository
 {
+    private readonly DatabaseHelper _db;
+
+    public RecentFileRepository(DatabaseHelper db) => _db = db;
+
     public List<(int Id, string Name, string? Subject, string? Type, string? FilePath, DateTime OpenedAt)> GetAll()
-        => DatabaseHelper.GetRecentFiles();
+        => _db.GetRecentFiles();
 
-    public void Add(int documentId) => DatabaseHelper.AddRecentFile(documentId);
+    public void Add(int documentId) => _db.AddRecentFile(documentId);
 
-    public void Clear() => DatabaseHelper.ClearRecentFiles();
+    public void Clear() => _db.ClearRecentFiles();
 }

@@ -3,27 +3,31 @@ using StudyDocumentManager.Data.Helpers;
 
 namespace StudyDocumentManager.Data.Repositories;
 
-public class CategoryRepository : ICategory
+public class CategoryRepository : ICategoryRepository
 {
-    public List<string> GetAllSubjects() => DatabaseHelper.GetAllSubjects();
+    private readonly DatabaseHelper _db;
 
-    public List<string> GetAllTypes() => DatabaseHelper.GetAllTypes();
+    public CategoryRepository(DatabaseHelper db) => _db = db;
 
-    public List<(string Name, int Count)> GetSubjectsWithCount() => DatabaseHelper.GetSubjectsWithCount();
+    public List<string> GetAllSubjects() => _db.GetAllSubjects();
 
-    public List<(string Name, int Count)> GetTypesWithCount() => DatabaseHelper.GetTypesWithCount();
+    public List<string> GetAllTypes() => _db.GetAllTypes();
 
-    public bool AddSubject(string name) => DatabaseHelper.AddSubject(name);
+    public List<(string Name, int Count)> GetSubjectsWithCount() => _db.GetSubjectsWithCount();
 
-    public bool AddType(string name) => DatabaseHelper.AddType(name);
+    public List<(string Name, int Count)> GetTypesWithCount() => _db.GetTypesWithCount();
 
-    public bool UpdateSubjectName(string oldName, string newName) => DatabaseHelper.UpdateSubjectName(oldName, newName);
+    public bool AddSubject(string name) => _db.AddSubject(name);
 
-    public bool UpdateTypeName(string oldName, string newName) => DatabaseHelper.UpdateTypeName(oldName, newName);
+    public bool AddType(string name) => _db.AddType(name);
 
-    public bool DeleteDocumentsBySubject(string subjectName) => DatabaseHelper.DeleteDocumentsBySubject(subjectName);
+    public bool UpdateSubjectName(string oldName, string newName) => _db.UpdateSubjectName(oldName, newName);
 
-    public bool DeleteDocumentsByType(string typeName) => DatabaseHelper.DeleteDocumentsByType(typeName);
+    public bool UpdateTypeName(string oldName, string newName) => _db.UpdateTypeName(oldName, newName);
 
-    public int GetTotalDocumentCount() => DatabaseHelper.GetTotalDocumentCount();
+    public bool DeleteDocumentsBySubject(string subjectName) => _db.DeleteDocumentsBySubject(subjectName);
+
+    public bool DeleteDocumentsByType(string typeName) => _db.DeleteDocumentsByType(typeName);
+
+    public int GetTotalDocumentCount() => _db.GetTotalDocumentCount();
 }

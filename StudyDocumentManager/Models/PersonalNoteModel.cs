@@ -9,7 +9,7 @@ namespace StudyDocumentManager.Models;
 
 public partial class PersonalNoteModel : ModelBase
 {
-    private readonly IPersonalNote _noteRepo;
+    private readonly IPersonalNoteRepository _noteRepo;
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
@@ -19,7 +19,7 @@ public partial class PersonalNoteModel : ModelBase
     [ObservableProperty] private string _noteContent = string.Empty;
     [ObservableProperty] private bool _hasExistingNote;
 
-    public PersonalNoteModel(IPersonalNote noteRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
+    public PersonalNoteModel(IPersonalNoteRepository noteRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
         _noteRepo = noteRepo;
         _dialogService = dialogService;

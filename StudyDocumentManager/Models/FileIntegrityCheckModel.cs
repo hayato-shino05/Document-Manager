@@ -9,7 +9,8 @@ namespace StudyDocumentManager.Models;
 
 public partial class FileIntegrityCheckModel : ModelBase
 {
-    private readonly IDocument _repository;
+    private readonly IDocumentRepository _repository;
+    private readonly IFileIntegrityRepository _fileIntegrityRepo;
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
     private readonly ILocalizationService _loc;
@@ -20,9 +21,10 @@ public partial class FileIntegrityCheckModel : ModelBase
     [ObservableProperty] private int _missingCount;
     [ObservableProperty] private string _statusText = string.Empty;
 
-    public FileIntegrityCheckModel(IDocument repository, IDialogService dialogService, IFileDialogService fileDialogService, ILocalizationService loc)
+    public FileIntegrityCheckModel(IDocumentRepository repository, IFileIntegrityRepository fileIntegrityRepo, IDialogService dialogService, IFileDialogService fileDialogService, ILocalizationService loc)
     {
         _repository = repository;
+        _fileIntegrityRepo = fileIntegrityRepo;
         _dialogService = dialogService;
         _fileDialogService = fileDialogService;
         _loc = loc;
@@ -75,7 +77,7 @@ public partial class FileIntegrityCheckModel : ModelBase
             _loc["Integrity_SelectNewFile"], _loc["Integrity_FileFilter"]);
         if (string.IsNullOrWhiteSpace(newPath)) return;
 
-        if (_repository.UpdateDocumentPath(item.Document.Id, newPath))
+        if (_fileIntegrityRepo.UpdateDocumentPath(item.Document.Id, newPath))
         {
             Results.Remove(item);
             MissingCount--;
@@ -96,7 +98,7 @@ public partial class FileIntegrityCheckModel : ModelBase
             _loc["Integrity_ConfirmClearPath"]);
         if (!confirmed) return;
 
-        if (_repository.ClearDocumentPath(item.Document.Id))
+        if (_fileIntegrityRepo.ClearDocumentPath(item.Document.Id))
         {
             Results.Remove(item);
             MissingCount--;

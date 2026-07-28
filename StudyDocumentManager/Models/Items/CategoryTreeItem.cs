@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Media;
 using Avalonia.Styling;
 
-namespace StudyDocumentManager.Models;
+namespace StudyDocumentManager.Models.Items;
 
 /// <summary>
 /// カテゴリツリーの各ノードを表すUIモデル

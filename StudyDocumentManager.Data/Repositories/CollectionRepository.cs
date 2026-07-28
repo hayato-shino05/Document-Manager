@@ -4,26 +4,30 @@ using StudyDocumentManager.Data.Helpers;
 
 namespace StudyDocumentManager.Data.Repositories;
 
-public class CollectionRepository : ICollection
+public class CollectionRepository : ICollectionRepository
 {
+    private readonly DatabaseHelper _db;
+
+    public CollectionRepository(DatabaseHelper db) => _db = db;
+
     public List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetAll()
-        => DatabaseHelper.GetCollections();
+        => _db.GetCollections();
 
     public int Create(string name, string? description = null)
-        => DatabaseHelper.CreateCollection(name, description);
+        => _db.CreateCollection(name, description);
 
     public bool Update(int id, string name, string? description = null)
-        => DatabaseHelper.UpdateCollection(id, name, description);
+        => _db.UpdateCollection(id, name, description);
 
     public bool Delete(int id)
-        => DatabaseHelper.DeleteCollection(id);
+        => _db.DeleteCollection(id);
 
     public List<StudyDocument> GetDocuments(int collectionId)
-        => DatabaseHelper.GetDocumentsInCollection(collectionId);
+        => _db.GetDocumentsInCollection(collectionId);
 
     public bool AddDocument(int collectionId, int documentId)
-        => DatabaseHelper.AddDocumentToCollection(collectionId, documentId);
+        => _db.AddDocumentToCollection(collectionId, documentId);
 
     public bool RemoveDocument(int collectionId, int documentId)
-        => DatabaseHelper.RemoveDocumentFromCollection(collectionId, documentId);
+        => _db.RemoveDocumentFromCollection(collectionId, documentId);
 }
