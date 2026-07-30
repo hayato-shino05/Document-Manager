@@ -13,8 +13,9 @@ public partial class ReportModel : ModelBase
     [ObservableProperty] private ObservableCollection<ChartDataItem> _byTypeData = new();
     [ObservableProperty] private ObservableCollection<ChartDataItem> _byDayData = new();
     [ObservableProperty] private ObservableCollection<ChartDataItem> _byMonthData = new();
+    [ObservableProperty] private bool _hasDayData;
+    [ObservableProperty] private bool _hasMonthData;
 
-    [ObservableProperty] private string _selectedTab = "subject";
 
     private readonly IReportRepository _reportRepo;
 
@@ -38,6 +39,9 @@ public partial class ReportModel : ModelBase
 
         ByMonthData = CreateChartData(
             _reportRepo.GetByMonth(12).Select(x => new ChartDataItem { Label = x.Label, Value = x.Count }));
+
+        HasDayData = ByDayData.Any(item => item.Value > 0);
+        HasMonthData = ByMonthData.Any(item => item.Value > 0);
     }
 
     private static ObservableCollection<ChartDataItem> CreateChartData(IEnumerable<ChartDataItem> items)

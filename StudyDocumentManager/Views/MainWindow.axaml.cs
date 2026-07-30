@@ -20,54 +20,73 @@ public partial class MainWindow : Window
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        base.OnKeyDown(e);
+        if (DataContext is MainWindowModel { CurrentView: AddEditModel addEdit }
+            && e.KeyModifiers == KeyModifiers.Control
+            && e.Key == Key.S)
+        {
+            addEdit.SaveCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
 
         var vm = DataContext as MainWindowModel;
-        if (vm?.CurrentView is not DashboardModel dashboard) return;
+        if (vm?.CurrentView is DashboardModel dashboard)
+        {
+            if (e.KeyModifiers == KeyModifiers.Control)
+            {
+                switch (e.Key)
+                {
+                    case Key.N:
+                        dashboard.AddDocumentCommand.Execute(null);
+                        e.Handled = true;
+                        return;
+                    case Key.F:
+                        dashboard.ToggleAdvancedFilterCommand.Execute(null);
+                        e.Handled = true;
+                        return;
+                    case Key.E:
+                        dashboard.ExportCsvCommand.Execute(null);
+                        e.Handled = true;
+                        return;
+                    case Key.O:
+                        dashboard.OpenFileCommand.Execute(null);
+                        e.Handled = true;
+                        return;
+                }
+            }
+            else if (e.KeyModifiers == KeyModifiers.None)
+            {
+                switch (e.Key)
+                {
+                    case Key.F5:
+                        dashboard.RefreshCommand.Execute(null);
+                        e.Handled = true;
+                        return;
+                    case Key.Delete:
+                        dashboard.DeleteDocumentCommand.Execute(null);
+                        e.Handled = true;
+                        return;
+                }
+            }
+        }
 
-        // Keyboard shortcuts — only active when on Dashboard
-        if (e.KeyModifiers == KeyModifiers.Control)
-        {
-            switch (e.Key)
-            {
-                case Key.N: // Ctrl+N → Add new document
-                    dashboard.AddDocumentCommand.Execute(null);
-                    e.Handled = true;
-                    break;
-                case Key.F: // Ctrl+F → Focus search (toggle advanced filter as placeholder)
-                    dashboard.ToggleAdvancedFilterCommand.Execute(null);
-                    e.Handled = true;
-                    break;
-                case Key.E: // Ctrl+E → Export CSV
-                    dashboard.ExportCsvCommand.Execute(null);
-                    e.Handled = true;
-                    break;
-                case Key.O: // Ctrl+O → Open selected file
-                    dashboard.OpenFileCommand.Execute(null);
-                    e.Handled = true;
-                    break;
-            }
-        }
-        else if (e.KeyModifiers == KeyModifiers.None)
-        {
-            switch (e.Key)
-            {
-                case Key.F5: // F5 → Refresh
-                    dashboard.RefreshCommand.Execute(null);
-                    e.Handled = true;
-                    break;
-                case Key.Delete: // Del → Delete selected
-                    dashboard.DeleteDocumentCommand.Execute(null);
-                    e.Handled = true;
-                    break;
-            }
-        }
+        base.OnKeyDown(e);
     }
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
-        // Accept file drops
-        e.DragEffects = e.Data.Contains(DataFormats.Files)
+        var hasFiles = e.Data.GetFiles()?
+            .OfType<Avalonia.Platform.Storage.IStorageFile>()
+            .Any() == true;
+
+        if (DataContext is not MainWindowModel vm || !hasFiles)
+        {
+            e.DragEffects = DragDropEffects.None;
+            e.Handled = true;
+            return;
+        }
+
+        e.DragEffects = vm.CanAcceptDroppedFiles
             ? DragDropEffects.Copy
             : DragDropEffects.None;
         e.Handled = true;
@@ -75,24 +94,53 @@ public partial class MainWindow : Window
 
     private async void OnDrop(object? sender, DragEventArgs e)
     {
-        if (!e.Data.Contains(DataFormats.Files))
-            return;
+        try
+        {
+            if (DataContext is not MainWindowModel vm)
+                return;
 
-        if (DataContext is not MainWindowModel vm)
-            return;
+            var files = e.Data.GetFiles()?
+                .OfType<Avalonia.Platform.Storage.IStorageFile>()
+                .ToList();
 
-        var filePaths = e.Data.GetFiles()?
-            .OfType<Avalonia.Platform.Storage.IStorageFile>()
-            .Select(file => file.Path.LocalPath)
-            .Where(path => !string.IsNullOrEmpty(path))
-            .Cast<string>()
-            .ToList();
+            if (files == null || files.Count == 0)
+            {
+                vm.ShowInvalidDropStatus();
+                return;
+            }
 
-        if (filePaths == null || filePaths.Count == 0)
-            return;
+            var filePaths = files
+                .Select(file => file.Path.LocalPath)
+                .Where(path => !string.IsNullOrEmpty(path))
+                .Cast<string>()
+                .ToList();
 
-        await vm.HandleDroppedFilesAsync(filePaths);
-        e.Handled = true;
+            if (filePaths.Count == 0)
+            {
+                vm.ShowInvalidDropStatus();
+                return;
+            }
+
+            await vm.HandleDroppedFilesAsync(filePaths);
+        }
+        catch (IOException)
+        {
+            if (DataContext is MainWindowModel vm)
+                vm.ShowInvalidDropStatus();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            if (DataContext is MainWindowModel vm)
+                vm.ShowInvalidDropStatus();
+        }
+        catch
+        {
+            if (DataContext is MainWindowModel vm)
+                vm.ShowInvalidDropStatus();
+        }
+        finally
+        {
+            e.Handled = true;
+        }
     }
-
 }

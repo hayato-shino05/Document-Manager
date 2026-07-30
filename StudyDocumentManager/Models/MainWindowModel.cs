@@ -25,6 +25,7 @@ public partial class MainWindowModel : ModelBase
     public IReadOnlyList<SupportedLanguage> AvailableLanguages => _loc.AvailableLanguages;
 
     public bool CanGoBack => _navigationService.CanGoBack;
+    public bool CanAcceptDroppedFiles => CurrentView is DashboardModel or AddEditModel or BatchImportModel;
 
     private readonly INavigationService _navigationService;
     private readonly IDialogService _dialogService;
@@ -193,21 +194,66 @@ public partial class MainWindowModel : ModelBase
         if (filePaths.Count == 0)
             return;
 
-        var subjects = _droppedFileImportService.GetAvailableSubjects([]);
-        var types = _droppedFileImportService.GetAvailableTypes([]);
+        var validPaths = filePaths
+            .Where(path => !string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
 
-        int imported = filePaths.Count == 1
-            ? await ImportSingleFileAsync(filePaths[0], subjects, types)
-            : ImportMultipleFiles(filePaths);
-
-        if (imported == 0)
-            return;
-
-        if (CurrentView is DashboardModel dashboard)
+        if (validPaths.Count == 0)
         {
-            dashboard.RefreshCommand.Execute(null);
-            UpdateStatusFromDashboard(dashboard);
+            ShowInvalidDropStatus();
+            return;
         }
+
+        try
+        {
+            switch (CurrentView)
+            {
+                case AddEditModel addEdit when validPaths.Count == 1:
+                    StatusText = addEdit.TryApplyFile(validPaths[0])
+                        ? string.Empty
+                        : _loc["BatchImport_InvalidDrop"];
+                    return;
+
+                case BatchImportModel batchImport:
+                    await batchImport.AddDroppedFilesAsync(validPaths);
+                    StatusText = string.Empty;
+                    return;
+
+                case DashboardModel dashboard:
+                {
+                    var subjects = _droppedFileImportService.GetAvailableSubjects([]);
+                    var types = _droppedFileImportService.GetAvailableTypes([]);
+                    int imported = validPaths.Count == 1
+                        ? await ImportSingleFileAsync(validPaths[0], subjects, types)
+                        : ImportMultipleFiles(validPaths);
+
+                    if (imported == 0)
+                        return;
+
+                    dashboard.RefreshCommand.Execute(null);
+                    UpdateStatusFromDashboard(dashboard);
+                    return;
+                }
+
+                default:
+                    ShowInvalidDropStatus();
+                    return;
+            }
+        }
+        catch (IOException)
+        {
+            ShowInvalidDropStatus();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            ShowInvalidDropStatus();
+        }
+    }
+
+    public void ShowInvalidDropStatus()
+    {
+        StatusText = _loc["BatchImport_InvalidDrop"];
     }
 
     private async Task<int> ImportSingleFileAsync(string filePath, IList<string> subjects, IList<string> types)

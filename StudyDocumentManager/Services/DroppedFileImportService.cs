@@ -20,15 +20,7 @@ public class DroppedFileImportService(IDocumentRepository repository) : IDropped
         return types.Count > 0 ? types : fallbackTypes.ToList();
     }
 
-    public bool SaveDocument(StudyDocument document)
-    {
-        if (!_repository.Add(document))
-            return false;
-
-        _repository.EnsureSubjectExists(document.Subject);
-        _repository.EnsureTypeExists(document.Type);
-        return true;
-    }
+    public bool SaveDocument(StudyDocument document) => _repository.AddWithCatalogs(document);
 
     public StudyDocument BuildDocumentFromPath(string filePath)
     {

@@ -32,66 +32,43 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
 
     public async Task ShowMessageAsync(string title, string message)
     {
-        var dialog = CreateDialog(title, message, showCancel: false);
-        await dialog.ShowDialog(GetMainWindow()!);
+        var (dialog, confirmButton, _) = CreateDialog(title, message, showCancel: false);
+        confirmButton.Click += (_, _) => dialog.Close();
+
+        var owner = GetMainWindow();
+        if (owner != null)
+            await dialog.ShowDialog(owner);
     }
 
     public async Task ShowErrorAsync(string title, string message)
     {
-        var dialog = CreateDialog(title, message, showCancel: false);
-        await dialog.ShowDialog(GetMainWindow()!);
+        var (dialog, confirmButton, _) = CreateDialog(title, message, showCancel: false);
+        confirmButton.Click += (_, _) => dialog.Close();
+
+        var owner = GetMainWindow();
+        if (owner != null)
+            await dialog.ShowDialog(owner);
     }
 
     public async Task<bool> ShowConfirmAsync(string title, string message)
-    {
-        var result = false;
-        var dialog = CreateDialog(title, message, showCancel: true);
-
-        if (dialog.Content is StackPanel panel)
-        {
-            var buttonPanel = panel.Children.OfType<StackPanel>().LastOrDefault();
-            if (buttonPanel != null)
-            {
-                var okButton = buttonPanel.Children.OfType<Button>().FirstOrDefault();
-                if (okButton != null)
-                {
-                    okButton.Click += (_, _) => { result = true; dialog.Close(); };
-                }
-                var cancelButton = buttonPanel.Children.OfType<Button>().LastOrDefault();
-                if (cancelButton != null)
-                {
-                    cancelButton.Click += (_, _) => { result = false; dialog.Close(); };
-                }
-            }
-        }
-
-        await dialog.ShowDialog(GetMainWindow()!);
-        return result;
-    }
+        => await ShowConfirmAsync(title, message, _loc["Action_Save"]);
 
     public async Task<bool> ShowConfirmAsync(string title, string message,
         string confirmText, bool isDanger = false)
     {
-        var result = false;
-        var dialog = CreateDialog(title, message, showCancel: true,
+        var (dialog, confirmButton, cancelButton) = CreateDialog(title, message, showCancel: true,
             okText: confirmText, okIsDanger: isDanger);
+        var result = false;
 
-        if (dialog.Content is StackPanel panel)
-        {
-            var buttonPanel = panel.Children.OfType<StackPanel>().LastOrDefault();
-            if (buttonPanel != null)
-            {
-                var okButton = buttonPanel.Children.OfType<Button>().FirstOrDefault();
-                if (okButton != null)
-                    okButton.Click += (_, _) => { result = true; dialog.Close(); };
+        confirmButton.Click += (_, _) => { result = true; dialog.Close(); };
+        if (cancelButton != null)
+            cancelButton.Click += (_, _) => { result = false; dialog.Close(); };
 
-                var cancelButton = buttonPanel.Children.OfType<Button>().LastOrDefault();
-                if (cancelButton != null)
-                    cancelButton.Click += (_, _) => { result = false; dialog.Close(); };
-            }
-        }
+        var owner = GetMainWindow();
+        if (owner == null)
+            return false;
 
-        await dialog.ShowDialog(GetMainWindow()!);
+        await dialog.ShowDialog(owner);
         return result;
     }
 
@@ -303,11 +280,11 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         return types.Count > 0 ? types : null;
     }
 
-    private Window CreateDialog(string title, string message, bool showCancel,
+    private (Window Dialog, Button ConfirmButton, Button? CancelButton) CreateDialog(string title, string message, bool showCancel,
         string? okText = null, bool okIsDanger = false)
     {
         var resolvedOkText = okText ?? _loc["Action_Save"];
-
+        var (buttonPanel, confirmButton, cancelButton) = CreateButtonPanel(showCancel, resolvedOkText, okIsDanger);
         var panel = new StackPanel
         {
             Spacing = 8,
@@ -320,7 +297,7 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
                     TextWrapping = Avalonia.Media.TextWrapping.Wrap,
                     MaxWidth = 350
                 },
-                CreateButtonPanel(showCancel, resolvedOkText, okIsDanger)
+                buttonPanel
             }
         };
 
@@ -334,24 +311,13 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
             CanResize = false
         };
 
-        if (!showCancel)
-        {
-            var buttonPanel = panel.Children.OfType<StackPanel>().LastOrDefault();
-            var okButton = buttonPanel?.Children.OfType<Button>().FirstOrDefault();
-            if (okButton != null)
-            {
-                okButton.Click += (_, _) => dialog.Close();
-            }
-        }
-
-        return dialog;
+        return (dialog, confirmButton, cancelButton);
     }
 
-    private StackPanel CreateButtonPanel(bool showCancel = true,
+    private (StackPanel Panel, Button ConfirmButton, Button? CancelButton) CreateButtonPanel(bool showCancel = true,
         string? okText = null, bool okIsDanger = false)
     {
         var resolvedOkText = okText ?? _loc["Action_Save"];
-
         var panel = new StackPanel
         {
             Orientation = Avalonia.Layout.Orientation.Horizontal,
@@ -360,29 +326,30 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
             Margin = new Thickness(0, 8, 0, 0)
         };
 
-        var okBtn = new Button
+        var confirmButton = new Button
         {
             Content = resolvedOkText,
             MinWidth = 80,
             HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-            IsDefault = true
+            IsDefault = !okIsDanger
         };
-        okBtn.Classes.Add(okIsDanger ? "danger" : "primary");
-        panel.Children.Add(okBtn);
+        confirmButton.Classes.Add(okIsDanger ? "danger" : "primary");
+        panel.Children.Add(confirmButton);
 
+        Button? cancelButton = null;
         if (showCancel)
         {
-            var cancelBtn = new Button
+            cancelButton = new Button
             {
                 Content = _loc["Action_Cancel"],
                 MinWidth = 80,
                 HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
                 IsCancel = true
             };
-            cancelBtn.Classes.Add("secondary");
-            panel.Children.Add(cancelBtn);
+            cancelButton.Classes.Add("secondary");
+            panel.Children.Add(cancelButton);
         }
 
-        return panel;
+        return (panel, confirmButton, cancelButton);
     }
 }

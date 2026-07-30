@@ -18,7 +18,7 @@ public class SelectCollectionDialogStateTests
         public string this[string key] => _strings.TryGetValue(key, out var v) ? v : key;
         public SupportedLanguage CurrentLanguage => SupportedLanguage.English;
         public IReadOnlyList<SupportedLanguage> AvailableLanguages => [SupportedLanguage.English];
-        public event EventHandler? LanguageChanged;
+        public event EventHandler? LanguageChanged { add { } remove { } }
         public void SetLanguage(SupportedLanguage language) { }
     }
 

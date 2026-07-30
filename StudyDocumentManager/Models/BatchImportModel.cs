@@ -10,25 +10,34 @@ namespace StudyDocumentManager.Models;
 
 public partial class BatchImportModel : ModelBase
 {
-    private readonly IDocumentRepository _repository;
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
+    private readonly IDroppedFileImportService _droppedFileImportService;
 
     [ObservableProperty] private string _folderPath = string.Empty;
     [ObservableProperty] private string _defaultSubject = string.Empty;
     [ObservableProperty] private ObservableCollection<FileImportItem> _files = new();
     [ObservableProperty] private int _importedCount;
     [ObservableProperty] private bool _isImporting;
+    [ObservableProperty] private string _importStatusMessage = string.Empty;
+    [ObservableProperty] private string _importErrorMessage = string.Empty;
 
-    public BatchImportModel(IDocumentRepository repository, IDialogService dialogService, IFileDialogService fileDialogService, INavigationService navigationService, ILocalizationService loc)
+    public bool HasFiles => Files.Count > 0;
+
+    public BatchImportModel(
+        IDialogService dialogService,
+        IFileDialogService fileDialogService,
+        INavigationService navigationService,
+        ILocalizationService loc,
+        IDroppedFileImportService droppedFileImportService)
     {
-        _repository = repository;
         _dialogService = dialogService;
         _fileDialogService = fileDialogService;
         _navigationService = navigationService;
         _loc = loc;
+        _droppedFileImportService = droppedFileImportService;
     }
 
     [RelayCommand]
@@ -45,16 +54,22 @@ public partial class BatchImportModel : ModelBase
     [RelayCommand]
     private void ScanFolder()
     {
-        if (string.IsNullOrWhiteSpace(FolderPath) || !Directory.Exists(FolderPath)) return;
+        if (string.IsNullOrWhiteSpace(FolderPath) || !Directory.Exists(FolderPath) || IsImporting)
+            return;
 
         Files.Clear();
-        var supportedExts = new[] { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".mp4", ".mp3", ".zip", ".rar" };
+        ImportErrorMessage = string.Empty;
 
-        foreach (var file in Directory.EnumerateFiles(FolderPath, "*.*", SearchOption.AllDirectories))
+        try
         {
-            var ext = Path.GetExtension(file).ToLowerInvariant();
-            if (supportedExts.Contains(ext))
+            var supportedExts = new[] { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".mp4", ".mp3", ".zip", ".rar" };
+
+            foreach (var file in Directory.EnumerateFiles(FolderPath, "*.*", SearchOption.AllDirectories))
             {
+                var ext = Path.GetExtension(file).ToLowerInvariant();
+                if (!supportedExts.Contains(ext))
+                    continue;
+
                 var info = new FileInfo(file);
                 Files.Add(new FileImportItem
                 {
@@ -66,12 +81,55 @@ public partial class BatchImportModel : ModelBase
                 });
             }
         }
+        catch (Exception)
+        {
+            Files.Clear();
+            ImportErrorMessage = _loc["BatchImport_ScanError"];
+        }
+
+        OnPropertyChanged(nameof(HasFiles));
+    }
+
+    public Task<int> AddDroppedFilesAsync(IReadOnlyList<string> filePaths)
+    {
+        var added = 0;
+        ImportErrorMessage = string.Empty;
+
+        foreach (var filePath in filePaths.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            if (!File.Exists(filePath) || Files.Any(file => string.Equals(file.FilePath, filePath, StringComparison.OrdinalIgnoreCase)))
+                continue;
+
+            try
+            {
+                var document = _droppedFileImportService.BuildDocumentFromPath(filePath);
+                Files.Add(new FileImportItem
+                {
+                    FileName = document.Name,
+                    FilePath = document.FilePath,
+                    FileType = document.Type,
+                    FileSizeMB = document.FileSize ?? 0,
+                    IsSelected = true
+                });
+                added++;
+            }
+            catch (Exception)
+            {
+                ImportErrorMessage = _loc["BatchImport_ScanError"];
+            }
+        }
+
+        OnPropertyChanged(nameof(HasFiles));
+        return Task.FromResult(added);
     }
 
     [RelayCommand]
     private async Task ImportAsync()
     {
-        var selected = Files.Where(f => f.IsSelected).ToList();
+        if (IsImporting)
+            return;
+
+        var selected = Files.Where(file => file.IsSelected).ToList();
         if (selected.Count == 0)
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Import_NoFileSelected"]);
@@ -80,40 +138,61 @@ public partial class BatchImportModel : ModelBase
 
         IsImporting = true;
         ImportedCount = 0;
+        ImportErrorMessage = string.Empty;
+        ImportStatusMessage = _loc["BatchImport_StatusImporting"];
 
-        foreach (var item in selected)
+        try
         {
-            var doc = new StudyDocument
-            {
-                Name = item.FileName,
-                Subject = DefaultSubject,
-                Type = item.FileType,
-                FilePath = item.FilePath,
-                FileSize = item.FileSizeMB
-            };
+            await Task.Yield();
 
-            if (_repository.Add(doc))
+            foreach (var item in selected)
             {
+                var document = new StudyDocument
+                {
+                    Name = item.FileName,
+                    Subject = DefaultSubject,
+                    Type = item.FileType,
+                    FilePath = item.FilePath,
+                    FileSize = item.FileSizeMB
+                };
+
+                if (!_droppedFileImportService.SaveDocument(document))
+                {
+                    ImportErrorMessage = _loc["BatchImport_ScanError"];
+                    return;
+                }
+
                 ImportedCount++;
+                item.IsSelected = false;
             }
         }
+        catch (Exception)
+        {
+            ImportErrorMessage = _loc["BatchImport_ScanError"];
+            return;
+        }
+        finally
+        {
+            IsImporting = false;
+        }
 
-        IsImporting = false;
-        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
-            string.Format(_loc["Import_Done"], ImportedCount, selected.Count));
+        ImportStatusMessage = string.Format(_loc["Import_Done"], ImportedCount, selected.Count);
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"], ImportStatusMessage);
         _navigationService.NavigateTo("dashboard");
     }
 
     [RelayCommand]
     private void SelectAll()
     {
-        foreach (var f in Files) f.IsSelected = true;
+        foreach (var file in Files)
+            file.IsSelected = true;
     }
 
     [RelayCommand]
     private void DeselectAll()
     {
-        foreach (var f in Files) f.IsSelected = false;
+        foreach (var file in Files)
+            file.IsSelected = false;
     }
 
     [RelayCommand]

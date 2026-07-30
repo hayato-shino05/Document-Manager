@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
@@ -31,6 +32,7 @@ public partial class BulkDeleteModel : ModelBase
 
     [ObservableProperty] private string _statusText = "";
     public int SelectedCount => Documents.Count(d => d.IsSelected);
+    public string SelectedCountText => string.Format(_loc["Bulk_SelectedCount"], SelectedCount);
 
     public BulkDeleteModel(IDocumentRepository repository, IBulkOperationRepository bulkRepo, ICategoryRepository categoryRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
@@ -70,8 +72,11 @@ public partial class BulkDeleteModel : ModelBase
         AvailableSubjects = new List<string>(subjects);
     }
 
-    private void LoadData()
+    private void LoadData(HashSet<int>? selectedIds = null)
     {
+        foreach (var document in Documents)
+            document.PropertyChanged -= OnSelectableDocumentPropertyChanged;
+
         var docs = _repository.GetAll();
 
         var allLabel = _loc["Filter_AllItems"];
@@ -83,8 +88,30 @@ public partial class BulkDeleteModel : ModelBase
             docs = docs.Where(d => d.Name.Contains(SearchKeyword, StringComparison.OrdinalIgnoreCase)
                 || (d.Notes ?? "").Contains(SearchKeyword, StringComparison.OrdinalIgnoreCase)).ToList();
 
-        Documents = docs.Select(d => new SelectableDocument { Document = d, IsSelected = false }).ToList();
+        Documents = docs.Select(d => new SelectableDocument
+        {
+            Document = d,
+            IsSelected = selectedIds?.Contains(d.Id) == true
+        }).ToList();
+
+        foreach (var document in Documents)
+            document.PropertyChanged += OnSelectableDocumentPropertyChanged;
+
         StatusText = string.Format(_loc["Status_Showing"], Documents.Count);
+        NotifySelectionChanged();
+    }
+
+    private void OnSelectableDocumentPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SelectableDocument.IsSelected))
+            NotifySelectionChanged();
+    }
+
+    private void NotifySelectionChanged()
+    {
+        OnPropertyChanged(nameof(SelectedCount));
+        OnPropertyChanged(nameof(SelectedCountText));
+        OnPropertyChanged(nameof(Documents));
     }
 
     [RelayCommand]
@@ -126,12 +153,12 @@ public partial class BulkDeleteModel : ModelBase
             return;
         }
 
-        var ids = selected.Select(s => s.Document.Id).ToList();
-        int updated = _bulkRepo.BulkToggleImportant(ids, true);
+        var ids = selected.Select(s => s.Document.Id).ToHashSet();
+        int updated = _bulkRepo.BulkToggleImportant([.. ids], true);
 
         await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
             string.Format(_loc["Bulk_MarkImportantDone"], updated));
-        LoadData();
+        LoadData(ids);
     }
 
     [RelayCommand]
@@ -154,26 +181,28 @@ public partial class BulkDeleteModel : ModelBase
             string.Format(_loc["Bulk_ConfirmChangeSubject"], selected.Count, NewSubjectValue));
         if (!confirmed) return;
 
-        var ids = selected.Select(s => s.Document.Id).ToList();
-        int updated = _bulkRepo.BulkUpdateSubject(ids, NewSubjectValue);
+        var ids = selected.Select(s => s.Document.Id).ToHashSet();
+        int updated = _bulkRepo.BulkUpdateSubject([.. ids], NewSubjectValue);
 
         await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
             string.Format(_loc["Bulk_ChangeSubjectDone"], updated));
-        LoadData();
+        LoadData(ids);
     }
 
     [RelayCommand]
     private void SelectAll()
     {
-        foreach (var d in Documents) d.IsSelected = true;
-        OnPropertyChanged(nameof(Documents));
+        foreach (var d in Documents)
+            d.IsSelected = true;
+        NotifySelectionChanged();
     }
 
     [RelayCommand]
     private void DeselectAll()
     {
-        foreach (var d in Documents) d.IsSelected = false;
-        OnPropertyChanged(nameof(Documents));
+        foreach (var d in Documents)
+            d.IsSelected = false;
+        NotifySelectionChanged();
     }
 
     [RelayCommand]

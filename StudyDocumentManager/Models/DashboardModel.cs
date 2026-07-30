@@ -464,23 +464,34 @@ public partial class DashboardModel : ModelBase
 
     // ——— Document actions ——— 
     [RelayCommand]
-    private void OpenFile()
+    private async Task OpenFileAsync()
     {
-        if (SelectedDocument == null || string.IsNullOrEmpty(SelectedDocument.FilePath)) return;
+        if (SelectedDocument == null || string.IsNullOrEmpty(SelectedDocument.FilePath))
+            return;
+
+        if (!File.Exists(SelectedDocument.FilePath))
+        {
+            var confirmed = await _dialogService.ShowConfirmAsync(
+                _loc["Dialog_Notice"],
+                _loc["Dashboard_FileMissingMessage"],
+                _loc["Menu_FileCheck"]);
+            if (confirmed)
+                _navigationService.NavigateTo("fileintegrity");
+            return;
+        }
 
         try
         {
-            if (File.Exists(SelectedDocument.FilePath))
-            {
-                // Track recent file
-                // NOTE: AddRecentFile is called via DashboardModel but RecentFileRepository is not injected here.
-                // This is intentional — recent file tracking does not affect dashboard state.
-                _recentFileRepo.Add(SelectedDocument.Id);
-
-                _processLauncher.OpenFile(SelectedDocument.FilePath);
-            }
+            _processLauncher.OpenFile(SelectedDocument.FilePath);
         }
-        catch { /* Ignore errors when opening files */ }
+        catch
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+            return;
+        }
+
+        if (!_recentFileRepo.Add(SelectedDocument.Id))
+            return;
     }
 
     [RelayCommand]
@@ -558,15 +569,8 @@ public partial class DashboardModel : ModelBase
     private async Task RestoreDatabaseAsync()
     {
         var (success, error) = await _backupService.RestoreAsync();
-        if (success)
-        {
-            LoadData();
-            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Dashboard_RestoreDone"]);
-        }
-        else if (error != null)
-        {
+        if (!success && error is not null)
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_RestoreError"], error));
-        }
     }
 
     [RelayCommand]
@@ -702,8 +706,34 @@ public partial class DashboardModel : ModelBase
         var rawCollections = _collectionRepo.GetAll();
         if (rawCollections.Count == 0)
         {
-            await _dialogService.ShowMessageAsync(_loc["Dialog_Notice"],
-                _loc["Dashboard_NoCollections"]);
+            var collectionName = await _dialogService.ShowInputAsync(
+                _loc["Collection_CreateTitle"],
+                _loc["Collection_CreateLabel"]);
+            if (string.IsNullOrWhiteSpace(collectionName))
+                return;
+
+            collectionName = collectionName.Trim();
+            var collectionId = _collectionRepo.Create(collectionName);
+            if (collectionId <= 0)
+            {
+                await _dialogService.ShowErrorAsync(
+                    _loc["Dialog_Error"],
+                    string.Format(_loc["Collection_CreateError"], collectionName));
+                return;
+            }
+
+            if (_collectionRepo.AddDocument(collectionId, SelectedDocument.Id))
+            {
+                await _dialogService.ShowMessageAsync(
+                    _loc["Dialog_Success"],
+                    string.Format(_loc["Dashboard_AddedToCollection"], SelectedDocument.Name, collectionName));
+                Refresh();
+                return;
+            }
+
+            await _dialogService.ShowErrorAsync(
+                _loc["Dialog_Error"],
+                string.Format(_loc["Collection_AddError"], collectionName));
             return;
         }
 

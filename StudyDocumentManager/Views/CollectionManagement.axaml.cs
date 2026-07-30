@@ -18,10 +18,10 @@ public partial class CollectionManagement : UserControl
     {
         if (DataContext is not CollectionManagementModel vm) return;
 
-        // Collect all selected StudyDocument items
-        var selected = DocumentGrid.SelectedItems
-            .OfType<StudyDocument>()
-            .ToList();
+        var selectedItems = DocumentGrid.SelectedItems;
+        var selected = selectedItems == null
+            ? new List<StudyDocument>()
+            : selectedItems.OfType<StudyDocument>().ToList();
 
         vm.SelectedDocumentsInCollection = selected;
     }

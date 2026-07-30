@@ -40,6 +40,7 @@ public class DroppedFileImportServiceTests
         public List<StudyDocument> Filter(string subject, string type) => throw new NotImplementedException();
         public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => throw new NotImplementedException();
         public bool Add(StudyDocument document) => throw new NotImplementedException();
+        public bool AddWithCatalogs(StudyDocument document) => throw new NotImplementedException();
         public bool Update(StudyDocument document) => throw new NotImplementedException();
         public bool Delete(int id) => throw new NotImplementedException();
         public List<string> GetDistinctSubjects() => throw new NotImplementedException();

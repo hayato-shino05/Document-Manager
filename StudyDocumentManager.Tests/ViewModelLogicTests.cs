@@ -1,8 +1,12 @@
 using Xunit;
+using StudyDocumentManager.Core;
 using StudyDocumentManager.Core.Entities;
+using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Core.Services;
 using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Data.Repositories;
+using StudyDocumentManager.Models;
+using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Tests;
 
@@ -67,6 +71,7 @@ public class DashboardFlowTests : DatabaseTestBase
     {
         _repo = new DocumentRepository(Db);
     }
+
 
     [Fact]
     public void LoadData_AfterAdd_TotalDocumentsIsCorrect()
@@ -211,6 +216,116 @@ public class DashboardFlowTests : DatabaseTestBase
         var colDocs = Db.GetDocumentsInCollection(col.Id)!;
         Assert.Single(colDocs);
     }
+
+
+    [Fact]
+    public async Task OpenMissingFile_ShowsExplanationAndNavigatesToFileIntegrity()
+    {
+        var document = new StudyDocument { Id = 7, Name = "Missing file", FilePath = @"Z:\missing.pdf" };
+        var dialog = new DashboardDialogService { ConfirmResult = true };
+        var navigation = new DashboardNavigationService();
+        var recent = new DashboardRecentFileRepository();
+        var process = new DashboardProcessLauncherService();
+        var model = new DashboardModel(
+            new DashboardDocumentRepository([document]),
+            new DashboardRecycleBinRepository(),
+            new DashboardCategoryRepository(),
+            new DashboardCollectionRepository(),
+            recent,
+            dialog,
+            new DashboardFileDialogService(),
+            new DashboardCustomDialogService(),
+            navigation,
+            new DashboardClipboardService(),
+            process,
+            new DashboardExportService(),
+            new DashboardBackupService(),
+            new DashboardLocalizationService())
+        {
+            SelectedDocument = document
+        };
+
+        model.OpenFileCommand.Execute(null);
+
+        Assert.Empty(recent.AddedDocumentIds);
+        Assert.Empty(process.OpenedFiles);
+        Assert.Equal("Dashboard_FileMissingMessage", dialog.LastConfirmMessage);
+        Assert.Equal(["fileintegrity"], navigation.Routes);
+    }
+
+    [Fact]
+    public async Task OpenFile_LauncherFailure_ShowsErrorWithoutNavigation()
+    {
+        var tempFile = Path.GetTempFileName();
+        var document = new StudyDocument { Id = 8, Name = "Open failure", FilePath = tempFile };
+        var dialog = new DashboardDialogService();
+        var navigation = new DashboardNavigationService();
+        var recent = new DashboardRecentFileRepository();
+        var process = new DashboardProcessLauncherService { ThrowOnOpen = true };
+        var model = new DashboardModel(
+            new DashboardDocumentRepository([document]),
+            new DashboardRecycleBinRepository(),
+            new DashboardCategoryRepository(),
+            new DashboardCollectionRepository(),
+            recent,
+            dialog,
+            new DashboardFileDialogService(),
+            new DashboardCustomDialogService(),
+            navigation,
+            new DashboardClipboardService(),
+            process,
+            new DashboardExportService(),
+            new DashboardBackupService(),
+            new DashboardLocalizationService())
+        {
+            SelectedDocument = document
+        };
+
+        try
+        {
+            await model.OpenFileCommand.ExecuteAsync(null);
+        }
+        finally
+        {
+            File.Delete(tempFile);
+        }
+
+        Assert.Equal("Msg_Error", dialog.LastErrorMessage);
+        Assert.Empty(recent.AddedDocumentIds);
+        Assert.Empty(navigation.Routes);
+    }
+
+    [Fact]
+    public async Task AddToCollection_EmptyCatalog_CreatesCollectionAndAddsSelectedDocument()
+    {
+        var document = new StudyDocument { Id = 9, Name = "Calculus" };
+        var collection = new DashboardCollectionRepository();
+        var dialog = new DashboardDialogService { InputResult = "  Study Set  " };
+        var model = new DashboardModel(
+            new DashboardDocumentRepository([document]),
+            new DashboardRecycleBinRepository(),
+            new DashboardCategoryRepository(),
+            collection,
+            new DashboardRecentFileRepository(),
+            dialog,
+            new DashboardFileDialogService(),
+            new DashboardCustomDialogService(),
+            new DashboardNavigationService(),
+            new DashboardClipboardService(),
+            new DashboardProcessLauncherService(),
+            new DashboardExportService(),
+            new DashboardBackupService(),
+            new DashboardLocalizationService())
+        {
+            SelectedDocument = document
+        };
+
+        await model.AddToCollectionCommand.ExecuteAsync(null);
+
+        Assert.Equal(["Study Set"], collection.CreatedNames);
+        Assert.Equal([(41, document.Id)], collection.AddedDocuments);
+        Assert.Equal("Dashboard_AddedToCollection", dialog.LastMessage);
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -221,6 +336,189 @@ public class DashboardFlowTests : DatabaseTestBase
 /// Tests static helper methods extracted from AddEditViewModel logic.
 /// These are pure functions; we invoke them via reflection or duplicate here.
 /// </summary>
+file sealed class DashboardDocumentRepository(List<StudyDocument> documents) : IDocumentRepository
+    {
+        private readonly List<StudyDocument> _documents = documents;
+
+        public List<StudyDocument> GetAll() => [.._documents];
+        public StudyDocument? GetById(int id) => _documents.FirstOrDefault(document => document.Id == id);
+        public List<StudyDocument> Search(string keyword) => [.._documents];
+        public List<StudyDocument> Filter(string subject, string type) => [.._documents];
+        public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => [.._documents];
+        public bool Add(StudyDocument document) => true;
+        public bool AddWithCatalogs(StudyDocument document) => true;
+        public bool Update(StudyDocument document) => true;
+        public bool Delete(int id) => true;
+        public List<string> GetDistinctSubjects() => [];
+        public List<string> GetDistinctTypes() => [];
+        public List<string> GetDistinctTags() => [];
+        public List<StudyDocument> GetUpcomingDeadlines(int days) => [];
+        public List<StudyDocument> GetOverdueDocuments() => [];
+        public void EnsureSubjectExists(string subject) { }
+        public void EnsureTypeExists(string type) { }
+    }
+
+file sealed class DashboardRecycleBinRepository : IRecycleBinRepository
+    {
+        public List<StudyDocument> GetDeletedDocuments() => [];
+        public bool RestoreDocument(int id) => false;
+        public bool PermanentDeleteDocument(int id) => false;
+        public int EmptyRecycleBin() => 0;
+        public int GetDeletedDocumentCount() => 0;
+    }
+
+file sealed class DashboardCategoryRepository : ICategoryRepository
+    {
+        public List<string> GetAllSubjects() => [];
+        public List<string> GetAllTypes() => [];
+        public List<(string Name, int Count)> GetSubjectsWithCount() => [];
+        public List<(string Name, int Count)> GetTypesWithCount() => [];
+        public bool AddSubject(string name) => true;
+        public bool AddType(string name) => true;
+        public bool UpdateSubjectName(string oldName, string newName) => false;
+        public bool UpdateTypeName(string oldName, string newName) => false;
+        public bool DeleteDocumentsBySubject(string subjectName) => false;
+        public bool DeleteDocumentsByType(string typeName) => false;
+        public int GetTotalDocumentCount() => 0;
+    }
+
+file sealed class DashboardCollectionRepository : ICollectionRepository
+    {
+        public List<string> CreatedNames { get; } = [];
+        public List<(int CollectionId, int DocumentId)> AddedDocuments { get; } = [];
+
+        public List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetAll() => [];
+        public int Create(string name, string? description = null)
+        {
+            CreatedNames.Add(name);
+            return 41;
+        }
+        public bool Update(int id, string name, string? description = null) => true;
+        public bool Delete(int id) => true;
+        public List<StudyDocument> GetDocuments(int collectionId) => [];
+        public bool AddDocument(int collectionId, int documentId)
+        {
+            AddedDocuments.Add((collectionId, documentId));
+            return true;
+        }
+        public bool RemoveDocument(int collectionId, int documentId) => true;
+    }
+
+file sealed class DashboardRecentFileRepository : IRecentFileRepository
+    {
+        public List<int> AddedDocumentIds { get; } = [];
+        public List<(int Id, string Name, string? Subject, string? Type, string? FilePath, DateTime OpenedAt)> GetAll() => [];
+        public bool Add(int documentId)
+        {
+            AddedDocumentIds.Add(documentId);
+            return true;
+        }
+        public void Clear() { }
+    }
+
+file sealed class DashboardDialogService : IDialogService
+    {
+        public bool ConfirmResult { get; set; }
+        public string? InputResult { get; set; }
+        public string? LastConfirmMessage { get; private set; }
+        public string? LastMessage { get; private set; }
+        public string? LastErrorMessage { get; private set; }
+
+        public Task ShowMessageAsync(string title, string message)
+        {
+            LastMessage = message;
+            return Task.CompletedTask;
+        }
+
+        public Task ShowErrorAsync(string title, string message)
+        {
+            LastErrorMessage = message;
+            return Task.CompletedTask;
+        }
+
+        public Task<bool> ShowConfirmAsync(string title, string message)
+        {
+            LastConfirmMessage = message;
+            return Task.FromResult(ConfirmResult);
+        }
+
+        public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false)
+        {
+            LastConfirmMessage = message;
+            return Task.FromResult(ConfirmResult);
+        }
+
+        public Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "")
+            => Task.FromResult(InputResult);
+    }
+
+file sealed class DashboardFileDialogService : IFileDialogService
+    {
+        public Task<string?> ShowOpenFileAsync(string title, string? filter = null) => Task.FromResult<string?>(null);
+        public Task<string?> ShowOpenFolderAsync(string title) => Task.FromResult<string?>(null);
+        public Task<string?> ShowSaveFileAsync(string title, string defaultFileName, string? filter = null) => Task.FromResult<string?>(null);
+    }
+
+file sealed class DashboardCustomDialogService : ICustomDialogService
+    {
+        public Task<string?> ShowOpenFileAsync(string title, string? filter = null) => Task.FromResult<string?>(null);
+        public Task<string?> ShowOpenFolderAsync(string title) => Task.FromResult<string?>(null);
+        public Task<string?> ShowSaveFileAsync(string title, string defaultFileName, string? filter = null) => Task.FromResult<string?>(null);
+        public Task<string?> ShowChangeCategoryAsync(string documentName, IList<string> existingCategories, string currentCategory) => Task.FromResult<string?>(null);
+        public Task<StudyDocumentManager.Core.DTOs.AddDocumentDraft?> ShowAddDocumentAsync(string filePath, IList<string> subjects, IList<string> types) => Task.FromResult<StudyDocumentManager.Core.DTOs.AddDocumentDraft?>(null);
+        public Task<List<StudyDocument>?> ShowDocumentPickerAsync(string collectionName, IEnumerable<StudyDocument> allDocuments, IEnumerable<int> alreadyInCollection) => Task.FromResult<List<StudyDocument>?>(null);
+        public Task<int> ShowSelectCollectionAsync(string documentName, IList<(int Id, string Name, int DocCount)> collections) => Task.FromResult(-1);
+    }
+
+file sealed class DashboardNavigationService : INavigationService
+    {
+        public List<string> Routes { get; } = [];
+        public bool CanGoBack => false;
+        public void NavigateTo(string viewKey) => Routes.Add(viewKey);
+        public void NavigateTo(string viewKey, object? parameter) => Routes.Add(viewKey);
+        public void GoBack() { }
+    }
+
+file sealed class DashboardClipboardService : IClipboardService
+    {
+        public Task SetTextAsync(string text) => Task.CompletedTask;
+    }
+
+file sealed class DashboardProcessLauncherService : IProcessLauncherService
+    {
+        public bool ThrowOnOpen { get; set; }
+        public List<string> OpenedFiles { get; } = [];
+        public void OpenFile(string filePath)
+        {
+            if (ThrowOnOpen)
+                throw new IOException("launch failed");
+            OpenedFiles.Add(filePath);
+        }
+        public void OpenFolderAndSelect(string filePath) { }
+        public void RevealInExplorer(string filePath) { }
+        public void OpenUrl(string url) { }
+    }
+
+file sealed class DashboardExportService : IExportService
+    {
+        public Task<ExportResult> ExportCsvAsync(IReadOnlyList<StudyDocument> documents, string? suggestedFileName) => Task.FromResult(new ExportResult(false));
+    }
+
+file sealed class DashboardBackupService : IBackupService
+    {
+        public Task<(bool Success, string? Path, string? Error)> BackupAsync() => Task.FromResult((false, (string?)null, (string?)null));
+        public Task<(bool Success, string? Error)> RestoreAsync() => Task.FromResult((false, (string?)null));
+    }
+
+file sealed class DashboardLocalizationService : ILocalizationService
+    {
+        public string this[string key] => key;
+        public SupportedLanguage CurrentLanguage => SupportedLanguage.Japanese;
+        public void SetLanguage(SupportedLanguage language) { }
+        public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = [];
+        public event EventHandler? LanguageChanged { add { } remove { } }
+    }
+
 public class AddEditLogicTests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
@@ -393,11 +691,11 @@ public class AddEditLogicTests : DatabaseTestBase
 // ═══════════════════════════════════════════════════════════════
 // BulkDeleteViewModel — business logic (filter + select/deselect)
 // ═══════════════════════════════════════════════════════════════
-public class BulkDeleteFlowTests : DatabaseTestBase
+public class BulkDeleteRepositoryCharacterizationTests : DatabaseTestBase
 {
     private readonly DocumentRepository _repo;
 
-    public BulkDeleteFlowTests()
+    public BulkDeleteRepositoryCharacterizationTests()
     {
         _repo = new DocumentRepository(Db);
     }
@@ -517,6 +815,7 @@ public class BulkDeleteFlowTests : DatabaseTestBase
         Assert.All(_repo.GetAll(), d => Assert.Equal("New Subject", d.Subject));
     }
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // CategoryManagementViewModel — business logic flow

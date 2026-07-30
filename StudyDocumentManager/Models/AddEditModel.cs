@@ -29,6 +29,8 @@ public partial class AddEditModel : ModelBase
     [ObservableProperty] private DateTimeOffset? _deadline;
     [ObservableProperty] private string _pageTitle = string.Empty;
     [ObservableProperty] private bool _isEditing;
+    [ObservableProperty] private bool _hasNameValidationError;
+    [ObservableProperty] private string _nameValidationMessage = string.Empty;
 
     [ObservableProperty] private ObservableCollection<string> _subjects = new();
     [ObservableProperty] private ObservableCollection<string> _types = new();
@@ -67,12 +69,66 @@ public partial class AddEditModel : ModelBase
         Deadline = doc.Deadline.HasValue ? new DateTimeOffset(doc.Deadline.Value) : null;
     }
 
+    partial void OnNameChanged(string value)
+    {
+        if (!string.IsNullOrWhiteSpace(value) && HasNameValidationError)
+        {
+            HasNameValidationError = false;
+            NameValidationMessage = string.Empty;
+        }
+    }
+
+    private bool ValidateName()
+    {
+        if (!string.IsNullOrWhiteSpace(Name))
+        {
+            HasNameValidationError = false;
+            NameValidationMessage = string.Empty;
+            return true;
+        }
+
+        HasNameValidationError = true;
+        NameValidationMessage = _loc["AddEdit_NameRequired"];
+        return false;
+    }
+
+    public bool TryApplyFile(string filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
+        {
+            return false;
+        }
+
+        FilePath = filePath;
+
+        if (string.IsNullOrWhiteSpace(Name))
+        {
+            Name = Path.GetFileNameWithoutExtension(filePath);
+        }
+
+        if (string.IsNullOrWhiteSpace(Type))
+        {
+            var detectedType = FileTypeDetector.Detect(Path.GetExtension(filePath));
+            if (!string.IsNullOrWhiteSpace(detectedType))
+            {
+                Type = detectedType;
+                if (!Types.Contains(detectedType))
+                {
+                    Types.Add(detectedType);
+                }
+            }
+        }
+
+        HasNameValidationError = false;
+        NameValidationMessage = string.Empty;
+        return true;
+    }
+
     [RelayCommand]
     private async Task SaveAsync()
     {
-        if (string.IsNullOrWhiteSpace(Name))
+        if (!ValidateName())
         {
-            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["AddEdit_NameRequired"]);
             return;
         }
 
@@ -90,29 +146,31 @@ public partial class AddEditModel : ModelBase
             FileSize = GetFileSize(FilePath)
         };
 
-        bool success;
-        if (IsEditing && _editingId.HasValue)
+        try
         {
-            doc.Id = _editingId.Value;
-            success = _repository.Update(doc);
-        }
-        else
-        {
-            success = _repository.Add(doc);
-        }
+            bool success;
+            if (IsEditing && _editingId.HasValue)
+            {
+                doc.Id = _editingId.Value;
+                success = _repository.Update(doc);
+            }
+            else
+            {
+                success = _repository.AddWithCatalogs(doc);
+            }
 
-        if (success)
-        {
-            if (!string.IsNullOrWhiteSpace(doc.Subject))
-                _categoryRepo.AddSubject(doc.Subject);
-            if (!string.IsNullOrWhiteSpace(doc.Type))
-                _categoryRepo.AddType(doc.Type);
-
-            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
-                IsEditing ? _loc["AddEdit_SaveUpdated"] : _loc["AddEdit_SaveAdded"]);
-            _navigationService.NavigateTo("dashboard");
+            if (success)
+            {
+                await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
+                    IsEditing ? _loc["AddEdit_SaveUpdated"] : _loc["AddEdit_SaveAdded"]);
+                _navigationService.NavigateTo("dashboard");
+            }
+            else
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["AddEdit_SaveError"]);
+            }
         }
-        else
+        catch
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["AddEdit_SaveError"]);
         }
@@ -130,23 +188,7 @@ public partial class AddEditModel : ModelBase
         var path = await _fileDialogService.ShowOpenFileAsync(_loc["AddEdit_BrowseFile"], _loc["AddEdit_FileFilter"]);
         if (string.IsNullOrEmpty(path)) return;
 
-        FilePath = path;
-
-        if (string.IsNullOrWhiteSpace(Name))
-        {
-            Name = Path.GetFileNameWithoutExtension(path);
-        }
-
-        if (string.IsNullOrWhiteSpace(Type))
-        {
-            var ext = Path.GetExtension(path);
-            Type = FileTypeDetector.Detect(ext);
-
-            if (!string.IsNullOrWhiteSpace(Type) && !Types.Contains(Type))
-            {
-                Types.Add(Type);
-            }
-        }
+        TryApplyFile(path);
     }
 
     private static double? GetFileSize(string path)

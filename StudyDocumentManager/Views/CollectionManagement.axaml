@@ -71,11 +71,25 @@
                                 </StackPanel>
                                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4"
                                             HorizontalAlignment="Right">
+                                    <Button Classes="secondary" Command="{Binding AddDocumentToCollectionCommand}" Padding="{StaticResource PaddingSm}"
+                                            IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3">
+                                            <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnAddDoc}" FontSize="{StaticResource FontSizeSm}"/>
+                                        </StackPanel>
+                                    </Button>
                                     <Button Classes="secondary" Command="{Binding RenameCollectionCommand}" Padding="{StaticResource PaddingSm}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconEdit}" Width="11" Height="11"/>
                                             <TextBlock Text="{loc:Localize CollectionMgmt_BtnRename}" FontSize="{StaticResource FontSizeSm}"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Classes="danger" Command="{Binding RemoveSelectedDocumentsCommand}" Padding="{StaticResource PaddingSm}"
+                                            IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3">
+                                            <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnRemoveDoc}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="danger" Command="{Binding DeleteCollectionCommand}" Padding="{StaticResource PaddingSm}"
@@ -108,12 +122,12 @@
                                     </StackPanel>
                                 </Border>
 
-                                <ListBox x:Name="DocumentGrid" ItemsSource="{Binding CollectionDocuments}" Padding="{StaticResource PaddingIcon}">
+                                <ListBox x:Name="DocumentGrid" ItemsSource="{Binding DocumentsInCollection}" SelectionMode="Multiple" Padding="{StaticResource PaddingIcon}">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" Spacing="8" Margin="6,4">
                                                 <Image Source="{StaticResource IconDocPage}" Width="12" Height="12"/>
-                                                <TextBlock Text="{Binding Title}" FontSize="{StaticResource FontSizeMd}"
+                                                <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMd}"
                                                            Foreground="{StaticResource TextPrimary}"/>
                                             </StackPanel>
                                         </DataTemplate>

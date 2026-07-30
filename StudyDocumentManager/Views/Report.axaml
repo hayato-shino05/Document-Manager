@@ -132,6 +132,8 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+                            <TextBlock Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                                       IsVisible="{Binding !HasDayData}" Margin="0,8"/>
                         </StackPanel>
                     </Border>
 
@@ -167,6 +169,8 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+                            <TextBlock Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                                       IsVisible="{Binding !HasMonthData}" Margin="0,8"/>
                         </StackPanel>
                     </Border>
 

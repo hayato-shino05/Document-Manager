@@ -45,6 +45,8 @@
                     CornerRadius="{StaticResource RadiusMd}" Padding="{StaticResource PaddingMd}" Margin="0,12,0,0">
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding SelectedCountText}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
+                                   Foreground="{StaticResource TextSecondary}" Margin="0,0,8,0"/>
                         <Button Classes="secondary" Command="{Binding SelectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconCheck}" Width="11" Height="11"/>

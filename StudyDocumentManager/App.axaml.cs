@@ -22,7 +22,7 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        Avalonia.Data.Core.Plugins.BindingPlugins.DataValidators.RemoveAt(0);
+        RemoveDataAnnotationsValidationPlugin();
         var services = new ServiceCollection();
         ConfigureServices(services);
         Services = services.BuildServiceProvider();
@@ -47,6 +47,17 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+
+    private static void RemoveDataAnnotationsValidationPlugin()
+    {
+        var validators = Avalonia.Data.Core.Plugins.BindingPlugins.DataValidators;
+        for (var index = validators.Count - 1; index >= 0; index--)
+        {
+            if (validators[index] is Avalonia.Data.Core.Plugins.DataAnnotationsValidationPlugin)
+                validators.RemoveAt(index);
+        }
     }
 
     private static void ConfigureServices(IServiceCollection services)

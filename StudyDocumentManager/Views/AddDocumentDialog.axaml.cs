@@ -1,8 +1,11 @@
+using StudyDocumentManager.Core;
 using StudyDocumentManager.Core.DTOs;
 using System;
 using System.IO;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Views;
@@ -17,6 +20,7 @@ public partial class AddDocumentDialog : Window
     {
         InitializeComponent();
         _filePath = string.Empty;
+        Opened += (_, _) => txtTen?.Focus();
     }
 
     /// <summary>
@@ -55,9 +59,14 @@ public partial class AddDocumentDialog : Window
         var name = txtTen?.Text?.Trim();
         if (string.IsNullOrWhiteSpace(name))
         {
+            txtNameError.Text = GetNameRequiredMessage();
+            txtNameError.IsVisible = true;
             txtTen?.Focus();
             return;
         }
+
+        txtNameError.IsVisible = false;
+        txtNameError.Text = string.Empty;
 
         Result = new AddDocumentDraft
         {
@@ -79,5 +88,11 @@ public partial class AddDocumentDialog : Window
     {
         Result = null;
         Close(false);
+    }
+
+    private static string GetNameRequiredMessage()
+    {
+        return (Application.Current?.Resources["Loc"] as ILocalizationService)?["AddEdit_NameRequired"]
+            ?? "AddEdit_NameRequired";
     }
 }

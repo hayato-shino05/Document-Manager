@@ -17,19 +17,19 @@
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
                             HorizontalAlignment="Right">
-                    <Button Classes="primary" Command="{Binding RestoreCommand}" Padding="{StaticResource PaddingMd}">
+                    <Button Classes="primary" Command="{Binding RestoreCommand}" IsEnabled="{Binding HasSelection}" Padding="{StaticResource PaddingMd}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconRestore}" Width="13" Height="13"/>
                             <TextBlock Text="{loc:Localize RecycleBin_BtnRestore}" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary" Command="{Binding PermanentDeleteCommand}" Padding="{StaticResource PaddingMd}">
+                    <Button Classes="secondary" Command="{Binding PermanentDeleteCommand}" IsEnabled="{Binding HasSelection}" Padding="{StaticResource PaddingMd}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
                             <TextBlock Text="{loc:Localize RecycleBin_BtnPermanentDelete}" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="danger" Command="{Binding EmptyTrashCommand}" Padding="{StaticResource PaddingMd}">
+                    <Button Classes="danger" Command="{Binding EmptyTrashCommand}" IsEnabled="{Binding HasDeletedDocuments}" Padding="{StaticResource PaddingMd}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconRecycle}" Width="13" Height="13"/>
                             <TextBlock Text="{loc:Localize RecycleBin_BtnEmptyTrash}" FontSize="{StaticResource FontSizeMd}"/>

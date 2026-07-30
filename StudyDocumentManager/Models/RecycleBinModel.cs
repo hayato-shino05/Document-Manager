@@ -16,6 +16,9 @@ public partial class RecycleBinModel : ModelBase
     [ObservableProperty] private ObservableCollection<StudyDocument> _deletedDocuments = new();
     [ObservableProperty] private StudyDocument? _selectedDocument;
 
+    public bool HasSelection => SelectedDocument != null;
+    public bool HasDeletedDocuments => DeletedDocuments.Count > 0;
+
     public RecycleBinModel(IRecycleBinRepository docRepo, IDialogService dialogService, ILocalizationService loc)
     {
         _docRepo = docRepo;
@@ -26,9 +29,14 @@ public partial class RecycleBinModel : ModelBase
 
     private void LoadData()
     {
+        SelectedDocument = null;
         var docs = _docRepo.GetDeletedDocuments();
         DeletedDocuments = new ObservableCollection<StudyDocument>(docs);
+        OnPropertyChanged(nameof(HasDeletedDocuments));
     }
+
+    partial void OnSelectedDocumentChanged(StudyDocument? value)
+        => OnPropertyChanged(nameof(HasSelection));
 
     [RelayCommand]
     private async Task RestoreAsync()
@@ -37,12 +45,17 @@ public partial class RecycleBinModel : ModelBase
 
         var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
             string.Format(_loc["Recycle_ConfirmRestore"], SelectedDocument.Name));
-        if (confirmed)
+        if (!confirmed)
+            return;
+
+        if (!_docRepo.RestoreDocument(SelectedDocument.Id))
         {
-            _docRepo.RestoreDocument(SelectedDocument.Id);
-            LoadData();
-            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Recycle_RestoreSuccess"]);
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Recycle_RestoreError"]);
+            return;
         }
+
+        LoadData();
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Recycle_RestoreSuccess"]);
     }
 
     [RelayCommand]
@@ -53,11 +66,17 @@ public partial class RecycleBinModel : ModelBase
         var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
             string.Format(_loc["Recycle_ConfirmPermanentDelete"], SelectedDocument.Name),
             _loc["Btn_PermanentDelete"], isDanger: true);
-        if (confirmed)
+        if (!confirmed)
+            return;
+
+        if (!_docRepo.PermanentDeleteDocument(SelectedDocument.Id))
         {
-            _docRepo.PermanentDeleteDocument(SelectedDocument.Id);
-            LoadData();
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Recycle_PermanentDeleteError"]);
+            return;
         }
+
+        LoadData();
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"], _loc["Recycle_PermanentDeleteSuccess"]);
     }
 
     [RelayCommand]
