@@ -128,9 +128,9 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" Spacing="6" Margin="4,2">
                                         <Image Source="{StaticResource IconDocPage}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding Ten}" FontSize="{StaticResource FontSizeSm}"
+                                        <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeSm}"
                                                    Foreground="{StaticResource TextPrimary}"/>
-                                        <TextBlock Text="{Binding MonHoc}" FontSize="{StaticResource FontSizeXs}"
+                                        <TextBlock Text="{Binding Subject}" FontSize="{StaticResource FontSizeXs}"
                                                    Foreground="{StaticResource TextMuted}"/>
                                     </StackPanel>
                                 </DataTemplate>

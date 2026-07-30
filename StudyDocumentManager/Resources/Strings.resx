@@ -139,6 +139,9 @@
   <data name="Recycle_ConfirmPermanentDelete" xml:space="preserve"><value>'{0}'を完全に削除しますか？この操作は元に戻せません！</value></data>
   <data name="Recycle_ConfirmEmptyTrash" xml:space="preserve"><value>{0}件の文書を完全に削除しますか？元に戻せません！</value></data>
   <data name="Recycle_EmptyTrashDone" xml:space="preserve"><value>{0}件の文書を完全に削除しました</value></data>
+  <data name="Recycle_RestoreError" xml:space="preserve"><value>文書を復元できませんでした</value></data>
+  <data name="Recycle_PermanentDeleteError" xml:space="preserve"><value>文書を完全に削除できませんでした</value></data>
+  <data name="Recycle_PermanentDeleteSuccess" xml:space="preserve"><value>文書を完全に削除しました</value></data>
 
   <!-- PersonalNote -->
   <data name="Note_SaveSuccess" xml:space="preserve"><value>メモを保存しました</value></data>
@@ -220,6 +223,10 @@
   <data name="Dashboard_BackupTitle" xml:space="preserve"><value>バックアップ</value></data>
   <data name="Dashboard_BackupDone" xml:space="preserve"><value>データベースをバックアップしました：&#xA;{0}</value></data>
   <data name="Dashboard_BackupError" xml:space="preserve"><value>バックアップできません: {0}</value></data>
+  <data name="Dashboard_BackupFailed" xml:space="preserve"><value>バックアップファイルを作成できませんでした</value></data>
+  <data name="Dashboard_ConfirmOverwriteBackup" xml:space="preserve"><value>バックアップの上書き</value></data>
+  <data name="Dashboard_OverwriteBackupWarning" xml:space="preserve"><value>既存のバックアップファイルを上書きします。よろしいですか？</value></data>
+  <data name="Dashboard_OverwriteBackup" xml:space="preserve"><value>上書き</value></data>
   <data name="Dashboard_ExportTitle" xml:space="preserve"><value>CSVエクスポート</value></data>
   <data name="Dashboard_ExportDone" xml:space="preserve"><value>{0}件の文書をエクスポートしました：&#xA;{1}</value></data>
   <data name="Dashboard_ExportError" xml:space="preserve"><value>CSVをエクスポートできません: {0}</value></data>
@@ -231,9 +238,13 @@
   <data name="Dashboard_RestoreWarning" xml:space="preserve"><value>復元すると現在のデータがすべて上書きされます。よろしいですか？</value></data>
   <data name="Dashboard_RestoreDone" xml:space="preserve"><value>データベースの復元が完了しました</value></data>
   <data name="Dashboard_RestoreError" xml:space="preserve"><value>復元できません: {0}</value></data>
+  <data name="Dashboard_RestoreFailed" xml:space="preserve"><value>バックアップファイルを検証または復元できませんでした</value></data>
+  <data name="Dashboard_RestoreRestartRequired" xml:space="preserve"><value>データベースを復元しました。アプリケーションを再度開いてください。</value></data>
+  <data name="Dashboard_ExportWriteFailed" xml:space="preserve"><value>CSVファイルを書き込めませんでした</value></data>
   <data name="Dashboard_NoCollections" xml:space="preserve"><value>コレクションがありません。先に「コレクション」メニューからコレクションを作成してください。</value></data>
   <data name="Dashboard_AddedToCollection" xml:space="preserve"><value>'{0}' をコレクション '{1}' に追加しました</value></data>
   <data name="Dashboard_AlreadyInCollection" xml:space="preserve"><value>この文書は既にコレクション '{0}' に含まれています</value></data>
+  <data name="Dashboard_FileMissingMessage" xml:space="preserve"><value>ファイルが見つかりません。ファイル整合性を開いてパスを再リンクまたはクリアしますか？</value></data>
   <data name="Dashboard_About" xml:space="preserve"><value>Study Document Manager v{0}&#xA;&#xA;個人向け学習文書管理アプリケーション&#xA;Framework: Avalonia UI (.NET 9)&#xA;Database: SQLite (local)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
 
   <!-- MainWindow -->
@@ -420,6 +431,11 @@
   <data name="AddToCollection_DocInfo" xml:space="preserve"><value>文書情報</value></data>
   <data name="AddToCollection_SelectCollection" xml:space="preserve"><value>コレクションを選択:</value></data>
   <data name="AddToCollection_BtnAdd" xml:space="preserve"><value>追加</value></data>
+  <data name="AddToCollection_Subtitle" xml:space="preserve"><value>選択した文書を追加するコレクションを選択</value></data>
+  <data name="AddToCollection_SearchPlaceholder" xml:space="preserve"><value>文書を検索...</value></data>
+  <data name="Bulk_BtnSelectAll" xml:space="preserve"><value>すべて選択</value></data>
+  <data name="Bulk_Selected" xml:space="preserve"><value>選択</value></data>
+  <data name="Bulk_Documents" xml:space="preserve"><value>文書</value></data>
 
   <!-- ChangeCategoryDialog -->
   <data name="ChangeCategory_Title" xml:space="preserve"><value>カテゴリ変更</value></data>
@@ -501,6 +517,8 @@
   <data name="BatchImport_ColFileSize" xml:space="preserve"><value>サイズ</value></data>
   <data name="BatchImport_ColSubject" xml:space="preserve"><value>カテゴリ</value></data>
   <data name="BatchImport_EmptyState" xml:space="preserve"><value>フォルダを選択してインポート可能なファイルを表示</value></data>
+  <data name="BatchImport_StatusImporting" xml:space="preserve"><value>選択したファイルをインポート中...</value></data>
+  <data name="BatchImport_ScanError" xml:space="preserve"><value>選択したファイルをスキャンまたはインポートできません</value></data>
 
   <!-- BulkDelete View -->
   <data name="BulkDelete_Title" xml:space="preserve"><value>一括削除</value></data>
@@ -531,6 +549,7 @@
   <data name="CollectionMgmt_BtnDelete" xml:space="preserve"><value>削除</value></data>
   <data name="CollectionMgmt_BtnAddDoc" xml:space="preserve"><value>文書追加</value></data>
   <data name="CollectionMgmt_BtnRemoveDoc" xml:space="preserve"><value>除外</value></data>
+  <data name="Bulk_SelectedCount" xml:space="preserve"><value>選択中: {0}</value></data>
   <data name="CollectionMgmt_EmptyState" xml:space="preserve"><value>コレクションがありません</value></data>
   <data name="CollectionMgmt_ColDocName" xml:space="preserve"><value>文書名</value></data>
   <data name="CollectionMgmt_ColSubject" xml:space="preserve"><value>カテゴリ</value></data>
@@ -674,6 +693,7 @@
   <data name="Collection_DeselectAll" xml:space="preserve"><value>すべて解除</value></data>
   <data name="Collection_AddToTitle" xml:space="preserve"><value>"{0}" に文書を追加</value></data>
 
+  <data name="BatchImport_InvalidDrop" xml:space="preserve"><value>この画面ではファイルをドロップできません</value></data>
 </root>
 
 

@@ -14,6 +14,8 @@ public partial class FileIntegrityCheckModel : ModelBase
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
     private readonly ILocalizationService _loc;
+    private string _statusKey = "Status_ScanPrompt";
+    private object[] _statusArguments = [];
 
     [ObservableProperty] private ObservableCollection<IntegrityResult> _results = new();
     [ObservableProperty] private bool _isChecking;
@@ -28,7 +30,8 @@ public partial class FileIntegrityCheckModel : ModelBase
         _dialogService = dialogService;
         _fileDialogService = fileDialogService;
         _loc = loc;
-        _statusText = _loc["Status_ScanPrompt"];
+        _loc.LanguageChanged += (_, _) => RefreshLocalizedStrings();
+        SetLocalizedStatus("Status_ScanPrompt");
     }
 
     [RelayCommand]
@@ -56,7 +59,7 @@ public partial class FileIntegrityCheckModel : ModelBase
         }
 
         IsChecking = false;
-        StatusText = string.Format(_loc["Status_ScanComplete"], MissingCount, TotalChecked);
+        SetLocalizedStatus("Status_ScanComplete", MissingCount, TotalChecked);
 
         if (MissingCount == 0)
         {
@@ -81,7 +84,7 @@ public partial class FileIntegrityCheckModel : ModelBase
         {
             Results.Remove(item);
             MissingCount--;
-            StatusText = string.Format(_loc["Status_MissingFiles"], MissingCount);
+            SetLocalizedStatus("Status_MissingFiles", MissingCount);
             await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Integrity_PathUpdated"]);
         }
     }
@@ -102,7 +105,7 @@ public partial class FileIntegrityCheckModel : ModelBase
         {
             Results.Remove(item);
             MissingCount--;
-            StatusText = string.Format(_loc["Status_MissingFiles"], MissingCount);
+            SetLocalizedStatus("Status_MissingFiles", MissingCount);
         }
     }
 
@@ -123,7 +126,7 @@ public partial class FileIntegrityCheckModel : ModelBase
         {
             Results.Remove(item);
             MissingCount--;
-            StatusText = string.Format(_loc["Status_MissingFiles"], MissingCount);
+            SetLocalizedStatus("Status_MissingFiles", MissingCount);
         }
     }
 
@@ -151,15 +154,15 @@ public partial class FileIntegrityCheckModel : ModelBase
         }
 
         MissingCount = Results.Count;
-        StatusText = string.Format(_loc["Integrity_MovedToTrash"], removed);
+        SetLocalizedStatus("Integrity_MovedToTrash", removed);
         await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
             string.Format(_loc["Integrity_MovedToTrash"], removed));
     }
 }
 
-public class IntegrityResult
+public partial class IntegrityResult : ObservableObject
 {
     public StudyDocument Document { get; set; } = new();
     public string FilePath { get; set; } = string.Empty;
-    public string Status { get; set; } = string.Empty;
+    [ObservableProperty] private string _status = string.Empty;
 }

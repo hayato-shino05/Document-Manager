@@ -42,8 +42,12 @@
                         <StackPanel Spacing="4">
                             <TextBlock Text="{loc:Localize AddEdit_LblDocName}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
-                            <TextBox Text="{Binding Ten, Mode=TwoWay}" FontSize="{StaticResource FontSizeLg}"
+                            <TextBox x:Name="txtName" Text="{Binding Name, Mode=TwoWay}" FontSize="{StaticResource FontSizeLg}"
                                      Watermark="{loc:Localize AddEdit_PlaceholderDocName}" Height="32"/>
+                            <TextBlock Text="{Binding NameValidationMessage}"
+                                       IsVisible="{Binding HasNameValidationError}"
+                                       Foreground="{StaticResource DangerBrush}"
+                                       FontSize="{StaticResource FontSizeSm}"/>
                         </StackPanel>
 
                         <!-- Row: Category + Type -->
@@ -52,7 +56,7 @@
                                 <TextBlock Text="{loc:Localize AddEdit_LblCategory}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
                                 <ComboBox ItemsSource="{Binding Subjects}"
-                                          SelectedItem="{Binding MonHoc, Mode=TwoWay}"
+                                          SelectedItem="{Binding Subject, Mode=TwoWay}"
                                           IsTextSearchEnabled="True"
                                           PlaceholderText="{loc:Localize AddEdit_PlaceholderCategory}"
                                           FontSize="{StaticResource FontSizeMd}" Height="32"
@@ -62,7 +66,7 @@
                                 <TextBlock Text="{loc:Localize AddEdit_LblDocType}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
                                 <ComboBox ItemsSource="{Binding Types}"
-                                          SelectedItem="{Binding Loai, Mode=TwoWay}"
+                                          SelectedItem="{Binding Type, Mode=TwoWay}"
                                           IsTextSearchEnabled="True"
                                           PlaceholderText="{loc:Localize AddEdit_PlaceholderDocType}"
                                           FontSize="{StaticResource FontSizeMd}" Height="32"
@@ -82,7 +86,7 @@
                                         <TextBlock Text="{loc:Localize AddEdit_BtnBrowse}" FontSize="{StaticResource FontSizeSm}"/>
                                     </StackPanel>
                                 </Button>
-                                <TextBox Text="{Binding DuongDan, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                                <TextBox Text="{Binding FilePath, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
                                          Watermark="{loc:Localize AddEdit_PlaceholderFilePath}" Height="32"/>
                             </DockPanel>
                         </StackPanel>
@@ -91,7 +95,7 @@
                         <StackPanel Spacing="4">
                             <TextBlock Text="{loc:Localize AddEdit_LblAuthor}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
-                            <TextBox Text="{Binding TacGia, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                            <TextBox Text="{Binding Author, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
                                      Watermark="{loc:Localize AddEdit_PlaceholderAuthor}" Height="32"/>
                         </StackPanel>
 
@@ -100,14 +104,14 @@
                             <TextBlock Text="{loc:Localize AddEdit_LblTags}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
                             <TextBox Text="{Binding Tags, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
-                                     Watermark="tag1, tag2, tag3..." Height="32"/>
+                                     Watermark="{loc:Localize AddEdit_PlaceholderTags}" Height="32"/>
                         </StackPanel>
 
                         <!-- Notes -->
                         <StackPanel Spacing="4">
                             <TextBlock Text="{loc:Localize AddEdit_LblNotes}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
-                            <TextBox Text="{Binding GhiChu, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                            <TextBox Text="{Binding Notes, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
                                      Watermark="{loc:Localize AddEdit_PlaceholderNotes}"
                                      AcceptsReturn="True" TextWrapping="Wrap"
                                      Height="80"/>
@@ -124,7 +128,7 @@
                             <StackPanel Grid.Column="2" Spacing="4" VerticalAlignment="Bottom"
                                         Margin="0,0,0,4">
                                 <CheckBox Content="{loc:Localize AddEdit_ChkImportant}" FontSize="{StaticResource FontSizeMd}"
-                                          IsChecked="{Binding QuanTrong}"/>
+                                          IsChecked="{Binding IsImportant}"/>
                             </StackPanel>
                         </Grid>
 

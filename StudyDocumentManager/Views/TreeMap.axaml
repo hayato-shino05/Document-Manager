@@ -24,7 +24,7 @@
                             Command="{Binding ShowBySubjectCommand}" Padding="{StaticResource PaddingBtnSm}" FontSize="{StaticResource FontSizeSm}"/>
                     <Button Classes="secondary" Content="{loc:Localize TreeMap_BtnByType}"
                             Command="{Binding ShowByTypeCommand}" Padding="{StaticResource PaddingBtnSm}" FontSize="{StaticResource FontSizeSm}"/>
-                    <TextBlock Text="{Binding TotalDocuments, StringFormat='Total: {0} documents'}"
+                    <TextBlock Text="{Binding TotalDocuments, StringFormat={loc:Localize TreeMap_StatTotal}}"
                                VerticalAlignment="Center" Margin="12,0,0,0"
                                FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold"/>
                 </StackPanel>
@@ -48,7 +48,7 @@
                                         <TextBlock Text="{Binding Label}"
                                                    Foreground="White" FontWeight="Bold" FontSize="{StaticResource FontSizeLg}"
                                                    TextAlignment="Center" TextWrapping="Wrap"/>
-                                        <TextBlock Text="{Binding Count, StringFormat='{}{0} docs'}"
+                                        <TextBlock Text="{Binding Count, StringFormat={loc:Localize TreeMap_ItemCount}}"
                                                    Foreground="{StaticResource OnColorPrimaryBrush}" FontSize="{StaticResource FontSizeMd}"
                                                    TextAlignment="Center"/>
                                         <TextBlock Text="{Binding Percentage, StringFormat='{}{0:F1}%'}"

@@ -7,7 +7,7 @@
         xmlns:loc="using:StudyDocumentManager.Markup"
         x:Class="StudyDocumentManager.Views.MainWindow"
         x:DataType="vm:MainWindowModel"
-        Title="Study Document Manager - Professional Edition"
+        Title="{loc:Localize MainWindow_Title}"
         Width="1280" Height="800"
         MinWidth="960" MinHeight="640"
         WindowStartupLocation="CenterScreen"
@@ -86,7 +86,7 @@
                         <MenuItem Header="{loc:Localize Menu_FindDuplicates}" Command="{Binding NavigateCommand}" CommandParameter="duplicates"/>
                         <MenuItem Header="{loc:Localize Menu_FileCheck}" Command="{Binding NavigateCommand}" CommandParameter="integrity"/>
                         <Separator/>
-                        <MenuItem Header="{loc:Localize Menu_Statistics}" Command="{Binding NavigateCommand}" CommandParameter="report" InputGesture="Ctrl+S"/>
+                        <MenuItem Header="{loc:Localize Menu_Statistics}" Command="{Binding NavigateCommand}" CommandParameter="report"/>
                         <Separator/>
                         <MenuItem Header="{loc:Localize Menu_RecycleBin}" Command="{Binding NavigateCommand}" CommandParameter="recycle"/>
                     </MenuItem>
@@ -150,7 +150,7 @@
                             Command="{Binding NavigateCommand}" CommandParameter="batch-import">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconImport}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="Import" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize Action_Import}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
 
@@ -207,7 +207,7 @@
                             Command="{Binding NavigateCommand}" CommandParameter="treemap">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconDashboard}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="TreeMap" Classes="toolbar-btn-label"/>
+                            <TextBlock Text="{loc:Localize TreeMap_Title}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>

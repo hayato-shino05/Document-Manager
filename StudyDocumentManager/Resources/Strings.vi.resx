@@ -18,65 +18,382 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
-  <resheader name="version"><value>2.0</value></resheader>
-  <resheader name="reader"><value>System.Resources.ResXResourceReader</value></resheader>
-  <resheader name="writer"><value>System.Resources.ResXResourceWriter</value></resheader>
-  <data name="Nav_Dashboard" xml:space="preserve"><value>Bảng điều khiển</value></data>
-  <data name="Nav_AddDocument" xml:space="preserve"><value>Thêm tài liệu</value></data>
-  <data name="Nav_Categories" xml:space="preserve"><value>Quản lý danh mục</value></data>
-  <data name="Nav_Collections" xml:space="preserve"><value>Bộ sưu tập</value></data>
-  <data name="Nav_RecycleBin" xml:space="preserve"><value>Thùng rác</value></data>
-  <data name="Nav_Reports" xml:space="preserve"><value>Báo cáo</value></data>
-  <data name="Nav_Settings" xml:space="preserve"><value>Cài đặt</value></data>
-  <data name="Action_Add" xml:space="preserve"><value>Thêm</value></data>
-  <data name="Action_Edit" xml:space="preserve"><value>Sửa</value></data>
-  <data name="Action_Delete" xml:space="preserve"><value>Xóa</value></data>
-  <data name="Action_Save" xml:space="preserve"><value>Lưu</value></data>
-  <data name="Action_Cancel" xml:space="preserve"><value>Hủy</value></data>
-  <data name="Action_Search" xml:space="preserve"><value>Tìm kiếm</value></data>
-  <data name="Action_Filter" xml:space="preserve"><value>Lọc</value></data>
-  <data name="Action_Refresh" xml:space="preserve"><value>Làm mới</value></data>
-  <data name="Action_Close" xml:space="preserve"><value>Đóng</value></data>
-  <data name="Action_Open" xml:space="preserve"><value>Mở</value></data>
-  <data name="Action_Export" xml:space="preserve"><value>Xuất</value></data>
-  <data name="Action_Import" xml:space="preserve"><value>Nhập</value></data>
-  <data name="Action_Restore" xml:space="preserve"><value>Khôi phục</value></data>
-  <data name="Action_SelectAll" xml:space="preserve"><value>Chọn tất cả</value></data>
-  <data name="Action_DeselectAll" xml:space="preserve"><value>Bỏ chọn tất cả</value></data>
-  <data name="Field_Name" xml:space="preserve"><value>Tên</value></data>
-  <data name="Field_Subject" xml:space="preserve"><value>Môn học</value></data>
-  <data name="Field_Type" xml:space="preserve"><value>Loại</value></data>
-  <data name="Field_Author" xml:space="preserve"><value>Tác giả</value></data>
-  <data name="Field_FilePath" xml:space="preserve"><value>Đường dẫn file</value></data>
-  <data name="Field_FileSize" xml:space="preserve"><value>Kích thước</value></data>
-  <data name="Field_CreatedAt" xml:space="preserve"><value>Ngày thêm</value></data>
-  <data name="Field_Notes" xml:space="preserve"><value>Ghi chú</value></data>
-  <data name="Field_Important" xml:space="preserve"><value>Quan trọng</value></data>
-  <data name="Field_Description" xml:space="preserve"><value>Mô tả</value></data>
-  <data name="Filter_All" xml:space="preserve"><value>Tất cả</value></data>
-  <data name="Filter_AllSubjects" xml:space="preserve"><value>Tất cả môn học</value></data>
-  <data name="Filter_AllTypes" xml:space="preserve"><value>Tất cả loại</value></data>
-  <data name="Filter_SearchPlaceholder" xml:space="preserve"><value>Tìm kiếm tài liệu...</value></data>
-  <data name="Msg_ConfirmDelete" xml:space="preserve"><value>Bạn có chắc muốn xóa?</value></data>
-  <data name="Msg_DeleteSuccess" xml:space="preserve"><value>Đã xóa thành công</value></data>
-  <data name="Msg_SaveSuccess" xml:space="preserve"><value>Đã lưu thành công</value></data>
-  <data name="Msg_Error" xml:space="preserve"><value>Đã xảy ra lỗi</value></data>
-  <data name="Msg_NoDocuments" xml:space="preserve"><value>Không có tài liệu nào</value></data>
-  <data name="Msg_FileNotFound" xml:space="preserve"><value>Không tìm thấy file</value></data>
-  <data name="Msg_RestoreSuccess" xml:space="preserve"><value>Đã khôi phục thành công</value></data>
-  <data name="Msg_ImportSuccess" xml:space="preserve"><value>Đã nhập thành công</value></data>
-  <data name="Dashboard_TotalDocuments" xml:space="preserve"><value>Tổng tài liệu</value></data>
-  <data name="Dashboard_TotalSubjects" xml:space="preserve"><value>Tổng môn học</value></data>
-  <data name="Dashboard_RecentFiles" xml:space="preserve"><value>File gần đây</value></data>
-  <data name="Dashboard_ImportantDocs" xml:space="preserve"><value>Tài liệu quan trọng</value></data>
-  <data name="Report_BySubject" xml:space="preserve"><value>Theo môn học</value></data>
-  <data name="Report_ByType" xml:space="preserve"><value>Theo loại</value></data>
-  <data name="Report_Timeline" xml:space="preserve"><value>Dòng thời gian</value></data>
-  <data name="Report_Unknown" xml:space="preserve"><value>Không rõ</value></data>
-  <data name="Lang_Japanese" xml:space="preserve"><value>日本語</value></data>
-  <data name="Lang_English" xml:space="preserve"><value>English</value></data>
-  <data name="Lang_Vietnamese" xml:space="preserve"><value>Tiếng Việt</value></data>
-  <data name="Lang_Chinese" xml:space="preserve"><value>中文</value></data>
-  <data name="Main_ChangeLanguage" xml:space="preserve"><value>Change Language</value></data>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter</value>
+  </resheader>
+  <data name="Nav_Dashboard" xml:space="preserve">
+    <value>Bảng điều khiển</value>
+  </data>
+  <data name="Nav_AddDocument" xml:space="preserve">
+    <value>Thêm tài liệu</value>
+  </data>
+  <data name="Nav_Categories" xml:space="preserve">
+    <value>Quản lý danh mục</value>
+  </data>
+  <data name="Nav_Collections" xml:space="preserve">
+    <value>Bộ sưu tập</value>
+  </data>
+  <data name="Nav_RecycleBin" xml:space="preserve">
+    <value>Thùng rác</value>
+  </data>
+  <data name="Nav_Reports" xml:space="preserve">
+    <value>Báo cáo</value>
+  </data>
+  <data name="Nav_Settings" xml:space="preserve">
+    <value>Cài đặt</value>
+  </data>
+  <data name="Action_Add" xml:space="preserve">
+    <value>Thêm</value>
+  </data>
+  <data name="Action_Edit" xml:space="preserve">
+    <value>Sửa</value>
+  </data>
+  <data name="Action_Delete" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+  <data name="Action_Save" xml:space="preserve">
+    <value>Lưu</value>
+  </data>
+  <data name="Action_Cancel" xml:space="preserve">
+    <value>Hủy</value>
+  </data>
+  <data name="Action_Search" xml:space="preserve">
+    <value>Tìm kiếm</value>
+  </data>
+  <data name="Action_Filter" xml:space="preserve">
+    <value>Lọc</value>
+  </data>
+  <data name="Action_Refresh" xml:space="preserve">
+    <value>Làm mới</value>
+  </data>
+  <data name="Action_Close" xml:space="preserve">
+    <value>Đóng</value>
+  </data>
+  <data name="Action_Open" xml:space="preserve">
+    <value>Mở</value>
+  </data>
+  <data name="Action_Export" xml:space="preserve">
+    <value>Xuất</value>
+  </data>
+  <data name="Action_Import" xml:space="preserve">
+    <value>Nhập</value>
+  </data>
+  <data name="Action_Restore" xml:space="preserve">
+    <value>Khôi phục</value>
+  </data>
+  <data name="Action_SelectAll" xml:space="preserve">
+    <value>Chọn tất cả</value>
+  </data>
+  <data name="Action_DeselectAll" xml:space="preserve">
+    <value>Bỏ chọn tất cả</value>
+  </data>
+  <data name="Field_Name" xml:space="preserve">
+    <value>Tên</value>
+  </data>
+  <data name="Field_Subject" xml:space="preserve">
+    <value>Môn học</value>
+  </data>
+  <data name="Field_Type" xml:space="preserve">
+    <value>Loại</value>
+  </data>
+  <data name="Field_Author" xml:space="preserve">
+    <value>Tác giả</value>
+  </data>
+  <data name="Field_FilePath" xml:space="preserve">
+    <value>Đường dẫn file</value>
+  </data>
+  <data name="Field_FileSize" xml:space="preserve">
+    <value>Kích thước</value>
+  </data>
+  <data name="Field_CreatedAt" xml:space="preserve">
+    <value>Ngày thêm</value>
+  </data>
+  <data name="Field_Notes" xml:space="preserve">
+    <value>Ghi chú</value>
+  </data>
+  <data name="Field_Important" xml:space="preserve">
+    <value>Quan trọng</value>
+  </data>
+  <data name="Field_Description" xml:space="preserve">
+    <value>Mô tả</value>
+  </data>
+  <data name="Filter_All" xml:space="preserve">
+    <value>Tất cả</value>
+  </data>
+  <data name="Filter_AllSubjects" xml:space="preserve">
+    <value>Tất cả môn học</value>
+  </data>
+  <data name="Filter_AllTypes" xml:space="preserve">
+    <value>Tất cả loại</value>
+  </data>
+  <data name="Filter_SearchPlaceholder" xml:space="preserve">
+    <value>Tìm kiếm tài liệu...</value>
+  </data>
+  <data name="Msg_ConfirmDelete" xml:space="preserve">
+    <value>Bạn có chắc muốn xóa?</value>
+  </data>
+  <data name="Msg_DeleteSuccess" xml:space="preserve">
+    <value>Đã xóa thành công</value>
+  </data>
+  <data name="Msg_SaveSuccess" xml:space="preserve">
+    <value>Đã lưu thành công</value>
+  </data>
+  <data name="Msg_Error" xml:space="preserve">
+    <value>Đã xảy ra lỗi</value>
+  </data>
+  <data name="Msg_NoDocuments" xml:space="preserve">
+    <value>Không có tài liệu nào</value>
+  </data>
+  <data name="Msg_FileNotFound" xml:space="preserve">
+    <value>Không tìm thấy file</value>
+  </data>
+  <data name="Msg_RestoreSuccess" xml:space="preserve">
+    <value>Đã khôi phục thành công</value>
+  </data>
+  <data name="Msg_ImportSuccess" xml:space="preserve">
+    <value>Đã nhập thành công</value>
+  </data>
+  <data name="Dashboard_TotalDocuments" xml:space="preserve">
+    <value>Tổng tài liệu</value>
+  </data>
+  <data name="Dashboard_TotalSubjects" xml:space="preserve">
+    <value>Tổng môn học</value>
+  </data>
+  <data name="Dashboard_RecentFiles" xml:space="preserve">
+    <value>File gần đây</value>
+  </data>
+  <data name="Dashboard_ImportantDocs" xml:space="preserve">
+    <value>Tài liệu quan trọng</value>
+  </data>
+  <data name="Report_BySubject" xml:space="preserve">
+    <value>Theo môn học</value>
+  </data>
+  <data name="Report_ByType" xml:space="preserve">
+    <value>Theo loại</value>
+  </data>
+  <data name="Report_Timeline" xml:space="preserve">
+    <value>Dòng thời gian</value>
+  </data>
+  <data name="Report_Unknown" xml:space="preserve">
+    <value>Không rõ</value>
+  </data>
+  <data name="Lang_Japanese" xml:space="preserve">
+    <value>日本語</value>
+  </data>
+  <data name="Lang_English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Lang_Vietnamese" xml:space="preserve">
+    <value>Tiếng Việt</value>
+  </data>
+  <data name="Lang_Chinese" xml:space="preserve">
+    <value>中文</value>
+  </data>
+  <data name="Main_ChangeLanguage" xml:space="preserve">
+    <value>Thay đổi ngôn ngữ</value>
+  </data>
+  <data name="Recycle_RestoreError" xml:space="preserve">
+    <value>Không thể khôi phục tài liệu</value>
+  </data>
+  <data name="Recycle_PermanentDeleteError" xml:space="preserve">
+    <value>Không thể xóa vĩnh viễn tài liệu</value>
+  </data>
+  <data name="Recycle_PermanentDeleteSuccess" xml:space="preserve">
+    <value>Đã xóa vĩnh viễn tài liệu</value>
+  </data>
+  <data name="Dashboard_BackupFailed" xml:space="preserve">
+    <value>Không thể tạo tệp sao lưu</value>
+  </data>
+  <data name="Dashboard_ConfirmOverwriteBackup" xml:space="preserve">
+    <value>Ghi đè bản sao lưu</value>
+  </data>
+  <data name="Dashboard_OverwriteBackupWarning" xml:space="preserve">
+    <value>Tệp sao lưu hiện có sẽ bị ghi đè. Bạn có muốn tiếp tục?</value>
+  </data>
+  <data name="Dashboard_OverwriteBackup" xml:space="preserve">
+    <value>Ghi đè</value>
+  </data>
+  <data name="Dashboard_RestoreFailed" xml:space="preserve">
+    <value>Không thể xác thực hoặc khôi phục tệp sao lưu</value>
+  </data>
+  <data name="Dashboard_RestoreRestartRequired" xml:space="preserve">
+    <value>Cơ sở dữ liệu đã được khôi phục. Vui lòng mở lại ứng dụng.</value>
+  </data>
+  <data name="Dashboard_ExportWriteFailed" xml:space="preserve">
+    <value>Không thể ghi tệp CSV</value>
+  </data>
+  <data name="AddEdit_NameRequired" xml:space="preserve">
+    <value>Tên tài liệu là bắt buộc</value>
+  </data>
+  <data name="BatchImport_InvalidDrop" xml:space="preserve">
+    <value>Không thể thả tệp ở màn hình này</value>
+  </data>
+  <data name="BatchImport_StatusImporting" xml:space="preserve">
+    <value>Đang nhập các tệp đã chọn...</value>
+  </data>
+  <data name="BatchImport_ScanError" xml:space="preserve">
+    <value>Không thể quét hoặc nhập các tệp đã chọn</value>
+  </data>
+  <data name="Dashboard_FileMissingMessage" xml:space="preserve">
+    <value>Tệp này không còn tồn tại. Mở Kiểm tra tính toàn vẹn tệp để liên kết lại đường dẫn hoặc xóa nó?</value>
+  </data>
+  <data name="Bulk_SelectedCount" xml:space="preserve">
+    <value>Đã chọn: {0}</value>
+  </data>
+  <data name="CollectionMgmt_BtnAddDoc" xml:space="preserve">
+    <value>Thêm tài liệu</value>
+  </data>
+  <data name="CollectionMgmt_BtnRemoveDoc" xml:space="preserve">
+    <value>Gỡ khỏi bộ sưu tập</value>
+  </data>
+  <data name="Collection_CreateTitle" xml:space="preserve">
+    <value>Tạo bộ sưu tập</value>
+  </data>
+  <data name="Collection_CreateLabel" xml:space="preserve">
+    <value>Tên bộ sưu tập:</value>
+  </data>
+  <data name="Collection_Created" xml:space="preserve">
+    <value>Đã tạo bộ sưu tập '{0}'</value>
+  </data>
+  <data name="Collection_LoadError" xml:space="preserve">
+    <value>Không thể tải bộ sưu tập: {0}</value>
+  </data>
+  <data name="Collection_CreateError" xml:space="preserve">
+    <value>Không thể tạo bộ sưu tập: {0}</value>
+  </data>
+  <data name="Collection_RenameTitle" xml:space="preserve">
+    <value>Đổi tên</value>
+  </data>
+  <data name="Collection_ConfirmDelete" xml:space="preserve">
+    <value>Xóa bộ sưu tập '{0}'?</value>
+  </data>
+  <data name="Collection_AllDocsAlreadyIn" xml:space="preserve">
+    <value>Tất cả tài liệu đã nằm trong bộ sưu tập này</value>
+  </data>
+  <data name="Collection_AddedDocs" xml:space="preserve">
+    <value>Đã thêm {0} tài liệu vào '{1}'</value>
+  </data>
+  <data name="Collection_AddError" xml:space="preserve">
+    <value>Không thể thêm tài liệu: {0}</value>
+  </data>
+  <data name="Collection_ConfirmRemoveDoc" xml:space="preserve">
+    <value>Gỡ '{0}' khỏi bộ sưu tập?</value>
+  </data>
+  <data name="Collection_ConfirmRemoveDocs" xml:space="preserve">
+    <value>Gỡ {0} tài liệu khỏi bộ sưu tập này?</value>
+  </data>
+  <data name="Category_NewNameLabel" xml:space="preserve">
+    <value>Tên mới:</value>
+  </data>
+  <data name="Report_NoData" xml:space="preserve">
+    <value>Không có dữ liệu</value>
+  </data>
+  <data name="AddToCollection_Title" xml:space="preserve">
+    <value>Thêm vào bộ sưu tập</value>
+  </data>
+  <data name="AddToCollection_DocInfo" xml:space="preserve">
+    <value>Thông tin tài liệu</value>
+  </data>
+  <data name="AddToCollection_SelectCollection" xml:space="preserve">
+    <value>Chọn bộ sưu tập:</value>
+  </data>
+  <data name="AddToCollection_BtnAdd" xml:space="preserve">
+    <value>Thêm</value>
+  </data>
+  <data name="AddToCollection_Subtitle" xml:space="preserve">
+    <value>Chọn bộ sưu tập để thêm tài liệu đã chọn</value>
+  </data>
+  <data name="AddToCollection_SearchPlaceholder" xml:space="preserve">
+    <value>Tìm tài liệu...</value>
+  </data>
+  <data name="Bulk_BtnSelectAll" xml:space="preserve">
+    <value>Chọn tất cả</value>
+  </data>
+  <data name="Bulk_Selected" xml:space="preserve">
+    <value>Đã chọn</value>
+  </data>
+  <data name="Bulk_Documents" xml:space="preserve">
+    <value>tài liệu</value>
+  </data>
+  <data name="CollectionMgmt_Title" xml:space="preserve">
+    <value>Quản lý bộ sưu tập</value>
+  </data>
+  <data name="CollectionMgmt_BtnCreate" xml:space="preserve">
+    <value>Tạo mới</value>
+  </data>
+  <data name="CollectionMgmt_BtnRename" xml:space="preserve">
+    <value>Đổi tên</value>
+  </data>
+  <data name="CollectionMgmt_BtnDelete" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+  <data name="CollectionMgmt_EmptyState" xml:space="preserve">
+    <value>Chưa có bộ sưu tập</value>
+  </data>
+  <data name="CollectionMgmt_ColDocName" xml:space="preserve">
+    <value>Tên tài liệu</value>
+  </data>
+  <data name="CollectionMgmt_ColSubject" xml:space="preserve">
+    <value>Danh mục</value>
+  </data>
+  <data name="CollectionMgmt_ColType" xml:space="preserve">
+    <value>Loại</value>
+  </data>
+  <data name="CollectionMgmt_ListHeader" xml:space="preserve">
+    <value>Danh sách bộ sưu tập</value>
+  </data>
+  <data name="CollectionMgmt_DetailHeader" xml:space="preserve">
+    <value>Chi tiết bộ sưu tập</value>
+  </data>
+  <data name="Dashboard_AddedToCollection" xml:space="preserve">
+    <value>Đã thêm '{0}' vào bộ sưu tập '{1}'</value>
+  </data>
+  <data name="Collection_DocCount" xml:space="preserve">
+    <value>Số tài liệu: {0}</value>
+  </data>
+  <data name="Collection_DocCountFiltered" xml:space="preserve">
+    <value>{0} / {1} tài liệu</value>
+  </data>
+  <data name="Collection_SelectAll" xml:space="preserve">
+    <value>Chọn tất cả</value>
+  </data>
+  <data name="Collection_DeselectAll" xml:space="preserve">
+    <value>Bỏ chọn tất cả</value>
+  </data>
+  <data name="Collection_AddToTitle" xml:space="preserve">
+    <value>Thêm tài liệu vào "{0}"</value>
+  </data>
+  <data name="AddToCollState_DocCount" xml:space="preserve">
+    <value>Số tài liệu: {0}</value>
+  </data>
+  <data name="AddToCollState_DocCountFiltered" xml:space="preserve">
+    <value>{0} / {1} tài liệu</value>
+  </data>
+  <data name="AddToCollState_SelectAll" xml:space="preserve">
+    <value>Chọn tất cả</value>
+  </data>
+  <data name="AddToCollState_DeselectAll" xml:space="preserve">
+    <value>Bỏ chọn tất cả</value>
+  </data>
+  <data name="SelectCollDialog_SelectChips" xml:space="preserve">
+    <value>Chạm vào bộ sưu tập để chọn:</value>
+  </data>
+  <data name="SelectCollDialog_EmptyState" xml:space="preserve">
+    <value>Chưa có bộ sưu tập - hãy tạo từ menu Bộ sưu tập</value>
+  </data>
+  <data name="SelectCollDialog_NoneSelected" xml:space="preserve">
+    <value>Chưa chọn bộ sưu tập</value>
+  </data>
+  <data name="SelectCollDialog_BtnAdd" xml:space="preserve">
+    <value>Thêm</value>
+  </data>
 </root>

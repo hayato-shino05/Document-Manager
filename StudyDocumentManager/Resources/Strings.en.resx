@@ -141,6 +141,9 @@
   <data name="Recycle_ConfirmPermanentDelete" xml:space="preserve"><value>Permanently delete '{0}'? This cannot be undone!</value></data>
   <data name="Recycle_ConfirmEmptyTrash" xml:space="preserve"><value>Permanently delete {0} document(s)? This cannot be undone!</value></data>
   <data name="Recycle_EmptyTrashDone" xml:space="preserve"><value>Permanently deleted {0} document(s)</value></data>
+  <data name="Recycle_RestoreError" xml:space="preserve"><value>Could not restore document</value></data>
+  <data name="Recycle_PermanentDeleteError" xml:space="preserve"><value>Could not permanently delete document</value></data>
+  <data name="Recycle_PermanentDeleteSuccess" xml:space="preserve"><value>Document permanently deleted</value></data>
   <data name="Note_SaveSuccess" xml:space="preserve"><value>Note saved</value></data>
   <data name="Note_SaveError" xml:space="preserve"><value>Cannot save note</value></data>
   <data name="Note_ConfirmDelete" xml:space="preserve"><value>Delete this note?</value></data>
@@ -229,6 +232,7 @@
   <data name="Dashboard_NoCollections" xml:space="preserve"><value>No collections. Please create one from the Collections menu first.</value></data>
   <data name="Dashboard_AddedToCollection" xml:space="preserve"><value>Added '{0}' to collection '{1}'</value></data>
   <data name="Dashboard_AlreadyInCollection" xml:space="preserve"><value>This document is already in collection '{0}'</value></data>
+  <data name="Dashboard_FileMissingMessage" xml:space="preserve"><value>This file is missing. Open File Integrity to relink the path or clear it?</value></data>
   <data name="Dashboard_About" xml:space="preserve"><value>Study Document Manager v{0}
 
 個人向け学習文書管理アプリケーション
@@ -388,6 +392,11 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="AddToCollection_DocInfo" xml:space="preserve"><value>Document Info</value></data>
   <data name="AddToCollection_SelectCollection" xml:space="preserve"><value>Select collection:</value></data>
   <data name="AddToCollection_BtnAdd" xml:space="preserve"><value>Add</value></data>
+  <data name="AddToCollection_Subtitle" xml:space="preserve"><value>Select a collection to add the selected document</value></data>
+  <data name="AddToCollection_SearchPlaceholder" xml:space="preserve"><value>Search documents...</value></data>
+  <data name="Bulk_BtnSelectAll" xml:space="preserve"><value>Select All</value></data>
+  <data name="Bulk_Selected" xml:space="preserve"><value>Selected</value></data>
+  <data name="Bulk_Documents" xml:space="preserve"><value>documents</value></data>
   <data name="ChangeCategory_Title" xml:space="preserve"><value>Change Category</value></data>
   <data name="ChangeCategory_NewCategory" xml:space="preserve"><value>New category:</value></data>
   <data name="ChangeCategory_BtnChange" xml:space="preserve"><value>Change</value></data>
@@ -449,6 +458,8 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="BatchImport_ColFileSize" xml:space="preserve"><value>Size</value></data>
   <data name="BatchImport_ColSubject" xml:space="preserve"><value>Category</value></data>
   <data name="BatchImport_EmptyState" xml:space="preserve"><value>Select a folder to show importable files</value></data>
+  <data name="BatchImport_StatusImporting" xml:space="preserve"><value>Importing selected files...</value></data>
+  <data name="BatchImport_ScanError" xml:space="preserve"><value>Could not scan or import the selected files</value></data>
   <data name="BulkDelete_Title" xml:space="preserve"><value>Bulk Delete</value></data>
   <data name="BulkDelete_BtnDelete" xml:space="preserve"><value>Delete</value></data>
   <data name="BulkDelete_BtnMarkImportant" xml:space="preserve"><value>Mark Important</value></data>
@@ -473,6 +484,7 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="CollectionMgmt_BtnDelete" xml:space="preserve"><value>Delete</value></data>
   <data name="CollectionMgmt_BtnAddDoc" xml:space="preserve"><value>Add Document</value></data>
   <data name="CollectionMgmt_BtnRemoveDoc" xml:space="preserve"><value>Remove</value></data>
+  <data name="Bulk_SelectedCount" xml:space="preserve"><value>Selected: {0}</value></data>
   <data name="CollectionMgmt_EmptyState" xml:space="preserve"><value>No collections</value></data>
   <data name="CollectionMgmt_ColDocName" xml:space="preserve"><value>Document Name</value></data>
   <data name="CollectionMgmt_ColSubject" xml:space="preserve"><value>Category</value></data>
@@ -578,4 +590,12 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="Collection_SelectAll" xml:space="preserve"><value>Select All</value></data>
   <data name="Collection_DeselectAll" xml:space="preserve"><value>Deselect All</value></data>
   <data name="Collection_AddToTitle" xml:space="preserve"><value>Add documents to "{0}"</value></data>
+  <data name="Dashboard_BackupFailed" xml:space="preserve"><value>Could not create the backup file</value></data>
+  <data name="Dashboard_ConfirmOverwriteBackup" xml:space="preserve"><value>Overwrite backup</value></data>
+  <data name="Dashboard_OverwriteBackupWarning" xml:space="preserve"><value>The existing backup file will be overwritten. Continue?</value></data>
+  <data name="Dashboard_OverwriteBackup" xml:space="preserve"><value>Overwrite</value></data>
+  <data name="Dashboard_RestoreFailed" xml:space="preserve"><value>Could not validate or restore the backup file</value></data>
+  <data name="Dashboard_RestoreRestartRequired" xml:space="preserve"><value>The database was restored. Please reopen the application.</value></data>
+  <data name="Dashboard_ExportWriteFailed" xml:space="preserve"><value>Could not write the CSV file</value></data>
+  <data name="BatchImport_InvalidDrop" xml:space="preserve"><value>Files cannot be dropped on this screen</value></data>
 </root>

@@ -28,6 +28,7 @@ public partial class RecentFilesModel : ModelBase
         _recentRepo = recentRepo;
         _processLauncher = processLauncher;
         _loc = loc;
+        _loc.LanguageChanged += (_, _) => LoadData();
         LoadData();
     }
 
@@ -57,12 +58,10 @@ public partial class RecentFilesModel : ModelBase
     {
         if (item == null || string.IsNullOrEmpty(item.FilePath) || !item.FileExists) return;
 
-        try
-        {
-            _recentRepo.Add(item.DocumentId);
-            _processLauncher.OpenFile(item.FilePath);
-        }
-        catch { /* Ignore */ }
+        if (!_recentRepo.Add(item.DocumentId))
+            return;
+
+        _processLauncher.OpenFile(item.FilePath);
     }
 
     [RelayCommand]

@@ -54,6 +54,10 @@
                     <StackPanel Spacing="3">
                         <TextBlock Text="{loc:Localize AddEdit_LblName}" Classes="field-label"/>
                         <TextBox Name="txtTen" FontSize="{StaticResource FontSizeMd}"/>
+                        <TextBlock Name="txtNameError"
+                                   IsVisible="False"
+                                   Foreground="{StaticResource DangerBrush}"
+                                   FontSize="{StaticResource FontSizeSm}"/>
                     </StackPanel>
 
 
@@ -81,8 +85,8 @@
                             <TextBox Name="txtTacGia" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Spacing="3">
-                            <TextBlock Text="Tags" Classes="field-label"/>
-                            <TextBox Name="txtTags" Watermark="tag1, tag2, ..." FontSize="{StaticResource FontSizeMd}"/>
+                            <TextBlock Text="{loc:Localize AddEdit_LblTags}" Classes="field-label"/>
+                            <TextBox Name="txtTags" Watermark="{loc:Localize AddEdit_PlaceholderTags}" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Grid>
 

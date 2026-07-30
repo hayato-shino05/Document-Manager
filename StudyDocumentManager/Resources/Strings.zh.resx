@@ -18,65 +18,382 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
-  <resheader name="version"><value>2.0</value></resheader>
-  <resheader name="reader"><value>System.Resources.ResXResourceReader</value></resheader>
-  <resheader name="writer"><value>System.Resources.ResXResourceWriter</value></resheader>
-  <data name="Nav_Dashboard" xml:space="preserve"><value>仪表盘</value></data>
-  <data name="Nav_AddDocument" xml:space="preserve"><value>添加文档</value></data>
-  <data name="Nav_Categories" xml:space="preserve"><value>分类管理</value></data>
-  <data name="Nav_Collections" xml:space="preserve"><value>收藏集</value></data>
-  <data name="Nav_RecycleBin" xml:space="preserve"><value>回收站</value></data>
-  <data name="Nav_Reports" xml:space="preserve"><value>报告</value></data>
-  <data name="Nav_Settings" xml:space="preserve"><value>设置</value></data>
-  <data name="Action_Add" xml:space="preserve"><value>添加</value></data>
-  <data name="Action_Edit" xml:space="preserve"><value>编辑</value></data>
-  <data name="Action_Delete" xml:space="preserve"><value>删除</value></data>
-  <data name="Action_Save" xml:space="preserve"><value>保存</value></data>
-  <data name="Action_Cancel" xml:space="preserve"><value>取消</value></data>
-  <data name="Action_Search" xml:space="preserve"><value>搜索</value></data>
-  <data name="Action_Filter" xml:space="preserve"><value>筛选</value></data>
-  <data name="Action_Refresh" xml:space="preserve"><value>刷新</value></data>
-  <data name="Action_Close" xml:space="preserve"><value>关闭</value></data>
-  <data name="Action_Open" xml:space="preserve"><value>打开</value></data>
-  <data name="Action_Export" xml:space="preserve"><value>导出</value></data>
-  <data name="Action_Import" xml:space="preserve"><value>导入</value></data>
-  <data name="Action_Restore" xml:space="preserve"><value>恢复</value></data>
-  <data name="Action_SelectAll" xml:space="preserve"><value>全选</value></data>
-  <data name="Action_DeselectAll" xml:space="preserve"><value>取消全选</value></data>
-  <data name="Field_Name" xml:space="preserve"><value>名称</value></data>
-  <data name="Field_Subject" xml:space="preserve"><value>科目</value></data>
-  <data name="Field_Type" xml:space="preserve"><value>类型</value></data>
-  <data name="Field_Author" xml:space="preserve"><value>作者</value></data>
-  <data name="Field_FilePath" xml:space="preserve"><value>文件路径</value></data>
-  <data name="Field_FileSize" xml:space="preserve"><value>文件大小</value></data>
-  <data name="Field_CreatedAt" xml:space="preserve"><value>添加日期</value></data>
-  <data name="Field_Notes" xml:space="preserve"><value>备注</value></data>
-  <data name="Field_Important" xml:space="preserve"><value>重要</value></data>
-  <data name="Field_Description" xml:space="preserve"><value>描述</value></data>
-  <data name="Filter_All" xml:space="preserve"><value>全部</value></data>
-  <data name="Filter_AllSubjects" xml:space="preserve"><value>所有科目</value></data>
-  <data name="Filter_AllTypes" xml:space="preserve"><value>所有类型</value></data>
-  <data name="Filter_SearchPlaceholder" xml:space="preserve"><value>搜索文档...</value></data>
-  <data name="Msg_ConfirmDelete" xml:space="preserve"><value>确定要删除吗？</value></data>
-  <data name="Msg_DeleteSuccess" xml:space="preserve"><value>删除成功</value></data>
-  <data name="Msg_SaveSuccess" xml:space="preserve"><value>保存成功</value></data>
-  <data name="Msg_Error" xml:space="preserve"><value>发生错误</value></data>
-  <data name="Msg_NoDocuments" xml:space="preserve"><value>没有文档</value></data>
-  <data name="Msg_FileNotFound" xml:space="preserve"><value>文件未找到</value></data>
-  <data name="Msg_RestoreSuccess" xml:space="preserve"><value>恢复成功</value></data>
-  <data name="Msg_ImportSuccess" xml:space="preserve"><value>导入成功</value></data>
-  <data name="Dashboard_TotalDocuments" xml:space="preserve"><value>文档总数</value></data>
-  <data name="Dashboard_TotalSubjects" xml:space="preserve"><value>科目总数</value></data>
-  <data name="Dashboard_RecentFiles" xml:space="preserve"><value>最近文件</value></data>
-  <data name="Dashboard_ImportantDocs" xml:space="preserve"><value>重要文档</value></data>
-  <data name="Report_BySubject" xml:space="preserve"><value>按科目</value></data>
-  <data name="Report_ByType" xml:space="preserve"><value>按类型</value></data>
-  <data name="Report_Timeline" xml:space="preserve"><value>时间线</value></data>
-  <data name="Report_Unknown" xml:space="preserve"><value>未知</value></data>
-  <data name="Lang_Japanese" xml:space="preserve"><value>日本語</value></data>
-  <data name="Lang_English" xml:space="preserve"><value>English</value></data>
-  <data name="Lang_Vietnamese" xml:space="preserve"><value>Tiếng Việt</value></data>
-  <data name="Lang_Chinese" xml:space="preserve"><value>中文</value></data>
-  <data name="Main_ChangeLanguage" xml:space="preserve"><value>切换语言</value></data>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter</value>
+  </resheader>
+  <data name="Nav_Dashboard" xml:space="preserve">
+    <value>仪表盘</value>
+  </data>
+  <data name="Nav_AddDocument" xml:space="preserve">
+    <value>添加文档</value>
+  </data>
+  <data name="Nav_Categories" xml:space="preserve">
+    <value>分类管理</value>
+  </data>
+  <data name="Nav_Collections" xml:space="preserve">
+    <value>收藏集</value>
+  </data>
+  <data name="Nav_RecycleBin" xml:space="preserve">
+    <value>回收站</value>
+  </data>
+  <data name="Nav_Reports" xml:space="preserve">
+    <value>报告</value>
+  </data>
+  <data name="Nav_Settings" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="Action_Add" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="Action_Edit" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="Action_Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="Action_Save" xml:space="preserve">
+    <value>保存</value>
+  </data>
+  <data name="Action_Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Action_Search" xml:space="preserve">
+    <value>搜索</value>
+  </data>
+  <data name="Action_Filter" xml:space="preserve">
+    <value>筛选</value>
+  </data>
+  <data name="Action_Refresh" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="Action_Close" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="Action_Open" xml:space="preserve">
+    <value>打开</value>
+  </data>
+  <data name="Action_Export" xml:space="preserve">
+    <value>导出</value>
+  </data>
+  <data name="Action_Import" xml:space="preserve">
+    <value>导入</value>
+  </data>
+  <data name="Action_Restore" xml:space="preserve">
+    <value>恢复</value>
+  </data>
+  <data name="Action_SelectAll" xml:space="preserve">
+    <value>全选</value>
+  </data>
+  <data name="Action_DeselectAll" xml:space="preserve">
+    <value>取消全选</value>
+  </data>
+  <data name="Field_Name" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="Field_Subject" xml:space="preserve">
+    <value>科目</value>
+  </data>
+  <data name="Field_Type" xml:space="preserve">
+    <value>类型</value>
+  </data>
+  <data name="Field_Author" xml:space="preserve">
+    <value>作者</value>
+  </data>
+  <data name="Field_FilePath" xml:space="preserve">
+    <value>文件路径</value>
+  </data>
+  <data name="Field_FileSize" xml:space="preserve">
+    <value>文件大小</value>
+  </data>
+  <data name="Field_CreatedAt" xml:space="preserve">
+    <value>添加日期</value>
+  </data>
+  <data name="Field_Notes" xml:space="preserve">
+    <value>备注</value>
+  </data>
+  <data name="Field_Important" xml:space="preserve">
+    <value>重要</value>
+  </data>
+  <data name="Field_Description" xml:space="preserve">
+    <value>描述</value>
+  </data>
+  <data name="Filter_All" xml:space="preserve">
+    <value>全部</value>
+  </data>
+  <data name="Filter_AllSubjects" xml:space="preserve">
+    <value>所有科目</value>
+  </data>
+  <data name="Filter_AllTypes" xml:space="preserve">
+    <value>所有类型</value>
+  </data>
+  <data name="Filter_SearchPlaceholder" xml:space="preserve">
+    <value>搜索文档...</value>
+  </data>
+  <data name="Msg_ConfirmDelete" xml:space="preserve">
+    <value>确定要删除吗？</value>
+  </data>
+  <data name="Msg_DeleteSuccess" xml:space="preserve">
+    <value>删除成功</value>
+  </data>
+  <data name="Msg_SaveSuccess" xml:space="preserve">
+    <value>保存成功</value>
+  </data>
+  <data name="Msg_Error" xml:space="preserve">
+    <value>发生错误</value>
+  </data>
+  <data name="Msg_NoDocuments" xml:space="preserve">
+    <value>没有文档</value>
+  </data>
+  <data name="Msg_FileNotFound" xml:space="preserve">
+    <value>文件未找到</value>
+  </data>
+  <data name="Msg_RestoreSuccess" xml:space="preserve">
+    <value>恢复成功</value>
+  </data>
+  <data name="Msg_ImportSuccess" xml:space="preserve">
+    <value>导入成功</value>
+  </data>
+  <data name="Dashboard_TotalDocuments" xml:space="preserve">
+    <value>文档总数</value>
+  </data>
+  <data name="Dashboard_TotalSubjects" xml:space="preserve">
+    <value>科目总数</value>
+  </data>
+  <data name="Dashboard_RecentFiles" xml:space="preserve">
+    <value>最近文件</value>
+  </data>
+  <data name="Dashboard_ImportantDocs" xml:space="preserve">
+    <value>重要文档</value>
+  </data>
+  <data name="Report_BySubject" xml:space="preserve">
+    <value>按科目</value>
+  </data>
+  <data name="Report_ByType" xml:space="preserve">
+    <value>按类型</value>
+  </data>
+  <data name="Report_Timeline" xml:space="preserve">
+    <value>时间线</value>
+  </data>
+  <data name="Report_Unknown" xml:space="preserve">
+    <value>未知</value>
+  </data>
+  <data name="Lang_Japanese" xml:space="preserve">
+    <value>日本語</value>
+  </data>
+  <data name="Lang_English" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Lang_Vietnamese" xml:space="preserve">
+    <value>Tiếng Việt</value>
+  </data>
+  <data name="Lang_Chinese" xml:space="preserve">
+    <value>中文</value>
+  </data>
+  <data name="Main_ChangeLanguage" xml:space="preserve">
+    <value>切换语言</value>
+  </data>
+  <data name="Recycle_RestoreError" xml:space="preserve">
+    <value>无法恢复文档</value>
+  </data>
+  <data name="Recycle_PermanentDeleteError" xml:space="preserve">
+    <value>无法永久删除文档</value>
+  </data>
+  <data name="Recycle_PermanentDeleteSuccess" xml:space="preserve">
+    <value>文档已被永久删除</value>
+  </data>
+  <data name="Dashboard_BackupFailed" xml:space="preserve">
+    <value>无法创建备份文件</value>
+  </data>
+  <data name="Dashboard_ConfirmOverwriteBackup" xml:space="preserve">
+    <value>覆盖备份</value>
+  </data>
+  <data name="Dashboard_OverwriteBackupWarning" xml:space="preserve">
+    <value>现有备份文件将被覆盖。是否继续？</value>
+  </data>
+  <data name="Dashboard_OverwriteBackup" xml:space="preserve">
+    <value>覆盖</value>
+  </data>
+  <data name="Dashboard_RestoreFailed" xml:space="preserve">
+    <value>无法验证或恢复备份文件</value>
+  </data>
+  <data name="Dashboard_RestoreRestartRequired" xml:space="preserve">
+    <value>数据库已恢复。请重新打开应用程序。</value>
+  </data>
+  <data name="Dashboard_ExportWriteFailed" xml:space="preserve">
+    <value>无法写入 CSV 文件</value>
+  </data>
+  <data name="AddEdit_NameRequired" xml:space="preserve">
+    <value>文档名称为必填项</value>
+  </data>
+  <data name="BatchImport_InvalidDrop" xml:space="preserve">
+    <value>无法在此界面拖放文件</value>
+  </data>
+  <data name="BatchImport_StatusImporting" xml:space="preserve">
+    <value>正在导入所选文件...</value>
+  </data>
+  <data name="BatchImport_ScanError" xml:space="preserve">
+    <value>无法扫描或导入所选文件</value>
+  </data>
+  <data name="Dashboard_FileMissingMessage" xml:space="preserve">
+    <value>该文件已丢失。要打开文件完整性检查以重新链接路径或清除它吗？</value>
+  </data>
+  <data name="Bulk_SelectedCount" xml:space="preserve">
+    <value>已选择：{0}</value>
+  </data>
+  <data name="CollectionMgmt_BtnAddDoc" xml:space="preserve">
+    <value>添加文档</value>
+  </data>
+  <data name="CollectionMgmt_BtnRemoveDoc" xml:space="preserve">
+    <value>从收藏集中移除</value>
+  </data>
+  <data name="Collection_CreateTitle" xml:space="preserve">
+    <value>创建收藏集</value>
+  </data>
+  <data name="Collection_CreateLabel" xml:space="preserve">
+    <value>收藏集名称：</value>
+  </data>
+  <data name="Collection_Created" xml:space="preserve">
+    <value>已创建收藏集“{0}”</value>
+  </data>
+  <data name="Collection_LoadError" xml:space="preserve">
+    <value>无法加载收藏集：{0}</value>
+  </data>
+  <data name="Collection_CreateError" xml:space="preserve">
+    <value>无法创建收藏集：{0}</value>
+  </data>
+  <data name="Collection_RenameTitle" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="Collection_ConfirmDelete" xml:space="preserve">
+    <value>要删除收藏集“{0}”吗？</value>
+  </data>
+  <data name="Collection_AllDocsAlreadyIn" xml:space="preserve">
+    <value>所有文档都已在此收藏集中</value>
+  </data>
+  <data name="Collection_AddedDocs" xml:space="preserve">
+    <value>已向“{1}”添加 {0} 个文档</value>
+  </data>
+  <data name="Collection_AddError" xml:space="preserve">
+    <value>无法添加文档：{0}</value>
+  </data>
+  <data name="Collection_ConfirmRemoveDoc" xml:space="preserve">
+    <value>要从收藏集中移除“{0}”吗？</value>
+  </data>
+  <data name="Collection_ConfirmRemoveDocs" xml:space="preserve">
+    <value>要从收藏集中移除这 {0} 个文档吗？</value>
+  </data>
+  <data name="Category_NewNameLabel" xml:space="preserve">
+    <value>新名称：</value>
+  </data>
+  <data name="Report_NoData" xml:space="preserve">
+    <value>没有可用数据</value>
+  </data>
+  <data name="AddToCollection_Title" xml:space="preserve">
+    <value>添加到收藏集</value>
+  </data>
+  <data name="AddToCollection_DocInfo" xml:space="preserve">
+    <value>文档信息</value>
+  </data>
+  <data name="AddToCollection_SelectCollection" xml:space="preserve">
+    <value>选择收藏集：</value>
+  </data>
+  <data name="AddToCollection_BtnAdd" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="AddToCollection_Subtitle" xml:space="preserve">
+    <value>选择一个收藏集以添加所选文档</value>
+  </data>
+  <data name="AddToCollection_SearchPlaceholder" xml:space="preserve">
+    <value>搜索文档...</value>
+  </data>
+  <data name="Bulk_BtnSelectAll" xml:space="preserve">
+    <value>全选</value>
+  </data>
+  <data name="Bulk_Selected" xml:space="preserve">
+    <value>已选择</value>
+  </data>
+  <data name="Bulk_Documents" xml:space="preserve">
+    <value>文档</value>
+  </data>
+  <data name="CollectionMgmt_Title" xml:space="preserve">
+    <value>收藏集管理</value>
+  </data>
+  <data name="CollectionMgmt_BtnCreate" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="CollectionMgmt_BtnRename" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="CollectionMgmt_BtnDelete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="CollectionMgmt_EmptyState" xml:space="preserve">
+    <value>暂无收藏集</value>
+  </data>
+  <data name="CollectionMgmt_ColDocName" xml:space="preserve">
+    <value>文档名称</value>
+  </data>
+  <data name="CollectionMgmt_ColSubject" xml:space="preserve">
+    <value>分类</value>
+  </data>
+  <data name="CollectionMgmt_ColType" xml:space="preserve">
+    <value>类型</value>
+  </data>
+  <data name="CollectionMgmt_ListHeader" xml:space="preserve">
+    <value>收藏集列表</value>
+  </data>
+  <data name="CollectionMgmt_DetailHeader" xml:space="preserve">
+    <value>收藏集详情</value>
+  </data>
+  <data name="Dashboard_AddedToCollection" xml:space="preserve">
+    <value>已将“{0}”添加到收藏集“{1}”</value>
+  </data>
+  <data name="Collection_DocCount" xml:space="preserve">
+    <value>文档数量：{0}</value>
+  </data>
+  <data name="Collection_DocCountFiltered" xml:space="preserve">
+    <value>{0} / {1} 个文档</value>
+  </data>
+  <data name="Collection_SelectAll" xml:space="preserve">
+    <value>全选</value>
+  </data>
+  <data name="Collection_DeselectAll" xml:space="preserve">
+    <value>取消全选</value>
+  </data>
+  <data name="Collection_AddToTitle" xml:space="preserve">
+    <value>向“{0}”添加文档</value>
+  </data>
+  <data name="AddToCollState_DocCount" xml:space="preserve">
+    <value>文档数量：{0}</value>
+  </data>
+  <data name="AddToCollState_DocCountFiltered" xml:space="preserve">
+    <value>{0} / {1} 个文档</value>
+  </data>
+  <data name="AddToCollState_SelectAll" xml:space="preserve">
+    <value>全选</value>
+  </data>
+  <data name="AddToCollState_DeselectAll" xml:space="preserve">
+    <value>取消全选</value>
+  </data>
+  <data name="SelectCollDialog_SelectChips" xml:space="preserve">
+    <value>点击收藏集进行选择：</value>
+  </data>
+  <data name="SelectCollDialog_EmptyState" xml:space="preserve">
+    <value>没有收藏集 - 请从收藏集菜单创建</value>
+  </data>
+  <data name="SelectCollDialog_NoneSelected" xml:space="preserve">
+    <value>未选择收藏集</value>
+  </data>
+  <data name="SelectCollDialog_BtnAdd" xml:space="preserve">
+    <value>添加</value>
+  </data>
 </root>
