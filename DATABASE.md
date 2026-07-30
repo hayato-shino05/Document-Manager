@@ -148,13 +148,15 @@ Lookup table for document types.
 
 `DatabaseMigrator.RunMigrations()` currently performs the following current-state flow:
 
-1. Creates the current tables and indexes if they do not exist.
-2. Adds `is_deleted` and `deleted_at` idempotently when upgrading older databases.
-3. Seeds `categories` and `document_types` from existing document data, then adds default values for fresh installs.
-4. Normalizes file-type labels based on existing values and file extensions.
-5. Neutralizes legacy catalog labels through schema version `3` using `app_settings`.
+1. Detects the complete legacy Vietnamese table set (`tai_lieu`, `danh_muc`, `loai_tai_lieu`) before current-schema preflight. It copies data into the English schema transactionally, remaps dependent document IDs, rebuilds child-table foreign keys, and drops the legacy tables only after `foreign_key_check` succeeds.
+2. Rejects incomplete or structurally unsupported legacy schemas before writing changes.
+3. Creates the current tables and indexes if they do not exist.
+4. Adds `is_deleted` and `deleted_at` idempotently when upgrading older databases.
+5. Seeds `categories` and `document_types` from existing document data, then adds default values for fresh installs.
+6. Normalizes file-type labels based on existing values and file extensions.
+7. Neutralizes legacy catalog labels through schema version `3` using `app_settings`.
 
-Legacy table and column names from the retired WinForms implementation are preserved only as migration compatibility context. They are not the active schema contract.
+Legacy table and column names from the retired WinForms implementation are accepted only as an exact, validated migration input. They are not the active schema contract.
 
 ## Soft Delete and Recycle Bin
 

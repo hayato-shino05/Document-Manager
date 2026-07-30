@@ -1278,8 +1278,9 @@ public class IntegrationTests : DatabaseTestBase
         Assert.Single(_repo.GetAll());
         Assert.Equal("Updated Lifecycle", _repo.GetAll()[0].Name);
 
-        // Permanent Delete
-        Db.PermanentDeleteDocument(id);
+        // Permanent Delete requires deleted state
+        _repo.Delete(id);
+        Assert.True(Db.PermanentDeleteDocument(id));
         Assert.Empty(_repo.GetAll());
         Assert.Null(_repo.GetById(id));
     }

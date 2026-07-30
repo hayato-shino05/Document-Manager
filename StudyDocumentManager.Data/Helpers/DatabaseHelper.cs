@@ -37,7 +37,7 @@ public class DatabaseHelper
     {
         get
         {
-            _connectionString ??= $"Data Source={DatabasePath}";
+            _connectionString ??= $"Data Source={DatabasePath};Foreign Keys=True";
             return _connectionString;
         }
     }
@@ -48,13 +48,14 @@ public class DatabaseHelper
     public void SetDatabasePath(string path)
     {
         _databasePath = path;
-        _connectionString = $"Data Source={path}";
+        _connectionString = $"Data Source={path};Foreign Keys=True";
     }
 
 
 
     public void InitializeDatabase()
     {
+        using var operationLock = AcquireDatabaseOperationLock(DatabasePath);
         try
         {
             string? dataFolder = Path.GetDirectoryName(DatabasePath);
@@ -188,6 +189,47 @@ public class DatabaseHelper
         return ExecuteNonQuery(query, BuildDocumentParameters(doc)) > 0;
     }
 
+
+    public bool InsertDocumentWithCatalogs(StudyDocument document)
+    {
+        const string query = """
+            INSERT INTO documents (name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline)
+            VALUES (@name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline)
+            """;
+
+        using var connection = OpenConnection();
+        using var transaction = connection.BeginTransaction();
+
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(document.Subject))
+                InsertCatalogValue(connection, transaction, "categories", document.Subject);
+
+            if (!string.IsNullOrWhiteSpace(document.Type))
+                InsertCatalogValue(connection, transaction, "document_types", document.Type);
+
+            using var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = query;
+            foreach (var parameter in BuildDocumentParameters(document))
+                command.Parameters.Add(parameter);
+
+            if (command.ExecuteNonQuery() == 0)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            transaction.Commit();
+            return true;
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
     public bool UpdateDocument(StudyDocument doc)
     {
         const string query = """
@@ -197,9 +239,39 @@ public class DatabaseHelper
                 is_important = @is_important, tags = @tags, deadline = @deadline
             WHERE id = @id
             """;
-        var parameters = BuildDocumentParameters(doc).ToList();
-        parameters.Add(new SqliteParameter("@id", doc.Id));
-        return ExecuteNonQuery(query, parameters.ToArray()) > 0;
+
+        using var connection = OpenConnection();
+        using var transaction = connection.BeginTransaction();
+
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(doc.Subject))
+                InsertCatalogValue(connection, transaction, "categories", doc.Subject);
+
+            if (!string.IsNullOrWhiteSpace(doc.Type))
+                InsertCatalogValue(connection, transaction, "document_types", doc.Type);
+
+            using var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = query;
+            foreach (var parameter in BuildDocumentParameters(doc))
+                command.Parameters.Add(parameter);
+            command.Parameters.Add(new SqliteParameter("@id", doc.Id));
+
+            if (command.ExecuteNonQuery() == 0)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            transaction.Commit();
+            return true;
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
 
     public bool DeleteDocument(int id)
@@ -227,8 +299,7 @@ public class DatabaseHelper
         const string query = "SELECT DISTINCT tags FROM documents WHERE tags IS NOT NULL AND tags != '' AND (is_deleted IS NULL OR is_deleted = 0)";
         var allTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = new SqliteCommand(query, conn);
         using var reader = cmd.ExecuteReader();
 
@@ -276,8 +347,7 @@ public class DatabaseHelper
     public DashboardStats GetDashboardStatistics()
     {
         var stats = new DashboardStats();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
 
         stats.TotalDocuments = GetScalarInt(conn, "SELECT COUNT(*) FROM documents WHERE (is_deleted IS NULL OR is_deleted = 0)");
         stats.ImportantDocuments = GetScalarInt(conn, "SELECT COUNT(*) FROM documents WHERE is_important = 1 AND (is_deleted IS NULL OR is_deleted = 0)");
@@ -301,23 +371,109 @@ public class DatabaseHelper
 
     public bool RestoreDocument(int id)
     {
-        const string query = "UPDATE documents SET is_deleted = 0, deleted_at = NULL WHERE id = @id";
-        return ExecuteNonQuery(query, new SqliteParameter("@id", id)) > 0;
+        using var conn = OpenConnection();
+        using var transaction = conn.BeginTransaction();
+
+        using var documentCommand = conn.CreateCommand();
+        documentCommand.Transaction = transaction;
+        documentCommand.CommandText = "SELECT subject, type FROM documents WHERE id = @id AND is_deleted = 1";
+        documentCommand.Parameters.AddWithValue("@id", id);
+
+        using var reader = documentCommand.ExecuteReader();
+        if (!reader.Read())
+            return false;
+
+        var subject = reader.IsDBNull(0) ? string.Empty : reader.GetString(0);
+        var type = reader.IsDBNull(1) ? string.Empty : reader.GetString(1);
+        reader.Close();
+
+        if (!string.IsNullOrWhiteSpace(subject))
+            InsertCatalogValue(conn, transaction, "categories", subject);
+
+        if (!string.IsNullOrWhiteSpace(type))
+            InsertCatalogValue(conn, transaction, "document_types", type);
+
+        using var restoreCommand = conn.CreateCommand();
+        restoreCommand.Transaction = transaction;
+        restoreCommand.CommandText = "UPDATE documents SET is_deleted = 0, deleted_at = NULL WHERE id = @id AND is_deleted = 1";
+        restoreCommand.Parameters.AddWithValue("@id", id);
+        var restored = restoreCommand.ExecuteNonQuery() > 0;
+
+        if (!restored)
+        {
+            transaction.Rollback();
+            return false;
+        }
+
+        transaction.Commit();
+        return true;
     }
 
     public bool PermanentDeleteDocument(int id)
     {
-        const string query = "DELETE FROM documents WHERE id = @id";
+        const string query = "DELETE FROM documents WHERE id = @id AND is_deleted = 1";
         return ExecuteNonQuery(query, new SqliteParameter("@id", id)) > 0;
     }
 
 
 
     public bool BackupDatabase(string destPath)
+        => BackupDatabase(destPath, overwrite: true);
+
+    public bool BackupDatabase(string destPath, bool overwrite)
+    {
+        string? stagingPath = null;
+        try
+        {
+            if (string.IsNullOrWhiteSpace(destPath))
+                return false;
+
+            var destinationPath = Path.GetFullPath(destPath);
+            if (PathsReferToSameFile(DatabasePath, destinationPath))
+                return false;
+
+            var destinationDirectory = Path.GetDirectoryName(destinationPath);
+            if (string.IsNullOrWhiteSpace(destinationDirectory) || !Directory.Exists(destinationDirectory))
+                return false;
+
+            if (File.Exists(destinationPath) && !overwrite)
+                return false;
+
+            stagingPath = CreateStagingPath(destinationPath);
+            using (var source = OpenConnection())
+            using (var destination = OpenConnection(stagingPath, pooling: false, synchronize: false))
+            {
+                source.BackupDatabase(destination);
+            }
+
+            ValidateBackupCandidate(stagingPath);
+
+            if (File.Exists(destinationPath))
+                File.Replace(stagingPath, destinationPath, null);
+            else
+                File.Move(stagingPath, destinationPath);
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            if (stagingPath is not null)
+                DeleteFileIfExists(stagingPath);
+        }
+    }
+
+    public bool CanRestoreDatabase(string sourcePath)
     {
         try
         {
-            File.Copy(DatabasePath, destPath, overwrite: true);
+            if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath) || PathsReferToSameFile(DatabasePath, sourcePath))
+                return false;
+
+            ValidateBackupCandidate(sourcePath);
             return true;
         }
         catch
@@ -326,14 +482,361 @@ public class DatabaseHelper
         }
     }
 
+    public bool RestoreDatabase(string sourcePath)
+    {
+        using var operationLock = AcquireDatabaseOperationLock(DatabasePath);
+        string? stagingPath = null;
+        string? rollbackPath = null;
+        var swapped = false;
 
+        try
+        {
+            if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath) || PathsReferToSameFile(DatabasePath, sourcePath))
+                return false;
+
+            stagingPath = CreateStagingPath(DatabasePath);
+            rollbackPath = CreateStagingPath(DatabasePath);
+
+            using (var source = OpenConnection(sourcePath, SqliteOpenMode.ReadOnly, pooling: false, synchronize: false))
+            using (var destination = OpenConnection(stagingPath, pooling: false, synchronize: false))
+            {
+                source.BackupDatabase(destination);
+            }
+
+            ValidateBackupCandidate(stagingPath);
+
+            using (var source = OpenConnection())
+            using (var destination = OpenConnection(rollbackPath, pooling: false, synchronize: false))
+            {
+                source.BackupDatabase(destination);
+            }
+
+            ValidateBackupCandidate(rollbackPath);
+            CloseAllConnections();
+            swapped = true;
+            DeleteSqliteSidecars(DatabasePath);
+            File.Replace(stagingPath, DatabasePath, null);
+            ValidateBackupCandidate(DatabasePath);
+            return true;
+        }
+        catch
+        {
+            if (swapped && rollbackPath is not null && File.Exists(rollbackPath))
+            {
+                try
+                {
+                    CloseAllConnections();
+                    DeleteSqliteSidecars(DatabasePath);
+                    File.Replace(rollbackPath, DatabasePath, null);
+                }
+                catch
+                {
+                }
+            }
+
+            return false;
+        }
+        finally
+        {
+            if (stagingPath is not null)
+                DeleteFileIfExists(stagingPath);
+            if (rollbackPath is not null)
+                DeleteFileIfExists(rollbackPath);
+        }
+    }
+
+    private static void InsertCatalogValue(SqliteConnection connection, SqliteTransaction transaction, string tableName, string value)
+    {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = $"INSERT OR IGNORE INTO {tableName} (name) VALUES (@name)";
+        command.Parameters.AddWithValue("@name", value);
+        command.ExecuteNonQuery();
+    }
+
+    private SqliteConnection OpenConnection()
+        => OpenConnection(DatabasePath);
+
+    private static SqliteConnection OpenConnection(
+        string databasePath,
+        SqliteOpenMode mode = SqliteOpenMode.ReadWriteCreate,
+        bool pooling = true,
+        bool synchronize = true)
+    {
+        DatabaseOperationLock? operationLock = synchronize ? AcquireDatabaseOperationLock(databasePath) : null;
+        try
+        {
+            var connectionString = new SqliteConnectionStringBuilder
+            {
+                DataSource = databasePath,
+                ForeignKeys = true,
+                Mode = mode,
+                Pooling = pooling
+            }.ToString();
+            var connection = new SqliteConnection(connectionString);
+            if (operationLock is not null)
+            {
+                connection.StateChange += (_, args) =>
+                {
+                    if (args.CurrentState == System.Data.ConnectionState.Closed)
+                        operationLock.Dispose();
+                };
+            }
+            connection.Open();
+            return connection;
+        }
+        catch
+        {
+            operationLock?.Dispose();
+            throw;
+        }
+    }
+
+    // ponytail: 同一DBを使う協調プロセスのみ直列化する。外部SQLite書き込みの調停が必要になればDBブローカーへ移行する。
+
+    private static DatabaseOperationLock AcquireDatabaseOperationLock(string databasePath)
+    {
+        var operationLock = new Mutex(false, GetOperationMutexName(databasePath));
+        try
+        {
+            operationLock.WaitOne();
+            return new DatabaseOperationLock(operationLock);
+        }
+        catch (AbandonedMutexException)
+        {
+            return new DatabaseOperationLock(operationLock);
+        }
+        catch
+        {
+            operationLock.Dispose();
+            throw;
+        }
+    }
+
+    private static string GetOperationMutexName(string databasePath)
+    {
+        var normalizedPath = Path.GetFullPath(databasePath).ToUpperInvariant();
+        var hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(normalizedPath));
+        return $"StudyDocumentManager.Database.{Convert.ToHexString(hash)[..16]}";
+    }
+
+    private sealed class DatabaseOperationLock(Mutex mutex) : IDisposable
+    {
+        private Mutex? _mutex = mutex;
+
+        public void Dispose()
+        {
+            var currentMutex = Interlocked.Exchange(ref _mutex, null);
+            if (currentMutex is null)
+                return;
+
+            currentMutex.ReleaseMutex();
+            currentMutex.Dispose();
+        }
+    }
+
+    private static bool PathsReferToSameFile(string firstPath, string secondPath)
+        => string.Equals(Path.GetFullPath(firstPath), Path.GetFullPath(secondPath), StringComparison.OrdinalIgnoreCase);
+
+    private static string CreateStagingPath(string targetPath)
+    {
+        var directory = Path.GetDirectoryName(Path.GetFullPath(targetPath));
+        var fileName = Path.GetFileName(targetPath);
+        return Path.Combine(directory!, $".{fileName}.{Guid.NewGuid():N}.tmp");
+    }
+
+    private static void DeleteFileIfExists(string path)
+    {
+        if (File.Exists(path))
+            File.Delete(path);
+    }
+
+    private static void DeleteSqliteSidecars(string databasePath)
+    {
+        DeleteFileIfExists($"{databasePath}-wal");
+        DeleteFileIfExists($"{databasePath}-shm");
+    }
+
+    private static void ValidateBackupCandidate(string databasePath)
+    {
+        using var connection = OpenConnection(databasePath, SqliteOpenMode.ReadOnly, pooling: false, synchronize: false);
+
+        var requiredTables = new[]
+        {
+            "documents", "collections", "collection_items", "personal_notes", "recent_files",
+            "document_relations", "categories", "document_types", "app_settings"
+        };
+        using var tableCommand = connection.CreateCommand();
+        tableCommand.CommandText = "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'";
+        using var tableReader = tableCommand.ExecuteReader();
+        var actualTables = new HashSet<string>(StringComparer.Ordinal);
+        while (tableReader.Read())
+            actualTables.Add(tableReader.GetString(0));
+
+        if (!actualTables.SetEquals(requiredTables))
+            throw new InvalidOperationException("Backup database tables are not supported.");
+
+        ValidateRequiredColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at"]);
+        ValidateRequiredColumns(connection, "collections", ["id", "name", "description", "created_at"]);
+        ValidateRequiredColumns(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"]);
+        ValidateRequiredColumns(connection, "personal_notes", ["id", "document_id", "content", "created_at", "updated_at"]);
+        ValidateRequiredColumns(connection, "recent_files", ["id", "document_id", "opened_at"]);
+        ValidateRequiredColumns(connection, "document_relations", ["id", "doc_id_1", "doc_id_2", "relation_type", "created_at"]);
+        ValidateRequiredColumns(connection, "categories", ["id", "name", "created_at"]);
+        ValidateRequiredColumns(connection, "document_types", ["id", "name", "created_at"]);
+        ValidateRequiredColumns(connection, "app_settings", ["key", "value"]);
+
+        ValidateCascadeForeignKeys(connection, "collection_items", [("collection_id", "collections", "id"), ("document_id", "documents", "id")]);
+        ValidateCascadeForeignKeys(connection, "personal_notes", [("document_id", "documents", "id")]);
+        ValidateCascadeForeignKeys(connection, "recent_files", [("document_id", "documents", "id")]);
+        ValidateCascadeForeignKeys(connection, "document_relations", [("doc_id_1", "documents", "id"), ("doc_id_2", "documents", "id")]);
+        ValidateUniqueConstraint(connection, "collection_items", ["collection_id", "document_id"]);
+        ValidateUniqueConstraint(connection, "recent_files", ["document_id"]);
+        ValidateUniqueConstraint(connection, "document_relations", ["doc_id_1", "doc_id_2"]);
+
+        foreach (var tableName in requiredTables)
+            ValidateIndexesAndTriggers(connection, tableName);
+
+        using var schemaVersionCommand = connection.CreateCommand();
+        schemaVersionCommand.CommandText = "SELECT value FROM app_settings WHERE key = 'schema_version'";
+        if (!string.Equals(schemaVersionCommand.ExecuteScalar()?.ToString(), "3", StringComparison.Ordinal))
+            throw new InvalidOperationException("Backup database schema version is not supported.");
+
+        using (var documentCommand = connection.CreateCommand())
+        {
+            documentCommand.CommandText = "SELECT * FROM documents";
+            using var documentReader = documentCommand.ExecuteReader();
+            while (documentReader.Read())
+                MapToDocument(documentReader);
+        }
+
+        using (var collectionCommand = connection.CreateCommand())
+        {
+            collectionCommand.CommandText = "SELECT created_at FROM collections";
+            using var collectionReader = collectionCommand.ExecuteReader();
+            while (collectionReader.Read())
+                DateTime.Parse(collectionReader.GetString(0));
+        }
+
+        using (var recentFilesCommand = connection.CreateCommand())
+        {
+            recentFilesCommand.CommandText = "SELECT opened_at FROM recent_files";
+            using var recentFilesReader = recentFilesCommand.ExecuteReader();
+            while (recentFilesReader.Read())
+                DateTime.Parse(recentFilesReader.GetString(0));
+        }
+
+        using var integrityCommand = connection.CreateCommand();
+        integrityCommand.CommandText = "PRAGMA integrity_check";
+        if (!string.Equals(integrityCommand.ExecuteScalar()?.ToString(), "ok", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("Backup database integrity check failed.");
+
+        using var foreignKeyCommand = connection.CreateCommand();
+        foreignKeyCommand.CommandText = "PRAGMA foreign_key_check";
+        using var foreignKeyReader = foreignKeyCommand.ExecuteReader();
+        if (foreignKeyReader.Read())
+            throw new InvalidOperationException("Backup database foreign key check failed.");
+    }
+
+    private static void ValidateRequiredColumns(SqliteConnection connection, string tableName, IReadOnlyCollection<string> requiredColumns)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA table_info({tableName})";
+        using var reader = command.ExecuteReader();
+        var actualColumns = new HashSet<string>(StringComparer.Ordinal);
+        while (reader.Read())
+            actualColumns.Add(reader.GetString(1));
+
+        if (!actualColumns.SetEquals(requiredColumns))
+            throw new InvalidOperationException($"Backup database table '{tableName}' is not supported.");
+    }
+
+
+    private static void ValidateCascadeForeignKeys(
+        SqliteConnection connection,
+        string tableName,
+        IReadOnlyCollection<(string From, string ParentTable, string ParentColumn)> expectedForeignKeys)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA foreign_key_list({tableName})";
+        using var reader = command.ExecuteReader();
+        var actualForeignKeys = new List<(string From, string ParentTable, string ParentColumn, string OnDelete)>();
+        while (reader.Read())
+            actualForeignKeys.Add((reader.GetString(3), reader.GetString(2), reader.GetString(4), reader.GetString(6)));
+
+        if (actualForeignKeys.Count != expectedForeignKeys.Count || actualForeignKeys.Any(foreignKey =>
+            !expectedForeignKeys.Contains((foreignKey.From, foreignKey.ParentTable, foreignKey.ParentColumn)) ||
+            !string.Equals(foreignKey.OnDelete, "CASCADE", StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException($"Backup database foreign key layout for '{tableName}' is not supported.");
+        }
+    }
+
+    private static void ValidateUniqueConstraint(SqliteConnection connection, string tableName, IReadOnlyList<string> expectedColumns)
+    {
+        using var indexesCommand = connection.CreateCommand();
+        indexesCommand.CommandText = $"PRAGMA index_list({tableName})";
+        using var indexReader = indexesCommand.ExecuteReader();
+        var indexNames = new List<string>();
+        while (indexReader.Read())
+        {
+            if (indexReader.GetInt32(2) == 1)
+                indexNames.Add(indexReader.GetString(1));
+        }
+        indexReader.Close();
+
+        var hasConstraint = indexNames.Any(indexName =>
+        {
+            using var columnsCommand = connection.CreateCommand();
+            columnsCommand.CommandText = $"PRAGMA index_info({indexName})";
+            using var columnReader = columnsCommand.ExecuteReader();
+            var columns = new List<string>();
+            while (columnReader.Read())
+                columns.Add(columnReader.GetString(2));
+            return columns.SequenceEqual(expectedColumns, StringComparer.Ordinal);
+        });
+
+        if (!hasConstraint)
+            throw new InvalidOperationException($"Backup database unique constraint for '{tableName}' is not supported.");
+    }
+
+
+    private static void ValidateIndexesAndTriggers(SqliteConnection connection, string tableName)
+    {
+        var allowedIndexes = tableName switch
+        {
+            "documents" => new HashSet<string>(StringComparer.Ordinal)
+            {
+                "idx_documents_subject", "idx_documents_type", "idx_documents_created_at", "idx_documents_deadline", "idx_documents_deleted", "idx_documents_important"
+            },
+            "collection_items" => new HashSet<string>(StringComparer.Ordinal)
+            {
+                "idx_collection_items_collection", "idx_collection_items_document"
+            },
+            _ => new HashSet<string>(StringComparer.Ordinal)
+        };
+
+        using var indexesCommand = connection.CreateCommand();
+        indexesCommand.CommandText = $"PRAGMA index_list({tableName})";
+        using var indexReader = indexesCommand.ExecuteReader();
+        while (indexReader.Read())
+        {
+            if (indexReader.GetString(3) == "c" && !allowedIndexes.Contains(indexReader.GetString(1)))
+                throw new InvalidOperationException($"Backup database index on '{tableName}' is not supported.");
+        }
+
+        using var triggersCommand = connection.CreateCommand();
+        triggersCommand.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'trigger' AND tbl_name = @tableName";
+        triggersCommand.Parameters.AddWithValue("@tableName", tableName);
+        if (Convert.ToInt32(triggersCommand.ExecuteScalar()) > 0)
+            throw new InvalidOperationException($"Backup database trigger on '{tableName}' is not supported.");
+    }
 
     private List<StudyDocument> ExecuteReader(string query, params SqliteParameter[] parameters)
     {
         var documents = new List<StudyDocument>();
 
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = new SqliteCommand(query, conn);
 
         foreach (var param in parameters)
@@ -350,8 +853,7 @@ public class DatabaseHelper
 
     private int ExecuteNonQuery(string query, params SqliteParameter[] parameters)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = new SqliteCommand(query, conn);
 
         foreach (var param in parameters)
@@ -363,8 +865,7 @@ public class DatabaseHelper
     private List<string> ExecuteStringList(string query, string columnName)
     {
         var result = new List<string>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = new SqliteCommand(query, conn);
         using var reader = cmd.ExecuteReader();
 
@@ -385,7 +886,7 @@ public class DatabaseHelper
         return result != null ? Convert.ToInt32(result) : 0;
     }
 
-    private StudyDocument MapToDocument(SqliteDataReader reader)
+    private static StudyDocument MapToDocument(SqliteDataReader reader)
     {
         return new StudyDocument
         {
@@ -425,8 +926,7 @@ public class DatabaseHelper
 
     public string? GetPersonalNote(int documentId)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "SELECT content FROM personal_notes WHERE document_id = @documentId";
         cmd.Parameters.AddWithValue("@documentId", documentId);
@@ -436,8 +936,7 @@ public class DatabaseHelper
 
     public bool SavePersonalNote(int documentId, string content)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
 
         using var checkCmd = conn.CreateCommand();
         checkCmd.CommandText = "SELECT COUNT(*) FROM personal_notes WHERE document_id = @documentId";
@@ -463,8 +962,7 @@ public class DatabaseHelper
 
     public bool DeletePersonalNote(int documentId)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "DELETE FROM personal_notes WHERE document_id = @documentId";
         cmd.Parameters.AddWithValue("@documentId", documentId);
@@ -477,8 +975,7 @@ public class DatabaseHelper
     {
         int lo = Math.Min(docId1, docId2);
         int hi = Math.Max(docId1, docId2);
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"INSERT OR IGNORE INTO document_relations (doc_id_1, doc_id_2, relation_type)
                             VALUES (@d1, @d2, @type)";
@@ -491,8 +988,7 @@ public class DatabaseHelper
     public List<(StudyDocument Doc, int RelationId, string RelationType)> GetRelatedDocuments(int docId)
     {
         var results = new List<(StudyDocument, int, string)>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"SELECT d.id, d.name, d.subject, d.type, d.file_path, r.relation_type, r.id as relation_id
                             FROM document_relations r
@@ -522,8 +1018,7 @@ public class DatabaseHelper
 
     public void RemoveDocumentRelation(int relationId)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "DELETE FROM document_relations WHERE id = @id";
         cmd.Parameters.AddWithValue("@id", relationId);
@@ -535,8 +1030,7 @@ public class DatabaseHelper
     public List<(string Label, int Count)> GetDocumentsByDay(int days = 7)
     {
         var results = new List<(string, int)>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"
             WITH RECURSIVE DateSeries(d) AS (
@@ -567,8 +1061,7 @@ public class DatabaseHelper
     public List<(string Label, int Count)> GetDocumentsByMonth(int months = 12)
     {
         var results = new List<(string, int)>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"
             WITH RECURSIVE MonthSeries(m) AS (
@@ -599,8 +1092,7 @@ public class DatabaseHelper
     public List<(string Label, int Count)> GetDocumentsBySubject()
     {
         var results = new List<(string, int)>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"SELECT COALESCE(subject, 'Unknown'), COUNT(*)
                             FROM documents
@@ -618,8 +1110,7 @@ public class DatabaseHelper
     public List<(string Label, int Count)> GetDocumentsByType()
     {
         var results = new List<(string, int)>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"SELECT COALESCE(type, 'Unknown'), COUNT(*)
                             FROM documents
@@ -639,8 +1130,7 @@ public class DatabaseHelper
     public List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetCollections()
     {
         var results = new List<(int, string, string?, DateTime, int)>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"SELECT c.id, c.name, c.description, c.created_at,
                             (SELECT COUNT(*) FROM collection_items ci WHERE ci.collection_id = c.id) as item_count
@@ -662,8 +1152,7 @@ public class DatabaseHelper
 
     public int CreateCollection(string name, string? description = null)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"INSERT INTO collections (name, description)
                             VALUES (@name, @description);
@@ -676,8 +1165,7 @@ public class DatabaseHelper
 
     public bool UpdateCollection(int collectionId, string name, string? description = null)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"UPDATE collections SET name = @name, description = @description
                             WHERE id = @id";
@@ -689,8 +1177,7 @@ public class DatabaseHelper
 
     public bool DeleteCollection(int collectionId)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
 
         using (var delItems = conn.CreateCommand())
         {
@@ -708,8 +1195,7 @@ public class DatabaseHelper
     public List<StudyDocument> GetDocumentsInCollection(int collectionId)
     {
         var results = new List<StudyDocument>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"SELECT t.*
                             FROM documents t
@@ -728,8 +1214,7 @@ public class DatabaseHelper
 
     public bool AddDocumentToCollection(int collectionId, int documentId)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
 
         using (var check = conn.CreateCommand())
         {
@@ -750,8 +1235,7 @@ public class DatabaseHelper
 
     public bool RemoveDocumentFromCollection(int collectionId, int documentId)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "DELETE FROM collection_items WHERE collection_id = @colId AND document_id = @docId";
         cmd.Parameters.AddWithValue("@colId", collectionId);
@@ -764,8 +1248,7 @@ public class DatabaseHelper
     public List<(string Name, int Count)> GetSubjectsWithCount()
     {
         var results = new List<(string, int)>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"
             SELECT c.name, COUNT(d.id) as doc_count
@@ -790,8 +1273,7 @@ public class DatabaseHelper
     public List<(string Name, int Count)> GetTypesWithCount()
     {
         var results = new List<(string, int)>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"
             SELECT dt.name, COUNT(d.id) as doc_count
@@ -815,8 +1297,7 @@ public class DatabaseHelper
 
     public bool UpdateSubjectName(string oldName, string newName)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var tx = conn.BeginTransaction();
 
         using var cmd1 = conn.CreateCommand();
@@ -836,8 +1317,7 @@ public class DatabaseHelper
 
     public bool UpdateTypeName(string oldName, string newName)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var tx = conn.BeginTransaction();
         using var cmd1 = conn.CreateCommand();
         cmd1.CommandText = "UPDATE documents SET type = @newName WHERE type = @oldName AND (is_deleted IS NULL OR is_deleted = 0)";
@@ -855,8 +1335,7 @@ public class DatabaseHelper
 
     public bool DeleteDocumentsBySubject(string subjectName)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var tx = conn.BeginTransaction();
         using var cmd1 = conn.CreateCommand();
         cmd1.CommandText = "UPDATE documents SET is_deleted = 1, deleted_at = datetime('now','localtime') WHERE subject = @name AND (is_deleted IS NULL OR is_deleted = 0)";
@@ -872,8 +1351,7 @@ public class DatabaseHelper
 
     public bool DeleteDocumentsByType(string typeName)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var tx = conn.BeginTransaction();
         using var cmd1 = conn.CreateCommand();
         cmd1.CommandText = "UPDATE documents SET is_deleted = 1, deleted_at = datetime('now','localtime') WHERE type = @name AND (is_deleted IS NULL OR is_deleted = 0)";
@@ -891,8 +1369,7 @@ public class DatabaseHelper
 
     public bool AddSubject(string name)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "INSERT OR IGNORE INTO categories (name) VALUES (@name)";
         cmd.Parameters.AddWithValue("@name", name);
@@ -901,8 +1378,7 @@ public class DatabaseHelper
 
     public bool AddType(string name)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "INSERT OR IGNORE INTO document_types (name) VALUES (@name)";
         cmd.Parameters.AddWithValue("@name", name);
@@ -912,8 +1388,7 @@ public class DatabaseHelper
     public List<string> GetAllSubjects()
     {
         var results = new List<string>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "SELECT name FROM categories ORDER BY name";
         using var reader = cmd.ExecuteReader();
@@ -924,8 +1399,7 @@ public class DatabaseHelper
     public List<string> GetAllTypes()
     {
         var results = new List<string>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "SELECT name FROM document_types ORDER BY name";
         using var reader = cmd.ExecuteReader();
@@ -935,8 +1409,7 @@ public class DatabaseHelper
 
     public bool DeleteSubject(string name)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "DELETE FROM categories WHERE name = @name";
         cmd.Parameters.AddWithValue("@name", name);
@@ -945,8 +1418,7 @@ public class DatabaseHelper
 
     public bool DeleteType(string name)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "DELETE FROM document_types WHERE name = @name";
         cmd.Parameters.AddWithValue("@name", name);
@@ -958,8 +1430,7 @@ public class DatabaseHelper
     public int BulkSoftDelete(List<int> ids)
     {
         if (ids == null || ids.Count == 0) return 0;
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
 
         var paramNames = new List<string>();
         using var cmd = conn.CreateCommand();
@@ -975,8 +1446,7 @@ public class DatabaseHelper
     public int BulkUpdateSubject(List<int> ids, string subject)
     {
         if (ids == null || ids.Count == 0) return 0;
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         var paramNames = new List<string>();
         using var cmd = conn.CreateCommand();
         for (int i = 0; i < ids.Count; i++)
@@ -992,8 +1462,7 @@ public class DatabaseHelper
     public int BulkToggleImportant(List<int> ids, bool important)
     {
         if (ids == null || ids.Count == 0) return 0;
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         var paramNames = new List<string>();
         using var cmd = conn.CreateCommand();
         for (int i = 0; i < ids.Count; i++)
@@ -1010,8 +1479,7 @@ public class DatabaseHelper
 
     public int EmptyRecycleBin()
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "DELETE FROM documents WHERE is_deleted = 1";
         return cmd.ExecuteNonQuery();
@@ -1019,8 +1487,7 @@ public class DatabaseHelper
 
     public int GetDeletedDocumentCount()
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "SELECT COUNT(*) FROM documents WHERE is_deleted = 1";
         var result = cmd.ExecuteScalar();
@@ -1029,10 +1496,17 @@ public class DatabaseHelper
 
 
 
-    public void AddRecentFile(int documentId)
+    public bool AddRecentFile(int documentId)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
+        using (var exists = conn.CreateCommand())
+        {
+            exists.CommandText = "SELECT COUNT(*) FROM documents WHERE id = @docId AND (is_deleted IS NULL OR is_deleted = 0)";
+            exists.Parameters.AddWithValue("@docId", documentId);
+            if (Convert.ToInt32(exists.ExecuteScalar()) == 0)
+                return false;
+        }
+
         using (var cmd = conn.CreateCommand())
         {
             cmd.CommandText = @"INSERT OR REPLACE INTO recent_files (document_id, opened_at)
@@ -1040,20 +1514,21 @@ public class DatabaseHelper
             cmd.Parameters.AddWithValue("@docId", documentId);
             cmd.ExecuteNonQuery();
         }
-        // 直近20件のみ保持
+
         using (var trim = conn.CreateCommand())
         {
             trim.CommandText = @"DELETE FROM recent_files WHERE id NOT IN
                                 (SELECT id FROM recent_files ORDER BY opened_at DESC LIMIT 20)";
             trim.ExecuteNonQuery();
         }
+
+        return true;
     }
 
     public List<(int Id, string Name, string? Subject, string? Type, string? FilePath, DateTime OpenedAt)> GetRecentFiles()
     {
         var results = new List<(int, string, string?, string?, string?, DateTime)>();
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"SELECT d.id, d.name, d.subject, d.type, d.file_path, r.opened_at
                              FROM recent_files r
@@ -1078,8 +1553,7 @@ public class DatabaseHelper
 
     public void RemoveRecentFile(int documentId)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "DELETE FROM recent_files WHERE document_id = @docId";
         cmd.Parameters.AddWithValue("@docId", documentId);
@@ -1088,8 +1562,7 @@ public class DatabaseHelper
 
     public void ClearRecentFiles()
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "DELETE FROM recent_files";
         cmd.ExecuteNonQuery();
@@ -1099,8 +1572,7 @@ public class DatabaseHelper
 
     public int GetTotalDocumentCount()
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "SELECT COUNT(*) FROM documents WHERE (is_deleted IS NULL OR is_deleted = 0)";
         var result = cmd.ExecuteScalar();
@@ -1114,8 +1586,7 @@ public class DatabaseHelper
     /// </summary>
     public bool UpdateDocumentPath(int id, string newPath)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "UPDATE documents SET file_path = @path WHERE id = @id";
         cmd.Parameters.AddWithValue("@path", newPath);
@@ -1146,8 +1617,7 @@ public class DatabaseHelper
     /// </summary>
     public string? GetSetting(string key)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "SELECT value FROM app_settings WHERE key = @key";
         cmd.Parameters.AddWithValue("@key", key);
@@ -1160,8 +1630,7 @@ public class DatabaseHelper
     /// </summary>
     public void SetSetting(string key, string value)
     {
-        using var conn = new SqliteConnection(ConnectionString);
-        conn.Open();
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = "INSERT OR REPLACE INTO app_settings (key, value) VALUES (@key, @value)";
         cmd.Parameters.AddWithValue("@key", key);

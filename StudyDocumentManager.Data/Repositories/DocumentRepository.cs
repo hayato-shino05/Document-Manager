@@ -29,6 +29,9 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
 
     public bool Add(StudyDocument document) => _db.InsertDocument(document);
 
+
+    public bool AddWithCatalogs(StudyDocument document) => _db.InsertDocumentWithCatalogs(document);
+
     public bool Update(StudyDocument document) => _db.UpdateDocument(document);
 
     public bool Delete(int id) => _db.DeleteDocument(id);
@@ -78,7 +81,11 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
 
     public bool ClearDocumentPath(int id) => _db.ClearDocumentPath(id);
 
-    public bool BackupDatabase(string destPath) => _db.BackupDatabase(destPath);
+    public bool BackupDatabase(string destPath, bool overwrite) => _db.BackupDatabase(destPath, overwrite);
+
+    public bool CanRestoreDatabase(string sourcePath) => _db.CanRestoreDatabase(sourcePath);
+
+    public bool RestoreDatabase(string sourcePath) => _db.RestoreDatabase(sourcePath);
 
     public string DatabasePath => _db.DatabasePath;
 }

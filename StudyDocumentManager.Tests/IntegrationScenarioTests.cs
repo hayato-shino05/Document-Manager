@@ -141,7 +141,7 @@ public class FullDocumentLifecycleTests : DatabaseTestBase
         };
         bool added = _repo.Add(doc);
         Assert.True(added);
-        Assert.Equal(1, _repo.GetAll().Count);
+        Assert.Single(_repo.GetAll());
 
         // 2. GETBYID
         int id = _repo.GetAll()[0].Id;

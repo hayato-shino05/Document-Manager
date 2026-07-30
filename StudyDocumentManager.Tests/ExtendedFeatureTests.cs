@@ -217,7 +217,7 @@ public class ExtendedStatisticsTests : DatabaseTestBase
     {
         _repo.Add(new StudyDocument { Name = "With File", FilePath = @"C:\file.pdf" });
         _repo.Add(new StudyDocument { Name = "No File 1", FilePath = "" });
-        _repo.Add(new StudyDocument { Name = "No File 2", FilePath = null });
+        _repo.Add(new StudyDocument { Name = "No File 2", FilePath = null! });
 
         var stats = Db.GetDashboardStatistics();
         Assert.Equal(2, stats.NoFileDocuments);
@@ -519,7 +519,7 @@ public class DistinctValuesEdgeCaseTests : DatabaseTestBase
     public void GetDistinctTags_EmptyTags_NotIncluded()
     {
         _repo.Add(new StudyDocument { Name = "A", Tags = "" });
-        _repo.Add(new StudyDocument { Name = "B", Tags = null });
+        _repo.Add(new StudyDocument { Name = "B", Tags = null! });
         _repo.Add(new StudyDocument { Name = "C", Tags = "valid" });
 
         var tags = _repo.GetDistinctTags();
@@ -867,13 +867,13 @@ public class DocumentCrudEdgeCaseTests : DatabaseTestBase
         var doc = new StudyDocument
         {
             Name = "Minimal Doc",
-            Subject = null,
-            Type = null,
-            FilePath = null,
-            Notes = null,
+            Subject = null!,
+            Type = null!,
+            FilePath = null!,
+            Notes = null!,
             FileSize = null,
-            Author = null,
-            Tags = null,
+            Author = null!,
+            Tags = null!,
             Deadline = null
         };
 

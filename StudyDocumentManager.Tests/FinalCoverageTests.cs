@@ -608,7 +608,7 @@ public class RepositoryInterfaceTests : DatabaseTestBase
         _repo.Add(new StudyDocument { Name = "Advanced Doc", Subject = "Science", IsImportant = true });
         _repo.Add(new StudyDocument { Name = "Other Doc", Subject = "Art", IsImportant = false });
 
-        var viaRepo = _repo.SearchAdvanced("Advanced", "Science", null, null, null, null, null, true);
+        var viaRepo = _repo.SearchAdvanced("Advanced", "Science", null!, null, null, null, null, true);
         var viaDirect = Db.SearchDocumentsAdvanced("Advanced", "Science", null, null, null, null, null, true);
 
         Assert.Equal(viaRepo.Count, viaDirect.Count);
@@ -858,8 +858,8 @@ public class DuplicateDetectionLogicTests : DatabaseTestBase
     [Fact]
     public void GetAllDocuments_NullPath_ExcludedFromDuplicatePathCheck()
     {
-        _repo.Add(new StudyDocument { Name = "NoPath1", FilePath = null });
-        _repo.Add(new StudyDocument { Name = "NoPath2", FilePath = null });
+        _repo.Add(new StudyDocument { Name = "NoPath1", FilePath = null! });
+        _repo.Add(new StudyDocument { Name = "NoPath2", FilePath = null! });
 
         var all = _repo.GetAll();
         var grouped = all

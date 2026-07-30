@@ -16,6 +16,8 @@ public interface IDocumentRepository
         DateTime? fromDate, DateTime? toDate,
         double? minSize, double? maxSize, bool? isImportant);
     bool Add(StudyDocument document);
+
+    bool AddWithCatalogs(StudyDocument document);
     bool Update(StudyDocument document);
     bool Delete(int id);
 

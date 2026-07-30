@@ -12,7 +12,7 @@ public class RecentFileRepository : IRecentFileRepository
     public List<(int Id, string Name, string? Subject, string? Type, string? FilePath, DateTime OpenedAt)> GetAll()
         => _db.GetRecentFiles();
 
-    public void Add(int documentId) => _db.AddRecentFile(documentId);
+    public bool Add(int documentId) => _db.AddRecentFile(documentId);
 
     public void Clear() => _db.ClearRecentFiles();
 }

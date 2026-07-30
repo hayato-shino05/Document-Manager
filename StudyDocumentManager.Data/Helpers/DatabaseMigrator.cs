@@ -106,28 +106,481 @@ public static class DatabaseMigrator
         using var conn = new SqliteConnection(connectionString);
         conn.Open();
 
-        using (var cmd = new SqliteCommand(createTablesQuery, conn))
+        if (HasAnyLegacyVietnameseTable(conn))
+            MigrateLegacyVietnameseSchema(conn, createTablesQuery);
+
+        var preflight = Preflight(conn);
+
+        using (var transaction = conn.BeginTransaction())
         {
-            cmd.ExecuteNonQuery();
+            ExecuteSql(conn, transaction, createTablesQuery);
+            MigrateAddColumn(conn, transaction, "documents", "is_deleted", "INTEGER DEFAULT 0");
+            MigrateAddColumn(conn, transaction, "documents", "deleted_at", "DATETIME");
+
+            foreach (var tableName in preflight.TablesToRebuild)
+                RebuildChildTable(conn, transaction, tableName);
+
+            ExecuteSql(conn, transaction, createTablesQuery);
+            EnsureForeignKeyCheckIsClean(conn, transaction);
+            transaction.Commit();
         }
 
-        MigrateAddColumn(conn, "documents", "is_deleted", "INTEGER DEFAULT 0");
-        MigrateAddColumn(conn, "documents", "deleted_at", "DATETIME");
         MigrateSeedCategories(conn);
         MigrateNormalizeFileTypes(conn);
         MigrateNeutralizeLabels(conn);
     }
 
-    private static void MigrateAddColumn(SqliteConnection conn, string table, string column, string type)
+    private sealed record MigrationPreflight(IReadOnlyList<string> TablesToRebuild);
+
+    private static bool HasAnyLegacyVietnameseTable(SqliteConnection connection)
+        => new[] { "tai_lieu", "danh_muc", "loai_tai_lieu" }.Any(tableName => TableExists(connection, tableName));
+
+    private static void ValidateCurrentTablesForLegacyMigration(SqliteConnection connection)
     {
-        try
+        if (TableExists(connection, "documents"))
         {
-            using var cmd = new SqliteCommand($"ALTER TABLE {table} ADD COLUMN {column} {type}", conn);
-            cmd.ExecuteNonQuery();
+            RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at"], ["is_deleted", "deleted_at"]);
+            EnsureNoUnsupportedIndexesOrTriggers(connection, "documents");
         }
-        catch (SqliteException)
+
+        ValidateKnownTable(connection, "collections", ["id", "name", "description", "created_at"]);
+        ValidateKnownTable(connection, "categories", ["id", "name", "created_at"]);
+        ValidateKnownTable(connection, "document_types", ["id", "name", "created_at"]);
+        ValidateKnownTable(connection, "app_settings", ["key", "value"]);
+    }
+
+    private static void MigrateLegacyVietnameseSchema(SqliteConnection connection, string createTablesQuery)
+    {
+        ValidateLegacyVietnameseSchema(connection);
+        ValidateCurrentTablesForLegacyMigration(connection);
+
+        using var transaction = connection.BeginTransaction();
+        ExecuteSql(connection, transaction, createTablesQuery);
+        MigrateAddColumn(connection, transaction, "documents", "is_deleted", "INTEGER DEFAULT 0");
+        MigrateAddColumn(connection, transaction, "documents", "deleted_at", "DATETIME");
+        CopyLegacyDocuments(connection, transaction);
+        ExecuteSql(connection, transaction, "INSERT INTO categories (name, created_at) SELECT legacy.ten, legacy.created_at FROM danh_muc legacy WHERE NOT EXISTS (SELECT 1 FROM categories current WHERE current.name = legacy.ten)");
+        ExecuteSql(connection, transaction, "INSERT INTO document_types (name, created_at) SELECT legacy.ten, legacy.created_at FROM loai_tai_lieu legacy WHERE NOT EXISTS (SELECT 1 FROM document_types current WHERE current.name = legacy.ten)");
+
+        foreach (var tableName in new[] { "collection_items", "personal_notes", "recent_files", "document_relations" })
         {
+            if (TableExists(connection, tableName))
+                RebuildLegacyChildTable(connection, transaction, tableName);
         }
+
+        ExecuteSql(connection, transaction, "DROP TABLE tai_lieu");
+        ExecuteSql(connection, transaction, "DROP TABLE danh_muc");
+        ExecuteSql(connection, transaction, "DROP TABLE loai_tai_lieu");
+        ExecuteSql(connection, transaction, "INSERT OR REPLACE INTO app_settings (key, value) VALUES ('schema_version', '2')");
+        ExecuteSql(connection, transaction, createTablesQuery);
+        EnsureForeignKeyCheckIsClean(connection, transaction);
+        transaction.Commit();
+    }
+
+    private static void ValidateLegacyVietnameseSchema(SqliteConnection connection)
+    {
+        var tables = GetApplicationTables(connection);
+        var legacyTables = new[] { "tai_lieu", "danh_muc", "loai_tai_lieu" };
+        var foundLegacyTables = legacyTables.Where(tables.Contains).ToList();
+        if (foundLegacyTables.Count != legacyTables.Length)
+            throw new InvalidOperationException($"Incomplete legacy database tables: {string.Join(", ", foundLegacyTables)}.");
+
+        var supportedTables = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "documents", "collections", "collection_items", "personal_notes", "recent_files",
+            "document_relations", "categories", "document_types", "app_settings",
+            "tai_lieu", "danh_muc", "loai_tai_lieu"
+        };
+        var unsupportedTables = tables.Where(table => !supportedTables.Contains(table)).ToList();
+        if (unsupportedTables.Count > 0)
+            throw new InvalidOperationException($"Unsupported database tables: {string.Join(", ", unsupportedTables)}.");
+
+        RequireColumns(connection, "tai_lieu", ["id", "ten", "mon_hoc", "loai", "duong_dan", "ghi_chu", "ngay_them", "kich_thuoc", "tac_gia", "quan_trong", "tags", "deadline", "is_deleted", "deleted_at"], ["is_deleted", "deleted_at"]);
+        RequireColumns(connection, "danh_muc", ["id", "ten", "created_at"], []);
+        RequireColumns(connection, "loai_tai_lieu", ["id", "ten", "created_at"], []);
+        EnsureNoUnsupportedLegacyIndexes(connection, "tai_lieu");
+        EnsureNoTriggers(connection, "tai_lieu");
+        EnsureNoTriggers(connection, "danh_muc");
+        EnsureNoTriggers(connection, "loai_tai_lieu");
+
+        ValidateLegacyChildTable(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"],
+            [("collection_id", "collections", "id"), ("document_id", "tai_lieu", "id")], ["collection_id", "document_id"]);
+        ValidateLegacyChildTable(connection, "personal_notes", ["id", "document_id", "content", "created_at", "updated_at"],
+            [("document_id", "tai_lieu", "id")], null);
+        ValidateLegacyChildTable(connection, "recent_files", ["id", "document_id", "opened_at"],
+            [("document_id", "tai_lieu", "id")], ["document_id"]);
+        ValidateLegacyChildTable(connection, "document_relations", ["id", "doc_id_1", "doc_id_2", "relation_type", "created_at"],
+            [("doc_id_1", "tai_lieu", "id"), ("doc_id_2", "tai_lieu", "id")], ["doc_id_1", "doc_id_2"]);
+    }
+
+    private static void ValidateLegacyChildTable(
+        SqliteConnection connection,
+        string tableName,
+        string[] expectedColumns,
+        (string From, string ParentTable, string ParentColumn)[] expectedForeignKeys,
+        string[]? uniqueColumns)
+    {
+        if (!TableExists(connection, tableName))
+            return;
+
+        RequireColumns(connection, tableName, expectedColumns, []);
+        EnsureNoUnsupportedIndexesOrTriggers(connection, tableName);
+        EnsureNoOrphans(connection, tableName, expectedForeignKeys);
+
+        if (uniqueColumns is not null && !HasUniqueIndex(connection, tableName, uniqueColumns))
+            throw new InvalidOperationException($"Missing unique constraint in '{tableName}'.");
+
+        var actualForeignKeys = GetForeignKeys(connection, tableName);
+        if (actualForeignKeys.Count != expectedForeignKeys.Length || actualForeignKeys.Any(foreignKey =>
+            !expectedForeignKeys.Any(expected => expected.From == foreignKey.From && expected.ParentTable == foreignKey.ParentTable && expected.ParentColumn == foreignKey.ParentColumn) ||
+            !string.Equals(foreignKey.OnDelete, "CASCADE", StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException($"Unsupported foreign key layout in '{tableName}'.");
+        }
+    }
+
+    private static void EnsureNoUnsupportedLegacyIndexes(SqliteConnection connection, string tableName)
+    {
+        var allowedIndexes = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "idx_tai_lieu_mon_hoc", "idx_tai_lieu_loai", "idx_tai_lieu_ngay_them",
+            "idx_tai_lieu_deadline", "idx_tai_lieu_deleted", "idx_tai_lieu_quan_trong"
+        };
+
+        using var indexes = connection.CreateCommand();
+        indexes.CommandText = $"PRAGMA index_list({tableName})";
+        using var indexReader = indexes.ExecuteReader();
+        while (indexReader.Read())
+        {
+            var indexName = indexReader.GetString(1);
+            var origin = indexReader.GetString(3);
+            if (origin == "c" && !allowedIndexes.Contains(indexName))
+                throw new InvalidOperationException($"Unsupported index '{indexName}' on '{tableName}'.");
+        }
+    }
+
+    private static void EnsureNoTriggers(SqliteConnection connection, string tableName)
+    {
+        using var triggers = connection.CreateCommand();
+        triggers.CommandText = "SELECT name FROM sqlite_master WHERE type = 'trigger' AND tbl_name = @tableName";
+        triggers.Parameters.AddWithValue("@tableName", tableName);
+        if (triggers.ExecuteScalar() is not null)
+            throw new InvalidOperationException($"Unsupported trigger on '{tableName}'.");
+    }
+
+    private static void CopyLegacyDocuments(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        var columns = GetColumns(connection, "tai_lieu");
+        var isDeleted = columns.Contains("is_deleted", StringComparer.Ordinal) ? "is_deleted" : "0";
+        var deletedAt = columns.Contains("deleted_at", StringComparer.Ordinal) ? "deleted_at" : "NULL";
+        var rows = new List<object?[]>();
+        using (var source = connection.CreateCommand())
+        {
+            source.Transaction = transaction;
+            source.CommandText = $"SELECT id, ten, mon_hoc, loai, duong_dan, ghi_chu, ngay_them, kich_thuoc, tac_gia, quan_trong, tags, deadline, {isDeleted}, {deletedAt} FROM tai_lieu ORDER BY id";
+            using var reader = source.ExecuteReader();
+            while (reader.Read())
+            {
+                var values = new object?[reader.FieldCount];
+                reader.GetValues(values);
+                rows.Add(values);
+            }
+        }
+
+        ExecuteSql(connection, transaction, "CREATE TEMP TABLE legacy_document_map (legacy_id INTEGER PRIMARY KEY, document_id INTEGER NOT NULL)");
+        foreach (var row in rows)
+        {
+            using var insert = connection.CreateCommand();
+            insert.Transaction = transaction;
+            insert.CommandText = """
+                INSERT INTO documents (name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at)
+                VALUES (@name, @subject, @type, @filePath, @notes, @createdAt, @fileSize, @author, @isImportant, @tags, @deadline, @isDeleted, @deletedAt)
+                """;
+            insert.Parameters.AddWithValue("@name", row[1]!);
+            insert.Parameters.AddWithValue("@subject", row[2]!);
+            insert.Parameters.AddWithValue("@type", row[3]!);
+            insert.Parameters.AddWithValue("@filePath", row[4]!);
+            insert.Parameters.AddWithValue("@notes", row[5]!);
+            insert.Parameters.AddWithValue("@createdAt", row[6]!);
+            insert.Parameters.AddWithValue("@fileSize", row[7]!);
+            insert.Parameters.AddWithValue("@author", row[8]!);
+            insert.Parameters.AddWithValue("@isImportant", row[9]!);
+            insert.Parameters.AddWithValue("@tags", row[10]!);
+            insert.Parameters.AddWithValue("@deadline", row[11]!);
+            insert.Parameters.AddWithValue("@isDeleted", row[12] is DBNull ? 0 : row[12]!);
+            insert.Parameters.AddWithValue("@deletedAt", row[13]!);
+            insert.ExecuteNonQuery();
+
+            using var map = connection.CreateCommand();
+            map.Transaction = transaction;
+            map.CommandText = "INSERT INTO legacy_document_map (legacy_id, document_id) VALUES (@legacyId, last_insert_rowid())";
+            map.Parameters.AddWithValue("@legacyId", row[0]!);
+            map.ExecuteNonQuery();
+        }
+    }
+
+    private static void RebuildLegacyChildTable(SqliteConnection connection, SqliteTransaction transaction, string tableName)
+    {
+        var (definition, copyQuery) = tableName switch
+        {
+            "collection_items" => ("CREATE TABLE collection_items_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, collection_id INTEGER NOT NULL, document_id INTEGER NOT NULL, added_at DATETIME DEFAULT (datetime('now', 'localtime')), FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE, FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE, UNIQUE(collection_id, document_id))", "INSERT INTO collection_items_rebuild (id, collection_id, document_id, added_at) SELECT child.id, child.collection_id, map.document_id, child.added_at FROM collection_items child INNER JOIN legacy_document_map map ON map.legacy_id = child.document_id"),
+            "personal_notes" => ("CREATE TABLE personal_notes_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, document_id INTEGER NOT NULL, content TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), updated_at DATETIME DEFAULT (datetime('now', 'localtime')), FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE)", "INSERT INTO personal_notes_rebuild (id, document_id, content, created_at, updated_at) SELECT child.id, map.document_id, child.content, child.created_at, child.updated_at FROM personal_notes child INNER JOIN legacy_document_map map ON map.legacy_id = child.document_id"),
+            "recent_files" => ("CREATE TABLE recent_files_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, document_id INTEGER NOT NULL UNIQUE, opened_at DATETIME DEFAULT (datetime('now','localtime')), FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE)", "INSERT INTO recent_files_rebuild (id, document_id, opened_at) SELECT child.id, map.document_id, child.opened_at FROM recent_files child INNER JOIN legacy_document_map map ON map.legacy_id = child.document_id"),
+            "document_relations" => ("CREATE TABLE document_relations_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, doc_id_1 INTEGER NOT NULL, doc_id_2 INTEGER NOT NULL, relation_type TEXT DEFAULT 'related', created_at DATETIME DEFAULT (datetime('now','localtime')), FOREIGN KEY (doc_id_1) REFERENCES documents(id) ON DELETE CASCADE, FOREIGN KEY (doc_id_2) REFERENCES documents(id) ON DELETE CASCADE, UNIQUE(doc_id_1, doc_id_2))", "INSERT INTO document_relations_rebuild (id, doc_id_1, doc_id_2, relation_type, created_at) SELECT child.id, first_map.document_id, second_map.document_id, child.relation_type, child.created_at FROM document_relations child INNER JOIN legacy_document_map first_map ON first_map.legacy_id = child.doc_id_1 INNER JOIN legacy_document_map second_map ON second_map.legacy_id = child.doc_id_2"),
+            _ => throw new InvalidOperationException($"Unsupported legacy table '{tableName}'.")
+        };
+
+        ExecuteSql(connection, transaction, definition);
+        ExecuteSql(connection, transaction, copyQuery);
+        ExecuteSql(connection, transaction, $"DROP TABLE {tableName}");
+        ExecuteSql(connection, transaction, $"ALTER TABLE {tableName}_rebuild RENAME TO {tableName}");
+    }
+
+    private static MigrationPreflight Preflight(SqliteConnection connection)
+    {
+        var tables = GetApplicationTables(connection);
+        if (tables.Count == 0)
+            return new MigrationPreflight([]);
+
+        var supportedTables = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "documents", "collections", "collection_items", "personal_notes", "recent_files",
+            "document_relations", "categories", "document_types", "app_settings"
+        };
+        var unsupportedTables = tables.Where(table => !supportedTables.Contains(table)).ToList();
+        if (unsupportedTables.Count > 0)
+            throw new InvalidOperationException($"Unsupported database tables: {string.Join(", ", unsupportedTables)}.");
+
+        RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at"], ["is_deleted", "deleted_at"]);
+        ValidateKnownTable(connection, "collections", ["id", "name", "description", "created_at"]);
+        ValidateKnownTable(connection, "categories", ["id", "name", "created_at"]);
+        ValidateKnownTable(connection, "document_types", ["id", "name", "created_at"]);
+        ValidateKnownTable(connection, "app_settings", ["key", "value"]);
+
+        var tablesToRebuild = new List<string>();
+        ValidateChildTable(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"],
+            [("collection_id", "collections", "id"), ("document_id", "documents", "id")], ["collection_id", "document_id"], tablesToRebuild);
+        ValidateChildTable(connection, "personal_notes", ["id", "document_id", "content", "created_at", "updated_at"],
+            [("document_id", "documents", "id")], null, tablesToRebuild);
+        ValidateChildTable(connection, "recent_files", ["id", "document_id", "opened_at"],
+            [("document_id", "documents", "id")], ["document_id"], tablesToRebuild);
+        ValidateChildTable(connection, "document_relations", ["id", "doc_id_1", "doc_id_2", "relation_type", "created_at"],
+            [("doc_id_1", "documents", "id"), ("doc_id_2", "documents", "id")], ["doc_id_1", "doc_id_2"], tablesToRebuild);
+
+        EnsureForeignKeyCheckIsClean(connection, null);
+        return new MigrationPreflight(tablesToRebuild);
+    }
+
+    private static List<string> GetApplicationTables(SqliteConnection connection)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'";
+        using var reader = command.ExecuteReader();
+        var tables = new List<string>();
+        while (reader.Read())
+            tables.Add(reader.GetString(0));
+        return tables;
+    }
+
+    private static void ValidateKnownTable(SqliteConnection connection, string tableName, string[] requiredColumns)
+    {
+        if (!TableExists(connection, tableName))
+            return;
+
+        RequireColumns(connection, tableName, requiredColumns, []);
+        EnsureNoUnsupportedIndexesOrTriggers(connection, tableName);
+    }
+
+    private static void RequireColumns(SqliteConnection connection, string tableName, string[] expectedColumns, string[] optionalColumns)
+    {
+        if (!TableExists(connection, tableName))
+            throw new InvalidOperationException($"Required table '{tableName}' is missing.");
+
+        var actualColumns = GetColumns(connection, tableName);
+        var unsupportedColumns = actualColumns.Except(expectedColumns, StringComparer.Ordinal).ToList();
+        if (unsupportedColumns.Count > 0)
+            throw new InvalidOperationException($"Unsupported columns in '{tableName}': {string.Join(", ", unsupportedColumns)}.");
+
+        var missingRequiredColumns = expectedColumns.Except(optionalColumns, StringComparer.Ordinal).Except(actualColumns, StringComparer.Ordinal).ToList();
+        if (missingRequiredColumns.Count > 0)
+            throw new InvalidOperationException($"Missing required columns in '{tableName}': {string.Join(", ", missingRequiredColumns)}.");
+    }
+
+    private static void ValidateChildTable(
+        SqliteConnection connection,
+        string tableName,
+        string[] expectedColumns,
+        (string From, string ParentTable, string ParentColumn)[] expectedForeignKeys,
+        string[]? uniqueColumns,
+        List<string> tablesToRebuild)
+    {
+        if (!TableExists(connection, tableName))
+            return;
+
+        RequireColumns(connection, tableName, expectedColumns, []);
+        EnsureNoUnsupportedIndexesOrTriggers(connection, tableName);
+        EnsureNoOrphans(connection, tableName, expectedForeignKeys);
+
+        if (uniqueColumns is not null && !HasUniqueIndex(connection, tableName, uniqueColumns))
+            throw new InvalidOperationException($"Missing unique constraint in '{tableName}'.");
+
+        var actualForeignKeys = GetForeignKeys(connection, tableName);
+        if (actualForeignKeys.Count == 0)
+        {
+            tablesToRebuild.Add(tableName);
+            return;
+        }
+
+        if (actualForeignKeys.Count != expectedForeignKeys.Length || actualForeignKeys.Any(foreignKey =>
+            !expectedForeignKeys.Any(expected => expected.From == foreignKey.From && expected.ParentTable == foreignKey.ParentTable && expected.ParentColumn == foreignKey.ParentColumn) ||
+            !string.Equals(foreignKey.OnDelete, "CASCADE", StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new InvalidOperationException($"Unsupported foreign key layout in '{tableName}'.");
+        }
+    }
+
+    private static bool TableExists(SqliteConnection connection, string tableName)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = @name";
+        command.Parameters.AddWithValue("@name", tableName);
+        return Convert.ToInt32(command.ExecuteScalar()) > 0;
+    }
+
+    private static List<string> GetColumns(SqliteConnection connection, string tableName)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA table_info({tableName})";
+        using var reader = command.ExecuteReader();
+        var columns = new List<string>();
+        while (reader.Read())
+            columns.Add(reader.GetString(1));
+        return columns;
+    }
+
+    private static List<(string From, string ParentTable, string ParentColumn, string OnDelete)> GetForeignKeys(SqliteConnection connection, string tableName)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA foreign_key_list({tableName})";
+        using var reader = command.ExecuteReader();
+        var foreignKeys = new List<(string, string, string, string)>();
+        while (reader.Read())
+            foreignKeys.Add((reader.GetString(3), reader.GetString(2), reader.GetString(4), reader.GetString(6)));
+        return foreignKeys;
+    }
+
+    private static bool HasUniqueIndex(SqliteConnection connection, string tableName, string[] expectedColumns)
+    {
+        using var indexes = connection.CreateCommand();
+        indexes.CommandText = $"PRAGMA index_list({tableName})";
+        using var indexReader = indexes.ExecuteReader();
+        var indexNames = new List<string>();
+        while (indexReader.Read())
+        {
+            if (indexReader.GetInt32(2) == 1)
+                indexNames.Add(indexReader.GetString(1));
+        }
+        indexReader.Close();
+
+        return indexNames.Any(indexName =>
+        {
+            using var columns = connection.CreateCommand();
+            columns.CommandText = $"PRAGMA index_info({indexName})";
+            using var columnReader = columns.ExecuteReader();
+            var names = new List<string>();
+            while (columnReader.Read())
+                names.Add(columnReader.GetString(2));
+            return names.SequenceEqual(expectedColumns, StringComparer.Ordinal);
+        });
+    }
+
+    private static void EnsureNoUnsupportedIndexesOrTriggers(SqliteConnection connection, string tableName)
+    {
+        var allowedIndexes = tableName switch
+        {
+            "documents" => new HashSet<string>(StringComparer.Ordinal)
+            {
+                "idx_documents_subject", "idx_documents_type", "idx_documents_created_at", "idx_documents_deadline", "idx_documents_deleted", "idx_documents_important"
+            },
+            "collection_items" => new HashSet<string>(StringComparer.Ordinal)
+            {
+                "idx_collection_items_collection", "idx_collection_items_document"
+            },
+            _ => new HashSet<string>(StringComparer.Ordinal)
+        };
+
+        using var indexes = connection.CreateCommand();
+        indexes.CommandText = $"PRAGMA index_list({tableName})";
+        using var indexReader = indexes.ExecuteReader();
+        while (indexReader.Read())
+        {
+            var indexName = indexReader.GetString(1);
+            var origin = indexReader.GetString(3);
+            if (origin == "c" && !allowedIndexes.Contains(indexName))
+                throw new InvalidOperationException($"Unsupported index '{indexName}' on '{tableName}'.");
+        }
+
+        using var triggers = connection.CreateCommand();
+        triggers.CommandText = "SELECT name FROM sqlite_master WHERE type = 'trigger' AND tbl_name = @tableName";
+        triggers.Parameters.AddWithValue("@tableName", tableName);
+        if (triggers.ExecuteScalar() is not null)
+            throw new InvalidOperationException($"Unsupported trigger on '{tableName}'.");
+    }
+
+    private static void EnsureNoOrphans(SqliteConnection connection, string tableName, (string From, string ParentTable, string ParentColumn)[] foreignKeys)
+    {
+        foreach (var foreignKey in foreignKeys)
+        {
+            if (!TableExists(connection, foreignKey.ParentTable))
+                throw new InvalidOperationException($"Table '{tableName}' references missing parent table '{foreignKey.ParentTable}'.");
+
+            using var command = connection.CreateCommand();
+            command.CommandText = $"SELECT EXISTS (SELECT 1 FROM {tableName} child LEFT JOIN {foreignKey.ParentTable} parent ON child.{foreignKey.From} = parent.{foreignKey.ParentColumn} WHERE parent.{foreignKey.ParentColumn} IS NULL)";
+            if (Convert.ToInt32(command.ExecuteScalar()) == 1)
+                throw new InvalidOperationException($"Orphaned records found in '{tableName}'.");
+        }
+    }
+
+    private static void RebuildChildTable(SqliteConnection connection, SqliteTransaction transaction, string tableName)
+    {
+        var (definition, columns) = tableName switch
+        {
+            "collection_items" => ("CREATE TABLE collection_items_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, collection_id INTEGER NOT NULL, document_id INTEGER NOT NULL, added_at DATETIME DEFAULT (datetime('now', 'localtime')), FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE, FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE, UNIQUE(collection_id, document_id))", "id, collection_id, document_id, added_at"),
+            "personal_notes" => ("CREATE TABLE personal_notes_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, document_id INTEGER NOT NULL, content TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), updated_at DATETIME DEFAULT (datetime('now', 'localtime')), FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE)", "id, document_id, content, created_at, updated_at"),
+            "recent_files" => ("CREATE TABLE recent_files_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, document_id INTEGER NOT NULL UNIQUE, opened_at DATETIME DEFAULT (datetime('now','localtime')), FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE)", "id, document_id, opened_at"),
+            "document_relations" => ("CREATE TABLE document_relations_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, doc_id_1 INTEGER NOT NULL, doc_id_2 INTEGER NOT NULL, relation_type TEXT DEFAULT 'related', created_at DATETIME DEFAULT (datetime('now','localtime')), FOREIGN KEY (doc_id_1) REFERENCES documents(id) ON DELETE CASCADE, FOREIGN KEY (doc_id_2) REFERENCES documents(id) ON DELETE CASCADE, UNIQUE(doc_id_1, doc_id_2))", "id, doc_id_1, doc_id_2, relation_type, created_at"),
+            _ => throw new InvalidOperationException($"Unsupported legacy table '{tableName}'.")
+        };
+
+        ExecuteSql(connection, transaction, definition);
+        ExecuteSql(connection, transaction, $"INSERT INTO {tableName}_rebuild ({columns}) SELECT {columns} FROM {tableName}");
+        ExecuteSql(connection, transaction, $"DROP TABLE {tableName}");
+        ExecuteSql(connection, transaction, $"ALTER TABLE {tableName}_rebuild RENAME TO {tableName}");
+    }
+
+    private static void EnsureForeignKeyCheckIsClean(SqliteConnection connection, SqliteTransaction? transaction)
+    {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = "PRAGMA foreign_key_check";
+        using var reader = command.ExecuteReader();
+        if (reader.Read())
+            throw new InvalidOperationException("Foreign key integrity check failed.");
+    }
+
+    private static void ExecuteSql(SqliteConnection connection, SqliteTransaction transaction, string sql)
+    {
+        using var command = new SqliteCommand(sql, connection, transaction);
+        command.ExecuteNonQuery();
+    }
+
+    private static void MigrateAddColumn(SqliteConnection conn, SqliteTransaction transaction, string table, string column, string type)
+    {
+        if (GetColumns(conn, table).Contains(column, StringComparer.Ordinal))
+            return;
+
+        using var cmd = new SqliteCommand($"ALTER TABLE {table} ADD COLUMN {column} {type}", conn, transaction);
+        cmd.ExecuteNonQuery();
     }
 
     private static void MigrateSeedCategories(SqliteConnection conn)

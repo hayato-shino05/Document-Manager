@@ -175,9 +175,7 @@ public class ReportBySubjectTypeTests : DatabaseTestBase
         var math = data.FirstOrDefault(d => d.Label == "Math");
         var phys = data.FirstOrDefault(d => d.Label == "Physics");
 
-        Assert.NotNull(math);
         Assert.Equal(2, math.Count);
-        Assert.NotNull(phys);
         Assert.Equal(1, phys.Count);
     }
 
@@ -197,7 +195,7 @@ public class ReportBySubjectTypeTests : DatabaseTestBase
     public void GetDocumentsBySubject_NullSubject_LabeledAsKhongRo()
     {
         var repo = new DocumentRepository(Db);
-        repo.Add(new StudyDocument { Name = "No Subject", Subject = null });
+        repo.Add(new StudyDocument { Name = "No Subject", Subject = null! });
 
         var data = Db.GetDocumentsBySubject();
         Assert.Contains(data, d => d.Label == "Unknown");
@@ -422,7 +420,7 @@ public class CategoryWithCountTests : DatabaseTestBase
     public void GetTypesWithCount_NullTypeExcluded()
     {
         var repo = new DocumentRepository(Db);
-        repo.Add(new StudyDocument { Name = "NoType", Type = null });
+        repo.Add(new StudyDocument { Name = "NoType", Type = null! });
 
         var data = Db.GetTypesWithCount();
         Assert.DoesNotContain(data, x => string.IsNullOrEmpty(x.Name));
@@ -495,8 +493,8 @@ public class CascadeRenameTests : DatabaseTestBase
 
         var all = repo.GetAll();
         Assert.Equal(2, all.Count(d => d.Type == "NewType"));
-        Assert.Empty(all.Where(d => d.Type == "OldType"));
-        Assert.Single(all.Where(d => d.Type == "Other"));
+        Assert.DoesNotContain(all, d => d.Type == "OldType");
+        Assert.Single(all, d => d.Type == "Other");
     }
 
     [Fact]
@@ -845,7 +843,7 @@ public class FileIntegrityDetailTests : DatabaseTestBase
     public void UpdateDocumentPath_AlsoRemovesFromNoFileStats()
     {
         var repo = new DocumentRepository(Db);
-        repo.Add(new StudyDocument { Name = "NoPath", FilePath = null });
+        repo.Add(new StudyDocument { Name = "NoPath", FilePath = null! });
         int id = repo.GetAll()[0].Id;
 
         var statsBefore = Db.GetDashboardStatistics();
@@ -923,7 +921,7 @@ public class BulkOperationsEdgeCaseTests : DatabaseTestBase
 
         var updated = repo.GetAll();
         Assert.Equal(2, updated.Count(d => d.Subject == "New"));
-        Assert.Single(updated.Where(d => d.Subject == "NotChanged"));
+        Assert.Single(updated, d => d.Subject == "NotChanged");
     }
 
     [Fact]
@@ -1239,8 +1237,8 @@ public class DuplicatePathDetectionTests : DatabaseTestBase
     public void DetectDuplicates_EmptyPath_ShouldNotGroup()
     {
         // Documents with empty/null paths should not be grouped as duplicates
-        _repo.Add(new StudyDocument { Name = "NoPath1", FilePath = null });
-        _repo.Add(new StudyDocument { Name = "NoPath2", FilePath = null });
+        _repo.Add(new StudyDocument { Name = "NoPath1", FilePath = null! });
+        _repo.Add(new StudyDocument { Name = "NoPath2", FilePath = null! });
 
         var all = _repo.GetAll();
         var groups = all.Where(d => !string.IsNullOrEmpty(d.FilePath))

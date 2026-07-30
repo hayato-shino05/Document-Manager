@@ -7,17 +7,20 @@ public class DatabaseBackupService : IBackupService
     private readonly IFileIntegrityRepository _fileIntegrityRepo;
     private readonly IFileDialogService _fileDialogService;
     private readonly IDialogService _dialogService;
+    private readonly IApplicationLifecycleService _lifecycleService;
     private readonly ILocalizationService _loc;
 
     public DatabaseBackupService(
         IFileIntegrityRepository fileIntegrityRepo,
         IFileDialogService fileDialogService,
         IDialogService dialogService,
+        IApplicationLifecycleService lifecycleService,
         ILocalizationService localizationService)
     {
         _fileIntegrityRepo = fileIntegrityRepo;
         _fileDialogService = fileDialogService;
         _dialogService = dialogService;
+        _lifecycleService = lifecycleService;
         _loc = localizationService;
     }
 
@@ -31,15 +34,20 @@ public class DatabaseBackupService : IBackupService
         if (string.IsNullOrWhiteSpace(path))
             return (false, null, null);
 
-        try
+        if (File.Exists(path))
         {
-            _fileIntegrityRepo.BackupDatabase(path);
-            return (true, path, null);
+            var confirmed = await _dialogService.ShowConfirmAsync(
+                _loc["Dashboard_ConfirmOverwriteBackup"],
+                _loc["Dashboard_OverwriteBackupWarning"],
+                _loc["Dashboard_OverwriteBackup"],
+                isDanger: true);
+            if (!confirmed)
+                return (false, null, null);
         }
-        catch (Exception ex)
-        {
-            return (false, null, ex.Message);
-        }
+
+        return _fileIntegrityRepo.BackupDatabase(path, overwrite: true)
+            ? (true, path, null)
+            : (false, null, _loc["Dashboard_BackupFailed"]);
     }
 
     public async Task<(bool Success, string? Error)> RestoreAsync()
@@ -54,6 +62,9 @@ public class DatabaseBackupService : IBackupService
         if (!File.Exists(path))
             return (false, _loc["Dashboard_BackupNotExist"]);
 
+        if (!_fileIntegrityRepo.CanRestoreDatabase(path))
+            return (false, _loc["Dashboard_RestoreFailed"]);
+
         var confirmed = await _dialogService.ShowConfirmAsync(
             _loc["Dashboard_ConfirmRestore"],
             _loc["Dashboard_RestoreWarning"],
@@ -63,14 +74,11 @@ public class DatabaseBackupService : IBackupService
         if (!confirmed)
             return (false, null);
 
-        try
-        {
-            File.Copy(path, _fileIntegrityRepo.DatabasePath, overwrite: true);
-            return (true, null);
-        }
-        catch (Exception ex)
-        {
-            return (false, ex.Message);
-        }
+        if (!_fileIntegrityRepo.RestoreDatabase(path))
+            return (false, _loc["Dashboard_RestoreFailed"]);
+
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Dashboard_RestoreRestartRequired"]);
+        _lifecycleService.Shutdown();
+        return (true, null);
     }
 }

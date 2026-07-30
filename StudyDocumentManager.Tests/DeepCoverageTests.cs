@@ -422,7 +422,7 @@ public class TagSearchTests : DatabaseTestBase
     [Fact]
     public void GetDistinctTags_NullAndEmptyTags_Excluded()
     {
-        _repo.Add(new StudyDocument { Name = "D1", Tags = null });
+        _repo.Add(new StudyDocument { Name = "D1", Tags = null! });
         _repo.Add(new StudyDocument { Name = "D2", Tags = "" });
         _repo.Add(new StudyDocument { Name = "D3", Tags = "valid" });
 
@@ -625,7 +625,7 @@ public class ConsistencyTests : DatabaseTestBase
     public void DashboardStats_NoFileDocuments_MatchesManualCount()
     {
         _repo.Add(new StudyDocument { Name = "WithFile", FilePath = @"C:\file.pdf" });
-        _repo.Add(new StudyDocument { Name = "NoFile1", FilePath = null });
+        _repo.Add(new StudyDocument { Name = "NoFile1", FilePath = null! });
         _repo.Add(new StudyDocument { Name = "NoFile2", FilePath = "" });
 
         var stats = Db.GetDashboardStatistics();
