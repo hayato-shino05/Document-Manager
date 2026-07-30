@@ -370,4 +370,6 @@ redist/
 .gitnexus
 .harness-backup/
 docs/
+!docs/
+!docs/TEST_MATRIX.md
 scripts/

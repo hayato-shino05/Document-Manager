@@ -76,8 +76,8 @@ jobs:
 
           ## System Requirements
 
-          - Windows 7 SP1 or later
-          - .NET Framework 4.8
+          - Windows 10 or later
+          - .NET 9 Desktop Runtime
 
           ## Full Changelog
 

@@ -55,7 +55,7 @@ jobs:
           fi
 
           # Prepare the prompt
-          SYSTEM_PROMPT="You are a senior C# developer reviewing code for a WinForms .NET Framework 4.8 desktop application. This is a Study Document Manager app using SQLite database.
+          SYSTEM_PROMPT="You are a senior C# developer reviewing code for an Avalonia .NET 9 desktop application. This is a Study Document Manager app using SQLite database.
 
           Review Guidelines:
           - Focus on code quality, potential bugs, and security issues

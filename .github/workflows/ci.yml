@@ -7,8 +7,7 @@ on:
     branches: [main, master, development]
 
 env:
-  SOLUTION_FILE: study-document-manager.sln
-  PROJECT_FILE: study-document-manager/study-document-manager.csproj
+  SOLUTION_FILE: StudyDocumentManager.sln
   BUILD_CONFIGURATION: Release
 
 jobs:
@@ -19,11 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Setup NuGet
-        uses: NuGet/setup-nuget@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
 
       - name: Cache NuGet packages
         uses: actions/cache@v4
@@ -32,20 +30,24 @@ jobs:
           key: nuget-${{ hashFiles('**/*.csproj') }}
           restore-keys: nuget-
 
-      - name: Restore NuGet packages
-        run: nuget restore ${{ env.SOLUTION_FILE }}
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_FILE }} -p:Configuration=${{ env.BUILD_CONFIGURATION }}
 
       - name: Build solution
-        run: msbuild ${{ env.SOLUTION_FILE }} /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform="Any CPU" /t:Rebuild /p:TreatWarningsAsErrors=false
+        run: dotnet build ${{ env.SOLUTION_FILE }} -c ${{ env.BUILD_CONFIGURATION }} --no-restore
+
+      - name: Run tests
+        run: dotnet test StudyDocumentManager.Tests/StudyDocumentManager.Tests.csproj -c ${{ env.BUILD_CONFIGURATION }} --no-build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-output-${{ github.sha }}
           path: |
-            study-document-manager/bin/Release/
-            !study-document-manager/bin/Release/*.pdb
-            !study-document-manager/bin/Release/*.xml
+            StudyDocumentManager/bin/Release/net9.0/
+            !StudyDocumentManager/bin/Release/net9.0/*.pdb
+            !StudyDocumentManager/bin/Release/net9.0/*.xml
+          if-no-files-found: error
           retention-days: 7
 
   notify:
