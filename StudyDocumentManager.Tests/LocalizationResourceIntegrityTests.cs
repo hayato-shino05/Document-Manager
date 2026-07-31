@@ -1,4 +1,7 @@
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using StudyDocumentManager.Core;
+using StudyDocumentManager.Services;
 using Xunit;
 
 namespace StudyDocumentManager.Tests;
@@ -31,6 +34,112 @@ public class LocalizationResourceIntegrityTests
         Assert.Contains("Bulk_Selected", resources.Keys);
         Assert.Contains("Bulk_Documents", resources.Keys);
     }
+
+    [Theory]
+    [InlineData("Strings.resx")]
+    [InlineData("Strings.en.resx")]
+    [InlineData("Strings.vi.resx")]
+    [InlineData("Strings.zh.resx")]
+    public void ResourceFiles_ContainI18nRepairKeys(string fileName)
+    {
+        var resources = LoadResources(fileName);
+
+        Assert.Contains("MainWindow_Title", resources.Keys);
+        Assert.Contains("AddEdit_PlaceholderTags", resources.Keys);
+        Assert.Contains("ChangeCategory_DocumentLabel", resources.Keys);
+        Assert.Contains("ChangeCategory_ChipHint", resources.Keys);
+        Assert.Contains("ChangeCategory_EmptyState", resources.Keys);
+        Assert.Contains("ChangeCategory_InputHint", resources.Keys);
+        Assert.Contains("ChangeCategory_Placeholder", resources.Keys);
+        Assert.Contains("ChangeCategory_BtnSave", resources.Keys);
+        Assert.Contains("AddDocDialog_Title", resources.Keys);
+        Assert.Contains("RelatedDocs_RelationType_related", resources.Keys);
+        Assert.Contains("RelatedDocs_RelationType_reference", resources.Keys);
+        Assert.Contains("RelatedDocs_RelationType_supplement", resources.Keys);
+        Assert.Contains("RelatedDocs_RelationType_prerequisite", resources.Keys);
+        Assert.Contains("RelatedDocs_RelationType_sequel", resources.Keys);
+    }
+
+    [Theory]
+    [InlineData("Strings.en.resx")]
+    [InlineData("Strings.vi.resx")]
+    [InlineData("Strings.zh.resx")]
+    public void LocalizedResourceFiles_ContainEveryCanonicalKeyWithNonEmptyValue(string fileName)
+    {
+        var canonical = LoadResources("Strings.resx");
+        var localized = LoadResources(fileName);
+
+        Assert.Equal(canonical.Keys.Order(), localized.Keys.Order());
+        foreach (var (key, canonicalValue) in canonical)
+        {
+            var value = localized[key];
+            Assert.False(string.IsNullOrWhiteSpace(value), $"{fileName} has an empty value for {key}");
+            Assert.Equal(GetFormatItems(canonicalValue), GetFormatItems(value));
+        }
+    }
+
+    [Fact]
+    public void EnglishResourceFile_DoesNotContainCjkFallbackText()
+    {
+        var resources = LoadResources("Strings.en.resx");
+
+        Assert.DoesNotContain(
+            resources,
+            pair => !pair.Key.StartsWith("Lang_", StringComparison.Ordinal)
+                && Regex.IsMatch(pair.Value, "[\\p{IsCJKUnifiedIdeographs}\\p{IsHiragana}\\p{IsKatakana}]"));
+    }
+
+    [Theory]
+    [InlineData(SupportedLanguage.English, "Strings.en.resx")]
+    [InlineData(SupportedLanguage.Vietnamese, "Strings.vi.resx")]
+    [InlineData(SupportedLanguage.Chinese, "Strings.zh.resx")]
+    public void LocalizationService_ResolvesEveryLocalizedResourceValue(SupportedLanguage language, string fileName)
+    {
+        var expected = LoadResources(fileName);
+        var localization = new LocalizationService();
+        localization.SetLanguage(language);
+
+        foreach (var (key, value) in expected)
+            Assert.Equal(NormalizeLineEndings(value), NormalizeLineEndings(localization[key]));
+    }
+
+    [Theory]
+    [InlineData("Strings.resx")]
+    [InlineData("Strings.en.resx")]
+    [InlineData("Strings.vi.resx")]
+    [InlineData("Strings.zh.resx")]
+    public void ResourceFiles_ContainEveryKnownRuntimeKey(string fileName)
+    {
+        var resources = LoadResources(fileName);
+        var runtimeKeys = new[]
+        {
+            "BatchImport_BtnBrowse",
+            "BatchImport_BtnScan",
+            "BatchImport_ColPath",
+            "BatchImport_ColSize",
+            "BatchImport_LblDefaultSubject",
+            "BatchImport_LblFolder",
+            "Bulk_BtnDeselectAll",
+            "BulkDelete_ColDateAdded",
+            "Menu_ChangeLanguage",
+            "Search_BtnSearch",
+            "Search_Label"
+        };
+
+        foreach (var key in runtimeKeys)
+        {
+            Assert.True(resources.TryGetValue(key, out var value), $"{fileName} is missing {key}");
+            Assert.False(string.IsNullOrWhiteSpace(value), $"{fileName} has an empty value for {key}");
+        }
+    }
+
+    private static string NormalizeLineEndings(string value)
+        => value.Replace("\r\n", "\n");
+
+    private static string[] GetFormatItems(string value)
+        => Regex.Matches(value, "\\{(\\d+)(?:[^}]*)\\}")
+            .Select(match => match.Groups[1].Value)
+            .ToArray();
 
     private static Dictionary<string, string> LoadResources(string fileName)
     {

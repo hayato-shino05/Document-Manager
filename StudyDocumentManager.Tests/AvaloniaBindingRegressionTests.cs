@@ -154,6 +154,30 @@ public class AvaloniaBindingRegressionTests
     }
 
     [AvaloniaFact]
+    public void ChangeCategoryDialog_RefreshesDocumentLabelWhenLanguageChanges()
+    {
+        var localization = GetLocalization();
+        var dialog = new ChangeCategoryDialog("Algorithms notes", ["Math"], "Math", localization);
+        dialog.Show();
+
+        try
+        {
+            var nameLabel = dialog.FindControl<TextBlock>("DocNameLabel");
+            Assert.NotNull(nameLabel);
+            Assert.Equal("文書: \"Algorithms notes\"", nameLabel!.Text);
+
+            localization.SetLanguage(Core.SupportedLanguage.English);
+            FlushAvaloniaBindings();
+
+            Assert.Equal("Document: \"Algorithms notes\"", nameLabel.Text);
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void RelatedDocuments_RendersEnglishDocumentValues()
     {
         var localization = GetLocalization();
