@@ -53,6 +53,7 @@ public partial class FileIntegrityCheckModel : ModelBase
                 {
                     Document = doc,
                     FilePath = doc.FilePath,
+                    StatusKey = "Integrity_FileNotExist",
                     Status = _loc["Integrity_FileNotExist"]
                 });
             }
@@ -158,11 +159,30 @@ public partial class FileIntegrityCheckModel : ModelBase
         await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
             string.Format(_loc["Integrity_MovedToTrash"], removed));
     }
+
+    private void RefreshLocalizedStrings()
+    {
+        StatusText = FormatLocalized(_statusKey, _statusArguments);
+        foreach (var result in Results)
+            result.Status = FormatLocalized(result.StatusKey, result.StatusArguments);
+    }
+
+    private void SetLocalizedStatus(string key, params object[] args)
+    {
+        _statusKey = key;
+        _statusArguments = args;
+        StatusText = FormatLocalized(key, args);
+    }
+
+    private string FormatLocalized(string key, params object[] args)
+        => args.Length == 0 ? _loc[key] : string.Format(_loc[key], args);
 }
 
 public partial class IntegrityResult : ObservableObject
 {
     public StudyDocument Document { get; set; } = new();
     public string FilePath { get; set; } = string.Empty;
+    public string StatusKey { get; set; } = string.Empty;
+    public object[] StatusArguments { get; set; } = [];
     [ObservableProperty] private string _status = string.Empty;
 }

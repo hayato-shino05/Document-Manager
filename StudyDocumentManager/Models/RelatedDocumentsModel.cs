@@ -20,17 +20,18 @@ public partial class RelatedDocumentsModel : ModelBase
     [ObservableProperty] private ObservableCollection<RelatedDocItem> _relatedDocuments = new();
     [ObservableProperty] private ObservableCollection<StudyDocument> _availableDocuments = new();
     [ObservableProperty] private StudyDocument? _selectedAvailableDoc;
-    [ObservableProperty] private string _selectedRelationType = "related";
+    [ObservableProperty] private string _selectedRelationType = string.Empty;
 
-    // DB stores English keys; UI displays localized labels
-    public List<string> RelationTypes { get; } = new()
-    {
+    private static readonly string[] CanonicalRelationTypes =
+    [
         "related",
         "reference",
         "supplement",
         "prerequisite",
         "sequel"
-    };
+    ];
+
+    public List<string> RelationTypes { get; private set; } = [];
 
     public RelatedDocumentsModel(IDocumentRepository repository, IRelatedDocumentRepository relatedDocRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
@@ -39,6 +40,8 @@ public partial class RelatedDocumentsModel : ModelBase
         _dialogService = dialogService;
         _navigationService = navigationService;
         _loc = loc;
+        _loc.LanguageChanged += (_, _) => RefreshLocalizedStrings();
+        RefreshRelationTypes();
     }
 
     public void Load(int docId, string docName)
@@ -59,7 +62,8 @@ public partial class RelatedDocumentsModel : ModelBase
             {
                 Document = doc,
                 RelationId = relId,
-                RelationType = relType
+                CanonicalRelationType = relType,
+                RelationType = LocalizeRelationType(relType)
             });
         }
     }
@@ -74,12 +78,41 @@ public partial class RelatedDocumentsModel : ModelBase
             allDocs.Where(d => !relatedIds.Contains(d.Id)));
     }
 
+    private void RefreshLocalizedStrings()
+    {
+        RefreshRelationTypes();
+        foreach (var item in RelatedDocuments)
+            item.RelationType = LocalizeRelationType(item.CanonicalRelationType);
+    }
+
+    private void RefreshRelationTypes()
+    {
+        var selectedCanonical = ToCanonicalRelationType(SelectedRelationType);
+        RelationTypes = [.. CanonicalRelationTypes.Select(LocalizeRelationType)];
+        OnPropertyChanged(nameof(RelationTypes));
+        SelectedRelationType = LocalizeRelationType(selectedCanonical);
+    }
+
+    private string LocalizeRelationType(string canonical)
+        => _loc[$"RelatedDocs_RelationType_{canonical}"];
+
+    private string ToCanonicalRelationType(string value)
+    {
+        foreach (var canonical in CanonicalRelationTypes)
+        {
+            if (value == canonical || value == LocalizeRelationType(canonical))
+                return canonical;
+        }
+
+        return "related";
+    }
+
     [RelayCommand]
     private void AddRelation()
     {
         if (SelectedAvailableDoc == null) return;
 
-        _relatedDocRepo.AddRelation(DocumentId, SelectedAvailableDoc.Id, SelectedRelationType);
+        _relatedDocRepo.AddRelation(DocumentId, SelectedAvailableDoc.Id, ToCanonicalRelationType(SelectedRelationType));
         RefreshRelated();
         LoadAvailable();
     }
@@ -106,5 +139,6 @@ public class RelatedDocItem
 {
     public StudyDocument Document { get; set; } = new();
     public int RelationId { get; set; }
-    public string RelationType { get; set; } = "related";
+    public string CanonicalRelationType { get; set; } = string.Empty;
+    public string RelationType { get; set; } = string.Empty;
 }

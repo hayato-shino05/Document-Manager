@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using StudyDocumentManager.Core.Interfaces;
 
 namespace StudyDocumentManager.Views;
 
@@ -11,17 +12,24 @@ public partial class ChangeCategoryDialog : Window
 {
     public string? Result { get; private set; }
 
+    private readonly ILocalizationService? _loc;
+    private readonly string _documentName = string.Empty;
     private AutoCompleteBox? _categoryInput;
 
     public ChangeCategoryDialog() { } // XAML loader
 
-    public ChangeCategoryDialog(string documentName, IList<string> existingCategories, string currentCategory)
+    public ChangeCategoryDialog(string documentName, IList<string> existingCategories, string currentCategory, ILocalizationService? loc = null)
     {
         InitializeComponent();
 
-        // ドキュメント名ラベルを設定
-        var nameLabel = this.FindControl<TextBlock>("DocNameLabel")!;
-        nameLabel.Text = $"Document: \"{documentName}\"";
+        _loc = loc;
+        _documentName = documentName;
+        UpdateDocumentLabel();
+        if (_loc != null)
+        {
+            _loc.LanguageChanged += OnLanguageChanged;
+            Closed += (_, _) => _loc.LanguageChanged -= OnLanguageChanged;
+        }
 
         _categoryInput = this.FindControl<AutoCompleteBox>("CategoryInput")!;
         _categoryInput.ItemsSource = existingCategories;
@@ -42,6 +50,20 @@ public partial class ChangeCategoryDialog : Window
 
         // ダイアログ表示時にインプットへフォーカス
         this.Opened += (_, _) => _categoryInput.Focus();
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+        => UpdateDocumentLabel();
+
+    private void UpdateDocumentLabel()
+    {
+        var nameLabel = this.FindControl<TextBlock>("DocNameLabel");
+        if (nameLabel == null)
+            return;
+
+        nameLabel.Text = _loc == null
+            ? $"Document: \"{_documentName}\""
+            : string.Format(_loc["ChangeCategory_DocumentLabel"], _documentName);
     }
 
     // Được gọi từ AXAML ItemTemplate DataTemplate Click="OnChipClicked"

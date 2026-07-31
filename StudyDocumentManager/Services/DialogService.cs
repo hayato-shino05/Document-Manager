@@ -219,7 +219,7 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         var owner = GetMainWindow();
         if (owner == null) return null;
 
-        var dialog = new ChangeCategoryDialog(documentName, existingCategories, currentCategory);
+        var dialog = new ChangeCategoryDialog(documentName, existingCategories, currentCategory, _loc);
         await dialog.ShowDialog(owner);
         return dialog.Result;
     }

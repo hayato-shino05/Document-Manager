@@ -694,6 +694,30 @@
   <data name="Collection_AddToTitle" xml:space="preserve"><value>"{0}" に文書を追加</value></data>
 
   <data name="BatchImport_InvalidDrop" xml:space="preserve"><value>この画面ではファイルをドロップできません</value></data>
+  <data name="MainWindow_Title" xml:space="preserve"><value>Study Document Manager - Professional Edition</value></data>
+  <data name="AddEdit_PlaceholderTags" xml:space="preserve"><value>tag1, tag2, tag3...</value></data>
+  <data name="ChangeCategory_DocumentLabel" xml:space="preserve"><value>文書: "{0}"</value></data>
+  <data name="ChangeCategory_ChipHint" xml:space="preserve"><value>既存カテゴリをクリックすると入力欄に反映されます</value></data>
+  <data name="ChangeCategory_EmptyState" xml:space="preserve"><value>利用可能なカテゴリがありません</value></data>
+  <data name="ChangeCategory_InputHint" xml:space="preserve"><value>新しいカテゴリ名</value></data>
+  <data name="ChangeCategory_Placeholder" xml:space="preserve"><value>カテゴリを入力...</value></data>
+  <data name="ChangeCategory_BtnSave" xml:space="preserve"><value>保存</value></data>
+  <data name="RelatedDocs_RelationType_related" xml:space="preserve"><value>関連</value></data>
+  <data name="RelatedDocs_RelationType_reference" xml:space="preserve"><value>参照</value></data>
+  <data name="RelatedDocs_RelationType_supplement" xml:space="preserve"><value>補足</value></data>
+  <data name="RelatedDocs_RelationType_prerequisite" xml:space="preserve"><value>前提</value></data>
+  <data name="RelatedDocs_RelationType_sequel" xml:space="preserve"><value>続編</value></data>
+  <data name="BatchImport_BtnBrowse" xml:space="preserve"><value>参照</value></data>
+  <data name="BatchImport_BtnScan" xml:space="preserve"><value>スキャン</value></data>
+  <data name="BatchImport_ColPath" xml:space="preserve"><value>パス</value></data>
+  <data name="BatchImport_ColSize" xml:space="preserve"><value>サイズ</value></data>
+  <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>デフォルト科目</value></data>
+  <data name="BatchImport_LblFolder" xml:space="preserve"><value>フォルダ</value></data>
+  <data name="Bulk_BtnDeselectAll" xml:space="preserve"><value>すべて解除</value></data>
+  <data name="BulkDelete_ColDateAdded" xml:space="preserve"><value>追加日</value></data>
+  <data name="Menu_ChangeLanguage" xml:space="preserve"><value>言語を変更</value></data>
+  <data name="Search_BtnSearch" xml:space="preserve"><value>検索</value></data>
+  <data name="Search_Label" xml:space="preserve"><value>検索:</value></data>
 </root>
 
 

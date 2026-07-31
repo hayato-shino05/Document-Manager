@@ -167,14 +167,14 @@
   <data name="Integrity_SelectNewFile" xml:space="preserve"><value>Select New File</value></data>
   <data name="Integrity_FileFilter" xml:space="preserve"><value>All (*.*)|*.*|PDF (*.pdf)|*.pdf|Word (*.docx;*.doc)|*.docx;*.doc|Excel (*.xlsx)|*.xlsx</value></data>
   <data name="Integrity_PathUpdated" xml:space="preserve"><value>File path updated</value></data>
-  <data name="Integrity_ConfirmClearPath" xml:space="preserve"><value>ファイルパスを削除しますか？
-文書のメタデータは保持されます（パスは空になります）。</value></data>
-  <data name="Integrity_ConfirmDeleteDoc" xml:space="preserve"><value>文書を削除しますか：
-"{0}"？
+  <data name="Integrity_ConfirmClearPath" xml:space="preserve"><value>Clear the file path?
+The document metadata will be kept and the path will be empty.</value></data>
+  <data name="Integrity_ConfirmDeleteDoc" xml:space="preserve"><value>Delete this document:
+"{0}"?
 
-（ゴミ箱から復元可能）</value></data>
-  <data name="Integrity_ConfirmRemoveAll" xml:space="preserve"><value>欠損ファイルの{0}件の文書をデータベースから削除しますか？
-（ゴミ箱から復元可能）</value></data>
+(It can be restored from the recycle bin)</value></data>
+  <data name="Integrity_ConfirmRemoveAll" xml:space="preserve"><value>Remove {0} document(s) with missing files from the database?
+(They can be restored from the recycle bin)</value></data>
   <data name="Integrity_MovedToTrash" xml:space="preserve"><value>Moved {0} item(s) to recycle bin</value></data>
   <data name="Category_RenameSubjectTitle" xml:space="preserve"><value>Rename Category</value></data>
   <data name="Category_RenameTypeTitle" xml:space="preserve"><value>Rename Type</value></data>
@@ -184,9 +184,9 @@
   <data name="Category_ConfirmDeleteSubject" xml:space="preserve"><value>Delete Category</value></data>
   <data name="Category_ConfirmDeleteType" xml:space="preserve"><value>Delete Type</value></data>
   <data name="Category_DeleteConfirmMsg" xml:space="preserve"><value>Delete {0}?</value></data>
-  <data name="Category_DeleteWithDocsMsg" xml:space="preserve"><value>{0}を削除しますか？
+  <data name="Category_DeleteWithDocsMsg" xml:space="preserve"><value>Delete {0}?
 
-関連する{1}件の文書はゴミ箱に移動されます。</value></data>
+The related {1} document(s) will be moved to the recycle bin.</value></data>
   <data name="Category_SelectedCount" xml:space="preserve"><value>Selected {0} items</value></data>
   <data name="Category_DeletedSubject" xml:space="preserve"><value>Deleted category '{0}'</value></data>
   <data name="Category_DeletedSubjects" xml:space="preserve"><value>Deleted {0} categories</value></data>
@@ -214,11 +214,11 @@
   <data name="Dashboard_ConfirmDelete" xml:space="preserve"><value>Move '{0}' to recycle bin?</value></data>
   <data name="Dashboard_CannotUpdateCategory" xml:space="preserve"><value>Cannot update category</value></data>
   <data name="Dashboard_BackupTitle" xml:space="preserve"><value>Backup</value></data>
-  <data name="Dashboard_BackupDone" xml:space="preserve"><value>データベースをバックアップしました：
+  <data name="Dashboard_BackupDone" xml:space="preserve"><value>Database backed up to:
 {0}</value></data>
   <data name="Dashboard_BackupError" xml:space="preserve"><value>Cannot backup: {0}</value></data>
   <data name="Dashboard_ExportTitle" xml:space="preserve"><value>CSV Export</value></data>
-  <data name="Dashboard_ExportDone" xml:space="preserve"><value>{0}件の文書をエクスポートしました：
+  <data name="Dashboard_ExportDone" xml:space="preserve"><value>Exported {0} document(s) to:
 {1}</value></data>
   <data name="Dashboard_ExportError" xml:space="preserve"><value>Cannot export CSV: {0}</value></data>
   <data name="Dashboard_CsvYes" xml:space="preserve"><value>Yes</value></data>
@@ -235,26 +235,26 @@
   <data name="Dashboard_FileMissingMessage" xml:space="preserve"><value>This file is missing. Open File Integrity to relink the path or clear it?</value></data>
   <data name="Dashboard_About" xml:space="preserve"><value>Study Document Manager v{0}
 
-個人向け学習文書管理アプリケーション
+A personal study document management application
 Framework: Avalonia UI (.NET 9)
 Database: SQLite (local)
 
 © 2025 hayato-shino05
 GitHub: github.com/hayato-shino05/study-document-manager</value></data>
   <data name="Main_UpdateTitle" xml:space="preserve"><value>Update</value></data>
-  <data name="Main_CannotConnect" xml:space="preserve"><value>サーバーに接続できません。
-ネットワーク接続を確認してください。</value></data>
+  <data name="Main_CannotConnect" xml:space="preserve"><value>Cannot connect to the server.
+Please check your network connection.</value></data>
   <data name="Main_AlreadyLatest" xml:space="preserve"><value>You are using the latest version (v{0}).</value></data>
   <data name="Main_About" xml:space="preserve"><value>Study Document Manager
 Professional Edition
 
-バージョン {0}
+Version {0}
 
-学習文書管理アプリケーション
+Study document management application
 MVVM • Avalonia UI • .NET 9.0
 
-制作: Vũ Đức Dũng - TT601-K14
-指導: Lê Thị Mai
+Created by: Vũ Đức Dũng - TT601-K14
+Instructor: Lê Thị Mai
 
 © 2024-2025 hayato-shino05
 GitHub: hayato-shino05/study-document-manager</value></data>
@@ -263,10 +263,10 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="AddEdit_PageTitleAdd" xml:space="preserve"><value>Add Document</value></data>
   <data name="AddEdit_PageTitleEdit" xml:space="preserve"><value>Edit Document</value></data>
   <data name="AddEdit_NameRequired" xml:space="preserve"><value>Document name is required</value></data>
-  <data name="AddEdit_SaveUpdated" xml:space="preserve"><value>文書を更新しました</value></data>
-  <data name="AddEdit_SaveAdded" xml:space="preserve"><value>文書を追加しました</value></data>
-  <data name="AddEdit_SaveError" xml:space="preserve"><value>文書を保存できません。もう一度お試しください。</value></data>
-  <data name="AddEdit_BrowseFile" xml:space="preserve"><value>文書を選択</value></data>
+  <data name="AddEdit_SaveUpdated" xml:space="preserve"><value>Document updated</value></data>
+  <data name="AddEdit_SaveAdded" xml:space="preserve"><value>Document added</value></data>
+  <data name="AddEdit_SaveError" xml:space="preserve"><value>Could not save the document. Please try again.</value></data>
+  <data name="AddEdit_BrowseFile" xml:space="preserve"><value>Select Document</value></data>
   <data name="AddEdit_FileFilter" xml:space="preserve"><value>All Files|*.*|PDF|*.pdf|Word|*.doc;*.docx|Excel|*.xls;*.xlsx|Image|*.png;*.jpg;*.jpeg;*.gif;*.bmp</value></data>
   <data name="Duplicate_NoDuplicates" xml:space="preserve"><value>No duplicate documents found</value></data>
   <data name="Duplicate_ConfirmDelete" xml:space="preserve"><value>Delete document '{0}' (ID: {1})?</value></data>
@@ -531,7 +531,7 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="Update_NewVersionTitle" xml:space="preserve"><value>Update Available</value></data>
   <data name="Update_NewVersionMsg" xml:space="preserve"><value>New version {0} is available!</value></data>
   <data name="Update_OpenBrowserPrompt" xml:space="preserve"><value>Open download page?</value></data>
-  <data name="Update_CannotOpenBrowser" xml:space="preserve"><value>ブラウザを開けません。\nアクセス先: {0}</value></data>
+  <data name="Update_CannotOpenBrowser" xml:space="preserve"><value>Could not open the browser.\nGo to: {0}</value></data>
   <data name="Update_StatusNewVersion" xml:space="preserve"><value>New version {0} available! Help -&gt; Check for Updates</value></data>
   <data name="AddToCollState_DocCount" xml:space="preserve"><value>Document count: {0}</value></data>
   <data name="AddToCollState_DocCountFiltered" xml:space="preserve"><value>{0} / {1} documents</value></data>
@@ -583,7 +583,7 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="Update_OpenDownloadPage" xml:space="preserve"><value>Open download page?</value></data>
   <data name="Update_DialogTitle" xml:space="preserve"><value>Update Available</value></data>
   <data name="Update_ErrorTitle" xml:space="preserve"><value>Error</value></data>
-  <data name="Update_BrowserError" xml:space="preserve"><value>ブラウザを開けません。\nアクセス先: {0}</value></data>
+  <data name="Update_BrowserError" xml:space="preserve"><value>Could not open the browser.\nGo to: {0}</value></data>
   <data name="Update_ToastNewVersion" xml:space="preserve"><value>New version {0} available! Help -&gt; Check for Updates</value></data>
   <data name="Collection_DocCount" xml:space="preserve"><value>Document count: {0}</value></data>
   <data name="Collection_DocCountFiltered" xml:space="preserve"><value>{0} / {1} documents</value></data>
@@ -598,4 +598,28 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="Dashboard_RestoreRestartRequired" xml:space="preserve"><value>The database was restored. Please reopen the application.</value></data>
   <data name="Dashboard_ExportWriteFailed" xml:space="preserve"><value>Could not write the CSV file</value></data>
   <data name="BatchImport_InvalidDrop" xml:space="preserve"><value>Files cannot be dropped on this screen</value></data>
+  <data name="MainWindow_Title" xml:space="preserve"><value>Study Document Manager - Professional Edition</value></data>
+  <data name="AddEdit_PlaceholderTags" xml:space="preserve"><value>tag1, tag2, tag3...</value></data>
+  <data name="ChangeCategory_DocumentLabel" xml:space="preserve"><value>Document: "{0}"</value></data>
+  <data name="ChangeCategory_ChipHint" xml:space="preserve"><value>Click an existing category to reuse it</value></data>
+  <data name="ChangeCategory_EmptyState" xml:space="preserve"><value>No available categories</value></data>
+  <data name="ChangeCategory_InputHint" xml:space="preserve"><value>New category name</value></data>
+  <data name="ChangeCategory_Placeholder" xml:space="preserve"><value>Enter category...</value></data>
+  <data name="ChangeCategory_BtnSave" xml:space="preserve"><value>Save</value></data>
+  <data name="RelatedDocs_RelationType_related" xml:space="preserve"><value>Related</value></data>
+  <data name="RelatedDocs_RelationType_reference" xml:space="preserve"><value>Reference</value></data>
+  <data name="RelatedDocs_RelationType_supplement" xml:space="preserve"><value>Supplement</value></data>
+  <data name="RelatedDocs_RelationType_prerequisite" xml:space="preserve"><value>Prerequisite</value></data>
+  <data name="RelatedDocs_RelationType_sequel" xml:space="preserve"><value>Sequel</value></data>
+  <data name="BatchImport_BtnBrowse" xml:space="preserve"><value>Browse</value></data>
+  <data name="BatchImport_BtnScan" xml:space="preserve"><value>Scan</value></data>
+  <data name="BatchImport_ColPath" xml:space="preserve"><value>Path</value></data>
+  <data name="BatchImport_ColSize" xml:space="preserve"><value>Size</value></data>
+  <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>Default Subject</value></data>
+  <data name="BatchImport_LblFolder" xml:space="preserve"><value>Folder</value></data>
+  <data name="Bulk_BtnDeselectAll" xml:space="preserve"><value>Deselect All</value></data>
+  <data name="BulkDelete_ColDateAdded" xml:space="preserve"><value>Date Added</value></data>
+  <data name="Menu_ChangeLanguage" xml:space="preserve"><value>Change Language</value></data>
+  <data name="Search_BtnSearch" xml:space="preserve"><value>Search</value></data>
+  <data name="Search_Label" xml:space="preserve"><value>Search:</value></data>
 </root>
