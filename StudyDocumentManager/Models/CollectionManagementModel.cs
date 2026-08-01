@@ -35,6 +35,7 @@ public partial class CollectionManagementModel : ModelBase
 
     private void LoadCollections()
     {
+        int? selectedId = SelectedCollection?.Id;
         try
         {
             var data = _collectionRepo.GetAll();
@@ -46,6 +47,9 @@ public partial class CollectionManagementModel : ModelBase
                     Description = c.Description,
                     ItemCount = c.ItemCount
                 }));
+            SelectedCollection = selectedId is int id
+                ? Collections.FirstOrDefault(c => c.Id == id)
+                : null;
         }
         catch (Exception ex)
         {
@@ -73,14 +77,18 @@ public partial class CollectionManagementModel : ModelBase
         try
         {
             var name = await _dialogService.ShowInputAsync(_loc["Collection_CreateTitle"], _loc["Collection_CreateLabel"]);
+            if (string.IsNullOrWhiteSpace(name)) return;
 
-            if (!string.IsNullOrWhiteSpace(name))
+            var trimmed = name.Trim();
+            if (_collectionRepo.Create(trimmed) <= 0)
             {
-                _collectionRepo.Create(name);
-                LoadCollections();
-                await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
-                    string.Format(_loc["Collection_Created"], name));
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+                return;
             }
+
+            LoadCollections();
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
+                string.Format(_loc["Collection_Created"], trimmed));
         }
         catch (Exception ex)
         {
@@ -94,11 +102,24 @@ public partial class CollectionManagementModel : ModelBase
     {
         if (SelectedCollection == null) return;
 
-        var newName = await _dialogService.ShowInputAsync(_loc["Collection_RenameTitle"], _loc["Category_NewNameLabel"], SelectedCollection.Name);
-        if (!string.IsNullOrWhiteSpace(newName) && newName != SelectedCollection.Name)
+        var collection = SelectedCollection;
+        var newName = await _dialogService.ShowInputAsync(_loc["Collection_RenameTitle"], _loc["Category_NewNameLabel"], collection.Name);
+        if (string.IsNullOrWhiteSpace(newName) || newName == collection.Name) return;
+
+        try
         {
-            _collectionRepo.Update(SelectedCollection.Id, newName);
+            if (!_collectionRepo.Update(collection.Id, newName.Trim()))
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+                return;
+            }
+
             LoadCollections();
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                string.Format(_loc["Collection_LoadError"], ex.Message));
         }
     }
 
@@ -107,14 +128,27 @@ public partial class CollectionManagementModel : ModelBase
     {
         if (SelectedCollection == null) return;
 
+        var collectionId = SelectedCollection.Id;
         var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
             string.Format(_loc["Collection_ConfirmDelete"], SelectedCollection.Name),
             _loc["Action_Delete"], isDanger: true);
-        if (confirmed)
+        if (!confirmed) return;
+
+        try
         {
-            _collectionRepo.Delete(SelectedCollection.Id);
+            if (!_collectionRepo.Delete(collectionId))
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+                return;
+            }
+
             SelectedCollection = null;
             LoadCollections();
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                string.Format(_loc["Collection_LoadError"], ex.Message));
         }
     }
 
@@ -125,12 +159,14 @@ public partial class CollectionManagementModel : ModelBase
 
         try
         {
+            var collectionId = SelectedCollection.Id;
+            var collectionName = SelectedCollection.Name;
             var allDocs = _repository.GetAll();
-            var alreadyIn = _collectionRepo.GetDocuments(SelectedCollection.Id)
+            var alreadyIn = _collectionRepo.GetDocuments(collectionId)
                                           .Select(d => d.Id)
                                           .ToList();
 
-            if (allDocs.Count == alreadyIn.Count)
+            if (allDocs.Count > 0 && allDocs.Count == alreadyIn.Count)
             {
                 await _dialogService.ShowMessageAsync(
                     _loc["Dialog_Notice"],
@@ -139,26 +175,35 @@ public partial class CollectionManagementModel : ModelBase
             }
 
             var selected = await _customDialogService.ShowDocumentPickerAsync(
-                SelectedCollection.Name,
+                collectionName,
                 allDocs,
                 alreadyIn);
 
             if (selected == null || selected.Count == 0) return;
 
-            int selectedId = SelectedCollection.Id;
-            string collectionName = SelectedCollection.Name;
-
             int addedCount = 0;
+            bool failed = false;
             foreach (var doc in selected)
             {
-                bool ok = _collectionRepo.AddDocument(selectedId, doc.Id);
-                if (ok) addedCount++;
+                try
+                {
+                    if (_collectionRepo.AddDocument(collectionId, doc.Id))
+                        addedCount++;
+                    else
+                        failed = true;
+                }
+                catch
+                {
+                    failed = true;
+                }
             }
 
-            OnSelectedCollectionChanged(SelectedCollection);
-
             LoadCollections();
-            SelectedCollection = Collections.FirstOrDefault(c => c.Id == selectedId);
+            if (failed || addedCount != selected.Count)
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+                return;
+            }
 
             await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
                 string.Format(_loc["Collection_AddedDocs"], addedCount, collectionName));
@@ -177,13 +222,23 @@ public partial class CollectionManagementModel : ModelBase
 
         var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
             string.Format(_loc["Collection_ConfirmRemoveDoc"], doc.Name));
-        if (confirmed)
+        if (!confirmed) return;
+
+        try
         {
             int selectedId = SelectedCollection.Id;
-            _collectionRepo.RemoveDocument(selectedId, doc.Id);
-            OnSelectedCollectionChanged(SelectedCollection);
+            if (!_collectionRepo.RemoveDocument(selectedId, doc.Id))
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+                return;
+            }
+
             LoadCollections();
-            SelectedCollection = Collections.FirstOrDefault(c => c.Id == selectedId);
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                string.Format(_loc["Collection_LoadError"], ex.Message));
         }
     }
 
@@ -203,13 +258,27 @@ public partial class CollectionManagementModel : ModelBase
         if (!confirmed) return;
 
         int selectedId = SelectedCollection.Id;
-        foreach (var d in targets)
-            _collectionRepo.RemoveDocument(selectedId, d.Id);
+        int removedCount = 0;
+        bool failed = false;
+        foreach (var document in targets)
+        {
+            try
+            {
+                if (_collectionRepo.RemoveDocument(selectedId, document.Id))
+                    removedCount++;
+                else
+                    failed = true;
+            }
+            catch
+            {
+                failed = true;
+            }
+        }
 
-        OnSelectedCollectionChanged(SelectedCollection);
         LoadCollections();
-        SelectedCollection = Collections.FirstOrDefault(c => c.Id == selectedId);
         SelectedDocumentsInCollection = new List<StudyDocument>();
+        if (failed || removedCount != targets.Count)
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
     }
 
     [RelayCommand]

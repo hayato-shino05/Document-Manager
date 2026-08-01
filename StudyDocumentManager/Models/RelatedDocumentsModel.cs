@@ -108,13 +108,22 @@ public partial class RelatedDocumentsModel : ModelBase
     }
 
     [RelayCommand]
-    private void AddRelation()
+    private async Task AddRelation()
     {
-        if (SelectedAvailableDoc == null) return;
+        var document = SelectedAvailableDoc;
+        if (document == null) return;
 
-        _relatedDocRepo.AddRelation(DocumentId, SelectedAvailableDoc.Id, ToCanonicalRelationType(SelectedRelationType));
-        RefreshRelated();
-        LoadAvailable();
+        try
+        {
+            _relatedDocRepo.AddRelation(DocumentId, document.Id, ToCanonicalRelationType(SelectedRelationType));
+            SelectedAvailableDoc = null;
+            RefreshRelated();
+            LoadAvailable();
+        }
+        catch
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+        }
     }
 
     [RelayCommand]
@@ -126,9 +135,16 @@ public partial class RelatedDocumentsModel : ModelBase
             string.Format(_loc["Related_ConfirmRemove"], item.Document.Name));
         if (!confirmed) return;
 
-        _relatedDocRepo.RemoveRelation(item.RelationId);
-        RefreshRelated();
-        LoadAvailable();
+        try
+        {
+            _relatedDocRepo.RemoveRelation(item.RelationId);
+            RefreshRelated();
+            LoadAvailable();
+        }
+        catch
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+        }
     }
 
     [RelayCommand]
