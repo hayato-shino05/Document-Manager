@@ -91,16 +91,29 @@ public partial class FileIntegrityCheckModel : ModelBase
     {
         if (item == null) return;
 
-        var newPath = await _fileDialogService.ShowOpenFileAsync(
-            _loc["Integrity_SelectNewFile"], _loc["Integrity_FileFilter"]);
-        if (string.IsNullOrWhiteSpace(newPath)) return;
-
-        if (_fileIntegrityRepo.UpdateDocumentPath(item.Document.Id, newPath))
+        try
         {
+            var newPath = await _fileDialogService.ShowOpenFileAsync(
+                _loc["Integrity_SelectNewFile"], _loc["Integrity_FileFilter"]);
+            if (string.IsNullOrWhiteSpace(newPath)) return;
+
+            if (!_fileIntegrityRepo.UpdateDocumentPath(item.Document.Id, newPath))
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+                return;
+            }
+
             Results.Remove(item);
             MissingCount--;
             SetLocalizedStatus("Status_MissingFiles", MissingCount);
             await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Integrity_PathUpdated"]);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
         }
     }
 
@@ -112,15 +125,28 @@ public partial class FileIntegrityCheckModel : ModelBase
     {
         if (item == null) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
-            _loc["Integrity_ConfirmClearPath"]);
-        if (!confirmed) return;
-
-        if (_fileIntegrityRepo.ClearDocumentPath(item.Document.Id))
+        try
         {
+            var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+                _loc["Integrity_ConfirmClearPath"]);
+            if (!confirmed) return;
+
+            if (!_fileIntegrityRepo.ClearDocumentPath(item.Document.Id))
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+                return;
+            }
+
             Results.Remove(item);
             MissingCount--;
             SetLocalizedStatus("Status_MissingFiles", MissingCount);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
         }
     }
 
@@ -132,16 +158,29 @@ public partial class FileIntegrityCheckModel : ModelBase
     {
         if (item == null) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
-            string.Format(_loc["Integrity_ConfirmDeleteDoc"], item.Document.Name),
-            _loc["Action_Delete"], isDanger: true);
-        if (!confirmed) return;
-
-        if (_repository.Delete(item.Document.Id))
+        try
         {
+            var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+                string.Format(_loc["Integrity_ConfirmDeleteDoc"], item.Document.Name),
+                _loc["Action_Delete"], isDanger: true);
+            if (!confirmed) return;
+
+            if (!_repository.Delete(item.Document.Id))
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+                return;
+            }
+
             Results.Remove(item);
             MissingCount--;
             SetLocalizedStatus("Status_MissingFiles", MissingCount);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
         }
     }
 
@@ -153,25 +192,46 @@ public partial class FileIntegrityCheckModel : ModelBase
     {
         if (Results.Count == 0) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
-            string.Format(_loc["Integrity_ConfirmRemoveAll"], Results.Count),
-            _loc["Btn_DeleteAll"], isDanger: true);
-        if (!confirmed) return;
-
-        int removed = 0;
-        foreach (var result in Results.ToList())
+        var total = Results.Count;
+        var removed = 0;
+        try
         {
-            if (_repository.Delete(result.Document.Id))
-            {
-                removed++;
-                Results.Remove(result);
-            }
-        }
+            var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+                string.Format(_loc["Integrity_ConfirmRemoveAll"], total),
+                _loc["Btn_DeleteAll"], isDanger: true);
+            if (!confirmed) return;
 
-        MissingCount = Results.Count;
-        SetLocalizedStatus("Integrity_MovedToTrash", removed);
-        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
-            string.Format(_loc["Integrity_MovedToTrash"], removed));
+            foreach (var result in Results.ToList())
+            {
+                if (_repository.Delete(result.Document.Id))
+                {
+                    removed++;
+                    Results.Remove(result);
+                }
+            }
+
+            MissingCount = Results.Count;
+            if (removed != 0 && Results.Count == 0)
+            {
+                SetLocalizedStatus("Integrity_MovedToTrash", removed);
+                await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
+                    string.Format(_loc["Integrity_MovedToTrash"], removed));
+                return;
+            }
+
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                string.Format(_loc["Operation_Partial"], removed, total));
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+            MissingCount = Results.Count;
+            SetLocalizedStatus("Status_MissingFiles", MissingCount);
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                removed == 0 ? _loc["Msg_Error"] : string.Format(_loc["Operation_Partial"], removed, total));
+        }
     }
 
     private void RefreshLocalizedStrings()

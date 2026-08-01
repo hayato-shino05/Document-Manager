@@ -130,17 +130,33 @@ public partial class BulkDeleteModel : ModelBase
             return;
         }
 
-        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
-            string.Format(_loc["Bulk_ConfirmDelete"], selected.Count),
-            _loc["Action_Delete"], isDanger: true);
-        if (!confirmed) return;
+        try
+        {
+            var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+                string.Format(_loc["Bulk_ConfirmDelete"], selected.Count),
+                _loc["Action_Delete"], isDanger: true);
+            if (!confirmed) return;
 
-        var ids = selected.Select(s => s.Document.Id).ToList();
-        int deleted = _bulkRepo.BulkSoftDelete(ids);
+            var deleted = _bulkRepo.BulkSoftDelete(selected.Select(s => s.Document.Id).ToList());
+            if (deleted != selected.Count)
+            {
+                LoadData(selected.Select(item => item.Document.Id).ToHashSet());
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                    string.Format(_loc["Operation_Partial"], deleted, selected.Count));
+                return;
+            }
 
-        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
-            string.Format(_loc["Bulk_DeleteDone"], deleted));
-        _navigationService.NavigateTo("dashboard");
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
+                string.Format(_loc["Bulk_DeleteDone"], deleted));
+            _navigationService.NavigateTo("dashboard");
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+        }
     }
 
     [RelayCommand]
@@ -153,12 +169,28 @@ public partial class BulkDeleteModel : ModelBase
             return;
         }
 
-        var ids = selected.Select(s => s.Document.Id).ToHashSet();
-        int updated = _bulkRepo.BulkToggleImportant([.. ids], true);
+        try
+        {
+            var ids = selected.Select(s => s.Document.Id).ToHashSet();
+            var updated = _bulkRepo.BulkToggleImportant([.. ids], true);
+            if (updated != selected.Count)
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                    string.Format(_loc["Operation_Partial"], updated, selected.Count));
+                return;
+            }
 
-        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
-            string.Format(_loc["Bulk_MarkImportantDone"], updated));
-        LoadData(ids);
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
+                string.Format(_loc["Bulk_MarkImportantDone"], updated));
+            LoadData(ids);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+        }
     }
 
     [RelayCommand]
@@ -177,16 +209,32 @@ public partial class BulkDeleteModel : ModelBase
             return;
         }
 
-        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Bulk_ChangeSubjectTitle"],
-            string.Format(_loc["Bulk_ConfirmChangeSubject"], selected.Count, NewSubjectValue));
-        if (!confirmed) return;
+        try
+        {
+            var confirmed = await _dialogService.ShowConfirmAsync(_loc["Bulk_ChangeSubjectTitle"],
+                string.Format(_loc["Bulk_ConfirmChangeSubject"], selected.Count, NewSubjectValue));
+            if (!confirmed) return;
 
-        var ids = selected.Select(s => s.Document.Id).ToHashSet();
-        int updated = _bulkRepo.BulkUpdateSubject([.. ids], NewSubjectValue);
+            var ids = selected.Select(s => s.Document.Id).ToHashSet();
+            var updated = _bulkRepo.BulkUpdateSubject([.. ids], NewSubjectValue);
+            if (updated != selected.Count)
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                    string.Format(_loc["Operation_Partial"], updated, selected.Count));
+                return;
+            }
 
-        await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
-            string.Format(_loc["Bulk_ChangeSubjectDone"], updated));
-        LoadData(ids);
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"],
+                string.Format(_loc["Bulk_ChangeSubjectDone"], updated));
+            LoadData(ids);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+        }
     }
 
     [RelayCommand]

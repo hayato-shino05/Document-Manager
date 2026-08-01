@@ -141,6 +141,7 @@
   <data name="Recycle_ConfirmPermanentDelete" xml:space="preserve"><value>Permanently delete '{0}'? This cannot be undone!</value></data>
   <data name="Recycle_ConfirmEmptyTrash" xml:space="preserve"><value>Permanently delete {0} document(s)? This cannot be undone!</value></data>
   <data name="Recycle_EmptyTrashDone" xml:space="preserve"><value>Permanently deleted {0} document(s)</value></data>
+  <data name="Operation_Partial" xml:space="preserve"><value>Processed {0} of {1} documents. The remaining items were kept. Please try again.</value></data>
   <data name="Recycle_RestoreError" xml:space="preserve"><value>Could not restore document</value></data>
   <data name="Recycle_PermanentDeleteError" xml:space="preserve"><value>Could not permanently delete document</value></data>
   <data name="Recycle_PermanentDeleteSuccess" xml:space="preserve"><value>Document permanently deleted</value></data>

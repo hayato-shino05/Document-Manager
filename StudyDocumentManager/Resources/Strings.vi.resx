@@ -442,6 +442,7 @@
   <data name="Recycle_ConfirmPermanentDelete" xml:space="preserve"><value>Xóa vĩnh viễn “{0}”? Bạn không thể hoàn tác thao tác này!</value></data>
   <data name="Recycle_ConfirmEmptyTrash" xml:space="preserve"><value>Xóa vĩnh viễn {0} tài liệu? Bạn không thể hoàn tác thao tác này!</value></data>
   <data name="Recycle_EmptyTrashDone" xml:space="preserve"><value>Đã xóa vĩnh viễn {0} tài liệu</value></data>
+  <data name="Operation_Partial" xml:space="preserve"><value>Đã xử lý {0} trong số {1} tài liệu. Các mục còn lại được giữ lại. Vui lòng thử lại.</value></data>
   <data name="Note_SaveSuccess" xml:space="preserve"><value>Đã lưu ghi chú</value></data>
   <data name="Note_SaveError" xml:space="preserve"><value>Không thể lưu ghi chú</value></data>
   <data name="Note_ConfirmDelete" xml:space="preserve"><value>Xóa ghi chú này?</value></data>

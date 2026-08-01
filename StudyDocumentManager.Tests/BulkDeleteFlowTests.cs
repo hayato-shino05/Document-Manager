@@ -75,6 +75,55 @@ public class BulkDeleteFlowTests
         Assert.All(model.Documents, document => Assert.Equal("Physics", document.Document.Subject));
     }
 
+
+    [Fact]
+    public async Task DeleteSelected_PartialResult_ReloadsOnlyUnresolvedSelection()
+    {
+        var repository = new BulkDocumentRepository([
+            new StudyDocument { Id = 1, Name = "A", Subject = "Math", Type = "PDF" },
+            new StudyDocument { Id = 2, Name = "B", Subject = "Math", Type = "PDF" }
+        ]);
+        var bulkRepository = new BulkOperationRepositoryStub(repository) { SoftDeleteCount = 1 };
+        var model = CreateModel(repository, bulkRepository, new BulkDialogService());
+        model.Initialize();
+        model.Documents[0].IsSelected = true;
+        model.Documents[1].IsSelected = true;
+
+        await model.DeleteSelectedCommand.ExecuteAsync(null);
+
+        Assert.Single(model.Documents);
+        Assert.Equal(2, model.Documents[0].Document.Id);
+        Assert.True(model.Documents[0].IsSelected);
+    }
+
+
+    [Fact]
+    public async Task DeleteSelected_ZeroExceptionOrCancellation_PreservesSelectionWithoutSuccess()
+    {
+        var repository = new BulkDocumentRepository([
+            new StudyDocument { Id = 1, Name = "A", Subject = "Math", Type = "PDF" }
+        ]);
+        var bulkRepository = new BulkOperationRepositoryStub(repository) { SoftDeleteCount = 0 };
+        var dialog = new BulkDialogService();
+        var model = CreateModel(repository, bulkRepository, dialog);
+        model.Initialize();
+        model.Documents[0].IsSelected = true;
+
+        await model.DeleteSelectedCommand.ExecuteAsync(null);
+        Assert.True(model.Documents[0].IsSelected);
+        Assert.Single(dialog.Errors);
+
+        bulkRepository.ThrowOnSoftDelete = true;
+        await model.DeleteSelectedCommand.ExecuteAsync(null);
+        Assert.Equal(2, dialog.Errors.Count);
+
+        bulkRepository.ThrowOnSoftDelete = false;
+        dialog.CancelConfirmation = true;
+        await model.DeleteSelectedCommand.ExecuteAsync(null);
+        Assert.Equal(2, dialog.Errors.Count);
+        Assert.True(model.Documents[0].IsSelected);
+    }
+
     [Fact]
     public void SelectedCountText_ReflectsCount()
     {
@@ -134,6 +183,8 @@ public class BulkDeleteFlowTests
                 document.Subject = subject;
         }
 
+        public void Remove(int id) => _documents.RemoveAll(document => document.Id == id);
+
         private static StudyDocument Clone(StudyDocument source)
             => new()
             {
@@ -154,7 +205,19 @@ public class BulkDeleteFlowTests
 
     private sealed class BulkOperationRepositoryStub(BulkDocumentRepository repository) : IBulkOperationRepository
     {
-        public int BulkSoftDelete(List<int> ids) => ids.Count;
+        public int? SoftDeleteCount { get; set; }
+        public bool ThrowOnSoftDelete { get; set; }
+
+        public int BulkSoftDelete(List<int> ids)
+        {
+            if (ThrowOnSoftDelete)
+                throw new InvalidOperationException();
+
+            var count = SoftDeleteCount ?? ids.Count;
+            foreach (var id in ids.Take(count))
+                repository.Remove(id);
+            return count;
+        }
         public int BulkUpdateSubject(List<int> ids, string subject)
         {
             repository.ChangeSubject(ids, subject);
@@ -185,10 +248,18 @@ public class BulkDeleteFlowTests
     private sealed class BulkDialogService : IDialogService
     {
         public bool ConfirmResult { get; set; } = true;
+        public bool CancelConfirmation { get; set; }
+        public List<string> Errors { get; } = [];
         public Task ShowMessageAsync(string title, string message) => Task.CompletedTask;
-        public Task ShowErrorAsync(string title, string message) => Task.CompletedTask;
-        public Task<bool> ShowConfirmAsync(string title, string message) => Task.FromResult(ConfirmResult);
-        public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false) => Task.FromResult(ConfirmResult);
+        public Task ShowErrorAsync(string title, string message)
+        {
+            Errors.Add(message);
+            return Task.CompletedTask;
+        }
+        public Task<bool> ShowConfirmAsync(string title, string message)
+            => CancelConfirmation ? Task.FromCanceled<bool>(new CancellationToken(true)) : Task.FromResult(ConfirmResult);
+        public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false)
+            => CancelConfirmation ? Task.FromCanceled<bool>(new CancellationToken(true)) : Task.FromResult(ConfirmResult);
         public Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "") => Task.FromResult<string?>(null);
     }
 

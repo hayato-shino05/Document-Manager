@@ -123,9 +123,93 @@ public class ScanRecoveryTests
         Assert.Equal(0, model.TotalGroups);
     }
 
+
+    [Fact]
+    public async Task DeleteDuplicateAsync_FailedOrCancelledDelete_PreservesGroupsAndReportsFailure()
+    {
+        var repository = new ThrowingDocumentRepository
+        {
+            ThrowOnGetAll = false,
+            DeleteResult = false,
+            Documents = [new StudyDocument { Id = 1, Name = "Duplicate" }, new StudyDocument { Id = 2, Name = "Duplicate" }]
+        };
+        var dialogs = new RecordingDialogService { ConfirmResult = true };
+        var model = new DuplicateDetectionModel(repository, dialogs, new LocalizationServiceStub());
+        await model.ScanDuplicatesCommand.ExecuteAsync(null);
+
+        await model.DeleteDuplicateCommand.ExecuteAsync(model.DuplicateGroups[0].Documents[0]);
+
+        Assert.Single(model.DuplicateGroups);
+        Assert.Single(dialogs.Errors);
+
+        dialogs.ThrowCancellation = true;
+        await model.DeleteDuplicateCommand.ExecuteAsync(model.DuplicateGroups[0].Documents[0]);
+
+        Assert.Single(model.DuplicateGroups);
+        Assert.Single(dialogs.Errors);
+    }
+
+    [Fact]
+    public async Task IntegrityMutations_FailedOutcomesPreserveItemsAndReportFailure()
+    {
+        var repository = new ThrowingDocumentRepository { ThrowOnGetAll = false, DeleteResult = false };
+        var integrityRepository = new FileIntegrityRepositoryStub();
+        var dialogs = new RecordingDialogService { ConfirmResult = true };
+        var fileDialogs = new FileDialogServiceStub { SelectedFile = "C:\\replacement.pdf" };
+        var model = new FileIntegrityCheckModel(repository, integrityRepository, dialogs, fileDialogs, new LocalizationServiceStub());
+        var item = new IntegrityResult { Document = new StudyDocument { Id = 1, Name = "Missing" } };
+        model.Results.Add(item);
+        model.MissingCount = 1;
+
+        await model.SelectNewFileCommand.ExecuteAsync(item);
+        await model.ClearFilePathCommand.ExecuteAsync(item);
+        await model.DeleteDocumentCommand.ExecuteAsync(item);
+
+        Assert.Single(model.Results);
+        Assert.Equal(3, dialogs.Errors.Count);
+
+        dialogs.ThrowCancellation = true;
+        await model.RemoveMissingCommand.ExecuteAsync(null);
+
+        Assert.Single(model.Results);
+        Assert.Equal(3, dialogs.Errors.Count);
+    }
+
+
+    [Fact]
+    public async Task RemoveMissingAsync_ThrowsAfterPartialSuccess_PreservesRetryState()
+    {
+        var repository = new ThrowingDocumentRepository
+        {
+            ThrowOnGetAll = false,
+            SuccessfulDeletesBeforeThrow = 1
+        };
+        var dialogs = new RecordingDialogService { ConfirmResult = true };
+        var model = new FileIntegrityCheckModel(repository, new FileIntegrityRepositoryStub(), dialogs, new FileDialogServiceStub(), new LocalizationServiceStub());
+        model.Results.Add(new IntegrityResult { Document = new StudyDocument { Id = 1, Name = "First" } });
+        model.Results.Add(new IntegrityResult { Document = new StudyDocument { Id = 2, Name = "Second" } });
+        model.MissingCount = 2;
+
+        await model.RemoveMissingCommand.ExecuteAsync(null);
+
+        Assert.Single(model.Results);
+        Assert.Equal(2, model.Results[0].Document.Id);
+        Assert.Equal(1, model.MissingCount);
+        Assert.Single(dialogs.Errors);
+
+        repository.SuccessfulDeletesBeforeThrow = int.MaxValue;
+        await model.RemoveMissingCommand.ExecuteAsync(null);
+
+        Assert.Empty(model.Results);
+        Assert.Equal(0, model.MissingCount);
+    }
+
     private sealed class ThrowingDocumentRepository : IDocumentRepository
     {
         public bool ThrowOnGetAll { get; set; } = true;
+        public bool DeleteResult { get; set; } = true;
+        public int SuccessfulDeletesBeforeThrow { get; set; } = int.MaxValue;
+        private int _deleteCount;
         public List<StudyDocument> Documents { get; set; } = [];
 
         public List<StudyDocument> GetAll()
@@ -138,7 +222,13 @@ public class ScanRecoveryTests
         public bool Add(StudyDocument document) => throw new NotImplementedException();
         public bool AddWithCatalogs(StudyDocument document) => throw new NotImplementedException();
         public bool Update(StudyDocument document) => throw new NotImplementedException();
-        public bool Delete(int id) => throw new NotImplementedException();
+        public bool Delete(int id)
+        {
+            if (_deleteCount++ >= SuccessfulDeletesBeforeThrow)
+                throw new InvalidOperationException();
+
+            return DeleteResult;
+        }
         public List<string> GetDistinctSubjects() => throw new NotImplementedException();
         public List<string> GetDistinctTypes() => throw new NotImplementedException();
         public List<string> GetDistinctTags() => throw new NotImplementedException();
@@ -160,7 +250,8 @@ public class ScanRecoveryTests
 
     private sealed class FileDialogServiceStub : IFileDialogService
     {
-        public Task<string?> ShowOpenFileAsync(string title, string? filter = null) => Task.FromResult<string?>(null);
+        public string? SelectedFile { get; set; }
+        public Task<string?> ShowOpenFileAsync(string title, string? filter = null) => Task.FromResult(SelectedFile);
         public Task<string?> ShowOpenFolderAsync(string title) => Task.FromResult<string?>(null);
         public Task<string?> ShowSaveFileAsync(string title, string defaultFileName, string? filter = null) => Task.FromResult<string?>(null);
     }
@@ -169,6 +260,8 @@ public class ScanRecoveryTests
     {
         public bool ThrowOnMessage { get; set; }
         public bool ThrowOnError { get; set; }
+        public bool ThrowCancellation { get; set; }
+        public bool ConfirmResult { get; set; }
         public List<string> Errors { get; } = [];
 
         public Task ShowMessageAsync(string title, string message)
@@ -180,8 +273,10 @@ public class ScanRecoveryTests
             return ThrowOnError ? throw new InvalidOperationException() : Task.CompletedTask;
         }
 
-        public Task<bool> ShowConfirmAsync(string title, string message) => Task.FromResult(false);
-        public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false) => Task.FromResult(false);
+        public Task<bool> ShowConfirmAsync(string title, string message)
+            => ThrowCancellation ? Task.FromCanceled<bool>(new CancellationToken(true)) : Task.FromResult(ConfirmResult);
+        public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false)
+            => ThrowCancellation ? Task.FromCanceled<bool>(new CancellationToken(true)) : Task.FromResult(ConfirmResult);
         public Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "") => Task.FromResult<string?>(null);
     }
 

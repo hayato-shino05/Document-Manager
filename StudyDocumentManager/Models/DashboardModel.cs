@@ -499,13 +499,27 @@ public partial class DashboardModel : ModelBase
     {
         if (SelectedDocument == null) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
-            string.Format(_loc["Dashboard_ConfirmDelete"], SelectedDocument.Name),
-            _loc["Action_Delete"], isDanger: true);
-        if (confirmed)
+        try
         {
-            _repository.Delete(SelectedDocument.Id);
+            var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+                string.Format(_loc["Dashboard_ConfirmDelete"], SelectedDocument.Name),
+                _loc["Action_Delete"], isDanger: true);
+            if (!confirmed) return;
+
+            if (!_repository.Delete(SelectedDocument.Id))
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+                return;
+            }
+
             LoadData();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
         }
     }
 

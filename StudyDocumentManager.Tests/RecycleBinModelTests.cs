@@ -105,18 +105,127 @@ public class RecycleBinModelTests
         Assert.Empty(model.DeletedDocuments);
     }
 
+
+    [Fact]
+    public async Task EmptyTrash_ZeroOrPartialOrCancelled_PreservesItemsAndDoesNotShowSuccess()
+    {
+        List<StudyDocument> documents = [new StudyDocument { Id = 1, Name = "First" }, new StudyDocument { Id = 2, Name = "Second" }];
+        var repository = new FakeRecycleBinRepository(documents) { EmptyTrashCount = 0 };
+        var dialog = new FakeDialogService { ConfirmResult = true };
+        var model = new RecycleBinModel(repository, dialog, new StubLocalizationService());
+
+        await ((IAsyncRelayCommand)model.EmptyTrashCommand).ExecuteAsync(null);
+
+        Assert.Equal(2, model.DeletedDocuments.Count);
+        Assert.Equal("Operation_Partial", dialog.LastErrorMessage);
+        Assert.Null(dialog.LastMessage);
+
+        dialog.CancelConfirmation = true;
+        await ((IAsyncRelayCommand)model.EmptyTrashCommand).ExecuteAsync(null);
+
+        Assert.Equal(2, model.DeletedDocuments.Count);
+        Assert.Equal("Operation_Partial", dialog.LastErrorMessage);
+    }
+
+
+    [Fact]
+    public async Task EmptyTrash_PartialResult_ReconcilesAndRetryRemovesRemaining()
+    {
+        List<StudyDocument> documents = [new StudyDocument { Id = 1, Name = "First" }, new StudyDocument { Id = 2, Name = "Second" }];
+        var repository = new FakeRecycleBinRepository(documents) { EmptyTrashCount = 1 };
+        var dialog = new FakeDialogService { ConfirmResult = true };
+        var model = new RecycleBinModel(repository, dialog, new StubLocalizationService());
+
+        await ((IAsyncRelayCommand)model.EmptyTrashCommand).ExecuteAsync(null);
+
+        Assert.Single(model.DeletedDocuments);
+        Assert.Equal(2, model.DeletedDocuments[0].Id);
+        Assert.Equal("Operation_Partial", dialog.LastErrorMessage);
+
+        repository.EmptyTrashCount = null;
+        await ((IAsyncRelayCommand)model.EmptyTrashCommand).ExecuteAsync(null);
+
+        Assert.Empty(model.DeletedDocuments);
+        Assert.Equal("Recycle_EmptyTrashDone", dialog.LastMessage);
+    }
+
+    [Fact]
+    public async Task EmptyTrash_RepositoryThrows_PreservesCurrentStateAndReportsError()
+    {
+        var repository = new FakeRecycleBinRepository([new StudyDocument { Id = 1, Name = "Deleted" }])
+        {
+            ThrowOnEmptyTrash = true
+        };
+        var dialog = new FakeDialogService { ConfirmResult = true };
+        var model = new RecycleBinModel(repository, dialog, new StubLocalizationService());
+
+        await ((IAsyncRelayCommand)model.EmptyTrashCommand).ExecuteAsync(null);
+
+        Assert.Single(model.DeletedDocuments);
+        Assert.Equal("Msg_Error", dialog.LastErrorMessage);
+        Assert.Null(dialog.LastMessage);
+    }
+
+    [Fact]
+    public async Task RestoreAndPermanentDelete_RepositoryThrows_PreserveSelectionAndReportError()
+    {
+        var document = new StudyDocument { Id = 1, Name = "Deleted" };
+        var repository = new FakeRecycleBinRepository([document])
+        {
+            ThrowOnRestore = true,
+            ThrowOnPermanentDelete = true
+        };
+        var dialog = new FakeDialogService { ConfirmResult = true };
+        var model = new RecycleBinModel(repository, dialog, new StubLocalizationService())
+        {
+            SelectedDocument = document
+        };
+
+        await ((IAsyncRelayCommand)model.RestoreCommand).ExecuteAsync(null);
+        Assert.Same(document, model.SelectedDocument);
+        Assert.Equal("Msg_Error", dialog.LastErrorMessage);
+
+        await ((IAsyncRelayCommand)model.PermanentDeleteCommand).ExecuteAsync(null);
+        Assert.Same(document, model.SelectedDocument);
+        Assert.Equal("Msg_Error", dialog.LastErrorMessage);
+    }
+
+
+    [Fact]
+    public async Task RestoreAndPermanentDelete_Cancellation_PreserveSelectionWithoutFeedback()
+    {
+        var document = new StudyDocument { Id = 1, Name = "Deleted" };
+        var dialog = new FakeDialogService { ConfirmResult = true, CancelConfirmation = true };
+        var model = new RecycleBinModel(new FakeRecycleBinRepository([document]), dialog, new StubLocalizationService())
+        {
+            SelectedDocument = document
+        };
+
+        await ((IAsyncRelayCommand)model.RestoreCommand).ExecuteAsync(null);
+        await ((IAsyncRelayCommand)model.PermanentDeleteCommand).ExecuteAsync(null);
+
+        Assert.Same(document, model.SelectedDocument);
+        Assert.Null(dialog.LastErrorMessage);
+        Assert.Null(dialog.LastMessage);
+    }
+
     private sealed class FakeRecycleBinRepository(List<StudyDocument> deletedDocuments) : IRecycleBinRepository
     {
         private readonly List<StudyDocument> _deletedDocuments = deletedDocuments;
 
         public bool RestoreResult { get; set; } = true;
         public bool PermanentDeleteResult { get; set; } = true;
-        public int EmptyTrashCount { get; set; }
+        public int? EmptyTrashCount { get; set; }
+        public bool ThrowOnEmptyTrash { get; set; }
+        public bool ThrowOnRestore { get; set; }
+        public bool ThrowOnPermanentDelete { get; set; }
 
         public List<StudyDocument> GetDeletedDocuments() => [.._deletedDocuments];
 
         public bool RestoreDocument(int id)
         {
+            if (ThrowOnRestore)
+                throw new InvalidOperationException();
             if (!RestoreResult)
                 return false;
 
@@ -126,6 +235,8 @@ public class RecycleBinModelTests
 
         public bool PermanentDeleteDocument(int id)
         {
+            if (ThrowOnPermanentDelete)
+                throw new InvalidOperationException();
             if (!PermanentDeleteResult)
                 return false;
 
@@ -135,8 +246,11 @@ public class RecycleBinModelTests
 
         public int EmptyRecycleBin()
         {
-            var count = EmptyTrashCount == 0 ? _deletedDocuments.Count : EmptyTrashCount;
-            _deletedDocuments.Clear();
+            if (ThrowOnEmptyTrash)
+                throw new InvalidOperationException();
+
+            var count = EmptyTrashCount ?? _deletedDocuments.Count;
+            _deletedDocuments.RemoveRange(0, Math.Min(count, _deletedDocuments.Count));
             return count;
         }
 
@@ -146,6 +260,7 @@ public class RecycleBinModelTests
     private sealed class FakeDialogService : IDialogService
     {
         public bool ConfirmResult { get; set; }
+        public bool CancelConfirmation { get; set; }
         public string? LastMessage { get; private set; }
         public string? LastErrorMessage { get; private set; }
 
@@ -162,10 +277,10 @@ public class RecycleBinModelTests
         }
 
         public Task<bool> ShowConfirmAsync(string title, string message)
-            => Task.FromResult(ConfirmResult);
+            => CancelConfirmation ? Task.FromCanceled<bool>(new CancellationToken(true)) : Task.FromResult(ConfirmResult);
 
         public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false)
-            => Task.FromResult(ConfirmResult);
+            => CancelConfirmation ? Task.FromCanceled<bool>(new CancellationToken(true)) : Task.FromResult(ConfirmResult);
 
         public Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "")
             => Task.FromResult<string?>(null);

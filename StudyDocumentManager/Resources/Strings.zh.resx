@@ -442,6 +442,7 @@
   <data name="Recycle_ConfirmPermanentDelete" xml:space="preserve"><value>要永久删除“{0}”吗？此操作无法撤销！</value></data>
   <data name="Recycle_ConfirmEmptyTrash" xml:space="preserve"><value>要永久删除这 {0} 个文档吗？此操作无法撤销！</value></data>
   <data name="Recycle_EmptyTrashDone" xml:space="preserve"><value>已永久删除 {0} 个文档</value></data>
+  <data name="Operation_Partial" xml:space="preserve"><value>已处理 {0} 个文档，共 {1} 个。其余项目已保留，请重试。</value></data>
   <data name="Note_SaveSuccess" xml:space="preserve"><value>备注已保存</value></data>
   <data name="Note_SaveError" xml:space="preserve"><value>无法保存备注</value></data>
   <data name="Note_ConfirmDelete" xml:space="preserve"><value>要删除此备注吗？</value></data>

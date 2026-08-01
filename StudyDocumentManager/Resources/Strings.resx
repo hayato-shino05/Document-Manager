@@ -139,6 +139,7 @@
   <data name="Recycle_ConfirmPermanentDelete" xml:space="preserve"><value>'{0}'を完全に削除しますか？この操作は元に戻せません！</value></data>
   <data name="Recycle_ConfirmEmptyTrash" xml:space="preserve"><value>{0}件の文書を完全に削除しますか？元に戻せません！</value></data>
   <data name="Recycle_EmptyTrashDone" xml:space="preserve"><value>{0}件の文書を完全に削除しました</value></data>
+  <data name="Operation_Partial" xml:space="preserve"><value>{0}件を処理しました（全{1}件）。未処理の項目は保持されています。もう一度お試しください。</value></data>
   <data name="Recycle_RestoreError" xml:space="preserve"><value>文書を復元できませんでした</value></data>
   <data name="Recycle_PermanentDeleteError" xml:space="preserve"><value>文書を完全に削除できませんでした</value></data>
   <data name="Recycle_PermanentDeleteSuccess" xml:space="preserve"><value>文書を完全に削除しました</value></data>

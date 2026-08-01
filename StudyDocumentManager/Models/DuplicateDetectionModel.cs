@@ -73,13 +73,28 @@ public partial class DuplicateDetectionModel : ModelBase
     {
         if (doc == null) return;
 
-        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
-            string.Format(_loc["Duplicate_ConfirmDelete"], doc.Name, doc.Id),
-            _loc["Action_Delete"], isDanger: true);
-        if (!confirmed) return;
+        try
+        {
+            var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+                string.Format(_loc["Duplicate_ConfirmDelete"], doc.Name, doc.Id),
+                _loc["Action_Delete"], isDanger: true);
+            if (!confirmed) return;
 
-        _repository.Delete(doc.Id);
-        await ScanDuplicatesAsync();
+            if (!_repository.Delete(doc.Id))
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+                return;
+            }
+
+            await ScanDuplicatesAsync();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+        }
     }
 }
 

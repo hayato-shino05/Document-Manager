@@ -326,6 +326,34 @@ public class DashboardFlowTests : DatabaseTestBase
         Assert.Equal([(41, document.Id)], collection.AddedDocuments);
         Assert.Equal("Dashboard_AddedToCollection", dialog.LastMessage);
     }
+
+
+    [Fact]
+    public async Task DeleteDocument_FailedOrCancelledOutcome_PreservesCurrentDocument()
+    {
+        var document = new StudyDocument { Id = 10, Name = "Keep" };
+        var repository = new DashboardDocumentRepository([document]) { DeleteResult = false };
+        var dialog = new DashboardDialogService { ConfirmResult = true };
+        var model = new DashboardModel(
+            repository, new DashboardRecycleBinRepository(), new DashboardCategoryRepository(),
+            new DashboardCollectionRepository(), new DashboardRecentFileRepository(), dialog,
+            new DashboardFileDialogService(), new DashboardCustomDialogService(), new DashboardNavigationService(),
+            new DashboardClipboardService(), new DashboardProcessLauncherService(), new DashboardExportService(),
+            new DashboardBackupService(), new DashboardLocalizationService())
+        {
+            SelectedDocument = document
+        };
+
+        await model.DeleteDocumentCommand.ExecuteAsync(null);
+
+        Assert.Same(document, model.SelectedDocument);
+        Assert.Equal("Msg_Error", dialog.LastErrorMessage);
+
+        dialog.CancelConfirmation = true;
+        await model.DeleteDocumentCommand.ExecuteAsync(null);
+
+        Assert.Same(document, model.SelectedDocument);
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -339,6 +367,7 @@ public class DashboardFlowTests : DatabaseTestBase
 file sealed class DashboardDocumentRepository(List<StudyDocument> documents) : IDocumentRepository
     {
         private readonly List<StudyDocument> _documents = documents;
+        public bool DeleteResult { get; set; } = true;
 
         public List<StudyDocument> GetAll() => [.._documents];
         public StudyDocument? GetById(int id) => _documents.FirstOrDefault(document => document.Id == id);
@@ -348,7 +377,7 @@ file sealed class DashboardDocumentRepository(List<StudyDocument> documents) : I
         public bool Add(StudyDocument document) => true;
         public bool AddWithCatalogs(StudyDocument document) => true;
         public bool Update(StudyDocument document) => true;
-        public bool Delete(int id) => true;
+        public bool Delete(int id) => DeleteResult;
         public List<string> GetDistinctSubjects() => [];
         public List<string> GetDistinctTypes() => [];
         public List<string> GetDistinctTags() => [];
@@ -419,6 +448,7 @@ file sealed class DashboardRecentFileRepository : IRecentFileRepository
 file sealed class DashboardDialogService : IDialogService
     {
         public bool ConfirmResult { get; set; }
+        public bool CancelConfirmation { get; set; }
         public string? InputResult { get; set; }
         public string? LastConfirmMessage { get; private set; }
         public string? LastMessage { get; private set; }
@@ -439,13 +469,13 @@ file sealed class DashboardDialogService : IDialogService
         public Task<bool> ShowConfirmAsync(string title, string message)
         {
             LastConfirmMessage = message;
-            return Task.FromResult(ConfirmResult);
+            return CancelConfirmation ? Task.FromCanceled<bool>(new CancellationToken(true)) : Task.FromResult(ConfirmResult);
         }
 
         public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false)
         {
             LastConfirmMessage = message;
-            return Task.FromResult(ConfirmResult);
+            return CancelConfirmation ? Task.FromCanceled<bool>(new CancellationToken(true)) : Task.FromResult(ConfirmResult);
         }
 
         public Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "")
