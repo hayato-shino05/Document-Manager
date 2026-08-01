@@ -461,6 +461,8 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="BatchImport_EmptyState" xml:space="preserve"><value>Select a folder to show importable files</value></data>
   <data name="BatchImport_StatusImporting" xml:space="preserve"><value>Importing selected files...</value></data>
   <data name="BatchImport_ScanError" xml:space="preserve"><value>Could not scan or import the selected files</value></data>
+  <data name="BatchImport_ResultSummary" xml:space="preserve"><value>Imported: {0}, skipped duplicates: {1}, failed: {2}</value></data>
+  <data name="BatchImport_FailuresRemain" xml:space="preserve"><value>{0} failed item(s) remain selected. Fix the issue and retry.</value></data>
   <data name="BulkDelete_Title" xml:space="preserve"><value>Bulk Delete</value></data>
   <data name="BulkDelete_BtnDelete" xml:space="preserve"><value>Delete</value></data>
   <data name="BulkDelete_BtnMarkImportant" xml:space="preserve"><value>Mark Important</value></data>

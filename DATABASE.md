@@ -143,6 +143,7 @@ Lookup table for document types.
 - `idx_collection_items_document` on `collection_items(document_id)`
 - `idx_documents_deleted` on `documents(is_deleted)`
 - `idx_documents_important` on `documents(is_important)`
+- `idx_documents_file_path_unique` は、`file_path IS NOT NULL AND file_path <> ''` の行だけを対象に `documents(file_path)` の完全一致を一意にする部分インデックスです。削除済み文書も対象で、SQLite の既定 `BINARY` 比較を使用します。
 
 ## Migration Behavior
 
@@ -152,9 +153,10 @@ Lookup table for document types.
 2. Rejects incomplete or structurally unsupported legacy schemas before writing changes.
 3. Creates the current tables and indexes if they do not exist.
 4. Adds `is_deleted` and `deleted_at` idempotently when upgrading older databases.
-5. Seeds `categories` and `document_types` from existing document data, then adds default values for fresh installs.
-6. Normalizes file-type labels based on existing values and file extensions.
-7. Neutralizes legacy catalog labels through schema version `3` using `app_settings`.
+5. 履歴データの空でない完全一致 `file_path` 重複を同一トランザクション内で解消します。最小の `id` のパスを保持し、それ以降の重複行は `file_path = NULL` にしてから部分一意インデックスを作成します。途中で失敗した場合はデータ変更とインデックス作成をまとめてロールバックします。
+6. Seeds `categories` and `document_types` from existing document data, then adds default values for fresh installs.
+7. Normalizes file-type labels based on existing values and file extensions.
+8. Neutralizes legacy catalog labels through schema version `3` using `app_settings`.
 
 Legacy table and column names from the retired WinForms implementation are accepted only as an exact, validated migration input. They are not the active schema contract.
 

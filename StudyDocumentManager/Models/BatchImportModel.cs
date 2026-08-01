@@ -20,6 +20,8 @@ public partial class BatchImportModel : ModelBase
     [ObservableProperty] private string _defaultSubject = string.Empty;
     [ObservableProperty] private ObservableCollection<FileImportItem> _files = new();
     [ObservableProperty] private int _importedCount;
+    [ObservableProperty] private int _skippedDuplicateCount;
+    [ObservableProperty] private int _failedCount;
     [ObservableProperty] private bool _isImporting;
     [ObservableProperty] private string _importStatusMessage = string.Empty;
     [ObservableProperty] private string _importErrorMessage = string.Empty;
@@ -138,6 +140,8 @@ public partial class BatchImportModel : ModelBase
 
         IsImporting = true;
         ImportedCount = 0;
+        SkippedDuplicateCount = 0;
+        FailedCount = 0;
         ImportErrorMessage = string.Empty;
         ImportStatusMessage = _loc["BatchImport_StatusImporting"];
 
@@ -156,27 +160,49 @@ public partial class BatchImportModel : ModelBase
                     FileSize = item.FileSizeMB
                 };
 
-                if (!_droppedFileImportService.SaveDocument(document))
+                DocumentImportOutcome outcome;
+                try
                 {
-                    ImportErrorMessage = _loc["BatchImport_ScanError"];
-                    return;
+                    outcome = _droppedFileImportService.SaveDocument(document);
+                }
+                catch (Exception)
+                {
+                    outcome = DocumentImportOutcome.Failed;
                 }
 
-                ImportedCount++;
-                item.IsSelected = false;
+                switch (outcome)
+                {
+                    case DocumentImportOutcome.Imported:
+                        ImportedCount++;
+                        item.IsSelected = false;
+                        break;
+                    case DocumentImportOutcome.SkippedDuplicate:
+                        SkippedDuplicateCount++;
+                        item.IsSelected = false;
+                        break;
+                    case DocumentImportOutcome.Failed:
+                        FailedCount++;
+                        break;
+                }
             }
-        }
-        catch (Exception)
-        {
-            ImportErrorMessage = _loc["BatchImport_ScanError"];
-            return;
         }
         finally
         {
             IsImporting = false;
         }
 
-        ImportStatusMessage = string.Format(_loc["Import_Done"], ImportedCount, selected.Count);
+        ImportStatusMessage = string.Format(
+            _loc["BatchImport_ResultSummary"],
+            ImportedCount,
+            SkippedDuplicateCount,
+            FailedCount);
+
+        if (FailedCount > 0)
+        {
+            ImportErrorMessage = string.Format(_loc["BatchImport_FailuresRemain"], FailedCount);
+            return;
+        }
+
         await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"], ImportStatusMessage);
         _navigationService.NavigateTo("dashboard");
     }

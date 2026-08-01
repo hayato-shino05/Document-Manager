@@ -243,6 +243,8 @@
   <data name="BatchImport_ScanError" xml:space="preserve">
     <value>Không thể quét hoặc nhập các tệp đã chọn</value>
   </data>
+  <data name="BatchImport_ResultSummary" xml:space="preserve"><value>Đã nhập: {0}, bỏ qua do trùng: {1}, thất bại: {2}</value></data>
+  <data name="BatchImport_FailuresRemain" xml:space="preserve"><value>{0} mục thất bại vẫn được chọn. Hãy khắc phục lỗi và thử lại.</value></data>
   <data name="Dashboard_FileMissingMessage" xml:space="preserve">
     <value>Tệp này không còn tồn tại. Mở Kiểm tra tính toàn vẹn tệp để liên kết lại đường dẫn hoặc xóa nó?</value>
   </data>

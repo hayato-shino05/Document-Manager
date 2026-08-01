@@ -231,7 +231,7 @@ public class Slice4FlowPolishTests
         await model.ImportCommand.ExecuteAsync(null);
 
         Assert.False(model.IsImporting);
-        Assert.Equal("BatchImport_ScanError", model.ImportErrorMessage);
+        Assert.Equal("BatchImport_FailuresRemain", model.ImportErrorMessage);
     }
 
     [Fact]
@@ -252,7 +252,7 @@ public class Slice4FlowPolishTests
         Assert.Equal(1, model.ImportedCount);
         Assert.False(model.Files[0].IsSelected);
         Assert.True(model.Files[1].IsSelected);
-        Assert.Equal("BatchImport_ScanError", model.ImportErrorMessage);
+        Assert.Equal("BatchImport_FailuresRemain", model.ImportErrorMessage);
         Assert.Empty(dialog.Messages);
         Assert.Empty(navigation.Routes);
 
@@ -260,6 +260,46 @@ public class Slice4FlowPolishTests
 
         Assert.Equal(["C:/first.pdf", "C:/second.pdf"], importService.SavedPaths);
         Assert.False(model.Files[1].IsSelected);
+    }
+
+    [Fact]
+    public async Task BatchImport_MixedOutcomes_ContinuesAndRetainsOnlyFailuresForRetry()
+    {
+        var importService = new MixedOutcomeDroppedFileImportService();
+        var dialog = new RecordingDialogService();
+        var navigation = new RecordingNavigationService();
+        var model = CreateBatchImportModel(importService, dialog, navigation);
+        model.Files = new System.Collections.ObjectModel.ObservableCollection<FileImportItem>
+        {
+            new() { FileName = "Unique 1", FilePath = "C:/unique-1.pdf", FileType = "PDF", IsSelected = true },
+            new() { FileName = "Active duplicate", FilePath = "C:/active-duplicate.pdf", FileType = "PDF", IsSelected = true },
+            new() { FileName = "Deleted duplicate", FilePath = "C:/deleted-duplicate.pdf", FileType = "PDF", IsSelected = true },
+            new() { FileName = "Unique 2", FilePath = "C:/unique-2.pdf", FileType = "PDF", IsSelected = true },
+            new() { FileName = "Failed", FilePath = "C:/failed.pdf", FileType = "PDF", IsSelected = true }
+        };
+
+        await model.ImportCommand.ExecuteAsync(null);
+
+        Assert.Equal(2, model.ImportedCount);
+        Assert.Equal(2, model.SkippedDuplicateCount);
+        Assert.Equal(1, model.FailedCount);
+        Assert.All(model.Files.Take(4), item => Assert.False(item.IsSelected));
+        Assert.True(model.Files[4].IsSelected);
+        Assert.Equal("BatchImport_ResultSummary", model.ImportStatusMessage);
+        Assert.Equal("BatchImport_FailuresRemain", model.ImportErrorMessage);
+        Assert.Empty(dialog.Messages);
+        Assert.Empty(navigation.Routes);
+        Assert.Equal(5, importService.AttemptedPaths.Count);
+
+        await model.ImportCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, model.ImportedCount);
+        Assert.Equal(0, model.SkippedDuplicateCount);
+        Assert.Equal(0, model.FailedCount);
+        Assert.False(model.Files[4].IsSelected);
+        Assert.Single(dialog.Messages);
+        Assert.Equal(["dashboard"], navigation.Routes);
+        Assert.Equal(6, importService.AttemptedPaths.Count);
     }
 
     [Fact]
@@ -277,7 +317,7 @@ public class Slice4FlowPolishTests
 
         Assert.Equal(0, model.ImportedCount);
         Assert.True(model.Files[0].IsSelected);
-        Assert.Equal("BatchImport_ScanError", model.ImportErrorMessage);
+        Assert.Equal("BatchImport_FailuresRemain", model.ImportErrorMessage);
         Assert.Empty(dialog.Messages);
         Assert.Empty(navigation.Routes);
     }
@@ -576,10 +616,10 @@ public class Slice4FlowPolishTests
 
         public List<string> GetAvailableSubjects(IReadOnlyList<string> fallbackSubjects) => fallbackSubjects.ToList();
         public List<string> GetAvailableTypes(IReadOnlyList<string> fallbackTypes) => fallbackTypes.ToList();
-        public bool SaveDocument(StudyDocument document)
+        public DocumentImportOutcome SaveDocument(StudyDocument document)
         {
             SavedDocuments.Add(document);
-            return true;
+            return DocumentImportOutcome.Imported;
         }
 
         public StudyDocument BuildDocumentFromPath(string filePath)
@@ -654,7 +694,7 @@ public class Slice4FlowPolishTests
     {
         public List<string> GetAvailableSubjects(IReadOnlyList<string> fallbackSubjects) => fallbackSubjects.ToList();
         public List<string> GetAvailableTypes(IReadOnlyList<string> fallbackTypes) => fallbackTypes.ToList();
-        public bool SaveDocument(StudyDocument document) => throw new IOException("save failed");
+        public DocumentImportOutcome SaveDocument(StudyDocument document) => throw new IOException("save failed");
         public StudyDocument BuildDocumentFromPath(string filePath)
             => new()
             {
@@ -675,24 +715,54 @@ public class Slice4FlowPolishTests
         public List<string> GetAvailableSubjects(IReadOnlyList<string> fallbackSubjects) => fallbackSubjects.ToList();
         public List<string> GetAvailableTypes(IReadOnlyList<string> fallbackTypes) => fallbackTypes.ToList();
 
-        public bool SaveDocument(StudyDocument document)
+        public DocumentImportOutcome SaveDocument(StudyDocument document)
         {
             _saveAttempts++;
             if (_saveAttempts == 2)
                 throw new IOException("save failed");
 
             SavedPaths.Add(document.FilePath);
-            return true;
+            return DocumentImportOutcome.Imported;
         }
 
         public StudyDocument BuildDocumentFromPath(string filePath) => throw new NotImplementedException();
+    }
+
+
+    private sealed class MixedOutcomeDroppedFileImportService : IDroppedFileImportService
+    {
+        private bool _failedOnce;
+
+        public List<string> AttemptedPaths { get; } = [];
+
+        public List<string> GetAvailableSubjects(IReadOnlyList<string> fallbackSubjects) => fallbackSubjects.ToList();
+        public List<string> GetAvailableTypes(IReadOnlyList<string> fallbackTypes) => fallbackTypes.ToList();
+
+        public DocumentImportOutcome SaveDocument(StudyDocument document)
+        {
+            AttemptedPaths.Add(document.FilePath);
+            return document.FilePath switch
+            {
+                "C:/active-duplicate.pdf" or "C:/deleted-duplicate.pdf" => DocumentImportOutcome.SkippedDuplicate,
+                "C:/failed.pdf" when !_failedOnce => FailOnce(),
+                _ => DocumentImportOutcome.Imported
+            };
+        }
+
+        public StudyDocument BuildDocumentFromPath(string filePath) => throw new NotImplementedException();
+
+        private DocumentImportOutcome FailOnce()
+        {
+            _failedOnce = true;
+            return DocumentImportOutcome.Failed;
+        }
     }
 
     private sealed class FailingDroppedFileImportService : IDroppedFileImportService
     {
         public List<string> GetAvailableSubjects(IReadOnlyList<string> fallbackSubjects) => fallbackSubjects.ToList();
         public List<string> GetAvailableTypes(IReadOnlyList<string> fallbackTypes) => fallbackTypes.ToList();
-        public bool SaveDocument(StudyDocument document) => false;
+        public DocumentImportOutcome SaveDocument(StudyDocument document) => DocumentImportOutcome.Failed;
         public StudyDocument BuildDocumentFromPath(string filePath) => throw new NotImplementedException();
     }
 
@@ -701,11 +771,11 @@ public class Slice4FlowPolishTests
     {
         public List<string> GetAvailableSubjects(IReadOnlyList<string> fallbackSubjects) => fallbackSubjects.ToList();
         public List<string> GetAvailableTypes(IReadOnlyList<string> fallbackTypes) => fallbackTypes.ToList();
-        public bool SaveDocument(StudyDocument document)
+        public DocumentImportOutcome SaveDocument(StudyDocument document)
         {
             signal.TrySetResult();
             gate.Task.GetAwaiter().GetResult();
-            return true;
+            return DocumentImportOutcome.Imported;
         }
         public StudyDocument BuildDocumentFromPath(string filePath)
             => new()

@@ -342,7 +342,7 @@ public class DuplicateDetectionDataTests : DatabaseTestBase
         // Simulate what DuplicateDetectionForm would find:
         // 同じFilePathを持つ文書は重複候補
         _repo.Add(new StudyDocument { Name = "Copy 1", FilePath = @"C:\same_file.pdf" });
-        _repo.Add(new StudyDocument { Name = "Copy 2", FilePath = @"C:\same_file.pdf" });
+        _repo.Add(new StudyDocument { Name = "Copy 2", FilePath = @"c:\SAME_FILE.pdf" });
         _repo.Add(new StudyDocument { Name = "Unique", FilePath = @"C:\different.pdf" });
 
         var allDocs = _repo.GetAll();
@@ -350,7 +350,7 @@ public class DuplicateDetectionDataTests : DatabaseTestBase
         // Group by path — application logic would do MD5 but here we test the data
         var groupedByPath = allDocs
             .Where(d => !string.IsNullOrEmpty(d.FilePath))
-            .GroupBy(d => d.FilePath)
+            .GroupBy(d => d.FilePath, StringComparer.OrdinalIgnoreCase)
             .Where(g => g.Count() > 1)
             .ToList();
 
@@ -362,7 +362,7 @@ public class DuplicateDetectionDataTests : DatabaseTestBase
     public void BulkSoftDelete_DuplicateGroup_RemovesSelectedOnly()
     {
         _repo.Add(new StudyDocument { Name = "Original", FilePath = @"C:\dup.pdf" });
-        _repo.Add(new StudyDocument { Name = "Duplicate", FilePath = @"C:\dup.pdf" });
+        _repo.Add(new StudyDocument { Name = "Duplicate", FilePath = @"c:\DUP.pdf" });
 
         var all = _repo.GetAll();
         // Keep the first one, delete the duplicate

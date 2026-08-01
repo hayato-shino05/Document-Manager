@@ -520,6 +520,8 @@
   <data name="BatchImport_EmptyState" xml:space="preserve"><value>フォルダを選択してインポート可能なファイルを表示</value></data>
   <data name="BatchImport_StatusImporting" xml:space="preserve"><value>選択したファイルをインポート中...</value></data>
   <data name="BatchImport_ScanError" xml:space="preserve"><value>選択したファイルをスキャンまたはインポートできません</value></data>
+  <data name="BatchImport_ResultSummary" xml:space="preserve"><value>インポート: {0}件、重複スキップ: {1}件、失敗: {2}件</value></data>
+  <data name="BatchImport_FailuresRemain" xml:space="preserve"><value>失敗した{0}件は選択されたままです。問題を修正して再試行してください。</value></data>
 
   <!-- BulkDelete View -->
   <data name="BulkDelete_Title" xml:space="preserve"><value>一括削除</value></data>

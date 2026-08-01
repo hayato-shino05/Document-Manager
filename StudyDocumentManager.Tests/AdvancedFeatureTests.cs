@@ -1207,17 +1207,17 @@ public class DuplicatePathDetectionTests : DatabaseTestBase
     public void GetAll_MultipleDocsWithSamePath_AllReturned()
     {
         _repo.Add(new StudyDocument { Name = "D1", FilePath = @"C:\same.pdf" });
-        _repo.Add(new StudyDocument { Name = "D2", FilePath = @"C:\same.pdf" });
+        _repo.Add(new StudyDocument { Name = "D2", FilePath = @"c:\SAME.pdf" });
         _repo.Add(new StudyDocument { Name = "D3", FilePath = @"C:\different.pdf" });
 
         var all = _repo.GetAll();
-        var duplicates = all.GroupBy(d => d.FilePath)
+        var duplicates = all.GroupBy(d => d.FilePath, StringComparer.OrdinalIgnoreCase)
                             .Where(g => g.Count() > 1)
                             .SelectMany(g => g)
                             .ToList();
 
         Assert.Equal(2, duplicates.Count);
-        Assert.All(duplicates, d => Assert.Equal(@"C:\same.pdf", d.FilePath));
+        Assert.All(duplicates, d => Assert.Equal(@"C:\same.pdf", d.FilePath, ignoreCase: true));
     }
 
     [Fact]

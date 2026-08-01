@@ -473,7 +473,7 @@ public class DatabaseHelper
             if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath) || PathsReferToSameFile(DatabasePath, sourcePath))
                 return false;
 
-            ValidateBackupCandidate(sourcePath);
+            ValidateBackupCandidate(sourcePath, requireDocumentPathIndex: false);
             return true;
         }
         catch
@@ -503,6 +503,8 @@ public class DatabaseHelper
                 source.BackupDatabase(destination);
             }
 
+            ValidateBackupCandidate(stagingPath, requireDocumentPathIndex: false);
+            DatabaseMigrator.RunMigrations($"Data Source={stagingPath};Foreign Keys=True");
             ValidateBackupCandidate(stagingPath);
 
             using (var source = OpenConnection())
@@ -657,7 +659,7 @@ public class DatabaseHelper
         DeleteFileIfExists($"{databasePath}-shm");
     }
 
-    private static void ValidateBackupCandidate(string databasePath)
+    private static void ValidateBackupCandidate(string databasePath, bool requireDocumentPathIndex = true)
     {
         using var connection = OpenConnection(databasePath, SqliteOpenMode.ReadOnly, pooling: false, synchronize: false);
 
@@ -693,9 +695,10 @@ public class DatabaseHelper
         ValidateUniqueConstraint(connection, "collection_items", ["collection_id", "document_id"]);
         ValidateUniqueConstraint(connection, "recent_files", ["document_id"]);
         ValidateUniqueConstraint(connection, "document_relations", ["doc_id_1", "doc_id_2"]);
+        ValidateDocumentPathIndex(connection, requireDocumentPathIndex);
 
         foreach (var tableName in requiredTables)
-            ValidateIndexesAndTriggers(connection, tableName);
+            ValidateIndexesAndTriggers(connection, tableName, allowLegacyDocumentPathIndexes: !requireDocumentPathIndex);
 
         using var schemaVersionCommand = connection.CreateCommand();
         schemaVersionCommand.CommandText = "SELECT value FROM app_settings WHERE key = 'schema_version'";
@@ -801,13 +804,36 @@ public class DatabaseHelper
     }
 
 
-    private static void ValidateIndexesAndTriggers(SqliteConnection connection, string tableName)
+private static void ValidateDocumentPathIndex(SqliteConnection connection, bool requireDocumentPathIndex)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = 'idx_documents_file_path_unique'";
+        var sql = command.ExecuteScalar()?.ToString();
+        const string expected = "CREATE UNIQUE INDEX idx_documents_file_path_unique ON documents(file_path COLLATE BINARY) WHERE file_path IS NOT NULL AND file_path <> ''";
+        if (sql is null && !requireDocumentPathIndex)
+            return;
+        if (!string.Equals(sql, expected, StringComparison.Ordinal))
+            throw new InvalidOperationException("Backup database document path index is not supported.");
+    }
+
+    private static bool IsDocumentPathUniqueIndex(SqliteConnection connection, string indexName)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA index_info(\"{indexName.Replace("\"", "\"\"")}\")";
+        using var reader = command.ExecuteReader();
+        var columns = new List<string>();
+        while (reader.Read())
+            columns.Add(reader.GetString(2));
+        return columns.SequenceEqual(["file_path"], StringComparer.Ordinal);
+    }
+
+    private static void ValidateIndexesAndTriggers(SqliteConnection connection, string tableName, bool allowLegacyDocumentPathIndexes)
     {
         var allowedIndexes = tableName switch
         {
             "documents" => new HashSet<string>(StringComparer.Ordinal)
             {
-                "idx_documents_subject", "idx_documents_type", "idx_documents_created_at", "idx_documents_deadline", "idx_documents_deleted", "idx_documents_important"
+                "idx_documents_subject", "idx_documents_type", "idx_documents_created_at", "idx_documents_deadline", "idx_documents_deleted", "idx_documents_important", "idx_documents_file_path_unique"
             },
             "collection_items" => new HashSet<string>(StringComparer.Ordinal)
             {
@@ -815,13 +841,22 @@ public class DatabaseHelper
             },
             _ => new HashSet<string>(StringComparer.Ordinal)
         };
+        var indexes = new List<(string Name, bool IsUnique, string Origin)>();
 
-        using var indexesCommand = connection.CreateCommand();
-        indexesCommand.CommandText = $"PRAGMA index_list({tableName})";
-        using var indexReader = indexesCommand.ExecuteReader();
-        while (indexReader.Read())
+        using (var command = connection.CreateCommand())
         {
-            if (indexReader.GetString(3) == "c" && !allowedIndexes.Contains(indexReader.GetString(1)))
+            command.CommandText = $"PRAGMA index_list({tableName})";
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+                indexes.Add((reader.GetString(1), reader.GetInt32(2) == 1, reader.GetString(3)));
+        }
+
+        foreach (var index in indexes)
+        {
+            var isLegacyDocumentPathIndex = allowLegacyDocumentPathIndexes && tableName == "documents" && index.IsUnique && IsDocumentPathUniqueIndex(connection, index.Name);
+            if (tableName == "documents" && index.Origin == "u" && !isLegacyDocumentPathIndex)
+                throw new InvalidOperationException($"Backup database unique constraint on '{tableName}' is not supported.");
+            if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isLegacyDocumentPathIndex)
                 throw new InvalidOperationException($"Backup database index on '{tableName}' is not supported.");
         }
 

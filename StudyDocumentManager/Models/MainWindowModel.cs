@@ -263,7 +263,7 @@ public partial class MainWindowModel : ModelBase
             return 0;
 
         var document = draft.ToStudyDocument();
-        return _droppedFileImportService.SaveDocument(document) ? 1 : 0;
+        return _droppedFileImportService.SaveDocument(document) == DocumentImportOutcome.Imported ? 1 : 0;
     }
 
     private int ImportMultipleFiles(IEnumerable<string> filePaths)
@@ -273,7 +273,7 @@ public partial class MainWindowModel : ModelBase
         foreach (var filePath in filePaths)
         {
             var document = _droppedFileImportService.BuildDocumentFromPath(filePath);
-            if (!_droppedFileImportService.SaveDocument(document))
+            if (_droppedFileImportService.SaveDocument(document) != DocumentImportOutcome.Imported)
                 continue;
 
             imported++;

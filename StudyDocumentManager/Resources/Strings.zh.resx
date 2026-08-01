@@ -243,6 +243,8 @@
   <data name="BatchImport_ScanError" xml:space="preserve">
     <value>无法扫描或导入所选文件</value>
   </data>
+  <data name="BatchImport_ResultSummary" xml:space="preserve"><value>已导入：{0}，因重复而跳过：{1}，失败：{2}</value></data>
+  <data name="BatchImport_FailuresRemain" xml:space="preserve"><value>{0} 个失败项目仍保持选中。请修复问题后重试。</value></data>
   <data name="Dashboard_FileMissingMessage" xml:space="preserve">
     <value>该文件已丢失。要打开文件完整性检查以重新链接路径或清除它吗？</value>
   </data>

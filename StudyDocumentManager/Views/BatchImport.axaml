@@ -49,7 +49,7 @@
 
             <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,12">
                 <TextBlock Text="{Binding ImportStatusMessage}"
-                           IsVisible="{Binding IsImporting}"
+                           IsVisible="{Binding ImportStatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                            FontSize="{StaticResource FontSizeSm}"
                            Foreground="{StaticResource TextSecondary}"/>
                 <TextBlock Text="{Binding ImportErrorMessage}"

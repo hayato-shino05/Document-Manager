@@ -1,7 +1,7 @@
+using Microsoft.Data.Sqlite;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Core.Services;
-
 namespace StudyDocumentManager.Services;
 
 public class DroppedFileImportService(IDocumentRepository repository) : IDroppedFileImportService
@@ -20,7 +20,21 @@ public class DroppedFileImportService(IDocumentRepository repository) : IDropped
         return types.Count > 0 ? types : fallbackTypes.ToList();
     }
 
-    public bool SaveDocument(StudyDocument document) => _repository.AddWithCatalogs(document);
+    public DocumentImportOutcome SaveDocument(StudyDocument document)
+    {
+        try
+        {
+            return _repository.AddWithCatalogs(document)
+                ? DocumentImportOutcome.Imported
+                : DocumentImportOutcome.Failed;
+        }
+        catch (SqliteException exception) when (
+            exception.SqliteExtendedErrorCode == 2067 &&
+            exception.Message.Contains("documents.file_path", StringComparison.Ordinal))
+        {
+            return DocumentImportOutcome.SkippedDuplicate;
+        }
+    }
 
     public StudyDocument BuildDocumentFromPath(string filePath)
     {

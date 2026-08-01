@@ -116,11 +116,19 @@ public static class DatabaseMigrator
             ExecuteSql(conn, transaction, createTablesQuery);
             MigrateAddColumn(conn, transaction, "documents", "is_deleted", "INTEGER DEFAULT 0");
             MigrateAddColumn(conn, transaction, "documents", "deleted_at", "DATETIME");
+            ExecuteSql(conn, transaction, "PRAGMA defer_foreign_keys = ON");
+
+            if (preflight.RebuildDocuments)
+                RebuildDocumentsTable(conn, transaction);
 
             foreach (var tableName in preflight.TablesToRebuild)
                 RebuildChildTable(conn, transaction, tableName);
 
             ExecuteSql(conn, transaction, createTablesQuery);
+            DropLegacyDocumentPathIndexes(conn, transaction);
+            ExecuteSql(conn, transaction, "UPDATE documents AS duplicate SET file_path = NULL WHERE file_path IS NOT NULL AND file_path <> '' AND EXISTS (SELECT 1 FROM documents AS original WHERE original.file_path = duplicate.file_path COLLATE BINARY AND original.id < duplicate.id)");
+            ExecuteSql(conn, transaction, "DROP INDEX IF EXISTS idx_documents_file_path_unique");
+            ExecuteSql(conn, transaction, "CREATE UNIQUE INDEX idx_documents_file_path_unique ON documents(file_path COLLATE BINARY) WHERE file_path IS NOT NULL AND file_path <> ''");
             EnsureForeignKeyCheckIsClean(conn, transaction);
             transaction.Commit();
         }
@@ -130,7 +138,7 @@ public static class DatabaseMigrator
         MigrateNeutralizeLabels(conn);
     }
 
-    private sealed record MigrationPreflight(IReadOnlyList<string> TablesToRebuild);
+    private sealed record MigrationPreflight(IReadOnlyList<string> TablesToRebuild, bool RebuildDocuments);
 
     private static bool HasAnyLegacyVietnameseTable(SqliteConnection connection)
         => new[] { "tai_lieu", "danh_muc", "loai_tai_lieu" }.Any(tableName => TableExists(connection, tableName));
@@ -340,7 +348,7 @@ public static class DatabaseMigrator
     {
         var tables = GetApplicationTables(connection);
         if (tables.Count == 0)
-            return new MigrationPreflight([]);
+            return new MigrationPreflight([], false);
 
         var supportedTables = new HashSet<string>(StringComparer.Ordinal)
         {
@@ -352,6 +360,7 @@ public static class DatabaseMigrator
             throw new InvalidOperationException($"Unsupported database tables: {string.Join(", ", unsupportedTables)}.");
 
         RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at"], ["is_deleted", "deleted_at"]);
+        var rebuildDocuments = ValidateDocumentIndexesAndTriggers(connection);
         ValidateKnownTable(connection, "collections", ["id", "name", "description", "created_at"]);
         ValidateKnownTable(connection, "categories", ["id", "name", "created_at"]);
         ValidateKnownTable(connection, "document_types", ["id", "name", "created_at"]);
@@ -368,7 +377,7 @@ public static class DatabaseMigrator
             [("doc_id_1", "documents", "id"), ("doc_id_2", "documents", "id")], ["doc_id_1", "doc_id_2"], tablesToRebuild);
 
         EnsureForeignKeyCheckIsClean(connection, null);
-        return new MigrationPreflight(tablesToRebuild);
+        return new MigrationPreflight(tablesToRebuild, rebuildDocuments);
     }
 
     private static List<string> GetApplicationTables(SqliteConnection connection)
@@ -494,13 +503,87 @@ public static class DatabaseMigrator
         });
     }
 
+    private static bool HasUniqueIndex(SqliteConnection connection, string tableName, string[] expectedColumns, string indexName)
+    {
+        using var columns = connection.CreateCommand();
+        columns.CommandText = $"PRAGMA index_info(\"{indexName.Replace("\"", "\"\"")}\")";
+        using var columnReader = columns.ExecuteReader();
+        var names = new List<string>();
+        while (columnReader.Read())
+            names.Add(columnReader.GetString(2));
+        return names.SequenceEqual(expectedColumns, StringComparer.Ordinal);
+    }
+
+    private static bool ValidateDocumentIndexesAndTriggers(SqliteConnection connection)
+    {
+        var allowedIndexes = new HashSet<string>(StringComparer.Ordinal)
+        {
+            "idx_documents_subject", "idx_documents_type", "idx_documents_created_at", "idx_documents_deadline", "idx_documents_deleted", "idx_documents_important", "idx_documents_file_path_unique"
+        };
+        var rebuildDocuments = false;
+        var indexes = new List<(string Name, bool IsUnique, string Origin)>();
+
+        using (var command = connection.CreateCommand())
+        {
+            command.CommandText = "PRAGMA index_list(documents)";
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+                indexes.Add((reader.GetString(1), reader.GetInt32(2) == 1, reader.GetString(3)));
+        }
+
+        foreach (var index in indexes)
+        {
+            var isDocumentPathIndex = index.IsUnique && HasUniqueIndex(connection, "documents", ["file_path"], index.Name);
+            if (index.Origin == "u")
+            {
+                if (!isDocumentPathIndex)
+                    throw new InvalidOperationException($"Unsupported unique constraint '{index.Name}' on 'documents'.");
+                rebuildDocuments = true;
+            }
+            else if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isDocumentPathIndex)
+            {
+                throw new InvalidOperationException($"Unsupported index '{index.Name}' on 'documents'.");
+            }
+        }
+
+        EnsureNoTriggers(connection, "documents");
+        return rebuildDocuments;
+    }
+
+    private static void DropLegacyDocumentPathIndexes(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        var indexes = new List<(string Name, bool IsUnique, string Origin)>();
+        using (var command = connection.CreateCommand())
+        {
+            command.Transaction = transaction;
+            command.CommandText = "PRAGMA index_list(documents)";
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+                indexes.Add((reader.GetString(1), reader.GetInt32(2) == 1, reader.GetString(3)));
+        }
+
+        foreach (var index in indexes)
+        {
+            if (index.Name != "idx_documents_file_path_unique" && index.Origin == "c" && index.IsUnique && HasUniqueIndex(connection, "documents", ["file_path"], index.Name))
+                ExecuteSql(connection, transaction, $"DROP INDEX \"{index.Name.Replace("\"", "\"\"")}\"");
+        }
+    }
+
+    private static void RebuildDocumentsTable(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        ExecuteSql(connection, transaction, "CREATE TABLE documents_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, subject TEXT, type TEXT, file_path TEXT, notes TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), file_size REAL, author TEXT, is_important INTEGER DEFAULT 0, tags TEXT, deadline DATETIME, is_deleted INTEGER DEFAULT 0, deleted_at DATETIME)");
+        ExecuteSql(connection, transaction, "INSERT INTO documents_rebuild (id, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at) SELECT id, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at FROM documents");
+        ExecuteSql(connection, transaction, "DROP TABLE documents");
+        ExecuteSql(connection, transaction, "ALTER TABLE documents_rebuild RENAME TO documents");
+    }
+
     private static void EnsureNoUnsupportedIndexesOrTriggers(SqliteConnection connection, string tableName)
     {
         var allowedIndexes = tableName switch
         {
             "documents" => new HashSet<string>(StringComparer.Ordinal)
             {
-                "idx_documents_subject", "idx_documents_type", "idx_documents_created_at", "idx_documents_deadline", "idx_documents_deleted", "idx_documents_important"
+                "idx_documents_subject", "idx_documents_type", "idx_documents_created_at", "idx_documents_deadline", "idx_documents_deleted", "idx_documents_important", "idx_documents_file_path_unique"
             },
             "collection_items" => new HashSet<string>(StringComparer.Ordinal)
             {
@@ -516,6 +599,8 @@ public static class DatabaseMigrator
         {
             var indexName = indexReader.GetString(1);
             var origin = indexReader.GetString(3);
+            if (tableName == "documents" && origin == "u")
+                throw new InvalidOperationException($"Unsupported unique constraint '{indexName}' on '{tableName}'.");
             if (origin == "c" && !allowedIndexes.Contains(indexName))
                 throw new InvalidOperationException($"Unsupported index '{indexName}' on '{tableName}'.");
         }

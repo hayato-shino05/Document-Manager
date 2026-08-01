@@ -824,13 +824,13 @@ public class DuplicateDetectionLogicTests : DatabaseTestBase
     {
         string sharedPath = @"C:\shared\file.pdf";
         _repo.Add(new StudyDocument { Name = "Copy A", FilePath = sharedPath });
-        _repo.Add(new StudyDocument { Name = "Copy B", FilePath = sharedPath });
+        _repo.Add(new StudyDocument { Name = "Copy B", FilePath = @"c:\SHARED\FILE.pdf" });
         _repo.Add(new StudyDocument { Name = "Unique",  FilePath = @"C:\unique.pdf" });
 
         var all = _repo.GetAll();
         var grouped = all
             .Where(d => !string.IsNullOrEmpty(d.FilePath))
-            .GroupBy(d => d.FilePath!)
+            .GroupBy(d => d.FilePath!, StringComparer.OrdinalIgnoreCase)
             .Where(g => g.Count() > 1)
             .ToList();
 
@@ -864,7 +864,7 @@ public class DuplicateDetectionLogicTests : DatabaseTestBase
         var all = _repo.GetAll();
         var grouped = all
             .Where(d => !string.IsNullOrEmpty(d.FilePath))
-            .GroupBy(d => d.FilePath!)
+            .GroupBy(d => d.FilePath!, StringComparer.OrdinalIgnoreCase)
             .Where(g => g.Count() > 1)
             .ToList();
 
@@ -876,14 +876,14 @@ public class DuplicateDetectionLogicTests : DatabaseTestBase
     {
         string path = @"C:\dup.pdf";
         _repo.Add(new StudyDocument { Name = "Live Copy",    FilePath = path });
-        _repo.Add(new StudyDocument { Name = "Deleted Copy", FilePath = path });
+        _repo.Add(new StudyDocument { Name = "Deleted Copy", FilePath = @"c:\DUP.pdf" });
         int deletedId = _repo.GetAll().First(d => d.Name == "Deleted Copy").Id;
         _repo.Delete(deletedId);
 
         var active = _repo.GetAll(); // excludes soft-deleted
         var grouped = active
             .Where(d => !string.IsNullOrEmpty(d.FilePath))
-            .GroupBy(d => d.FilePath!)
+            .GroupBy(d => d.FilePath!, StringComparer.OrdinalIgnoreCase)
             .Where(g => g.Count() > 1)
             .ToList();
 
