@@ -26,7 +26,7 @@ StudyDocumentManager.sln
 │   ├── Models/
 │   ├── Services/
 │   └── App.axaml.cs               # DI composition root
-└── StudyDocumentManager.Tests/    # xUnit test suite (614 tests)
+└── StudyDocumentManager.Tests/    # xUnit test suite (785 tests)
 ```
 
 ## Dependency Rule
@@ -52,7 +52,7 @@ All table and column names use English. No legacy Vietnamese naming.
 | collections | User-defined groupings |
 | collection_items | Many-to-many: documents ↔ collections |
 | recent_files | Recently accessed documents |
-| app_settings | Application configuration (planned) |
+| app_settings | 言語などのアプリケーション設定 |
 
 ## MVVM Separation (Mandatory)
 
@@ -63,12 +63,9 @@ All table and column names use English. No legacy Vietnamese naming.
 | Service/Model | Business logic, DB, I/O | Any UI awareness |
 | Code-behind | UI glue (focus, animation) only | DB calls, API calls |
 
-## i18n Strategy (Planned)
+## i18n Strategy
 
-Schema uses English column names as neutral keys. UI strings will be
-externalized to `.resx` resource files supporting Japanese (default),
-English, Vietnamese, and Chinese. Language selection persisted in
-`app_settings` table.
+Schema uses English column names as neutral keys. UI strings are externalized to `.resx` resource files supporting Japanese (default), English, Vietnamese, and Chinese. `Strings.resx`、`Strings.en.resx`、`Strings.vi.resx`、`Strings.zh.resx` はすべて 548 キーで構成され、未翻訳キーは日本語へフォールバックします。言語選択は `app_settings.language` に保存されます。ResX のキー整合性と model 層の保存・復元は自動テスト済みですが、起動時の復元と実行中の `MainWindow` 切り替えは desktop 手動確認です。
 
 ## Project Overlay — Study Document Manager
 

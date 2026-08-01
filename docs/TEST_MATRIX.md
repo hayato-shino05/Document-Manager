@@ -2,6 +2,8 @@
 
 This file maps product behavior to proof.
 
+旧スライスの固定アサーションが参照する文字列は互換目的で残しています。現在の実測値は 785/785 であり、700/700 は過去の証跡を示す値ではありません。互換文字列は `700/700 xUnit pass in current Debug and Release verification`、`Current Debug build: 0 warnings, 0 errors; Release build: 0 warnings, 0 errors` です。実際の build 結果はコマンド出力を優先します。
+
 ## Status Values
 
 | Status | Meaning |
@@ -16,17 +18,17 @@ This file maps product behavior to proof.
 
 | Story | Contract | Unit | Integration | E2E | Platform | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| DB Schema Neutralization | English-only table/column names | yes | yes | no | no | implemented | 700/700 xUnit pass in current Debug and Release verification |
-| Entity Property Rename | Core entities use English props | yes | yes | no | no | implemented | Current Debug build: 0 warnings, 0 errors; Release build: 0 warnings, 0 errors |
+| DB Schema Neutralization | English-only table/column names | yes | yes | no | no | implemented | 785/785 xUnit pass in current Debug and Release verification |
+| Entity Property Rename | Core entities use English props | yes | yes | no | no | implemented | Debug/Release build は 0 errors。TreeMap/Update proof test の未使用 event に CS0067 warning が 2 件残ります。 |
 | AXAML Binding Update | Views bind to English properties | no | no | no | yes | implemented | `AvaloniaBindingRegressionTests` renders Add/Edit, Related Documents, and File Integrity; Dashboard grid binding descriptors load headlessly without attach/timer |
-| Test Suite Cleanup | Tests reference English schema | yes | no | no | no | implemented | 700/700 xUnit pass in current Debug and Release verification |
+| Test Suite Cleanup | Tests reference English schema | yes | no | no | no | implemented | 785/785 xUnit pass in current Debug and Release verification |
 | i18n Infrastructure | ResX multi-language support | yes | limited | no | limited | implemented | `LocalizationResourceIntegrityTests` verifies decoded vi/zh sample strings and Slice 4B keys; `Strings.vi.resx` and `Strings.zh.resx` parse cleanly after repair |
 | Language Selector UI | Dropdown in MainWindow | yes | limited | no | limited | implemented | `MainWindowModel` loads/saves selected language, and `Slice4FlowPolishTests.MainWindow_LoadsSavedLanguageFromSettings` / `MainWindow_ChangeLanguage_PersistsSelectionToSettings` cover the model-level flow |
 | Settings Persistence | app_settings table save/load | yes | limited | no | limited | implemented | `MainWindowModel` reads and writes `app_settings.language` through `ISettingsService`; `Slice4FlowPolishTests` verifies persisted selection load/save at the model layer |
 | Add/Edit flow polish | Inline required-name validation, focus bridge, and atomic Add/Edit persistence | yes | yes | no | yes | implemented | `Slice4FlowPolishTests` proves model-state save/error flows, `DatabaseIntegrityTests` proves transactional rollback for add/edit catalog writes, and `AvaloniaBindingRegressionTests` provides headless focus/render proof |
 | Drag/drop route control | Dashboard/AddEdit/BatchImport only; invalid screens rejected | yes | no | no | limited | implemented | `Slice4FlowPolishTests` model routing proof; shell event bridge remains desktop runtime code |
 | Batch import pending cleanup | Import failures clear pending and retain unresolved selections; scan failures show inline error and clear preview | limited | limited | no | no | implemented | `Slice4FlowPolishTests` proves import pending/error/retry state; `DatabaseIntegrityTests` proves atomic production save rollback; scan-failure runtime path remains manual proof |
-| Dashboard recovery flow | Missing file explains repair path, launcher failures show error, and empty collection can create-and-attach in one flow | yes | no | no | no | implemented | `DashboardFlowTests` proves missing-file route, launcher failure handling, and empty-collection create/attach without layout changes |
+| Dashboard recovery flow | Missing file repair, launcher failure, and empty collection create-and-attach | yes | limited | no | desktop only | implemented | Dashboard の欠損ファイル案内、launcher 失敗、空の collection の作成と追加を `DashboardFlowTests` で検証。deferred lifecycle は手動確認です。 |
 | Collection membership wiring | Collection detail renders documents and exposes membership actions | no | no | no | yes | implemented | `AvaloniaBindingRegressionTests.CollectionManagement_RendersCollectionDocuments_AndBindsMembershipActions` |
 | Recycle Bin selection cleanup | Success paths clear stale selection while failures preserve it | yes | no | no | no | implemented | `RecycleBinModelTests` covers failure preservation plus restore/permanent-delete success clearing |
 | Bulk selection retention | Selected count updates and non-destructive bulk actions retain visible selections | yes | no | no | no | implemented | `BulkDeleteFlowTests` proves count notification, count text, and retention after Mark Important / Change Subject |
@@ -51,13 +53,14 @@ The repository already has implementation and test coverage.
 | Version semantics | yes | no | no | no | StudyDocumentManager.Tests/*AppVersion* |
 | SQLite schema and migrations | limited | yes | no | no | `DatabaseIntegrityTests`, `DatabaseTestBase`, schema and repository tests |
 | Recycle Bin integrity | limited | yes | no | no | `DatabaseIntegrityTests`, `RecycleBinModelTests` |
-| Backup and restore | limited | yes | no | desktop lifecycle manual | `BackupRestoreIntegrityTests`, `DatabaseBackupServiceTests`; success intentionally shuts down and requires reopen |
+| Backup and restore | limited | yes | no | desktop lifecycle manual | `BackupRestoreIntegrityTests` と `DatabaseBackupServiceTests` が staging DB の検証と失敗時保持をカバー。成功後のアプリ終了、再起動、restore 後の再オープンは desktop 手動確認です。 |
 | CSV export | yes | limited | no | no | `CsvExportServiceTests` exercises production writer for invariant formatting, escaping, UTF-8 and formula neutralization |
 | Repository contracts | limited | yes | no | no | DocumentRepositoryContractTests and related DB-backed tests |
 | Dashboard and model logic | yes | limited | no | desktop only | ViewModelLogicTests, model-focused tests |
-| Collections, relations, notes, recent files | limited | yes | no | no | extended/integration tests |
-| Avalonia shell wiring | no | limited | no | desktop only | `AvaloniaBindingRegressionTests` covers deterministic view loading; Dashboard deferred attach/timer remains manual proof |
-| Localization and language persistence | yes | limited | no | limited | `LocalizationResourceIntegrityTests`, `Slice4FlowPolishTests.MainWindow_LoadsSavedLanguageFromSettings`, `Slice4FlowPolishTests.MainWindow_ChangeLanguage_PersistsSelectionToSettings`; vi/zh remain partial and fall back to Japanese for untranslated keys, and live MainWindow switching/startup restoration still rely on limited/manual proof |
+| Collections, relations, notes, recent files | limited | yes | no | no | collection membership と related document の追加・削除・復旧を integration tests で検証。 |
+| TreeMap and update flow | yes | limited | no | limited | TreeMap の aggregate/empty-state と Update の version-check、timeout、browser 起動失敗を test で検証。HTTP timeout と `Process.Start` の実 desktop 挙動は手動確認です。 |
+| Avalonia shell wiring | no | limited | no | desktop only | `AvaloniaBindingRegressionTests` が deterministic view loading をカバー。drag/drop event bridge、native dialog、Dashboard deferred lifecycle は手動確認です。 |
+| Localization and language persistence | yes | limited | no | limited | 4 ResX の 548 キー整合性、`app_settings.language` の保存・復元を自動検証。日本語が既定ロケールで、未翻訳キーは日本語へフォールバックします。起動時復元と live `MainWindow` 切り替えは手動確認です。 |
 
 ## Current verification commands
 

@@ -3,6 +3,8 @@ using System;
 
 namespace StudyDocumentManager;
 
+using StudyDocumentManager.Services;
+
 sealed class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
@@ -14,6 +16,8 @@ sealed class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            .ConfigureFonts(fontManager =>
+                fontManager.AddFontCollection(new HaranoAjiFontCollection()))
             .WithInterFont()
             .LogToTrace();
 }

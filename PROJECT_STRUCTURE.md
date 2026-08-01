@@ -229,7 +229,9 @@ Localization is implemented through:
 - `StudyDocumentManager/Resources/Strings.vi.resx`
 - `StudyDocumentManager/Resources/Strings.zh.resx`
 
-Language selection is exposed in `MainWindowModel` and persisted in SQLite through `app_settings.language`.
+日本語を既定ロケールとして使用します。4 つの ResX は同じ 548 キーを持ち、未翻訳キーは日本語へフォールバックします。言語選択は `MainWindowModel` から変更でき、SQLite の `app_settings.language` に保存されます。XAML の動的な表示は `LocalizationService` と `LocalizeExtension` が更新しますが、起動時復元と表示済みモデル文字列のライブ更新はデスクトップ実行で確認する必要があります。
+
+`Harano Aji Gothic` の Regular/Bold と SIL Open Font License 1.1 の通知を `StudyDocumentManager/Assets/Fonts` に同梱し、`fonts:HaranoAji#Harano Aji Gothic` として参照できるよう登録します。Avalonia の現行 headless runtime はこの CFF OpenType を glyph typeface として生成できないため、既定 UI フォントは Inter のままです。
 
 ## 10. Data Layer
 
@@ -255,6 +257,8 @@ See `DATABASE.md` for schema details.
 | Dashboard search, filter, list | `DashboardModel`, `Dashboard.axaml` | `IDocumentRepository`, `ICategoryRepository`, `ICollectionRepository` |
 | Add and edit document | `AddEditModel`, `AddEdit.axaml` | `IDocumentRepository` |
 | Batch import | `BatchImportModel`, `BatchImport.axaml` | `IDocumentRepository`, file and dialog services |
+
+Batch Import は全件成功だけでなく部分成功を許容します。保存済み項目を保持し、失敗項目と未解決の選択を再試行できる状態に残します。`file_path` は空でない完全一致を部分一意インデックスで制約し、旧データの重複は移行時に最小 `id` の行を保持して解消します。
 | Bulk operations | `BulkDeleteModel`, `BulkDelete.axaml` | `IBulkOperationRepository` |
 | Duplicate detection | `DuplicateDetectionModel`, `DuplicateDetection.axaml` | `IDocumentRepository` |
 | Categories and types | `CategoryManagementModel`, `CategoryManagement.axaml` | `ICategoryRepository` |
@@ -267,11 +271,13 @@ See `DATABASE.md` for schema details.
 | Reports | `ReportModel`, `Report.axaml` | `IReportRepository` |
 | TreeMap | `TreeMapModel`, `TreeMap.axaml` | aggregate report data |
 
+Dashboard は欠損ファイルと launcher 失敗をエラーとして案内し、空の collection は作成と文書追加を同じフローで復旧できます。Recycle Bin、collection、related document の復旧と選択状態の保持はモデル／SQLite テストで検証済みです。Backup restore は staging DB の検証まで自動化し、成功後のアプリ終了と再起動はデスクトップ手動確認が必要です。
+
 ## 12. Tests
 
-`StudyDocumentManager.Tests` uses xUnit. `DatabaseTestBase` creates a unique temporary SQLite file per test-class instance and overrides the database path before initialization.
+`StudyDocumentManager.Tests` uses xUnit. `DatabaseTestBase` creates a unique temporary SQLite file per test-class instance and overrides the database path before initialization. 現行スイートは 785 テストです。
 
-The current proof surface is strongest on database and repository behavior. Avalonia runtime UI behavior has more limited proof and should be verified carefully when changed.
+データベース、repository、model/service の自動検証は強い一方、次の desktop runtime 証跡は手動確認として残ります。drag/drop の event bridge、native dialog、Dashboard の deferred lifecycle、HTTP timeout と browser の `Process.Start`、restore 後の再オープン、実行中の `MainWindow` ローカライズ切り替えです。
 
 ## 13. Verification Commands
 

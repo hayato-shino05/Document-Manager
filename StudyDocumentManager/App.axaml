@@ -3,6 +3,10 @@
              x:Class="StudyDocumentManager.App"
              RequestedThemeVariant="Light">
 
+    <Application.Resources>
+        <FontFamily x:Key="HaranoAjiGothic">fonts:HaranoAji#Harano Aji Gothic</FontFamily>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
