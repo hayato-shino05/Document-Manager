@@ -72,6 +72,9 @@ public partial class DashboardModel : ModelBase
     [ObservableProperty] private int _noFileDocuments;
     [ObservableProperty] private int _deletedCount;
     [ObservableProperty] private string _statusText = string.Empty;
+    [ObservableProperty] private bool _isEmptyState;
+    [ObservableProperty] private bool _hasLoadError;
+    [ObservableProperty] private string _stateMessage = string.Empty;
 
     // ——— Search & Filter ——— 
     [ObservableProperty] private string _searchKeyword = string.Empty;
@@ -165,52 +168,71 @@ public partial class DashboardModel : ModelBase
         _isLoadingData = true;
         SelectedDocument = null;
 
-        var docs = _repository.GetAll();
+        try
+        {
+            var docs = _repository.GetAll();
+            var subjects = _categoryRepo.GetAllSubjects();
+            var types = _categoryRepo.GetAllTypes();
 
-        // Stats
-        TotalDocuments = docs.Count;
-        ImportantDocuments = docs.Count(d => d.IsImportant);
-        OverdueDocuments = _repository.GetOverdueDocuments().Count;
-        NoFileDocuments = docs.Count(d => string.IsNullOrEmpty(d.FilePath));
-        TotalCategories = _categoryRepo.GetAllSubjects().Count;
-        DeletedCount = _recycleBinRepo.GetDeletedDocumentCount();
+            TotalDocuments = docs.Count;
+            ImportantDocuments = docs.Count(d => d.IsImportant);
+            OverdueDocuments = _repository.GetOverdueDocuments().Count;
+            NoFileDocuments = docs.Count(d => string.IsNullOrEmpty(d.FilePath));
+            TotalCategories = subjects.Count;
+            DeletedCount = _recycleBinRepo.GetDeletedDocumentCount();
 
-        // Load filter dropdowns — clear and re-populate EXISTING collections
-        // to avoid replacing the ObservableCollection reference which causes
-        // Avalonia ComboBox binding loop (StackOverflowException).
-        var subjects = _categoryRepo.GetAllSubjects();
-        var types = _categoryRepo.GetAllTypes();
+            Subjects = [FILTER_ALL_SENTINEL, ..subjects];
+            Types = [FILTER_ALL_SENTINEL, ..types];
+            SelectedSubject = FILTER_ALL_SENTINEL;
+            SelectedType = FILTER_ALL_SENTINEL;
+            Documents = docs.ToList();
+            BuildCategoryTree(docs, subjects, types);
 
-        var subjectList = new List<string> { FILTER_ALL_SENTINEL };
-        subjectList.AddRange(subjects);
-        Subjects = subjectList;
+            HasLoadError = false;
+            IsEmptyState = docs.Count == 0;
+            StateMessage = IsEmptyState ? _loc["Dashboard_EmptyState"] : string.Empty;
+            StatusText = string.Format(_loc["Status_TotalSummary"], TotalDocuments, ImportantDocuments, OverdueDocuments);
+            NotifyStatPropertiesChanged();
+        }
+        catch
+        {
+            Documents = [];
+            HasLoadError = true;
+            IsEmptyState = false;
+            StateMessage = _loc["Dashboard_LoadError"];
+            StatusText = StateMessage;
+            NotifyStatPropertiesChanged();
+        }
+        finally
+        {
+            _isLoadingData = false;
+        }
+    }
 
-        var typeList = new List<string> { FILTER_ALL_SENTINEL };
-        typeList.AddRange(types);
-        Types = typeList;
-
-        SelectedSubject = FILTER_ALL_SENTINEL;
-        SelectedType = FILTER_ALL_SENTINEL;
-
-        // Assign new List (not ObservableCollection) — DataGrid ItemsSource
-        // is set from code-behind to avoid binding loop.
-        Documents = docs.ToList();
-
-        // Build category tree
-        BuildCategoryTree(docs, subjects, types);
-
-        // Update status
-        StatusText = string.Format(_loc["Status_TotalSummary"], TotalDocuments, ImportantDocuments, OverdueDocuments);
-
-        // Notify stat card properties changed
+    private void NotifyStatPropertiesChanged()
+    {
         OnPropertyChanged(nameof(TotalCount));
         OnPropertyChanged(nameof(SubjectCount));
         OnPropertyChanged(nameof(ImportantCount));
         OnPropertyChanged(nameof(OverdueCount));
         OnPropertyChanged(nameof(NoFileCount));
         OnPropertyChanged(nameof(RecycleBinCount));
+    }
 
-        _isLoadingData = false;
+
+    private void UpdateVisibleState(IList<StudyDocument> documents)
+    {
+        SelectedDocument = null;
+        Documents = documents.ToList();
+        TotalDocuments = documents.Count;
+        ImportantDocuments = documents.Count(d => d.IsImportant);
+        OverdueDocuments = documents.Count(d => d.Deadline.HasValue && d.Deadline.Value < DateTime.Now);
+        NoFileDocuments = documents.Count(d => string.IsNullOrEmpty(d.FilePath));
+        IsEmptyState = documents.Count == 0;
+        HasLoadError = false;
+        StateMessage = IsEmptyState ? _loc["Dashboard_EmptyState"] : string.Empty;
+        StatusText = string.Format(_loc["Status_TotalSummary"], TotalDocuments, ImportantDocuments, OverdueDocuments);
+        NotifyStatPropertiesChanged();
     }
 
     private void BuildCategoryTree(IList<StudyDocument> docs, List<string> subjects, List<string> types)
@@ -376,10 +398,7 @@ public partial class DashboardModel : ModelBase
                         _isApplyingFilters = true;
                         try
                         {
-                            SelectedDocument = null;
-                            Documents = colDocs;
-                            TotalDocuments = colDocs.Count;
-                            ImportantDocuments = colDocs.Count(d => d.IsImportant);
+                            UpdateVisibleState(colDocs);
                         }
                         finally { _isApplyingFilters = false; }
                         return;
@@ -423,10 +442,7 @@ public partial class DashboardModel : ModelBase
 
     private void ApplyFilters()
     {
-        // Skip during initial data load
-        if (_isLoadingData) return;
-        // Re-entrancy guard: setting Documents triggers OnDocumentsChanged which could re-invoke
-        if (_isApplyingFilters) return;
+        if (_isLoadingData || _isApplyingFilters) return;
         _isApplyingFilters = true;
 
         try
@@ -434,27 +450,20 @@ public partial class DashboardModel : ModelBase
             string keyword = SearchKeyword?.Trim() ?? "";
             string subject = SelectedSubject == FILTER_ALL_SENTINEL ? "" : SelectedSubject;
             string type = SelectedType == FILTER_ALL_SENTINEL ? "" : SelectedType;
-
-            DateTime? fromDate = IsDateFilterEnabled && FilterFromDate.HasValue
-                ? FilterFromDate.Value.DateTime : null;
-            DateTime? toDate = IsDateFilterEnabled && FilterToDate.HasValue
-                ? FilterToDate.Value.DateTime : null;
+            DateTime? fromDate = IsDateFilterEnabled && FilterFromDate.HasValue ? FilterFromDate.Value.DateTime : null;
+            DateTime? toDate = IsDateFilterEnabled && FilterToDate.HasValue ? FilterToDate.Value.DateTime : null;
             double? minSize = IsSizeFilterEnabled ? FilterMinSize : null;
             double? maxSize = IsSizeFilterEnabled ? FilterMaxSize : null;
             bool? isImportant = IsImportantOnly ? true : null;
-
             bool hasFilter = !string.IsNullOrEmpty(subject) || !string.IsNullOrEmpty(type)
-                || fromDate.HasValue || toDate.HasValue
-                || minSize.HasValue || maxSize.HasValue
+                || fromDate.HasValue || toDate.HasValue || minSize.HasValue || maxSize.HasValue
                 || isImportant.HasValue || !string.IsNullOrEmpty(keyword);
 
-            List<StudyDocument> results = hasFilter
+            var results = hasFilter
                 ? _repository.SearchAdvanced(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant)
                 : _repository.GetAll();
 
-            Documents = results.ToList();
-            TotalDocuments = results.Count;
-            ImportantDocuments = results.Count(d => d.IsImportant);
+            UpdateVisibleState(results);
         }
         finally
         {

@@ -670,6 +670,10 @@
   <data name="RecentFiles_ColType" xml:space="preserve"><value>Loại</value></data>
   <data name="RecentFiles_ColOpenedAt" xml:space="preserve"><value>Thời gian mở</value></data>
   <data name="RecentFiles_ColStatus" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="RecentFiles_ColAction" xml:space="preserve"><value>Thao tác</value></data>
+  <data name="RecentFiles_BtnOpen" xml:space="preserve"><value>Mở</value></data>
+  <data name="Dashboard_EmptyState" xml:space="preserve"><value>Không có tài liệu để hiển thị</value></data>
+  <data name="Dashboard_LoadError" xml:space="preserve"><value>Không thể tải tài liệu. Vui lòng thử lại.</value></data>
   <data name="RecentFiles_EmptyState" xml:space="preserve"><value>Chưa có tệp nào được mở gần đây</value></data>
   <data name="RecycleBin_EmptyState" xml:space="preserve"><value>Thùng rác đang trống</value></data>
   <data name="RecycleBin_ColSubject" xml:space="preserve"><value>Danh mục</value></data>

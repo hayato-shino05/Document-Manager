@@ -58,6 +58,16 @@
                             <DataGridTextColumn Header="{loc:Localize RecentFiles_ColType}" Binding="{Binding FileType}" Width="80"/>
                             <DataGridTextColumn Header="{loc:Localize RecentFiles_ColOpenedAt}" Binding="{Binding OpenedAtDisplay}" Width="130"/>
                             <DataGridTextColumn Header="{loc:Localize RecentFiles_ColStatus}" Binding="{Binding StatusDisplay}" Width="100"/>
+                            <DataGridTemplateColumn Header="{loc:Localize RecentFiles_ColAction}" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="vm:RecentFileItem">
+                                        <Button Classes="secondary" Command="{Binding $parent[DataGrid].DataContext.OpenFileCommand}"
+                                                CommandParameter="{Binding}" IsEnabled="{Binding FileExists}">
+                                            <TextBlock Text="{loc:Localize RecentFiles_BtnOpen}"/>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                     <StackPanel Classes="empty-state" IsVisible="{Binding !RecentFiles.Count}">

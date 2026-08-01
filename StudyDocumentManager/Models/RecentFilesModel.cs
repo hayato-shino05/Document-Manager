@@ -54,14 +54,21 @@ public partial class RecentFilesModel : ModelBase
     }
 
     [RelayCommand]
-    private void OpenFile(RecentFileItem? item)
+    private async Task OpenFile(RecentFileItem? item)
     {
         if (item == null || string.IsNullOrEmpty(item.FilePath) || !item.FileExists) return;
 
-        if (!_recentRepo.Add(item.DocumentId))
+        try
+        {
+            _processLauncher.OpenFile(item.FilePath);
+        }
+        catch
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
             return;
+        }
 
-        _processLauncher.OpenFile(item.FilePath);
+        _recentRepo.Add(item.DocumentId);
     }
 
     [RelayCommand]

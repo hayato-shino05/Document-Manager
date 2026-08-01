@@ -670,6 +670,10 @@
   <data name="RecentFiles_ColType" xml:space="preserve"><value>类型</value></data>
   <data name="RecentFiles_ColOpenedAt" xml:space="preserve"><value>打开时间</value></data>
   <data name="RecentFiles_ColStatus" xml:space="preserve"><value>状态</value></data>
+  <data name="RecentFiles_ColAction" xml:space="preserve"><value>操作</value></data>
+  <data name="RecentFiles_BtnOpen" xml:space="preserve"><value>打开</value></data>
+  <data name="Dashboard_EmptyState" xml:space="preserve"><value>没有可显示的文档</value></data>
+  <data name="Dashboard_LoadError" xml:space="preserve"><value>无法加载文档，请重试</value></data>
   <data name="RecentFiles_EmptyState" xml:space="preserve"><value>暂无最近打开的文件</value></data>
   <data name="RecycleBin_EmptyState" xml:space="preserve"><value>回收站为空</value></data>
   <data name="RecycleBin_ColSubject" xml:space="preserve"><value>分类</value></data>

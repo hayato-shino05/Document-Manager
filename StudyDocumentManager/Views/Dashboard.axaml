@@ -340,6 +340,7 @@
 
                     <!-- ═══ DATA GRID ═══ -->
                     <Border Grid.Row="1" ClipToBounds="True">
+                        <Panel>
                         <DataGrid Name="dgvDocuments"
                                   AutoGenerateColumns="False"
                                   CanUserReorderColumns="True"
@@ -468,6 +469,11 @@
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <StackPanel Classes="empty-state" IsVisible="{Binding !Documents.Count}">
+                            <Image Classes="empty-state-icon" Source="{StaticResource IconDocPage}"/>
+                            <TextBlock Classes="empty-state-text" Text="{Binding StateMessage}"/>
+                        </StackPanel>
+                        </Panel>
                     </Border>
 
                     <!-- ═══ DOCUMENT PREVIEW PANEL (collapsible, like WinForms) ═══ -->

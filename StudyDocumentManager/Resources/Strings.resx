@@ -474,6 +474,10 @@
   <data name="RecentFiles_ColType" xml:space="preserve"><value>種類</value></data>
   <data name="RecentFiles_ColOpenedAt" xml:space="preserve"><value>開いた時間</value></data>
   <data name="RecentFiles_ColStatus" xml:space="preserve"><value>状態</value></data>
+  <data name="RecentFiles_ColAction" xml:space="preserve"><value>操作</value></data>
+  <data name="RecentFiles_BtnOpen" xml:space="preserve"><value>開く</value></data>
+  <data name="Dashboard_EmptyState" xml:space="preserve"><value>表示する文書がありません</value></data>
+  <data name="Dashboard_LoadError" xml:space="preserve"><value>文書を読み込めません。再試行してください</value></data>
   <data name="RecentFiles_EmptyState" xml:space="preserve"><value>最近開いたファイルはありません</value></data>
 
   <!-- RecycleBin View (additional) -->
