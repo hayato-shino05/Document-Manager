@@ -29,30 +29,42 @@ public partial class DuplicateDetectionModel : ModelBase
     {
         IsScanning = true;
         DuplicateGroups.Clear();
+        TotalGroups = 0;
 
-        var docs = _repository.GetAll();
-
-        var groups = docs
-            .GroupBy(d => d.Name.Trim().ToLowerInvariant())
-            .Where(g => g.Count() > 1)
-            .ToList();
-
-        foreach (var group in groups)
+        try
         {
-            DuplicateGroups.Add(new DuplicateGroup
+            var docs = _repository.GetAll();
+            var groups = docs
+                .GroupBy(d => d.Name.Trim().ToLowerInvariant())
+                .Where(g => g.Count() > 1)
+                .ToList();
+
+            foreach (var group in groups)
             {
-                GroupName = group.First().Name,
-                Documents = new ObservableCollection<StudyDocument>(group.ToList()),
-                Count = group.Count()
-            });
+                DuplicateGroups.Add(new DuplicateGroup
+                {
+                    GroupName = group.First().Name,
+                    Documents = new ObservableCollection<StudyDocument>(group.ToList()),
+                    Count = group.Count()
+                });
+            }
+
+            TotalGroups = DuplicateGroups.Count;
+
+            if (TotalGroups == 0)
+            {
+                await _dialogService.ShowMessageAsync(_loc["Dialog_Result"], _loc["Duplicate_NoDuplicates"]);
+            }
         }
-
-        TotalGroups = DuplicateGroups.Count;
-        IsScanning = false;
-
-        if (TotalGroups == 0)
+        catch (Exception)
         {
-            await _dialogService.ShowMessageAsync(_loc["Dialog_Result"], _loc["Duplicate_NoDuplicates"]);
+            DuplicateGroups.Clear();
+            TotalGroups = 0;
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+        }
+        finally
+        {
+            IsScanning = false;
         }
     }
 

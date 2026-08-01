@@ -42,30 +42,44 @@ public partial class FileIntegrityCheckModel : ModelBase
         TotalChecked = 0;
         MissingCount = 0;
 
-        var docs = _repository.GetAll();
-        foreach (var doc in docs)
+        try
         {
-            TotalChecked++;
-            if (!string.IsNullOrEmpty(doc.FilePath) && !File.Exists(doc.FilePath))
+            var docs = _repository.GetAll();
+            foreach (var doc in docs)
             {
-                MissingCount++;
-                Results.Add(new IntegrityResult
+                TotalChecked++;
+                if (!string.IsNullOrEmpty(doc.FilePath) && !File.Exists(doc.FilePath))
                 {
-                    Document = doc,
-                    FilePath = doc.FilePath,
-                    StatusKey = "Integrity_FileNotExist",
-                    Status = _loc["Integrity_FileNotExist"]
-                });
+                    MissingCount++;
+                    Results.Add(new IntegrityResult
+                    {
+                        Document = doc,
+                        FilePath = doc.FilePath,
+                        StatusKey = "Integrity_FileNotExist",
+                        Status = _loc["Integrity_FileNotExist"]
+                    });
+                }
+            }
+
+            SetLocalizedStatus("Status_ScanComplete", MissingCount, TotalChecked);
+
+            if (MissingCount == 0)
+            {
+                await _dialogService.ShowMessageAsync(_loc["Dialog_Result"],
+                    string.Format(_loc["Integrity_AllFilesOk"], TotalChecked));
             }
         }
-
-        IsChecking = false;
-        SetLocalizedStatus("Status_ScanComplete", MissingCount, TotalChecked);
-
-        if (MissingCount == 0)
+        catch (Exception)
         {
-            await _dialogService.ShowMessageAsync(_loc["Dialog_Result"],
-                string.Format(_loc["Integrity_AllFilesOk"], TotalChecked));
+            Results.Clear();
+            TotalChecked = 0;
+            MissingCount = 0;
+            SetLocalizedStatus("Status_ScanPrompt");
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+        }
+        finally
+        {
+            IsChecking = false;
         }
     }
 
