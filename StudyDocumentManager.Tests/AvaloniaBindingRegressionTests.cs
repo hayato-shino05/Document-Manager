@@ -204,7 +204,14 @@ public class AvaloniaBindingRegressionTests
     {
         var localization = GetLocalization();
         var model = new AddEditModel(
-            null!, new CategoryRepositoryStub(), null!, null!, null!, localization);
+            null!, new CategoryRepositoryStub(), null!, null!, null!, localization)
+        {
+            Name = "日本語の長い文書名と学習ノート",
+            FilePath = "C:/study/非常に長いフォルダー名/アルゴリズムとデータ構造の講義資料.pdf",
+            Author = "著者名",
+            Tags = "アルゴリズム,データ構造",
+            Notes = "狭い画面でも入力欄が縦方向に積み重なり、長い文字列が別の項目へ重ならないことを確認します。"
+        };
         var view = new AddEdit { DataContext = model };
         var window = new Window { Width = 520, Height = 720, Content = view };
 
@@ -212,6 +219,16 @@ public class AvaloniaBindingRegressionTests
         {
             window.Show();
             FlushAvaloniaBindings();
+
+            var formGrid = view.FindControl<Grid>("formGrid")!;
+            Assert.Single(formGrid.ColumnDefinitions);
+            Assert.Equal(6, formGrid.RowDefinitions.Count);
+            Assert.Equal(0, Grid.GetColumn(view.FindControl<StackPanel>("nameField")!));
+            Assert.Equal(1, Grid.GetRow(view.FindControl<StackPanel>("filePathField")!));
+            Assert.Equal(2, Grid.GetRow(view.FindControl<Grid>("categoryTypeFields")!));
+            Assert.Equal(3, Grid.GetRow(view.FindControl<Grid>("authorTagsFields")!));
+            Assert.Equal(4, Grid.GetRow(view.FindControl<Grid>("deadlineImportantFields")!));
+            Assert.Equal(5, Grid.GetRow(view.FindControl<StackPanel>("notesField")!));
 
             Assert.True(view.Bounds.Width > 0);
             Assert.True(view.Bounds.Height > 0);
@@ -443,7 +460,6 @@ public class AvaloniaBindingRegressionTests
             window.Close();
         }
     }
-
 
     [AvaloniaFact]
     public void CollectionManagement_RendersCollectionDocuments_AndBindsMembershipActions()

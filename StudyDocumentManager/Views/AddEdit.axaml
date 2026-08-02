@@ -33,9 +33,11 @@
                         BorderBrush="{StaticResource CardBorder}"
                         BorderThickness="1"
                         Padding="{StaticResource PaddingPage}">
-                    <Grid ColumnDefinitions="*,*"
+                    <Grid x:Name="formGrid"
+                          ColumnDefinitions="*,*"
                           RowDefinitions="Auto,Auto,Auto,Auto">
-                        <StackPanel Grid.Row="0"
+                        <StackPanel x:Name="nameField"
+                                    Grid.Row="0"
                                     Spacing="{StaticResource Space1}">
                             <TextBlock Text="{loc:Localize AddEdit_LblDocName}"
                                        FontSize="{StaticResource FontSizeMd}"
@@ -53,7 +55,8 @@
                                        FontSize="{StaticResource FontSizeSm}"/>
                         </StackPanel>
 
-                        <StackPanel Grid.Row="1"
+                        <StackPanel x:Name="filePathField"
+                                    Grid.Row="1"
                                     Spacing="{StaticResource Space1}">
                             <TextBlock Text="{loc:Localize AddEdit_LblFilePath}"
                                        FontSize="{StaticResource FontSizeMd}"
@@ -86,7 +89,8 @@
                             </DockPanel>
                         </StackPanel>
 
-                        <StackPanel Grid.Row="2"
+                        <StackPanel x:Name="notesField"
+                                    Grid.Row="2"
                                     Grid.RowSpan="2"
                                     Spacing="{StaticResource Space1}">
                             <TextBlock Text="{loc:Localize AddEdit_LblNotes}"
@@ -104,7 +108,8 @@
                                      VerticalContentAlignment="Top"/>
                         </StackPanel>
 
-                        <Grid Grid.Column="1"
+                        <Grid x:Name="categoryTypeFields"
+                              Grid.Column="1"
                               Grid.Row="0"
                               ColumnDefinitions="*,Auto,*">
                             <Border Grid.Column="1"
@@ -141,7 +146,8 @@
                             </StackPanel>
                         </Grid>
 
-                        <Grid Grid.Column="1"
+                        <Grid x:Name="authorTagsFields"
+                              Grid.Column="1"
                               Grid.Row="1"
                               ColumnDefinitions="*,Auto,*">
                             <Border Grid.Column="1"
@@ -174,7 +180,8 @@
                             </StackPanel>
                         </Grid>
 
-                        <Grid Grid.Column="1"
+                        <Grid x:Name="deadlineImportantFields"
+                              Grid.Column="1"
                               Grid.Row="2"
                               ColumnDefinitions="*,Auto,Auto">
                             <Border Grid.Column="1"
