@@ -1,141 +1,236 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-        xmlns:loc="using:StudyDocumentManager.Markup"
-                     x:Class="StudyDocumentManager.Views.AddEdit"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             x:Class="StudyDocumentManager.Views.AddEdit"
              x:DataType="vm:AddEditModel">
 
-    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
-        <DockPanel MaxWidth="700">
-
-            <!-- Title -->
-            <TextBlock DockPanel.Dock="Top" Text="{Binding PageTitle}" FontSize="{StaticResource FontSizeXl}"
-                       FontWeight="Bold" Foreground="{StaticResource TextPrimary}"
-                       Margin="0,0,0,16"/>
-
-            <!-- Buttons bottom -->
-            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="10"
-                        HorizontalAlignment="Right" Margin="0,16,0,0">
-                <Button Classes="primary" Command="{Binding SaveCommand}" Padding="20,8"
-                        HotKey="Ctrl+S"
-                        ToolTip.Tip="{loc:Localize AddEdit_TipSave}">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <Image Source="{StaticResource IconSave}" Width="13" Height="13"/>
-                        <TextBlock Text="{loc:Localize AddEdit_BtnSave}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"/>
-                    </StackPanel>
-                </Button>
-                <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="20,8"
-                        HotKey="Escape"
-                        ToolTip.Tip="{loc:Localize AddEdit_TipCancel}">
-                    <TextBlock Text="{loc:Localize AddEdit_BtnCancel}" FontSize="{StaticResource FontSizeLg}"/>
-                </Button>
+    <Border Background="{StaticResource ContentBackground}"
+            Padding="{StaticResource PaddingPage}">
+        <Grid RowDefinitions="Auto,*,Auto"
+              MaxWidth="1040"
+              HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal"
+                        Spacing="{StaticResource Space4}"
+                        Margin="0,0,0,12">
+                <Image Source="{StaticResource IconAdd}"
+                       Width="20"
+                       Height="20"
+                       VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding PageTitle}"
+                           FontSize="{StaticResource FontSizeXl}"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimary}"
+                           VerticalAlignment="Center"/>
             </StackPanel>
 
-            <!-- Form fields -->
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto">
+                <Border Background="{StaticResource CardBackground}"
+                        CornerRadius="{StaticResource RadiusMd}"
+                        BorderBrush="{StaticResource CardBorder}"
+                        BorderThickness="1"
                         Padding="{StaticResource PaddingPage}">
-                    <StackPanel Spacing="12">
-
-                        <!-- Document Name -->
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="{loc:Localize AddEdit_LblDocName}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                    <Grid ColumnDefinitions="*,*"
+                          RowDefinitions="Auto,Auto,Auto,Auto">
+                        <StackPanel Grid.Row="0"
+                                    Spacing="4">
+                            <TextBlock Text="{loc:Localize AddEdit_LblDocName}"
+                                       AutomationProperties.Name="{loc:Localize AddEdit_LblDocName}"
+                                       FontSize="{StaticResource FontSizeMd}"
+                                       FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
-                            <TextBox x:Name="txtName" Text="{Binding Name, Mode=TwoWay}" FontSize="{StaticResource FontSizeLg}"
-                                     Watermark="{loc:Localize AddEdit_PlaceholderDocName}" Height="32"/>
+                            <TextBox x:Name="txtName"
+                                     Text="{Binding Name, Mode=TwoWay}"
+                                     AutomationProperties.Name="{loc:Localize AddEdit_LblDocName}"
+                                     FontSize="{StaticResource FontSizeLg}"
+                                     Watermark="{loc:Localize AddEdit_PlaceholderDocName}"
+                                     Height="32"/>
                             <TextBlock Text="{Binding NameValidationMessage}"
                                        IsVisible="{Binding HasNameValidationError}"
                                        Foreground="{StaticResource DangerBrush}"
                                        FontSize="{StaticResource FontSizeSm}"/>
                         </StackPanel>
 
-                        <!-- Row: Category + Type -->
-                        <Grid ColumnDefinitions="*,16,*">
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{loc:Localize AddEdit_LblCategory}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}"/>
-                                <ComboBox ItemsSource="{Binding Subjects}"
-                                          SelectedItem="{Binding Subject, Mode=TwoWay}"
-                                          IsTextSearchEnabled="True"
-                                          PlaceholderText="{loc:Localize AddEdit_PlaceholderCategory}"
-                                          FontSize="{StaticResource FontSizeMd}" Height="32"
-                                          HorizontalAlignment="Stretch"/>
-                            </StackPanel>
-                            <StackPanel Grid.Column="2" Spacing="4">
-                                <TextBlock Text="{loc:Localize AddEdit_LblDocType}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}"/>
-                                <ComboBox ItemsSource="{Binding Types}"
-                                          SelectedItem="{Binding Type, Mode=TwoWay}"
-                                          IsTextSearchEnabled="True"
-                                          PlaceholderText="{loc:Localize AddEdit_PlaceholderDocType}"
-                                          FontSize="{StaticResource FontSizeMd}" Height="32"
-                                          HorizontalAlignment="Stretch"/>
-                            </StackPanel>
-                        </Grid>
-
-                        <!-- File Path -->
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="{loc:Localize AddEdit_LblFilePath}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                        <StackPanel Grid.Row="1"
+                                    Spacing="4">
+                            <TextBlock Text="{loc:Localize AddEdit_LblFilePath}"
+                                       FontSize="{StaticResource FontSizeMd}"
+                                       FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
                             <DockPanel>
-                                <Button DockPanel.Dock="Right" Classes="secondary" Margin="6,0,0,0"
-                                        Command="{Binding BrowseFileCommand}" Padding="{StaticResource PaddingMd}">
-                                    <StackPanel Orientation="Horizontal" Spacing="3">
-                                        <Image Source="{StaticResource IconOpenFile}" Width="11" Height="11"/>
-                                        <TextBlock Text="{loc:Localize AddEdit_BtnBrowse}" FontSize="{StaticResource FontSizeSm}"/>
+                                <Button x:Name="btnBrowse"
+                                        DockPanel.Dock="Right"
+                                        Classes="secondary"
+                                        Margin="6,0,0,0"
+                                        Command="{Binding BrowseFileCommand}"
+                                        AutomationProperties.Name="{loc:Localize AddEdit_BtnBrowse}"
+                                        Padding="{StaticResource PaddingMd}">
+                                    <StackPanel Orientation="Horizontal"
+                                                Spacing="3">
+                                        <Image Source="{StaticResource IconOpenFile}"
+                                               Width="11"
+                                               Height="11"/>
+                                        <TextBlock Text="{loc:Localize AddEdit_BtnBrowse}"
+                                                   FontSize="{StaticResource FontSizeSm}"/>
                                     </StackPanel>
                                 </Button>
-                                <TextBox Text="{Binding FilePath, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
-                                         Watermark="{loc:Localize AddEdit_PlaceholderFilePath}" Height="32"/>
+                                <TextBox x:Name="txtFilePath"
+                                         Text="{Binding FilePath, Mode=TwoWay}"
+                                         AutomationProperties.Name="{loc:Localize AddEdit_LblFilePath}"
+                                         FontSize="{StaticResource FontSizeMd}"
+                                         Watermark="{loc:Localize AddEdit_PlaceholderFilePath}"
+                                         Height="32"/>
                             </DockPanel>
                         </StackPanel>
 
-                        <!-- Author -->
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="{loc:Localize AddEdit_LblAuthor}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                        <StackPanel Grid.Row="2"
+                                    Grid.RowSpan="2"
+                                    Spacing="4">
+                            <TextBlock Text="{loc:Localize AddEdit_LblNotes}"
+                                       FontSize="{StaticResource FontSizeMd}"
+                                       FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
-                            <TextBox Text="{Binding Author, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
-                                     Watermark="{loc:Localize AddEdit_PlaceholderAuthor}" Height="32"/>
-                        </StackPanel>
-
-                        <!-- Tags -->
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="{loc:Localize AddEdit_LblTags}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextPrimary}"/>
-                            <TextBox Text="{Binding Tags, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
-                                     Watermark="{loc:Localize AddEdit_PlaceholderTags}" Height="32"/>
-                        </StackPanel>
-
-                        <!-- Notes -->
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="{loc:Localize AddEdit_LblNotes}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextPrimary}"/>
-                            <TextBox Text="{Binding Notes, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                            <TextBox x:Name="txtNotes"
+                                     Text="{Binding Notes, Mode=TwoWay}"
+                                     AutomationProperties.Name="{loc:Localize AddEdit_LblNotes}"
+                                     FontSize="{StaticResource FontSizeMd}"
                                      Watermark="{loc:Localize AddEdit_PlaceholderNotes}"
-                                     AcceptsReturn="True" TextWrapping="Wrap"
-                                     Height="80"/>
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     MinHeight="140"
+                                     VerticalContentAlignment="Top"/>
                         </StackPanel>
 
-                        <!-- Row: Deadline + Important -->
-                        <Grid ColumnDefinitions="*,16,Auto">
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{loc:Localize AddEdit_LblDeadline}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
+                        <Grid Grid.Column="1"
+                              Grid.Row="0"
+                              ColumnDefinitions="*,16,*">
+                            <StackPanel Grid.Column="0"
+                                        Spacing="4">
+                                <TextBlock Text="{loc:Localize AddEdit_LblCategory}"
+                                           FontSize="{StaticResource FontSizeMd}"
+                                           FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
-                                <DatePicker SelectedDate="{Binding Deadline}" FontSize="{StaticResource FontSizeMd}"
-                                            HorizontalAlignment="Stretch"/>
+                                <ComboBox ItemsSource="{Binding Subjects}"
+                                          SelectedItem="{Binding Subject, Mode=TwoWay}"
+                                          AutomationProperties.Name="{loc:Localize AddEdit_LblCategory}"
+                                          IsTextSearchEnabled="True"
+                                          PlaceholderText="{loc:Localize AddEdit_PlaceholderCategory}"
+                                          FontSize="{StaticResource FontSizeMd}"
+                                          Height="32"
+                                          HorizontalAlignment="Stretch"/>
                             </StackPanel>
-                            <StackPanel Grid.Column="2" Spacing="4" VerticalAlignment="Bottom"
-                                        Margin="0,0,0,4">
-                                <CheckBox Content="{loc:Localize AddEdit_ChkImportant}" FontSize="{StaticResource FontSizeMd}"
-                                          IsChecked="{Binding IsImportant}"/>
+                            <StackPanel Grid.Column="2"
+                                        Spacing="4">
+                                <TextBlock Text="{loc:Localize AddEdit_LblDocType}"
+                                           FontSize="{StaticResource FontSizeMd}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                                <ComboBox ItemsSource="{Binding Types}"
+                                          SelectedItem="{Binding Type, Mode=TwoWay}"
+                                          AutomationProperties.Name="{loc:Localize AddEdit_LblDocType}"
+                                          IsTextSearchEnabled="True"
+                                          PlaceholderText="{loc:Localize AddEdit_PlaceholderDocType}"
+                                          FontSize="{StaticResource FontSizeMd}"
+                                          Height="32"
+                                          HorizontalAlignment="Stretch"/>
                             </StackPanel>
                         </Grid>
 
-                    </StackPanel>
+                        <Grid Grid.Column="1"
+                              Grid.Row="1"
+                              ColumnDefinitions="*,16,*">
+                            <StackPanel Grid.Column="0"
+                                        Spacing="4">
+                                <TextBlock Text="{loc:Localize AddEdit_LblAuthor}"
+                                           FontSize="{StaticResource FontSizeMd}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                                <TextBox x:Name="txtAuthor"
+                                         Text="{Binding Author, Mode=TwoWay}"
+                                         AutomationProperties.Name="{loc:Localize AddEdit_LblAuthor}"
+                                         FontSize="{StaticResource FontSizeMd}"
+                                         Watermark="{loc:Localize AddEdit_PlaceholderAuthor}"
+                                         Height="32"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2"
+                                        Spacing="4">
+                                <TextBlock Text="{loc:Localize AddEdit_LblTags}"
+                                           FontSize="{StaticResource FontSizeMd}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                                <TextBox x:Name="txtTags"
+                                         Text="{Binding Tags, Mode=TwoWay}"
+                                         AutomationProperties.Name="{loc:Localize AddEdit_LblTags}"
+                                         FontSize="{StaticResource FontSizeMd}"
+                                         Watermark="{loc:Localize AddEdit_PlaceholderTags}"
+                                         Height="32"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Grid.Column="1"
+                              Grid.Row="2"
+                              ColumnDefinitions="*,16,Auto">
+                            <StackPanel Grid.Column="0"
+                                        Spacing="4">
+                                <TextBlock Text="{loc:Localize AddEdit_LblDeadline}"
+                                           FontSize="{StaticResource FontSizeMd}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                                <DatePicker SelectedDate="{Binding Deadline, Mode=TwoWay}"
+                                            AutomationProperties.Name="{loc:Localize AddEdit_LblDeadline}"
+                                            FontSize="{StaticResource FontSizeMd}"
+                                            HorizontalAlignment="Stretch"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2"
+                                        Spacing="4"
+                                        VerticalAlignment="Bottom"
+                                        Margin="0,0,0,4">
+                                <CheckBox x:Name="chkImportant"
+                                          Content="{loc:Localize AddEdit_ChkImportant}"
+                                          AutomationProperties.Name="{loc:Localize AddEdit_ChkImportant}"
+                                          FontSize="{StaticResource FontSizeMd}"
+                                          IsChecked="{Binding IsImportant, Mode=TwoWay}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
                 </Border>
             </ScrollViewer>
-        </DockPanel>
+
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        Spacing="{StaticResource Space4}"
+                        HorizontalAlignment="Right"
+                        Margin="0,12,0,0">
+                <Button x:Name="btnSave"
+                        Classes="primary"
+                        Command="{Binding SaveCommand}"
+                        AutomationProperties.Name="{loc:Localize AddEdit_BtnSave}"
+                        Padding="20,8"
+                        HotKey="Ctrl+S"
+                        ToolTip.Tip="{loc:Localize AddEdit_TipSave}">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="4">
+                        <Image Source="{StaticResource IconSave}"
+                               Width="13"
+                               Height="13"/>
+                        <TextBlock Text="{loc:Localize AddEdit_BtnSave}"
+                                   FontSize="{StaticResource FontSizeLg}"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnCancel"
+                        Classes="secondary"
+                        Command="{Binding CancelCommand}"
+                        AutomationProperties.Name="{loc:Localize AddEdit_BtnCancel}"
+                        Padding="20,8"
+                        HotKey="Escape"
+                        ToolTip.Tip="{loc:Localize AddEdit_TipCancel}">
+                    <TextBlock Text="{loc:Localize AddEdit_BtnCancel}"
+                               FontSize="{StaticResource FontSizeLg}"/>
+                </Button>
+            </StackPanel>
+        </Grid>
     </Border>
 
 </UserControl>
