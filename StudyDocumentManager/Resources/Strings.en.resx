@@ -587,6 +587,7 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="Dashboard_TipCopyPath" xml:space="preserve"><value>Copy selected document path</value></data>
   <data name="Dashboard_TipOpenFolder" xml:space="preserve"><value>Open folder of selected document</value></data>
   <data name="Dashboard_TipAbout" xml:space="preserve"><value>About this software</value></data>
+  <data name="Dashboard_A11yToggleImportant" xml:space="preserve"><value>Toggle important flag</value></data>
   <data name="Dashboard_PreviewDeadline" xml:space="preserve"><value>Deadline: {0:dd/MM/yyyy}</value></data>
   <data name="Update_NewVersionReady" xml:space="preserve"><value>New version {0} is available!</value></data>
   <data name="Update_OpenDownloadPage" xml:space="preserve"><value>Open download page?</value></data>

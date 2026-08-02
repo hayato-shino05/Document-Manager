@@ -28,6 +28,7 @@
                            VerticalAlignment="Center" Opacity="0.5"/>
                     <TextBox Width="260" Height="{StaticResource HeightControl}" FontSize="{StaticResource FontSizeMd}"
                              Watermark="{loc:Localize Dashboard_SearchPlaceholder}"
+                             AutomationProperties.Name="{loc:Localize Dashboard_SearchPlaceholder}"
                              Text="{Binding SearchKeyword, Mode=TwoWay}"
                              VerticalContentAlignment="Center"/>
                     <Button Classes="primary" Command="{Binding SearchCommand}"
@@ -41,7 +42,8 @@
                     <TextBlock Text="{loc:Localize Dashboard_LblCategory}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
                                Foreground="{StaticResource TextSecondary}"/>
                     <ComboBox Name="cboSubject" Width="140" FontSize="{StaticResource FontSizeMd}"
-                              Height="{StaticResource HeightControl}" VerticalAlignment="Center">
+                              Height="{StaticResource HeightControl}" VerticalAlignment="Center"
+                              AutomationProperties.Name="{loc:Localize Dashboard_LblCategory}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Converter={x:Static conv:DashboardFilterLabelConverter.Instance}, ConverterParameter=Filter_AllSubjects}"/>
@@ -52,7 +54,8 @@
                     <TextBlock Text="{loc:Localize Dashboard_LblType}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
                                Foreground="{StaticResource TextSecondary}"/>
                     <ComboBox Name="cboType" Width="120" FontSize="{StaticResource FontSizeMd}"
-                              Height="{StaticResource HeightControl}" VerticalAlignment="Center">
+                              Height="{StaticResource HeightControl}" VerticalAlignment="Center"
+                              AutomationProperties.Name="{loc:Localize Dashboard_LblType}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Converter={x:Static conv:DashboardFilterLabelConverter.Instance}, ConverterParameter=Filter_AllTypes}"/>
@@ -458,7 +461,10 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate DataType="{x:Type core:StudyDocument}">
                                             <Button Background="Transparent" BorderThickness="0" Cursor="Hand"
-                                                    Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                    Padding="4" MinWidth="24" MinHeight="24"
+                                                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                    AutomationProperties.Name="{loc:Localize Dashboard_A11yToggleImportant}"
+                                                    ToolTip.Tip="{loc:Localize Dashboard_A11yToggleImportant}"
                                                     Command="{Binding $parent[DataGrid].DataContext.ToggleImportantInlineCommand}"
                                                     CommandParameter="{Binding}">
                                                 <Panel>
@@ -618,8 +624,9 @@
                                     <TextBlock Text="{loc:Localize Dashboard_BtnOverdue}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="4" Classes="secondary" Padding="{StaticResource PaddingChip}"
+                            <Button x:Name="StatusCopyPathButton" Grid.Column="4" Classes="secondary" Padding="{StaticResource PaddingChip}"
                                     Command="{Binding CopyPathCommand}"
+                                    IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipCopyPath}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
@@ -627,8 +634,9 @@
                                     <TextBlock Text="{loc:Localize Dashboard_CtxCopyPath}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="5" Classes="secondary" Padding="{StaticResource PaddingChip}"
+                            <Button x:Name="StatusOpenFolderButton" Grid.Column="5" Classes="secondary" Padding="{StaticResource PaddingChip}"
                                     Command="{Binding OpenFolderCommand}"
+                                    IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
                                     Margin="4,0" Height="24" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipOpenFolder}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">

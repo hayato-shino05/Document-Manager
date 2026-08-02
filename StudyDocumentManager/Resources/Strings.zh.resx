@@ -806,6 +806,7 @@
   <data name="Dashboard_TipCopyPath" xml:space="preserve"><value>复制所选文档的路径</value></data>
   <data name="Dashboard_TipOpenFolder" xml:space="preserve"><value>打开所选文档所在的文件夹</value></data>
   <data name="Dashboard_TipAbout" xml:space="preserve"><value>关于本软件</value></data>
+  <data name="Dashboard_A11yToggleImportant" xml:space="preserve"><value>切换重要标记</value></data>
   <data name="Dashboard_PreviewDeadline" xml:space="preserve"><value>截止日期：{0:dd/MM/yyyy}</value></data>
   <data name="Update_NewVersionReady" xml:space="preserve"><value>新版本 {0} 可用！</value></data>
   <data name="Update_OpenDownloadPage" xml:space="preserve"><value>要打开下载页面吗？</value></data>

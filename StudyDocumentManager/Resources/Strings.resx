@@ -685,6 +685,7 @@
   <data name="Dashboard_TipCopyPath" xml:space="preserve"><value>選択した文書のパスをコピー</value></data>
   <data name="Dashboard_TipOpenFolder" xml:space="preserve"><value>選択した文書のフォルダを開く</value></data>
   <data name="Dashboard_TipAbout" xml:space="preserve"><value>このソフトウェアについて</value></data>
+  <data name="Dashboard_A11yToggleImportant" xml:space="preserve"><value>重要フラグを切り替え</value></data>
   <data name="Dashboard_PreviewDeadline" xml:space="preserve"><value>期限: {0:dd/MM/yyyy}</value></data>
 
   <!-- UpdateService (additional) -->

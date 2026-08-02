@@ -806,6 +806,7 @@
   <data name="Dashboard_TipCopyPath" xml:space="preserve"><value>Sao chép đường dẫn của tài liệu đã chọn</value></data>
   <data name="Dashboard_TipOpenFolder" xml:space="preserve"><value>Mở thư mục chứa tài liệu đã chọn</value></data>
   <data name="Dashboard_TipAbout" xml:space="preserve"><value>Giới thiệu phần mềm này</value></data>
+  <data name="Dashboard_A11yToggleImportant" xml:space="preserve"><value>Bật hoặc tắt cờ quan trọng</value></data>
   <data name="Dashboard_PreviewDeadline" xml:space="preserve"><value>Hạn chót: {0:dd/MM/yyyy}</value></data>
   <data name="Update_NewVersionReady" xml:space="preserve"><value>Đã có phiên bản mới {0}!</value></data>
   <data name="Update_OpenDownloadPage" xml:space="preserve"><value>Mở trang tải xuống?</value></data>

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Headless.XUnit;
@@ -225,6 +226,47 @@ public class AvaloniaBindingRegressionTests
         Assert.Equal("Type", GetPath(Assert.IsType<DataGridTextColumn>(grid.Columns[2])));
         Assert.Equal("CreatedAt", GetPath(Assert.IsType<DataGridTextColumn>(grid.Columns[3])));
         Assert.Equal("FileSize", GetPath(Assert.IsType<DataGridTextColumn>(grid.Columns[4])));
+    }
+
+
+    [AvaloniaFact]
+    public void Dashboard_SelectionDependentQuickActionsAndSearchLabelsAreAccessible()
+    {
+        var localization = GetLocalization();
+        var model = new DashboardModel(
+            null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, localization);
+        var view = new Dashboard { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            var copyPathButton = view.FindControl<Button>("StatusCopyPathButton");
+            var openFolderButton = view.FindControl<Button>("StatusOpenFolderButton");
+            var searchBox = view.GetVisualDescendants().OfType<TextBox>().Single();
+            var subjectCombo = view.FindControl<ComboBox>("cboSubject");
+            var typeCombo = view.FindControl<ComboBox>("cboType");
+
+            Assert.NotNull(copyPathButton);
+            Assert.NotNull(openFolderButton);
+            Assert.False(copyPathButton!.IsEnabled);
+            Assert.False(openFolderButton!.IsEnabled);
+            Assert.Equal(localization["Dashboard_SearchPlaceholder"], searchBox.GetValue(AutomationProperties.NameProperty));
+            Assert.Equal(localization["Dashboard_LblCategory"], subjectCombo!.GetValue(AutomationProperties.NameProperty));
+            Assert.Equal(localization["Dashboard_LblType"], typeCombo!.GetValue(AutomationProperties.NameProperty));
+
+            model.SelectedDocument = new StudyDocument { Id = 1, Name = "Accessible document" };
+            FlushAvaloniaBindings();
+
+            Assert.True(copyPathButton.IsEnabled);
+            Assert.True(openFolderButton.IsEnabled);
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
 
