@@ -218,15 +218,15 @@ public class AvaloniaBindingRegressionTests
 
             var controls = new Control[]
             {
-                view.FindControl<TextBox>("txtName")!,
-                view.FindControl<TextBox>("txtFilePath")!,
-                view.FindControl<TextBox>("txtAuthor")!,
-                view.FindControl<TextBox>("txtTags")!,
-                view.FindControl<TextBox>("txtNotes")!,
-                view.FindControl<Button>("btnBrowse")!,
-                view.FindControl<Button>("btnSave")!,
-                view.FindControl<Button>("btnCancel")!,
-                view.FindControl<CheckBox>("chkImportant")!
+                FindControl<TextBox>(view, "txtName"),
+                FindControl<TextBox>(view, "txtFilePath"),
+                FindControl<TextBox>(view, "txtAuthor"),
+                FindControl<TextBox>(view, "txtTags"),
+                FindControl<TextBox>(view, "txtNotes"),
+                FindControl<Button>(view, "btnBrowse"),
+                FindControl<Button>(view, "btnSave"),
+                FindControl<Button>(view, "btnCancel"),
+                FindControl<CheckBox>(view, "chkImportant")
             };
 
             foreach (var control in controls)
@@ -237,7 +237,7 @@ public class AvaloniaBindingRegressionTests
             var scrollViewer = view.GetVisualDescendants().OfType<ScrollViewer>()
                 .OrderByDescending(candidate => candidate.Bounds.Width * candidate.Bounds.Height)
                 .First();
-            Assert.True(scrollViewer.Bounds.Width >= 0);
+            Assert.True(scrollViewer.Bounds.Width > 0);
             Assert.True(scrollViewer.Bounds.Height > 0);
             AssertInsideView(view, scrollViewer);
         }
@@ -564,10 +564,18 @@ public class AvaloniaBindingRegressionTests
         }
     }
 
+    private static T FindControl<T>(AddEdit view, string name)
+        where T : Control
+    {
+        var control = view.FindControl<T>(name);
+        Assert.NotNull(control);
+        return control;
+    }
+
     private static void AssertInsideView(AddEdit view, Control control)
     {
-        Assert.True(control.Bounds.Width >= 0);
-        Assert.True(control.Bounds.Height >= 0);
+        Assert.True(control.Bounds.Width > 0);
+        Assert.True(control.Bounds.Height > 0);
 
         var origin = control.TranslatePoint(new Point(0, 0), view);
         Assert.True(origin.HasValue);

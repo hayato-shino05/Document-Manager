@@ -43,11 +43,15 @@ public partial class AddEditModel : ModelBase
         _fileDialogService = fileDialogService;
         _navigationService = navigationService;
         _loc = loc;
+        _loc.LanguageChanged += OnLanguageChanged;
 
         PageTitle = _loc["AddEdit_PageTitleAdd"];
         Subjects = new ObservableCollection<string>(_categoryRepo.GetAllSubjects());
         Types = new ObservableCollection<string>(_categoryRepo.GetAllTypes());
     }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+        => PageTitle = _loc[IsEditing ? "AddEdit_PageTitleEdit" : "AddEdit_PageTitleAdd"];
 
     public void LoadDocument(int documentId)
     {
