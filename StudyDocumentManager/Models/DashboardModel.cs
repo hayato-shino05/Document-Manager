@@ -73,6 +73,7 @@ public partial class DashboardModel : ModelBase
     [ObservableProperty] private int _noFileDocuments;
     [ObservableProperty] private int _deletedCount;
     [ObservableProperty] private string _statusText = string.Empty;
+    [ObservableProperty] private bool _isLoading = true;
     [ObservableProperty] private bool _isEmptyState;
     [ObservableProperty] private bool _hasLoadError;
     [ObservableProperty] private string _stateMessage = string.Empty;
@@ -172,6 +173,7 @@ public partial class DashboardModel : ModelBase
     private void LoadData()
     {
         _isLoadingData = true;
+        IsLoading = true;
         SelectedDocument = null;
 
         try
@@ -212,6 +214,7 @@ public partial class DashboardModel : ModelBase
         finally
         {
             _isLoadingData = false;
+            IsLoading = false;
         }
     }
 

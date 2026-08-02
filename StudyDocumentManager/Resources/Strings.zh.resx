@@ -426,6 +426,7 @@
   <data name="Btn_OverwriteRestore" xml:space="preserve"><value>覆盖并恢复</value></data>
   <data name="Filter_AllItems" xml:space="preserve"><value>全部</value></data>
   <data name="Status_Ready" xml:space="preserve"><value>就绪</value></data>
+  <data name="Status_Loading" xml:space="preserve"><value>正在加载...</value></data>
   <data name="Status_TotalSummary" xml:space="preserve"><value>总计：{0} 个 | 重要：{1} 个 | 已过期：{2} 个</value></data>
   <data name="Status_Showing" xml:space="preserve"><value>正在显示 {0} 个</value></data>
   <data name="Status_CategorySummary" xml:space="preserve"><value>总计：{0} 个 | 分类：{1} | 类型：{2}</value></data>
@@ -674,6 +675,7 @@
   <data name="RecentFiles_BtnOpen" xml:space="preserve"><value>打开</value></data>
   <data name="Dashboard_EmptyState" xml:space="preserve"><value>没有可显示的文档</value></data>
   <data name="Dashboard_LoadError" xml:space="preserve"><value>无法加载文档，请重试</value></data>
+  <data name="Dashboard_BtnRetry" xml:space="preserve"><value>重试</value></data>
   <data name="RecentFiles_EmptyState" xml:space="preserve"><value>暂无最近打开的文件</value></data>
   <data name="RecycleBin_EmptyState" xml:space="preserve"><value>回收站为空</value></data>
   <data name="RecycleBin_ColSubject" xml:space="preserve"><value>分类</value></data>

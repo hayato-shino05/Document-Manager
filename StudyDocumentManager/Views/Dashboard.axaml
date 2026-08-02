@@ -481,7 +481,18 @@
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <StackPanel Classes="empty-state" IsVisible="{Binding !Documents.Count}">
+                        <StackPanel Classes="empty-state" IsVisible="{Binding IsLoading}">
+                            <ProgressBar IsIndeterminate="True" Width="180" Height="4"/>
+                            <TextBlock Classes="empty-state-text" Text="{loc:Localize Status_Loading}"/>
+                        </StackPanel>
+                        <StackPanel Classes="empty-state" IsVisible="{Binding HasLoadError}">
+                            <Image Classes="empty-state-icon" Source="{StaticResource IconWarning}"/>
+                            <TextBlock Classes="empty-state-text" Text="{Binding StateMessage}"/>
+                            <Button Classes="secondary" Command="{Binding RefreshCommand}"
+                                    Padding="{StaticResource PaddingBtnSm}"
+                                    Content="{loc:Localize Dashboard_BtnRetry}"/>
+                        </StackPanel>
+                        <StackPanel Classes="empty-state" IsVisible="{Binding IsEmptyState}">
                             <Image Classes="empty-state-icon" Source="{StaticResource IconDocPage}"/>
                             <TextBlock Classes="empty-state-text" Text="{Binding StateMessage}"/>
                         </StackPanel>

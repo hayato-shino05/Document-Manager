@@ -426,6 +426,7 @@
   <data name="Btn_OverwriteRestore" xml:space="preserve"><value>Ghi đè và khôi phục</value></data>
   <data name="Filter_AllItems" xml:space="preserve"><value>Tất cả</value></data>
   <data name="Status_Ready" xml:space="preserve"><value>Sẵn sàng</value></data>
+  <data name="Status_Loading" xml:space="preserve"><value>Đang tải...</value></data>
   <data name="Status_TotalSummary" xml:space="preserve"><value>Tổng: {0} | Quan trọng: {1} | Quá hạn: {2}</value></data>
   <data name="Status_Showing" xml:space="preserve"><value>Đang hiển thị {0} mục</value></data>
   <data name="Status_CategorySummary" xml:space="preserve"><value>Tổng: {0} | Danh mục: {1} | Loại: {2}</value></data>
@@ -674,6 +675,7 @@
   <data name="RecentFiles_BtnOpen" xml:space="preserve"><value>Mở</value></data>
   <data name="Dashboard_EmptyState" xml:space="preserve"><value>Không có tài liệu để hiển thị</value></data>
   <data name="Dashboard_LoadError" xml:space="preserve"><value>Không thể tải tài liệu. Vui lòng thử lại.</value></data>
+  <data name="Dashboard_BtnRetry" xml:space="preserve"><value>Thử lại</value></data>
   <data name="RecentFiles_EmptyState" xml:space="preserve"><value>Chưa có tệp nào được mở gần đây</value></data>
   <data name="RecycleBin_EmptyState" xml:space="preserve"><value>Thùng rác đang trống</value></data>
   <data name="RecycleBin_ColSubject" xml:space="preserve"><value>Danh mục</value></data>

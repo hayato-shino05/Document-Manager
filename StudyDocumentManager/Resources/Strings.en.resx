@@ -123,6 +123,7 @@
   <data name="Btn_OverwriteRestore" xml:space="preserve"><value>Overwrite Restore</value></data>
   <data name="Filter_AllItems" xml:space="preserve"><value>All</value></data>
   <data name="Status_Ready" xml:space="preserve"><value>Ready</value></data>
+  <data name="Status_Loading" xml:space="preserve"><value>Loading...</value></data>
   <data name="Status_TotalSummary" xml:space="preserve"><value>Total: {0} | Important: {1} | Overdue: {2}</value></data>
   <data name="Status_Showing" xml:space="preserve"><value>Showing {0} items</value></data>
   <data name="Status_CategorySummary" xml:space="preserve"><value>Total: {0} | Categories: {1} | Types: {2}</value></data>
@@ -429,6 +430,7 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="RecentFiles_BtnOpen" xml:space="preserve"><value>Open</value></data>
   <data name="Dashboard_EmptyState" xml:space="preserve"><value>No documents to display</value></data>
   <data name="Dashboard_LoadError" xml:space="preserve"><value>Could not load documents. Please retry.</value></data>
+  <data name="Dashboard_BtnRetry" xml:space="preserve"><value>Retry</value></data>
   <data name="RecentFiles_EmptyState" xml:space="preserve"><value>No recently opened files</value></data>
   <data name="RecycleBin_EmptyState" xml:space="preserve"><value>Recycle bin is empty</value></data>
   <data name="RecycleBin_ColSubject" xml:space="preserve"><value>Category</value></data>

@@ -39,9 +39,10 @@ public sealed class Task5DashboardRecentFilesTests
         model.Initialize();
 
         Assert.True(model.HasLoadError);
+        Assert.False(model.IsLoading);
         Assert.Equal("load-error", model.StateMessage);
 
-        model.Initialize();
+        model.RefreshCommand.Execute(null);
 
         Assert.False(model.HasLoadError);
         Assert.Single(model.Documents);

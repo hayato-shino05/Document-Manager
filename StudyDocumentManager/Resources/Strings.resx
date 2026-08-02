@@ -119,6 +119,7 @@
 
   <!-- Status -->
   <data name="Status_Ready" xml:space="preserve"><value>準備完了</value></data>
+  <data name="Status_Loading" xml:space="preserve"><value>読み込み中...</value></data>
   <data name="Status_TotalSummary" xml:space="preserve"><value>合計: {0}件 | 重要: {1}件 | 期限切れ: {2}件</value></data>
   <data name="Status_Showing" xml:space="preserve"><value>{0}件表示中</value></data>
   <data name="Status_CategorySummary" xml:space="preserve"><value>合計: {0}件 | カテゴリ: {1} | 種類: {2}</value></data>
@@ -478,6 +479,7 @@
   <data name="RecentFiles_BtnOpen" xml:space="preserve"><value>開く</value></data>
   <data name="Dashboard_EmptyState" xml:space="preserve"><value>表示する文書がありません</value></data>
   <data name="Dashboard_LoadError" xml:space="preserve"><value>文書を読み込めません。再試行してください</value></data>
+  <data name="Dashboard_BtnRetry" xml:space="preserve"><value>再試行</value></data>
   <data name="RecentFiles_EmptyState" xml:space="preserve"><value>最近開いたファイルはありません</value></data>
 
   <!-- RecycleBin View (additional) -->
