@@ -13,8 +13,10 @@ rule/
 .codegraph/
 .agents/
 gemini.md
+docs/
 .harness-core/
 codegrove.sqlite
+.superpowers/
 # User-specific files
 *.rsuser
 *.suo
