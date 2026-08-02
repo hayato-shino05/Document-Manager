@@ -275,7 +275,7 @@ Dashboard は欠損ファイルと launcher 失敗をエラーとして案内し
 
 ## 12. Tests
 
-`StudyDocumentManager.Tests` uses xUnit. `DatabaseTestBase` creates a unique temporary SQLite file per test-class instance and overrides the database path before initialization. 現行スイートは 785 テストです。
+`StudyDocumentManager.Tests` uses xUnit. `DatabaseTestBase` creates a unique temporary SQLite file per test-class instance and overrides the database path before initialization. 現行スイートは 795 テストです。
 
 データベース、repository、model/service の自動検証は強い一方、次の desktop runtime 証跡は手動確認として残ります。drag/drop の event bridge、native dialog、Dashboard の deferred lifecycle、HTTP timeout と browser の `Process.Start`、restore 後の再オープン、実行中の `MainWindow` ローカライズ切り替えです。
 

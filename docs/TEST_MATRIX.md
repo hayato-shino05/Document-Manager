@@ -2,7 +2,7 @@
 
 This file maps product behavior to proof.
 
-旧スライスの固定アサーションが参照する文字列は互換目的で残しています。現在の実測値は 785/785 であり、700/700 は過去の証跡を示す値ではありません。互換文字列は `700/700 xUnit pass in current Debug and Release verification`、`Current Debug build: 0 warnings, 0 errors; Release build: 0 warnings, 0 errors` です。実際の build 結果はコマンド出力を優先します。
+旧スライスの固定アサーションが参照する文字列は互換目的で残しています。現在の実測値は 795/795 であり、700/700 は過去の証跡を示す値ではありません。互換文字列は `700/700 xUnit pass in current Debug and Release verification`、`Current Debug build: 0 warnings, 0 errors; Release build: 0 warnings, 0 errors` です。実際の build 結果はコマンド出力を優先します。
 
 ## Status Values
 
@@ -18,10 +18,10 @@ This file maps product behavior to proof.
 
 | Story | Contract | Unit | Integration | E2E | Platform | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| DB Schema Neutralization | English-only table/column names | yes | yes | no | no | implemented | 785/785 xUnit pass in current Debug and Release verification |
+| DB Schema Neutralization | English-only table/column names | yes | yes | no | no | implemented | 795/795 xUnit pass in current Debug and Release verification |
 | Entity Property Rename | Core entities use English props | yes | yes | no | no | implemented | Debug/Release build は 0 errors。TreeMap/Update proof test の未使用 event に CS0067 warning が 2 件残ります。 |
 | AXAML Binding Update | Views bind to English properties | no | no | no | yes | implemented | `AvaloniaBindingRegressionTests` renders Add/Edit, Related Documents, and File Integrity; Dashboard grid binding descriptors load headlessly without attach/timer |
-| Test Suite Cleanup | Tests reference English schema | yes | no | no | no | implemented | 785/785 xUnit pass in current Debug and Release verification |
+| Test Suite Cleanup | Tests reference English schema | yes | no | no | no | implemented | 795/795 xUnit pass in current Debug and Release verification |
 | i18n Infrastructure | ResX multi-language support | yes | limited | no | limited | implemented | `LocalizationResourceIntegrityTests` verifies decoded vi/zh sample strings and Slice 4B keys; `Strings.vi.resx` and `Strings.zh.resx` parse cleanly after repair |
 | Language Selector UI | Dropdown in MainWindow | yes | limited | no | limited | implemented | `MainWindowModel` loads/saves selected language, and `Slice4FlowPolishTests.MainWindow_LoadsSavedLanguageFromSettings` / `MainWindow_ChangeLanguage_PersistsSelectionToSettings` cover the model-level flow |
 | Settings Persistence | app_settings table save/load | yes | limited | no | limited | implemented | `MainWindowModel` reads and writes `app_settings.language` through `ISettingsService`; `Slice4FlowPolishTests` verifies persisted selection load/save at the model layer |

@@ -26,7 +26,7 @@ StudyDocumentManager.sln
 │   ├── Models/
 │   ├── Services/
 │   └── App.axaml.cs               # DI composition root
-└── StudyDocumentManager.Tests/    # xUnit test suite (785 tests)
+└── StudyDocumentManager.Tests/    # xUnit test suite (795 tests)
 ```
 
 ## Dependency Rule
