@@ -191,7 +191,6 @@
                                             HorizontalAlignment="Stretch"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2"
-                                        Spacing="0"
                                         VerticalAlignment="Bottom">
                                 <CheckBox x:Name="chkImportant"
                                           Content="{loc:Localize AddEdit_ChkImportant}"
