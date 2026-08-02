@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
+using StudyDocumentManager.Core.Interfaces;
 
 namespace StudyDocumentManager.Converters;
 
@@ -91,4 +92,37 @@ public class DeadlineTextConverter : IValueConverter
     {
         throw new NotSupportedException();
     }
+}
+
+public sealed class DeadlineStatusConverter : IValueConverter
+{
+    public const string OverdueKey = "Dashboard_DeadlineStatusOverdue";
+    public const string UrgentKey = "Dashboard_DeadlineStatusUrgent";
+    public const string UpcomingKey = "Dashboard_DeadlineStatusUpcoming";
+    public const string ScheduledKey = "Dashboard_DeadlineStatusScheduled";
+
+    public static readonly DeadlineStatusConverter Instance = new();
+
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var key = GetStatusKey(value);
+        return Application.Current?.Resources["Loc"] is ILocalizationService localization
+            ? localization[key]
+            : key;
+    }
+
+    public static string GetStatusKey(object? value)
+    {
+        if (value is not DateTime deadline)
+            return ScheduledKey;
+
+        var daysLeft = (deadline.Date - DateTime.Today).TotalDays;
+        if (daysLeft < 0) return OverdueKey;
+        if (daysLeft < 3) return UrgentKey;
+        if (daysLeft < 7) return UpcomingKey;
+        return ScheduledKey;
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
 }

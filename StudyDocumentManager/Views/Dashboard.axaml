@@ -271,7 +271,7 @@
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconAllDocs}" Width="11" Height="11"/>
                                         <TextBlock Text="{loc:Localize Dashboard_StatTotal}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextMuted}"/>
+                                                   Foreground="{StaticResource TextSecondary}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding TotalCount}" FontSize="{StaticResource FontSizeXl}"
                                                FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
@@ -286,7 +286,7 @@
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconCategory}" Width="11" Height="11"/>
                                         <TextBlock Text="{loc:Localize Dashboard_StatCategories}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextMuted}"/>
+                                                   Foreground="{StaticResource TextSecondary}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding SubjectCount}" FontSize="{StaticResource FontSizeXl}"
                                                FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"/>
@@ -301,7 +301,7 @@
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconStar}" Width="11" Height="11"/>
                                         <TextBlock Text="{loc:Localize Dashboard_StatImportant}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextMuted}"/>
+                                                   Foreground="{StaticResource TextSecondary}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding ImportantCount}" FontSize="{StaticResource FontSizeXl}"
                                                FontWeight="Bold" Foreground="{StaticResource WarningBrush}"/>
@@ -316,7 +316,7 @@
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconClock}" Width="11" Height="11"/>
                                         <TextBlock Text="{loc:Localize Dashboard_StatOverdue}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextMuted}"/>
+                                                   Foreground="{StaticResource TextSecondary}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding OverdueCount}" FontSize="{StaticResource FontSizeXl}"
                                                FontWeight="Bold" Foreground="{StaticResource DangerBrush}"/>
@@ -331,7 +331,7 @@
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconWarning}" Width="11" Height="11"/>
                                         <TextBlock Text="{loc:Localize Dashboard_StatNoFile}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextMuted}"/>
+                                                   Foreground="{StaticResource TextSecondary}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding NoFileCount}" FontSize="{StaticResource FontSizeXl}"
                                                FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
@@ -346,7 +346,7 @@
                                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconRecycle}" Width="11" Height="11"/>
                                         <TextBlock Text="{loc:Localize Dashboard_StatRecycleBin}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextMuted}"/>
+                                                   Foreground="{StaticResource TextSecondary}"/>
                                     </StackPanel>
                                     <TextBlock Text="{Binding RecycleBinCount}" FontSize="{StaticResource FontSizeXl}"
                                                FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
@@ -476,6 +476,7 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate DataType="{x:Type core:StudyDocument}">
                                             <Border Background="{Binding Deadline, Converter={StaticResource DeadlineBrushConverter}}"
+                                                    ToolTip.Tip="{Binding Deadline, Converter={x:Static conv:DeadlineStatusConverter.Instance}}"
                                                     CornerRadius="{StaticResource RadiusXs}" Padding="{StaticResource PaddingXs}" Margin="1">
                                                 <TextBlock Text="{Binding Deadline, StringFormat=\{0:dd/MM/yyyy\}}"
                                                            Foreground="{Binding Deadline, Converter={StaticResource DeadlineTextConverter}}"

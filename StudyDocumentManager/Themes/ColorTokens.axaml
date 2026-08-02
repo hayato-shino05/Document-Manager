@@ -109,9 +109,9 @@
         <SolidColorBrush x:Key="DeadlineOverdueBrush"      Color="{StaticResource StatusRed}"/>
         <SolidColorBrush x:Key="DeadlineUrgentBrush"       Color="{StaticResource StatusAmber}"/>
         <SolidColorBrush x:Key="DeadlineUpcomingBrush"     Color="{StaticResource StatusYellow}"/>
-        <SolidColorBrush x:Key="DeadlineOverdueTextBrush"  Color="#FECACA"/>
-        <SolidColorBrush x:Key="DeadlineUrgentTextBrush"   Color="#FEF3C7"/>
-        <SolidColorBrush x:Key="DeadlineUpcomingTextBrush" Color="#FEF9C3"/>
+        <SolidColorBrush x:Key="DeadlineOverdueTextBrush"  Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="DeadlineUrgentTextBrush"   Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="DeadlineUpcomingTextBrush" Color="#1F2937"/>
         <!-- Toast notification brushes -->
         <SolidColorBrush x:Key="ToastSuccessBrush"     Color="#10B981"/>
         <SolidColorBrush x:Key="ToastErrorBrush"       Color="#EF4444"/>

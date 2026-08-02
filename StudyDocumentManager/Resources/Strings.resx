@@ -727,6 +727,10 @@
   <data name="Menu_ChangeLanguage" xml:space="preserve"><value>言語を変更</value></data>
   <data name="Search_BtnSearch" xml:space="preserve"><value>検索</value></data>
   <data name="Search_Label" xml:space="preserve"><value>検索:</value></data>
+  <data name="Dashboard_DeadlineStatusOverdue" xml:space="preserve"><value>期限切れ</value></data>
+  <data name="Dashboard_DeadlineStatusUrgent" xml:space="preserve"><value>3日以内が期限</value></data>
+  <data name="Dashboard_DeadlineStatusUpcoming" xml:space="preserve"><value>7日以内が期限</value></data>
+  <data name="Dashboard_DeadlineStatusScheduled" xml:space="preserve"><value>期限に余裕あり</value></data>
 </root>
 
 

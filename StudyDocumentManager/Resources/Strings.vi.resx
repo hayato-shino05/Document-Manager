@@ -824,4 +824,8 @@
   <data name="Menu_ChangeLanguage" xml:space="preserve"><value>Đổi ngôn ngữ</value></data>
   <data name="Search_BtnSearch" xml:space="preserve"><value>Tìm kiếm</value></data>
   <data name="Search_Label" xml:space="preserve"><value>Tìm kiếm:</value></data>
+  <data name="Dashboard_DeadlineStatusOverdue" xml:space="preserve"><value>Đã quá hạn</value></data>
+  <data name="Dashboard_DeadlineStatusUrgent" xml:space="preserve"><value>Hạn trong 3 ngày</value></data>
+  <data name="Dashboard_DeadlineStatusUpcoming" xml:space="preserve"><value>Hạn trong 7 ngày</value></data>
+  <data name="Dashboard_DeadlineStatusScheduled" xml:space="preserve"><value>Chưa đến hạn gần</value></data>
 </root>
