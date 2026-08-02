@@ -31,7 +31,7 @@
             </Border>
 
             <!-- TreeMap grid -->
-            <Border Classes="card" Padding="{StaticResource Space4}">
+            <Border Classes="card" Padding="{StaticResource PaddingCard}">
                 <ScrollViewer>
                     <ItemsControl ItemsSource="{Binding Items}">
                         <ItemsControl.ItemsPanel>
@@ -42,7 +42,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:TreeMapItem">
                                 <Border MinWidth="120" MinHeight="80"
-                                        Margin="4" Padding="{StaticResource Space4}" CornerRadius="{StaticResource RadiusMd}"
+                                        Margin="4" Padding="{StaticResource PaddingCard}" CornerRadius="{StaticResource RadiusMd}"
                                         Background="{Binding Color}">
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                         <TextBlock Text="{Binding Label}"

@@ -148,6 +148,11 @@ public partial class DashboardModel : ModelBase
         _backupService = backupService;
         _loc = localizationService;
         _statusText = _loc["Status_Ready"];
+        _loc.LanguageChanged += (_, _) =>
+        {
+            Subjects = [.. Subjects];
+            Types = [.. Types];
+        };
         // DO NOT call LoadData() here — it causes StackOverflowException
         // because DataGrid layout hasn't completed yet.
         // Call Initialize() from View.Loaded event instead.
