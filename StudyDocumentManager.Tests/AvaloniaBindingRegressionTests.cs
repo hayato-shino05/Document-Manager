@@ -153,6 +153,101 @@ public class AvaloniaBindingRegressionTests
     }
 
     [AvaloniaFact]
+    public void AddEdit_LocalizedMarkupRefreshesAfterLanguageChanges()
+    {
+        var localization = GetLocalization();
+        var model = new AddEditModel(
+            null!, new CategoryRepositoryStub(), null!, null!, null!, localization);
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            var title = Assert.Single(view.GetVisualDescendants().OfType<TextBlock>(),
+                text => text.Text == localization["AddEdit_PageTitleAdd"]);
+            var nameLabel = Assert.Single(view.GetVisualDescendants().OfType<TextBlock>(),
+                text => text.Text == localization["AddEdit_LblDocName"]);
+            var nameBox = view.FindControl<TextBox>("txtName")!;
+            var browseButton = view.FindControl<Button>("btnBrowse")!;
+            var saveButton = view.FindControl<Button>("btnSave")!;
+            var cancelButton = view.FindControl<Button>("btnCancel")!;
+            var browseText = Assert.Single(browseButton.GetVisualDescendants().OfType<TextBlock>());
+            var saveText = Assert.Single(saveButton.GetVisualDescendants().OfType<TextBlock>());
+            var cancelText = Assert.Single(cancelButton.GetVisualDescendants().OfType<TextBlock>());
+
+            Assert.Equal(localization["AddEdit_LblDocName"], nameBox.GetValue(AutomationProperties.NameProperty));
+            Assert.Equal(localization["AddEdit_BtnBrowse"], browseText.Text);
+            Assert.Equal(localization["AddEdit_BtnSave"], saveText.Text);
+            Assert.Equal(localization["AddEdit_BtnCancel"], cancelText.Text);
+
+            localization.SetLanguage(Core.SupportedLanguage.English);
+            FlushAvaloniaBindings();
+
+            Assert.Equal(localization["AddEdit_PageTitleAdd"], title.Text);
+            Assert.Equal(localization["AddEdit_LblDocName"], nameLabel.Text);
+            Assert.Equal(localization["AddEdit_LblDocName"], nameBox.GetValue(AutomationProperties.NameProperty));
+            Assert.Equal(localization["AddEdit_BtnBrowse"], browseText.Text);
+            Assert.Equal(localization["AddEdit_BtnSave"], saveText.Text);
+            Assert.Equal(localization["AddEdit_BtnCancel"], cancelText.Text);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void AddEdit_NarrowWidthKeepsFormControlsInsideArrangedView()
+    {
+        var localization = GetLocalization();
+        var model = new AddEditModel(
+            null!, new CategoryRepositoryStub(), null!, null!, null!, localization);
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Width = 520, Height = 720, Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            Assert.True(view.Bounds.Width > 0);
+            Assert.True(view.Bounds.Height > 0);
+
+            var controls = new Control[]
+            {
+                view.FindControl<TextBox>("txtName")!,
+                view.FindControl<TextBox>("txtFilePath")!,
+                view.FindControl<TextBox>("txtAuthor")!,
+                view.FindControl<TextBox>("txtTags")!,
+                view.FindControl<TextBox>("txtNotes")!,
+                view.FindControl<Button>("btnBrowse")!,
+                view.FindControl<Button>("btnSave")!,
+                view.FindControl<Button>("btnCancel")!,
+                view.FindControl<CheckBox>("chkImportant")!
+            };
+
+            foreach (var control in controls)
+            {
+                AssertInsideView(view, control);
+            }
+
+            var scrollViewer = view.GetVisualDescendants().OfType<ScrollViewer>()
+                .OrderByDescending(candidate => candidate.Bounds.Width * candidate.Bounds.Height)
+                .First();
+            Assert.True(scrollViewer.Bounds.Width >= 0);
+            Assert.True(scrollViewer.Bounds.Height > 0);
+            AssertInsideView(view, scrollViewer);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void AddEdit_ShowsInlineErrorTextWhenValidationFails()
     {
         var localization = GetLocalization();
@@ -467,6 +562,21 @@ public class AvaloniaBindingRegressionTests
             foreach (var validator in originalValidators)
                 validators.Add(validator);
         }
+    }
+
+    private static void AssertInsideView(AddEdit view, Control control)
+    {
+        Assert.True(control.Bounds.Width >= 0);
+        Assert.True(control.Bounds.Height >= 0);
+
+        var origin = control.TranslatePoint(new Point(0, 0), view);
+        Assert.True(origin.HasValue);
+
+        var bounds = new Rect(origin!.Value, control.Bounds.Size);
+        Assert.True(bounds.X >= -0.5);
+        Assert.True(bounds.Y >= -0.5);
+        Assert.True(bounds.Right <= view.Bounds.Width + 0.5);
+        Assert.True(bounds.Bottom <= view.Bounds.Height + 0.5);
     }
 
     private static void FlushAvaloniaBindings()
