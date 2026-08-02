@@ -73,6 +73,86 @@ public class AvaloniaBindingRegressionTests
     }
 
     [AvaloniaFact]
+    public void AddEdit_EditorialWorkspace_PreservesBindingsAndActions()
+    {
+        var localization = GetLocalization();
+        var model = new AddEditModel(
+            null!, new CategoryRepositoryStub(), null!, null!, null!, localization)
+        {
+            Name = "Algorithms notes",
+            Subject = "Computer Science",
+            Type = "PDF",
+            FilePath = "C:/study/algorithms.pdf",
+            Author = "Ada",
+            Tags = "algorithms",
+            Notes = "Read chapter three",
+            IsImportant = true
+        };
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            Assert.Same(model, view.DataContext);
+            Assert.Equal(model.Name, view.FindControl<TextBox>("txtName")!.Text);
+            Assert.Equal(model.FilePath, view.FindControl<TextBox>("txtFilePath")!.Text);
+            Assert.Equal(model.Author, view.FindControl<TextBox>("txtAuthor")!.Text);
+            Assert.Equal(model.Tags, view.FindControl<TextBox>("txtTags")!.Text);
+            Assert.Equal(model.Notes, view.FindControl<TextBox>("txtNotes")!.Text);
+            Assert.True(view.FindControl<CheckBox>("chkImportant")!.IsChecked);
+            Assert.Same(model.SaveCommand, view.FindControl<Button>("btnSave")!.Command);
+            Assert.Same(model.CancelCommand, view.FindControl<Button>("btnCancel")!.Command);
+            Assert.Same(model.BrowseFileCommand, view.FindControl<Button>("btnBrowse")!.Command);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task AddEdit_EditorialWorkspace_PreservesAccessibilityAndValidationFocus()
+    {
+        var localization = GetLocalization();
+        var model = new AddEditModel(
+            null!, new CategoryRepositoryStub(), null!, null!, null!, localization);
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            var nameBox = view.FindControl<TextBox>("txtName")!;
+            var filePathBox = view.FindControl<TextBox>("txtFilePath")!;
+            var browseButton = view.FindControl<Button>("btnBrowse")!;
+
+            Assert.Equal(localization["AddEdit_LblDocName"],
+                nameBox.GetValue(AutomationProperties.NameProperty));
+            Assert.Equal(localization["AddEdit_LblFilePath"],
+                filePathBox.GetValue(AutomationProperties.NameProperty));
+            Assert.Equal(localization["AddEdit_BtnBrowse"],
+                browseButton.GetValue(AutomationProperties.NameProperty));
+
+            model.Name = string.Empty;
+            model.SaveCommand.Execute(null);
+            await model.SaveCommand.ExecutionTask!;
+            FlushAvaloniaBindings();
+
+            Assert.True(model.HasNameValidationError);
+            Assert.Same(nameBox, TopLevel.GetTopLevel(view)?.FocusManager?.GetFocusedElement());
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void AddEdit_ShowsInlineErrorTextWhenValidationFails()
     {
         var localization = GetLocalization();
