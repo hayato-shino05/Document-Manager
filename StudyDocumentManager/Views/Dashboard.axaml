@@ -267,7 +267,7 @@
                             <Grid ColumnDefinitions="*,*,*,*,*,*">
 
                             <!-- Card 1: Total -->
-                            <Border CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource GradientStatBlue}"
+                            <Border CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource StatBlueBg}"
                                     BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
                                     Padding="{StaticResource PaddingNavItem}" Margin="0,0,4,0">
                                 <StackPanel Spacing="{StaticResource Space1}">
@@ -282,7 +282,7 @@
                             </Border>
 
                             <!-- Card 2: Subjects -->
-                            <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource GradientStatTeal}"
+                            <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource StatGreenBg}"
                                     BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
                                     Padding="{StaticResource PaddingNavItem}" Margin="0,0,4,0">
                                 <StackPanel Spacing="{StaticResource Space1}">
@@ -297,7 +297,7 @@
                             </Border>
 
                             <!-- Card 3: Important -->
-                            <Border Grid.Column="2" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource GradientStatAmber}"
+                            <Border Grid.Column="2" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource StatAmberBg}"
                                     BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
                                     Padding="{StaticResource PaddingNavItem}" Margin="0,0,4,0">
                                 <StackPanel Spacing="{StaticResource Space1}">
@@ -312,7 +312,7 @@
                             </Border>
 
                             <!-- Card 4: Overdue -->
-                            <Border Grid.Column="3" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource GradientStatRed}"
+                            <Border Grid.Column="3" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource StatRedBg}"
                                     BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
                                     Padding="{StaticResource PaddingNavItem}" Margin="0,0,4,0">
                                 <StackPanel Spacing="{StaticResource Space1}">
