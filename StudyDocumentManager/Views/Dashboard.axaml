@@ -22,7 +22,8 @@
             <Grid ColumnDefinitions="*,Auto">
 
                 <!-- Left: Search + Dropdown filters -->
-                <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}" VerticalAlignment="Center">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}" VerticalAlignment="Center">
                     <Image Source="{StaticResource IconSearch}" Width="13" Height="13"
                            VerticalAlignment="Center" Opacity="0.5"/>
                     <TextBox Width="260" Height="{StaticResource HeightControl}" FontSize="{StaticResource FontSizeMd}"
@@ -58,7 +59,8 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
 
                 <!-- Right: Toggle advanced filter button -->
                 <Button Grid.Column="1" Classes="secondary"
@@ -89,7 +91,8 @@
             <StackPanel Spacing="12">
 
                 <!-- Filter Groups Row -->
-                <Grid ColumnDefinitions="*,*,Auto">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <Grid ColumnDefinitions="*,*,Auto">
 
                     <!-- ── Group 1: Khoảng thời gian ── -->
                     <Border CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource CardBackground}"
@@ -187,7 +190,8 @@
                             </StackPanel>
                         </Button>
                     </StackPanel>
-                </Grid>
+                    </Grid>
+                </ScrollViewer>
 
             </StackPanel>
         </Border>
@@ -256,7 +260,8 @@
                     <Border Background="{StaticResource SidebarBackground}"
                             Padding="{StaticResource PaddingStatCard}"
                             BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1">
-                        <Grid ColumnDefinitions="*,*,*,*,*,*">
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                            <Grid ColumnDefinitions="*,*,*,*,*,*">
 
                             <!-- Card 1: Total -->
                             <Border CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource GradientStatBlue}"
@@ -347,7 +352,8 @@
                                                FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
                                 </StackPanel>
                             </Border>
-                        </Grid>
+                            </Grid>
+                        </ScrollViewer>
                     </Border>
 
                     <!-- ═══ DATA GRID ═══ -->
