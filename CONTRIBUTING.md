@@ -1,118 +1,124 @@
-# Contributing to Study Document Manager
+# Study Document Manager への貢献
 
-Thank you for contributing to Study Document Manager. This guide covers the current development workflow for the Avalonia and .NET 9 codebase.
+Study Document Manager への貢献を歓迎します。このガイドでは、Avalonia と .NET 9 で構成された現在の開発フローを説明します。
 
-## Table of Contents
+## 目次
 
-- [Prerequisites](#prerequisites)
-- [Repository Setup](#repository-setup)
-- [Build and Test](#build-and-test)
-- [Development Notes](#development-notes)
-- [Pull Requests](#pull-requests)
-- [Bug Reports and Feature Requests](#bug-reports-and-feature-requests)
-- [Related Documentation](#related-documentation)
+- [前提条件](#前提条件)
+- [リポジトリのセットアップ](#リポジトリのセットアップ)
+- [ビルドとテスト](#ビルドとテスト)
+- [開発時の注意](#開発時の注意)
+- [プルリクエスト](#プルリクエスト)
+- [バグ報告と機能提案](#バグ報告と機能提案)
+- [関連ドキュメント](#関連ドキュメント)
 
-## Prerequisites
+## 前提条件
 
 - .NET 9 SDK
 - Git
-- An editor or IDE that supports .NET desktop development
+- .NET デスクトップ開発に対応したエディターまたは IDE
 
-SQLite is created locally by the application. No separate database server setup is required.
+SQLite のデータベースはアプリケーションがローカルに作成します。別途データベースサーバーを用意する必要はありません。
 
-## Repository Setup
+## リポジトリのセットアップ
 
 ```bash
 git clone https://github.com/hayato-shino05/study-document-manager.git
 cd study-document-manager
 ```
 
-Create a focused branch for each change.
+変更ごとに目的を絞ったブランチを作成してください。
 
-- New feature: `feature/short-description`
-- Bug fix: `fix/short-description`
-- Documentation: `docs/short-description`
+- 新機能: `feature/short-description`
+- バグ修正: `fix/short-description`
+- ドキュメント: `docs/short-description`
 
-Example:
+例:
 
 ```bash
 git checkout -b feature/language-menu-polish
 ```
 
-## Build and Test
+## ビルドとテスト
 
-Use the verified local commands below.
+次のコマンドでローカル確認を行います。
 
 ```powershell
 dotnet build "StudyDocumentManager.sln" -c Debug
 dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c Debug
 ```
 
-If your change affects startup, routing, schema, localization, or theme resources, read the project guidance files before editing.
+起動、ルーティング、スキーマ、ローカライズ、テーマリソースに関わる変更では、編集前にプロジェクトのガイドラインを確認してください。
 
-## Development Notes
+## 開発時の注意
 
-### Architecture boundaries
+### アーキテクチャの境界
 
-- `StudyDocumentManager` contains Avalonia views, models, services, and themes.
-- `StudyDocumentManager.Core` contains entities, DTOs, and service or repository contracts.
-- `StudyDocumentManager.Data` contains SQLite schema, migrations, and repository implementations.
-- `StudyDocumentManager.Tests` contains xUnit coverage.
+- `StudyDocumentManager` は Avalonia の view、model、service、theme を含みます。
+- `StudyDocumentManager.Core` は entity、DTO、service と repository の contract を含みます。
+- `StudyDocumentManager.Data` は SQLite の schema、migration、repository implementation を含みます。
+- `StudyDocumentManager.Tests` は xUnit のテストを含みます。
 
-### UI and theme work
+### UI とテーマの変更
 
-Do not hardcode shared colors or brushes in views. Use the existing theme resources instead.
+view に共有の色や brush を直接記述しないでください。既存の theme resource を使用してください。
 
 - `StudyDocumentManager/Themes/ColorTokens.axaml`
 - `StudyDocumentManager/Themes/AppTheme.axaml`
 - `StudyDocumentManager/Themes/SharedStyles.axaml`
 
-Keep view state in `Models/*Model.cs`. Use code-behind only when Avalonia event bridging or control lifecycle work requires it.
+view の状態は `Models/*Model.cs` で管理します。code-behind は Avalonia の event bridge または control lifecycle に対応する必要がある場合だけ使用してください。
 
-### Data and schema work
+### データとスキーマの変更
 
-When changing schema or repository behavior, keep these surfaces in sync.
+schema や repository の動作を変更する場合は、次の範囲を同時に更新してください。
 
 - `StudyDocumentManager.Data/Helpers/DatabaseHelper.cs`
 - `StudyDocumentManager.Data/Helpers/DatabaseMigrator.cs`
 - `StudyDocumentManager.Core/Interfaces/*.cs`
 - `StudyDocumentManager.Data/Repositories/*.cs`
 - `DATABASE.md`
-- affected tests in `StudyDocumentManager.Tests`
+- `StudyDocumentManager.Tests` の関連テスト
 
-### Localization work
+`documents.file_path` の空でない完全一致を対象とする部分一意インデックス、soft delete、restore、`app_settings.language` の保存と復元を変更する場合は、schema、migration、contract、mapping、テストを確認してください。
 
-Current localization is implemented through `.resx` resources, `LocalizationService`, and `LocalizeExtension`. If you touch labels, menus, or dialogs, verify both the resource keys and the runtime language-switching behavior.
+### ローカライズの変更
 
-## Pull Requests
+現在のローカライズは `.resx` resource、`LocalizationService`、`LocalizeExtension` で実装しています。label、menu、dialog に触れる場合は、resource key の整合性と実行中の言語切り替えを確認してください。日本語が既定ロケールで、未翻訳の key は日本語へフォールバックします。
 
-Before opening a pull request:
+### Dashboard とデスクトップ実行
 
-1. Keep the diff focused on one task.
-2. Run the relevant build and test commands.
-3. Update documentation when the contract or workflow changes.
-4. Summarize what changed, how it was verified, and any remaining limitation.
+Dashboard は `Dashboard.axaml.cs` で初期化を遅延させ、DataGrid と layout の binding loop を避けています。欠損ファイル、launcher 失敗、空の collection は復旧フローを持ちます。deferred lifecycle、drag/drop の event bridge、native dialog、restore 後の再オープンは、モデル／SQLite の自動テストに加えてデスクトップ実行で確認してください。
 
-Recommended commit message style:
+## プルリクエスト
+
+プルリクエストを作成する前に、次を確認してください。
+
+1. 変更範囲を 1 つの目的に絞る。
+2. 関連する build と test コマンドを実行する。
+3. contract または workflow が変わる場合はドキュメントを更新する。
+4. 変更内容、確認方法、残っている制限を説明する。
+
+推奨する commit message の形式:
 
 - `feat: add collection filter shortcut`
 - `fix: preserve selection after dashboard refresh`
 - `docs: rewrite readme for avalonia app`
 
-## Bug Reports and Feature Requests
+## バグ報告と機能提案
 
-When opening an issue, include:
+Issue を作成するときは、次の情報を含めてください。
 
-- a short summary
-- the affected screen, service, or workflow
-- reproduction steps
-- expected behavior
-- actual behavior
-- screenshots or logs when relevant
+- 簡潔な概要
+- 影響する画面、service、workflow
+- 再現手順
+- 期待される動作
+- 実際の動作
+- 必要に応じたスクリーンショットまたはログ
 
-For feature requests, describe the user problem first, then the proposed behavior.
+機能提案では、最初に解決したい利用者の問題を説明し、その後に提案する動作を記載してください。
 
-## Related Documentation
+## 関連ドキュメント
 
 - [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)
 - [DATABASE.md](./DATABASE.md)

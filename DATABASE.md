@@ -1,62 +1,62 @@
-# Database Schema
+# データベーススキーマ
 
-This document describes the current SQLite schema used by the Avalonia and .NET 9 application.
+この文書では、Avalonia と .NET 9 アプリケーションが現在使用している SQLite スキーマを説明します。
 
-The implementation authority is:
+実装上の正本は次のファイルです。
 
 - `StudyDocumentManager.Data/Helpers/DatabaseHelper.cs`
 - `StudyDocumentManager.Data/Helpers/DatabaseMigrator.cs`
 
-## Overview
+## 概要
 
-- Engine: SQLite through `Microsoft.Data.Sqlite`
-- Default file: `AppDomain.CurrentDomain.BaseDirectory/data/study_documents.db`
-- Tests can override the path through `DatabaseHelper.SetDatabasePath(path)` before `InitializeDatabase()`
-- Schema and migrations are orchestrated by `DatabaseHelper.InitializeDatabase()` which calls `DatabaseMigrator.RunMigrations()`
-- Legacy WinForms schema names remain relevant only as migration compatibility input
+- エンジン: `Microsoft.Data.Sqlite` 経由の SQLite
+- 既定のファイル: `AppDomain.CurrentDomain.BaseDirectory/data/study_documents.db`
+- テストでは `InitializeDatabase()` の前に `DatabaseHelper.SetDatabasePath(path)` を呼び出してパスを変更できます
+- スキーマと migration は `DatabaseHelper.InitializeDatabase()` が `DatabaseMigrator.RunMigrations()` を呼び出して管理します
+- 旧 WinForms のスキーマ名は migration の互換入力としてのみ残っています
 
-## Tables
+## テーブル
 
 ### `documents`
 
-| Column | Type | Notes |
+| カラム | 型 | 説明 |
 | --- | --- | --- |
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
-| `name` | TEXT NOT NULL | Document name |
-| `subject` | TEXT | Category or subject label |
-| `type` | TEXT | Normalized document type |
-| `file_path` | TEXT | File path on disk |
-| `notes` | TEXT | General notes |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
-| `file_size` | REAL | Size in MB |
-| `author` | TEXT | Author |
-| `is_important` | INTEGER DEFAULT 0 | Important flag |
-| `tags` | TEXT | Comma-separated tags |
-| `deadline` | DATETIME | Optional deadline |
-| `is_deleted` | INTEGER DEFAULT 0 | Soft-delete flag |
-| `deleted_at` | DATETIME | Soft-delete timestamp |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `name` | TEXT NOT NULL | 文書名 |
+| `subject` | TEXT | カテゴリまたは科目のラベル |
+| `type` | TEXT | 正規化された文書タイプ |
+| `file_path` | TEXT | ディスク上のファイルパス |
+| `notes` | TEXT | 一般的なメモ |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 作成日時 |
+| `file_size` | REAL | MB 単位のサイズ |
+| `author` | TEXT | 作成者 |
+| `is_important` | INTEGER DEFAULT 0 | 重要フラグ |
+| `tags` | TEXT | カンマ区切りのタグ |
+| `deadline` | DATETIME | 任意の期限 |
+| `is_deleted` | INTEGER DEFAULT 0 | soft delete フラグ |
+| `deleted_at` | DATETIME | soft delete の日時 |
 
 ### `collections`
 
-| Column | Type | Notes |
+| カラム | 型 | 説明 |
 | --- | --- | --- |
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
-| `name` | TEXT NOT NULL | Collection name |
-| `description` | TEXT | Optional description |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `name` | TEXT NOT NULL | collection 名 |
+| `description` | TEXT | 任意の説明 |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 作成日時 |
 
 ### `collection_items`
 
-Many-to-many link between `collections` and `documents`.
+`collections` と `documents` の多対多リンクです。
 
-| Column | Type | Notes |
+| カラム | 型 | 説明 |
 | --- | --- | --- |
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
-| `collection_id` | INTEGER NOT NULL | FK to `collections(id)` |
-| `document_id` | INTEGER NOT NULL | FK to `documents(id)` |
-| `added_at` | DATETIME DEFAULT `datetime('now','localtime')` | Added timestamp |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `collection_id` | INTEGER NOT NULL | `collections(id)` への FK |
+| `document_id` | INTEGER NOT NULL | `documents(id)` への FK |
+| `added_at` | DATETIME DEFAULT `datetime('now','localtime')` | 追加日時 |
 
-Constraints:
+制約:
 
 - `FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE`
 - `FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE`
@@ -64,43 +64,43 @@ Constraints:
 
 ### `personal_notes`
 
-| Column | Type | Notes |
+| カラム | 型 | 説明 |
 | --- | --- | --- |
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
-| `document_id` | INTEGER NOT NULL | FK to `documents(id)` |
-| `content` | TEXT | Note content |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
-| `updated_at` | DATETIME DEFAULT `datetime('now','localtime')` | Last update timestamp |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `document_id` | INTEGER NOT NULL | `documents(id)` への FK |
+| `content` | TEXT | メモの内容 |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 作成日時 |
+| `updated_at` | DATETIME DEFAULT `datetime('now','localtime')` | 最終更新日時 |
 
-Constraint:
+制約:
 
 - `FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE`
 
 ### `recent_files`
 
-| Column | Type | Notes |
+| カラム | 型 | 説明 |
 | --- | --- | --- |
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
-| `document_id` | INTEGER NOT NULL UNIQUE | One recent-file row per document |
-| `opened_at` | DATETIME DEFAULT `datetime('now','localtime')` | Last-opened timestamp |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `document_id` | INTEGER NOT NULL UNIQUE | 文書ごとに 1 行 |
+| `opened_at` | DATETIME DEFAULT `datetime('now','localtime')` | 最終オープン日時 |
 
-Constraint:
+制約:
 
 - `FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE`
 
 ### `document_relations`
 
-Stores related-document links by normalized pair.
+正規化したペアで関連文書のリンクを保存します。
 
-| Column | Type | Notes |
+| カラム | 型 | 説明 |
 | --- | --- | --- |
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
-| `doc_id_1` | INTEGER NOT NULL | Lower document id in the pair |
-| `doc_id_2` | INTEGER NOT NULL | Higher document id in the pair |
-| `relation_type` | TEXT DEFAULT `'related'` | Relation label |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `doc_id_1` | INTEGER NOT NULL | ペア内で小さい方の文書 ID |
+| `doc_id_2` | INTEGER NOT NULL | ペア内で大きい方の文書 ID |
+| `relation_type` | TEXT DEFAULT `'related'` | 関連ラベル |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 作成日時 |
 
-Constraints:
+制約:
 
 - `FOREIGN KEY (doc_id_1) REFERENCES documents(id) ON DELETE CASCADE`
 - `FOREIGN KEY (doc_id_2) REFERENCES documents(id) ON DELETE CASCADE`
@@ -108,88 +108,88 @@ Constraints:
 
 ### `categories`
 
-Lookup table for categories.
+カテゴリの lookup table です。
 
-| Column | Type | Notes |
+| カラム | 型 | 説明 |
 | --- | --- | --- |
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
-| `name` | TEXT NOT NULL UNIQUE | Category name |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `name` | TEXT NOT NULL UNIQUE | カテゴリ名 |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 作成日時 |
 
 ### `document_types`
 
-Lookup table for document types.
+文書タイプの lookup table です。
 
-| Column | Type | Notes |
+| カラム | 型 | 説明 |
 | --- | --- | --- |
-| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | Primary key |
-| `name` | TEXT NOT NULL UNIQUE | Type name |
-| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | Creation timestamp |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `name` | TEXT NOT NULL UNIQUE | タイプ名 |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 作成日時 |
 
 ### `app_settings`
 
-| Column | Type | Notes |
+| カラム | 型 | 説明 |
 | --- | --- | --- |
-| `key` | TEXT PRIMARY KEY | Setting key |
-| `value` | TEXT | Setting value |
+| `key` | TEXT PRIMARY KEY | 設定キー |
+| `value` | TEXT | 設定値 |
 
-## Indexes
+## インデックス
 
-- `idx_documents_subject` on `documents(subject)`
-- `idx_documents_type` on `documents(type)`
-- `idx_documents_created_at` on `documents(created_at)`
-- `idx_documents_deadline` on `documents(deadline)`
-- `idx_collection_items_collection` on `collection_items(collection_id)`
-- `idx_collection_items_document` on `collection_items(document_id)`
-- `idx_documents_deleted` on `documents(is_deleted)`
-- `idx_documents_important` on `documents(is_important)`
+- `idx_documents_subject`: `documents(subject)`
+- `idx_documents_type`: `documents(type)`
+- `idx_documents_created_at`: `documents(created_at)`
+- `idx_documents_deadline`: `documents(deadline)`
+- `idx_collection_items_collection`: `collection_items(collection_id)`
+- `idx_collection_items_document`: `collection_items(document_id)`
+- `idx_documents_deleted`: `documents(is_deleted)`
+- `idx_documents_important`: `documents(is_important)`
 - `idx_documents_file_path_unique` は、`file_path IS NOT NULL AND file_path <> ''` の行だけを対象に `documents(file_path)` の完全一致を一意にする部分インデックスです。削除済み文書も対象で、SQLite の既定 `BINARY` 比較を使用します。
 
-## Migration Behavior
+## migration の動作
 
-`DatabaseMigrator.RunMigrations()` currently performs the following current-state flow:
+`DatabaseMigrator.RunMigrations()` は、現在次の流れで処理します。
 
-1. Detects the complete legacy Vietnamese table set (`tai_lieu`, `danh_muc`, `loai_tai_lieu`) before current-schema preflight. It copies data into the English schema transactionally, remaps dependent document IDs, rebuilds child-table foreign keys, and drops the legacy tables only after `foreign_key_check` succeeds.
-2. Rejects incomplete or structurally unsupported legacy schemas before writing changes.
-3. Creates the current tables and indexes if they do not exist.
-4. Adds `is_deleted` and `deleted_at` idempotently when upgrading older databases.
-5. 履歴データの空でない完全一致 `file_path` 重複を同一トランザクション内で解消します。最小の `id` のパスを保持し、それ以降の重複行は `file_path = NULL` にしてから部分一意インデックスを作成します。途中で失敗した場合はデータ変更とインデックス作成をまとめてロールバックします。
-6. Seeds `categories` and `document_types` from existing document data, then adds default values for fresh installs.
-7. Normalizes file-type labels based on existing values and file extensions.
-8. Neutralizes legacy catalog labels through schema version `3` using `app_settings`.
+1. 現行スキーマの事前確認より前に、旧ベトナム語テーブル一式（`tai_lieu`、`danh_muc`、`loai_tai_lieu`）がそろっているか検出します。データをトランザクション内で英語スキーマへコピーし、関連する文書 ID を再マッピングし、子テーブルの外部キーを再構築します。`foreign_key_check` が成功した後に旧テーブルを削除します。
+2. 不完全または構造上サポートされない旧スキーマは、書き込み前に拒否します。
+3. 現行のテーブルとインデックスが存在しない場合に作成します。
+4. 古いデータベースを更新するときは、`is_deleted` と `deleted_at` を冪等に追加します。
+5. 履歴データにある空でない `file_path` の完全一致重複を、同一トランザクション内で解消します。最小の `id` のパスを保持し、それ以降の重複行は `file_path = NULL` にしてから部分一意インデックスを作成します。途中で失敗した場合は、データ変更とインデックス作成をまとめてロールバックします。
+6. 既存の文書データから `categories` と `document_types` を seed し、新規インストールには既定値を追加します。
+7. 既存の値とファイル拡張子に基づいてファイルタイプのラベルを正規化します。
+8. `app_settings` を使い、schema version `3` までの旧 catalog ラベルを無効化します。
 
-Legacy table and column names from the retired WinForms implementation are accepted only as an exact, validated migration input. They are not the active schema contract.
+引退した WinForms 実装の旧テーブル名とカラム名は、検証済みの完全一致 migration 入力としてのみ受け付けます。現行スキーマの contract ではありません。
 
-## Soft Delete and Recycle Bin
+## soft delete とごみ箱
 
-- Normal deletion marks `documents.is_deleted = 1` and sets `deleted_at`.
-- Main document lists filter for records where `is_deleted` is null or `0`.
-- Restore sets `is_deleted = 0` and `deleted_at = NULL`.
-- Permanent delete removes rows from `documents`.
-- Empty recycle bin permanently deletes all soft-deleted document rows.
+- 通常の削除では `documents.is_deleted = 1` を設定し、`deleted_at` に日時を保存します。
+- メインの文書一覧は `is_deleted` が null または `0` のレコードだけを表示します。
+- restore では `is_deleted = 0` を設定し、`deleted_at = NULL` にします。
+- 完全削除では `documents` の行を削除します。
+- ごみ箱を空にすると、soft delete 済みの文書行をすべて完全削除します。
 
-## Repository Mapping
+## repository の対応
 
-| Contract | Implementation | Main backing helper |
+| Contract | Implementation | 主な backing helper |
 | --- | --- | --- |
-| `IDocumentRepository` | `DocumentRepository` | document CRUD, search, filters, deadlines |
-| `IRecycleBinRepository` | `DocumentRepository` | recycle-bin behavior |
-| `IBulkOperationRepository` | `DocumentRepository` | bulk delete, subject update, important toggle |
-| `IFileIntegrityRepository` | `DocumentRepository` | path updates, backup, database path |
-| `ICategoryRepository` | `CategoryRepository` | categories and document types |
-| `ICollectionRepository` | `CollectionRepository` | collections and collection items |
-| `IPersonalNoteRepository` | `PersonalNoteRepository` | personal notes |
-| `IRecentFileRepository` | `RecentFileRepository` | recent files |
-| `IRelatedDocumentRepository` | `RelatedDocumentRepository` | document relations |
-| `IReportRepository` | `ReportRepository` | aggregate report queries |
-| `ISettingsService` | `SettingsRepository` | key-value settings |
+| `IDocumentRepository` | `DocumentRepository` | 文書 CRUD、検索、フィルター、期限 |
+| `IRecycleBinRepository` | `DocumentRepository` | ごみ箱の動作 |
+| `IBulkOperationRepository` | `DocumentRepository` | 一括削除、subject 更新、重要フラグ切り替え |
+| `IFileIntegrityRepository` | `DocumentRepository` | パス更新、バックアップ、データベースパス |
+| `ICategoryRepository` | `CategoryRepository` | カテゴリと文書タイプ |
+| `ICollectionRepository` | `CollectionRepository` | collection と collection item |
+| `IPersonalNoteRepository` | `PersonalNoteRepository` | 個人メモ |
+| `IRecentFileRepository` | `RecentFileRepository` | 最近使ったファイル |
+| `IRelatedDocumentRepository` | `RelatedDocumentRepository` | 文書 relation |
+| `IReportRepository` | `ReportRepository` | 集計レポートクエリ |
+| `ISettingsService` | `SettingsRepository` | key-value 設定 |
 
-## Rules for Schema Changes
+## スキーマ変更のルール
 
-When changing schema or persistence behavior:
+スキーマまたは永続化の動作を変更するときは、次のルールに従ってください。
 
-- Update the current schema and migration flow together.
-- Keep repository contracts, implementations, and entity or DTO mappings aligned.
-- Update database-backed tests in `StudyDocumentManager.Tests`.
-- Update this document when the active schema contract changes.
-- Keep new code on English schema names only. Legacy Vietnamese names belong only to migration compatibility logic.
+- 現行スキーマと migration の流れを同時に更新する。
+- repository contract、implementation、entity または DTO の mapping を一致させる。
+- `StudyDocumentManager.Tests` のデータベーステストを更新する。
+- 現行スキーマの contract が変わった場合は、この文書も更新する。
+- 新しいコードでは英語のスキーマ名だけを使用する。旧ベトナム語名は migration の互換ロジックに限定する。

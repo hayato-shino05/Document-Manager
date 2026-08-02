@@ -31,7 +31,7 @@
 
 Study Document Manager は、ローカルの SQLite データベースを使って文書を整理するデスクトップアプリケーションです。検索、分類、期限管理、コレクション管理、レポート表示までを 1 つのアプリケーションで扱えます。
 
-現在の実装は Avalonia 11.2.7 と .NET 9.0 をベースにしており、表示層は MVVM、データ永続化は `Microsoft.Data.Sqlite` を使っています。
+現在の実装は Avalonia 11.2.7 と .NET 9.0 をベースにしており、表示層は MVVM、データ永続化は `Microsoft.Data.Sqlite` を使っています。日本語を既定ロケールとし、言語設定は SQLite の `app_settings` に保存します。
 
 ## 主な機能
 
@@ -42,6 +42,7 @@ Study Document Manager は、ローカルの SQLite データベースを使っ�
 - 最近開いた文書、CSV エクスポート、データベースのバックアップと復元
 - レポート画面と TreeMap による可視化
 - 日本語、英語、ベトナム語、中国語の UI 切り替え
+- Dashboard での欠損ファイル修復、launcher 失敗の案内、空の collection の作成と文書追加
 
 ## 技術スタック
 
@@ -82,7 +83,7 @@ dotnet build "StudyDocumentManager.sln" -c Debug
 dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c Debug
 ```
 
-現行のテストスイートは xUnit ベースで、614 件のテストを含みます。CI はビルドとアーティファクト生成を実行しますが、テスト実行はローカル確認に委ねています。
+現行のテストスイートは xUnit ベースで、795 件のテストを含みます。データベース、repository、model/service の自動検証を行います。CI はビルドとアーティファクト生成を実行しますが、テスト実行はローカル確認に委ねています。Dashboard の deferred lifecycle、drag/drop の event bridge、native dialog、restore 後の再オープンなど、デスクトップ実行が必要な項目は手動確認の対象です。
 
 ## プロジェクト構成
 
