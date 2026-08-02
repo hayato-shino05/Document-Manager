@@ -10,18 +10,20 @@
         <Grid RowDefinitions="Auto,*,Auto"
               MaxWidth="1040"
               HorizontalAlignment="Center">
-            <StackPanel Orientation="Horizontal"
-                        Spacing="{StaticResource Space4}"
-                        Margin="0,0,0,12">
-                <Image Source="{StaticResource IconAdd}"
-                       Width="20"
-                       Height="20"
-                       VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding PageTitle}"
-                           FontSize="{StaticResource FontSizeXl}"
-                           FontWeight="Bold"
-                           Foreground="{StaticResource TextPrimary}"
+            <StackPanel>
+                <StackPanel Orientation="Horizontal"
+                            Spacing="{StaticResource Space1}">
+                    <Image Source="{StaticResource IconAdd}"
+                           Width="20"
+                           Height="20"
                            VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding PageTitle}"
+                               FontSize="{StaticResource FontSizeXl}"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+                <Border Height="{StaticResource Space4}"/>
             </StackPanel>
 
             <ScrollViewer Grid.Row="1"
@@ -34,9 +36,8 @@
                     <Grid ColumnDefinitions="*,*"
                           RowDefinitions="Auto,Auto,Auto,Auto">
                         <StackPanel Grid.Row="0"
-                                    Spacing="4">
+                                    Spacing="{StaticResource Space1}">
                             <TextBlock Text="{loc:Localize AddEdit_LblDocName}"
-                                       AutomationProperties.Name="{loc:Localize AddEdit_LblDocName}"
                                        FontSize="{StaticResource FontSizeMd}"
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
@@ -53,21 +54,22 @@
                         </StackPanel>
 
                         <StackPanel Grid.Row="1"
-                                    Spacing="4">
+                                    Spacing="{StaticResource Space1}">
                             <TextBlock Text="{loc:Localize AddEdit_LblFilePath}"
                                        FontSize="{StaticResource FontSizeMd}"
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
                             <DockPanel>
+                                <Border DockPanel.Dock="Right"
+                                        Width="{StaticResource Space2}"/>
                                 <Button x:Name="btnBrowse"
                                         DockPanel.Dock="Right"
                                         Classes="secondary"
-                                        Margin="6,0,0,0"
                                         Command="{Binding BrowseFileCommand}"
                                         AutomationProperties.Name="{loc:Localize AddEdit_BtnBrowse}"
                                         Padding="{StaticResource PaddingMd}">
                                     <StackPanel Orientation="Horizontal"
-                                                Spacing="3">
+                                                Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconOpenFile}"
                                                Width="11"
                                                Height="11"/>
@@ -86,7 +88,7 @@
 
                         <StackPanel Grid.Row="2"
                                     Grid.RowSpan="2"
-                                    Spacing="4">
+                                    Spacing="{StaticResource Space1}">
                             <TextBlock Text="{loc:Localize AddEdit_LblNotes}"
                                        FontSize="{StaticResource FontSizeMd}"
                                        FontWeight="SemiBold"
@@ -104,9 +106,11 @@
 
                         <Grid Grid.Column="1"
                               Grid.Row="0"
-                              ColumnDefinitions="*,16,*">
+                              ColumnDefinitions="*,Auto,*">
+                            <Border Grid.Column="1"
+                                    Width="{StaticResource Space5}"/>
                             <StackPanel Grid.Column="0"
-                                        Spacing="4">
+                                        Spacing="{StaticResource Space1}">
                                 <TextBlock Text="{loc:Localize AddEdit_LblCategory}"
                                            FontSize="{StaticResource FontSizeMd}"
                                            FontWeight="SemiBold"
@@ -121,7 +125,7 @@
                                           HorizontalAlignment="Stretch"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2"
-                                        Spacing="4">
+                                        Spacing="{StaticResource Space1}">
                                 <TextBlock Text="{loc:Localize AddEdit_LblDocType}"
                                            FontSize="{StaticResource FontSizeMd}"
                                            FontWeight="SemiBold"
@@ -139,9 +143,11 @@
 
                         <Grid Grid.Column="1"
                               Grid.Row="1"
-                              ColumnDefinitions="*,16,*">
+                              ColumnDefinitions="*,Auto,*">
+                            <Border Grid.Column="1"
+                                    Width="{StaticResource Space5}"/>
                             <StackPanel Grid.Column="0"
-                                        Spacing="4">
+                                        Spacing="{StaticResource Space1}">
                                 <TextBlock Text="{loc:Localize AddEdit_LblAuthor}"
                                            FontSize="{StaticResource FontSizeMd}"
                                            FontWeight="SemiBold"
@@ -154,7 +160,7 @@
                                          Height="32"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2"
-                                        Spacing="4">
+                                        Spacing="{StaticResource Space1}">
                                 <TextBlock Text="{loc:Localize AddEdit_LblTags}"
                                            FontSize="{StaticResource FontSizeMd}"
                                            FontWeight="SemiBold"
@@ -170,9 +176,11 @@
 
                         <Grid Grid.Column="1"
                               Grid.Row="2"
-                              ColumnDefinitions="*,16,Auto">
+                              ColumnDefinitions="*,Auto,Auto">
+                            <Border Grid.Column="1"
+                                    Width="{StaticResource Space5}"/>
                             <StackPanel Grid.Column="0"
-                                        Spacing="4">
+                                        Spacing="{StaticResource Space1}">
                                 <TextBlock Text="{loc:Localize AddEdit_LblDeadline}"
                                            FontSize="{StaticResource FontSizeMd}"
                                            FontWeight="SemiBold"
@@ -183,26 +191,26 @@
                                             HorizontalAlignment="Stretch"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2"
-                                        Spacing="4"
-                                        VerticalAlignment="Bottom"
-                                        Margin="0,0,0,4">
+                                        Spacing="0"
+                                        VerticalAlignment="Bottom">
                                 <CheckBox x:Name="chkImportant"
                                           Content="{loc:Localize AddEdit_ChkImportant}"
                                           AutomationProperties.Name="{loc:Localize AddEdit_ChkImportant}"
                                           FontSize="{StaticResource FontSizeMd}"
                                           IsChecked="{Binding IsImportant, Mode=TwoWay}"/>
+                                <Border Height="{StaticResource Space1}"/>
                             </StackPanel>
                         </Grid>
                     </Grid>
                 </Border>
             </ScrollViewer>
 
-            <StackPanel Grid.Row="2"
-                        Orientation="Horizontal"
-                        Spacing="{StaticResource Space4}"
-                        HorizontalAlignment="Right"
-                        Margin="0,12,0,0">
-                <Button x:Name="btnSave"
+            <StackPanel Grid.Row="2">
+                <Border Height="{StaticResource Space4}"/>
+                <StackPanel Orientation="Horizontal"
+                            Spacing="{StaticResource Space1}"
+                            HorizontalAlignment="Right">
+                    <Button x:Name="btnSave"
                         Classes="primary"
                         Command="{Binding SaveCommand}"
                         AutomationProperties.Name="{loc:Localize AddEdit_BtnSave}"
@@ -210,7 +218,7 @@
                         HotKey="Ctrl+S"
                         ToolTip.Tip="{loc:Localize AddEdit_TipSave}">
                     <StackPanel Orientation="Horizontal"
-                                Spacing="4">
+                                Spacing="{StaticResource Space1}">
                         <Image Source="{StaticResource IconSave}"
                                Width="13"
                                Height="13"/>
@@ -229,6 +237,7 @@
                     <TextBlock Text="{loc:Localize AddEdit_BtnCancel}"
                                FontSize="{StaticResource FontSizeLg}"/>
                 </Button>
+                </StackPanel>
             </StackPanel>
         </Grid>
     </Border>
