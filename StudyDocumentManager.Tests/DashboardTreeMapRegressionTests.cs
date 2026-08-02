@@ -44,9 +44,9 @@ public sealed class DashboardTreeMapRegressionTests
         var converter = DashboardFilterLabelConverter.Instance;
 
         Assert.Equal(localization["Filter_AllSubjects"], converter.Convert(
-            "__ALL__", typeof(string), "Filter_AllSubjects", CultureInfo.InvariantCulture));
+            "Filter_AllSubjects", typeof(string), "Filter_AllSubjects", CultureInfo.InvariantCulture));
         Assert.Equal(localization["Filter_AllTypes"], converter.Convert(
-            "__ALL__", typeof(string), "Filter_AllTypes", CultureInfo.InvariantCulture));
+            "Filter_AllTypes", typeof(string), "Filter_AllTypes", CultureInfo.InvariantCulture));
     }
 
     private sealed class ReportStub : IReportRepository

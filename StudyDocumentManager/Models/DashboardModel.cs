@@ -12,7 +12,8 @@ namespace StudyDocumentManager.Models;
 
 public partial class DashboardModel : ModelBase
 {
-    private const string FILTER_ALL_SENTINEL = "__ALL__";
+    private const string FILTER_ALL_SUBJECTS_KEY = "Filter_AllSubjects";
+    private const string FILTER_ALL_TYPES_KEY = "Filter_AllTypes";
 
     private readonly IDocumentRepository _repository;
     private readonly IRecycleBinRepository _recycleBinRepo;
@@ -80,8 +81,8 @@ public partial class DashboardModel : ModelBase
     [ObservableProperty] private string _searchKeyword = string.Empty;
     [ObservableProperty] private List<string> _subjects = new();
     [ObservableProperty] private List<string> _types = new();
-    [ObservableProperty] private string _selectedSubject = FILTER_ALL_SENTINEL;
-    [ObservableProperty] private string _selectedType = FILTER_ALL_SENTINEL;
+    [ObservableProperty] private string _selectedSubject = FILTER_ALL_SUBJECTS_KEY;
+    [ObservableProperty] private string _selectedType = FILTER_ALL_TYPES_KEY;
 
     // ——— Advanced Filter ——— 
     [ObservableProperty] private bool _isAdvancedFilterVisible;
@@ -186,10 +187,10 @@ public partial class DashboardModel : ModelBase
             TotalCategories = subjects.Count;
             DeletedCount = _recycleBinRepo.GetDeletedDocumentCount();
 
-            Subjects = [FILTER_ALL_SENTINEL, ..subjects];
-            Types = [FILTER_ALL_SENTINEL, ..types];
-            SelectedSubject = FILTER_ALL_SENTINEL;
-            SelectedType = FILTER_ALL_SENTINEL;
+            Subjects = [FILTER_ALL_SUBJECTS_KEY, ..subjects];
+            Types = [FILTER_ALL_TYPES_KEY, ..types];
+            SelectedSubject = FILTER_ALL_SUBJECTS_KEY;
+            SelectedType = FILTER_ALL_TYPES_KEY;
             Documents = docs.ToList();
             BuildCategoryTree(docs, subjects, types);
 
@@ -375,23 +376,23 @@ public partial class DashboardModel : ModelBase
         switch (item.FilterType)
         {
             case "all":
-                SelectedSubject = FILTER_ALL_SENTINEL;
-                SelectedType = FILTER_ALL_SENTINEL;
+                SelectedSubject = FILTER_ALL_SUBJECTS_KEY;
+                SelectedType = FILTER_ALL_TYPES_KEY;
                 IsImportantOnly = false;
                 break;
             case "subject":
                 SelectedSubject = item.FilterValue;
-                SelectedType = FILTER_ALL_SENTINEL;
+                SelectedType = FILTER_ALL_TYPES_KEY;
                 IsImportantOnly = false;
                 break;
             case "type":
-                SelectedSubject = FILTER_ALL_SENTINEL;
+                SelectedSubject = FILTER_ALL_SUBJECTS_KEY;
                 SelectedType = item.FilterValue;
                 IsImportantOnly = false;
                 break;
             case "important":
-                SelectedSubject = FILTER_ALL_SENTINEL;
-                SelectedType = FILTER_ALL_SENTINEL;
+                SelectedSubject = FILTER_ALL_SUBJECTS_KEY;
+                SelectedType = FILTER_ALL_TYPES_KEY;
                 IsImportantOnly = true;
                 break;
             case "collection":
@@ -453,8 +454,8 @@ public partial class DashboardModel : ModelBase
         try
         {
             string keyword = SearchKeyword?.Trim() ?? "";
-            string subject = SelectedSubject == FILTER_ALL_SENTINEL ? "" : SelectedSubject;
-            string type = SelectedType == FILTER_ALL_SENTINEL ? "" : SelectedType;
+            string subject = SelectedSubject == FILTER_ALL_SUBJECTS_KEY ? "" : SelectedSubject;
+            string type = SelectedType == FILTER_ALL_TYPES_KEY ? "" : SelectedType;
             DateTime? fromDate = IsDateFilterEnabled && FilterFromDate.HasValue ? FilterFromDate.Value.DateTime : null;
             DateTime? toDate = IsDateFilterEnabled && FilterToDate.HasValue ? FilterToDate.Value.DateTime : null;
             double? minSize = IsSizeFilterEnabled ? FilterMinSize : null;
@@ -607,8 +608,8 @@ public partial class DashboardModel : ModelBase
         // Set guard BEFORE changing properties to block ApplyFilters re-entrance
         _isLoadingData = true;
         SearchKeyword = string.Empty;
-        SelectedSubject = FILTER_ALL_SENTINEL;
-        SelectedType = FILTER_ALL_SENTINEL;
+        SelectedSubject = FILTER_ALL_SUBJECTS_KEY;
+        SelectedType = FILTER_ALL_TYPES_KEY;
         IsAdvancedFilterVisible = false;
         IsDateFilterEnabled = false;
         FilterFromDate = null;

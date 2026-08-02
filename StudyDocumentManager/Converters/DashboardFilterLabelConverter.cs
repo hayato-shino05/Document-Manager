@@ -12,7 +12,7 @@ public sealed class DashboardFilterLabelConverter : IValueConverter
 
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is string valueText && valueText == "__ALL__" && parameter is string key &&
+        if (value is string valueText && parameter is string key && valueText == key &&
             Application.Current?.Resources["Loc"] is ILocalizationService localization)
         {
             return localization[key];
