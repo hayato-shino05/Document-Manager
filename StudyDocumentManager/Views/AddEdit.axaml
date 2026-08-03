@@ -13,7 +13,15 @@
             <StackPanel>
                 <StackPanel Orientation="Horizontal"
                             Spacing="{StaticResource Space1}">
-                    <Image Source="{StaticResource IconAdd}"
+                    <Image x:Name="addHeaderIcon"
+                           Source="{StaticResource IconAdd}"
+                           IsVisible="{Binding !IsEditing}"
+                           Width="20"
+                           Height="20"
+                           VerticalAlignment="Center"/>
+                    <Image x:Name="editHeaderIcon"
+                           Source="{StaticResource IconEdit}"
+                           IsVisible="{Binding IsEditing}"
                            Width="20"
                            Height="20"
                            VerticalAlignment="Center"/>

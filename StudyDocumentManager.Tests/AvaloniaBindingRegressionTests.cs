@@ -75,6 +75,43 @@ public class AvaloniaBindingRegressionTests
     }
 
     [AvaloniaFact]
+    public void AddEdit_EditModeUsesEditHeaderIcon()
+    {
+        var localization = GetLocalization();
+        var document = new StudyDocument
+        {
+            Id = 42,
+            Name = "Algorithms notes",
+            Subject = "Computer Science",
+            Type = "PDF",
+            FilePath = "C:/study/algorithms.pdf"
+        };
+        var model = new AddEditModel(
+            new ExistingDocumentRepository(document),
+            new CategoryRepositoryStub(),
+            null!, null!, null!, localization);
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            model.LoadDocument(document.Id);
+            window.Show();
+            FlushAvaloniaBindings();
+
+            Assert.True(model.IsEditing);
+            var addHeaderIcon = view.FindControl<Image>("addHeaderIcon")!;
+            var editHeaderIcon = view.FindControl<Image>("editHeaderIcon")!;
+            Assert.False(addHeaderIcon.IsVisible);
+            Assert.True(editHeaderIcon.IsVisible);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void AddEdit_EditorialWorkspace_PreservesBindingsAndActions()
     {
         var localization = GetLocalization();
@@ -860,6 +897,26 @@ public class AvaloniaBindingRegressionTests
         public bool RemoveDocument(int collectionId, int documentId) => true;
     }
 
+
+    private sealed class ExistingDocumentRepository(StudyDocument document) : IDocumentRepository
+    {
+        public List<StudyDocument> GetAll() => [document];
+        public StudyDocument? GetById(int id) => id == document.Id ? document : null;
+        public List<StudyDocument> Search(string keyword) => [];
+        public List<StudyDocument> Filter(string subject, string type) => [];
+        public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => [];
+        public bool Add(StudyDocument document) => false;
+        public bool AddWithCatalogs(StudyDocument document) => false;
+        public bool Update(StudyDocument document) => false;
+        public bool Delete(int id) => false;
+        public List<string> GetDistinctSubjects() => [];
+        public List<string> GetDistinctTypes() => [];
+        public List<string> GetDistinctTags() => [];
+        public List<StudyDocument> GetUpcomingDeadlines(int days) => [];
+        public List<StudyDocument> GetOverdueDocuments() => [];
+        public void EnsureSubjectExists(string subject) { }
+        public void EnsureTypeExists(string type) { }
+    }
 
     private sealed class MissingDocumentRepository(StudyDocument document) : IDocumentRepository
     {
