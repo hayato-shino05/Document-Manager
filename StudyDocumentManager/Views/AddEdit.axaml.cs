@@ -7,11 +7,14 @@ namespace StudyDocumentManager.Views;
 public partial class AddEdit : UserControl
 {
     private AddEditModel? _model;
+    private bool _propertyChangedSubscribed;
 
     public AddEdit()
     {
         InitializeComponent();
         DataContextChanged += OnDataContextChanged;
+        AttachedToVisualTree += OnAttachedToVisualTree;
+        DetachedFromVisualTree += OnDetachedFromVisualTree;
         SizeChanged += OnSizeChanged;
     }
 
@@ -56,16 +59,43 @@ public partial class AddEdit : UserControl
 
     private void OnDataContextChanged(object? sender, System.EventArgs e)
     {
-        if (_model is not null)
-        {
-            _model.PropertyChanged -= OnModelPropertyChanged;
-        }
+        DetachModelHandlers();
 
         _model = DataContext as AddEditModel;
-        if (_model is not null)
+        if (VisualRoot is not null)
+            AttachPropertyChangedHandler();
+    }
+
+    private void OnAttachedToVisualTree(object? sender, Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        _model?.AttachLocalization();
+        AttachPropertyChangedHandler();
+    }
+
+    private void OnDetachedFromVisualTree(object? sender, Avalonia.VisualTreeAttachmentEventArgs e)
+        => DetachModelHandlers();
+
+    private void AttachPropertyChangedHandler()
+    {
+        if (_model is null || _propertyChangedSubscribed)
+            return;
+
+        _model.PropertyChanged += OnModelPropertyChanged;
+        _propertyChangedSubscribed = true;
+    }
+
+    private void DetachModelHandlers()
+    {
+        if (_model is null)
+            return;
+
+        if (_propertyChangedSubscribed)
         {
-            _model.PropertyChanged += OnModelPropertyChanged;
+            _model.PropertyChanged -= OnModelPropertyChanged;
+            _propertyChangedSubscribed = false;
         }
+
+        _model.DetachLocalization();
     }
 
     private void OnModelPropertyChanged(object? sender, PropertyChangedEventArgs e)

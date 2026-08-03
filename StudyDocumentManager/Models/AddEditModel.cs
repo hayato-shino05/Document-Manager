@@ -16,6 +16,7 @@ public partial class AddEditModel : ModelBase
     private readonly IFileDialogService _fileDialogService;
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
+    private bool _localizationSubscribed;
     private int? _editingId;
 
     [ObservableProperty] private string _name = string.Empty;
@@ -44,10 +45,29 @@ public partial class AddEditModel : ModelBase
         _navigationService = navigationService;
         _loc = loc;
         _loc.LanguageChanged += OnLanguageChanged;
+        _localizationSubscribed = true;
 
         PageTitle = _loc["AddEdit_PageTitleAdd"];
         Subjects = new ObservableCollection<string>(_categoryRepo.GetAllSubjects());
         Types = new ObservableCollection<string>(_categoryRepo.GetAllTypes());
+    }
+
+    public void AttachLocalization()
+    {
+        if (_localizationSubscribed)
+            return;
+
+        _loc.LanguageChanged += OnLanguageChanged;
+        _localizationSubscribed = true;
+    }
+
+    public void DetachLocalization()
+    {
+        if (!_localizationSubscribed)
+            return;
+
+        _loc.LanguageChanged -= OnLanguageChanged;
+        _localizationSubscribed = false;
     }
 
     private void OnLanguageChanged(object? sender, EventArgs e)
