@@ -71,6 +71,18 @@ public sealed class AddEditLifecycleCleanupTests
         }
     }
 
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void AddEdit_DetachedDataContextChange_DoesNotDetachModelLocalization()
+    {
+        var localization = new TrackingLocalizationService();
+        var model = CreateModel(localization);
+        var view = new StudyDocumentManager.Views.AddEdit { DataContext = model };
+
+        view.DataContext = null;
+
+        Assert.Equal(1, localization.SubscriberCount);
+    }
+
     private static AddEditModel CreateModel(ILocalizationService localization)
         => new(null!, new CategoryRepositoryStub(), null!, null!, null!, localization);
 

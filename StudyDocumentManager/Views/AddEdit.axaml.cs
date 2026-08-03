@@ -92,12 +92,11 @@ public partial class AddEdit : UserControl
         if (_model is null)
             return;
 
-        if (_propertyChangedSubscribed)
-        {
-            _model.PropertyChanged -= OnModelPropertyChanged;
-            _propertyChangedSubscribed = false;
-        }
+        if (!_propertyChangedSubscribed)
+            return;
 
+        _model.PropertyChanged -= OnModelPropertyChanged;
+        _propertyChangedSubscribed = false;
         _model.DetachLocalization();
     }
 
