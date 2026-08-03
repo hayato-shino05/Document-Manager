@@ -389,6 +389,8 @@ public class AvaloniaBindingRegressionTests
             AssertLayout(759, true);
             AssertLayout(760, false);
             AssertLayout(1024, false);
+
+            AssertLayout(760, false);
             AssertLayout(520, true);
             AssertLayout(1024, false);
         }
@@ -428,6 +430,23 @@ public class AvaloniaBindingRegressionTests
                 scrollViewer.VerticalScrollBarVisibility);
             AssertInsideView(view, scrollViewer);
 
+            foreach (var language in new[]
+            {
+                Core.SupportedLanguage.Japanese,
+                Core.SupportedLanguage.Vietnamese,
+                Core.SupportedLanguage.Chinese
+            })
+            {
+                localization.SetLanguage(language);
+                FlushAvaloniaBindings();
+                Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(),
+                    text => text.Text == localization["AddEdit_LblDocName"]);
+                Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(),
+                    text => text.Text == localization["AddEdit_LblFilePath"]);
+                Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(),
+                    text => text.Text == localization["AddEdit_LblNotes"]);
+            }
+
             foreach (var name in new[]
             {
                 "txtName", "txtFilePath", "txtAuthor", "txtTags", "txtNotes",
@@ -442,6 +461,13 @@ public class AvaloniaBindingRegressionTests
                 .GetVisualDescendants().OfType<TextBlock>().Single().Text));
             Assert.False(string.IsNullOrWhiteSpace(FindControl<Button>(view, "btnCancel")
                 .GetVisualDescendants().OfType<TextBlock>().Single().Text));
+
+            window.Height = 420;
+            FlushAvaloniaBindings();
+            Assert.True(scrollViewer.Extent.Height > scrollViewer.Viewport.Height);
+            scrollViewer.Offset = new Vector(0, 1);
+            FlushAvaloniaBindings();
+            Assert.True(scrollViewer.Offset.Y > 0);
         }
         finally
         {
