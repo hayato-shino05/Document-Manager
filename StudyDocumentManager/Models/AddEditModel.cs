@@ -59,6 +59,7 @@ public partial class AddEditModel : ModelBase
 
         _loc.LanguageChanged += OnLanguageChanged;
         _localizationSubscribed = true;
+        OnLanguageChanged(this, EventArgs.Empty);
     }
 
     public void DetachLocalization()

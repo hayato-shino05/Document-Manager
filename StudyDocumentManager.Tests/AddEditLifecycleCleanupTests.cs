@@ -44,6 +44,33 @@ public sealed class AddEditLifecycleCleanupTests
         }
     }
 
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void AddEdit_ReassigningDetachedModel_ResynchronizesLocalization()
+    {
+        var localization = new TrackingLocalizationService();
+        var model = CreateModel(localization);
+        var view = new StudyDocumentManager.Views.AddEdit { DataContext = model };
+        var window = new Avalonia.Controls.Window { Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            model.DetachLocalization();
+            model.IsEditing = true;
+            view.DataContext = null;
+            view.DataContext = model;
+
+            Assert.Equal("AddEdit_PageTitleEdit", model.PageTitle);
+            Assert.Equal(1, localization.SubscriberCount);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     private static AddEditModel CreateModel(ILocalizationService localization)
         => new(null!, new CategoryRepositoryStub(), null!, null!, null!, localization);
 

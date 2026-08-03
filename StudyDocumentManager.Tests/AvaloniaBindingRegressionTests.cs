@@ -87,7 +87,7 @@ public class AvaloniaBindingRegressionTests
             FilePath = "C:/study/algorithms.pdf"
         };
         var model = new AddEditModel(
-            new ExistingDocumentRepository(document),
+            new DocumentRepositoryStub(document, returnDocument: true),
             new CategoryRepositoryStub(),
             null!, null!, null!, localization);
         var view = new AddEdit { DataContext = model };
@@ -762,7 +762,7 @@ public class AvaloniaBindingRegressionTests
         var missingPath = Path.Combine(Path.GetTempPath(), $"missing_{Guid.NewGuid():N}.pdf");
         var document = new StudyDocument { Id = 17, Name = "Missing syllabus", FilePath = missingPath };
         var model = new FileIntegrityCheckModel(
-            new MissingDocumentRepository(document),
+            new DocumentRepositoryStub(document, returnDocument: false),
             null!,
             null!,
             null!,
@@ -898,30 +898,10 @@ public class AvaloniaBindingRegressionTests
     }
 
 
-    private sealed class ExistingDocumentRepository(StudyDocument document) : IDocumentRepository
+    private sealed class DocumentRepositoryStub(StudyDocument document, bool returnDocument) : IDocumentRepository
     {
         public List<StudyDocument> GetAll() => [document];
-        public StudyDocument? GetById(int id) => id == document.Id ? document : null;
-        public List<StudyDocument> Search(string keyword) => [];
-        public List<StudyDocument> Filter(string subject, string type) => [];
-        public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => [];
-        public bool Add(StudyDocument document) => false;
-        public bool AddWithCatalogs(StudyDocument document) => false;
-        public bool Update(StudyDocument document) => false;
-        public bool Delete(int id) => false;
-        public List<string> GetDistinctSubjects() => [];
-        public List<string> GetDistinctTypes() => [];
-        public List<string> GetDistinctTags() => [];
-        public List<StudyDocument> GetUpcomingDeadlines(int days) => [];
-        public List<StudyDocument> GetOverdueDocuments() => [];
-        public void EnsureSubjectExists(string subject) { }
-        public void EnsureTypeExists(string type) { }
-    }
-
-    private sealed class MissingDocumentRepository(StudyDocument document) : IDocumentRepository
-    {
-        public List<StudyDocument> GetAll() => [document];
-        public StudyDocument? GetById(int id) => null;
+        public StudyDocument? GetById(int id) => returnDocument && id == document.Id ? document : null;
         public List<StudyDocument> Search(string keyword) => [];
         public List<StudyDocument> Filter(string subject, string type) => [];
         public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => [];

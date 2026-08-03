@@ -63,7 +63,10 @@ public partial class AddEdit : UserControl
 
         _model = DataContext as AddEditModel;
         if (VisualRoot is not null)
+        {
+            _model?.AttachLocalization();
             AttachPropertyChangedHandler();
+        }
     }
 
     private void OnAttachedToVisualTree(object? sender, Avalonia.VisualTreeAttachmentEventArgs e)

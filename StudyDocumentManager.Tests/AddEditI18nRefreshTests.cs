@@ -36,6 +36,30 @@ public sealed class AddEditI18nRefreshTests
         Assert.Equal(localization["AddEdit_PageTitleEdit"], model.PageTitle);
     }
 
+    [Fact]
+    public async Task AddEdit_ReattachLocalization_ResynchronizesCurrentLocale()
+    {
+        var localization = new LocalizationService();
+        var model = new AddEditModel(
+            new DocumentRepositoryStub(new StudyDocument { Id = 7, Name = "Notes" }),
+            new CategoryRepositoryStub(),
+            new DialogServiceStub(),
+            new FileDialogServiceStub(),
+            new NavigationServiceStub(),
+            localization);
+
+        model.LoadDocument(7);
+        model.Name = string.Empty;
+        await model.SaveCommand.ExecuteAsync(null);
+        model.DetachLocalization();
+
+        localization.SetLanguage(SupportedLanguage.English);
+        model.AttachLocalization();
+
+        Assert.Equal(localization["AddEdit_NameRequired"], model.NameValidationMessage);
+        Assert.Equal(localization["AddEdit_PageTitleEdit"], model.PageTitle);
+    }
+
     private sealed class DocumentRepositoryStub(StudyDocument document) : IDocumentRepository
     {
         public List<StudyDocument> GetAll() => [];
