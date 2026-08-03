@@ -1,0 +1,58 @@
+name: Label Pending Release
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches: [development]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: read
+
+    steps:
+      - name: Label linked issues as pending-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Extract issue numbers from PR title and body (passed via env vars for safety)
+          # Using env vars prevents shell injection from backticks in markdown
+          PR_TEXT="$PR_TITLE $PR_BODY"
+          ISSUES=$(echo "$PR_TEXT" | grep -oE "(Fixes|Closes|Resolves|Refs?) #[0-9]+" | grep -oE "#[0-9]+" | sort -u || true)
+
+          if [[ -z "$ISSUES" ]]; then
+            echo "No linked issues found in PR"
+            exit 0
+          fi
+
+          for ISSUE in $ISSUES; do
+            NUM=${ISSUE#\#}
+            echo "Labeling issue #$NUM as pending-release"
+
+            # Create label if doesn't exist
+            gh label create "pending-release" \
+              --color "fbca04" \
+              --description "Fix in review, awaiting merge" \
+              --repo ${{ github.repository }} 2>/dev/null || true
+
+            # Add label to issue
+            gh issue edit $NUM --add-label "pending-release" --repo ${{ github.repository }} || true
+          done
+
+      - name: Add PR comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_TEXT="${{ github.event.pull_request.title }} ${{ github.event.pull_request.body }}"
+          ISSUES=$(echo "$PR_TEXT" | grep -oE "(Fixes|Closes|Resolves|Refs?) #[0-9]+" | grep -oE "#[0-9]+" | sort -u || true)
+
+          if [[ -n "$ISSUES" ]]; then
+            ISSUE_LIST=$(echo "$ISSUES" | tr '\n' ' ')
+            gh pr comment ${{ github.event.pull_request.number }} \
+              --body "🏷️ Linked issues labeled as \`pending-release\`: $ISSUE_LIST" \
+              --repo ${{ github.repository }}
+          fi
