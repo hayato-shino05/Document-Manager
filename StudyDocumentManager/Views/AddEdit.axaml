@@ -45,12 +45,17 @@
                                        Foreground="{StaticResource TextPrimary}"/>
                             <TextBox x:Name="txtName"
                                      Text="{Binding Name, Mode=TwoWay}"
+                                     TabIndex="1"
                                      AutomationProperties.Name="{loc:Localize AddEdit_LblDocName}"
+                                     AutomationProperties.HelpText="{Binding NameValidationMessage}"
                                      FontSize="{StaticResource FontSizeLg}"
                                      Watermark="{loc:Localize AddEdit_PlaceholderDocName}"
                                      Height="32"/>
-                            <TextBlock Text="{Binding NameValidationMessage}"
+                            <TextBlock x:Name="txtNameError"
+                                       Text="{Binding NameValidationMessage}"
                                        IsVisible="{Binding HasNameValidationError}"
+                                       AutomationProperties.Name="{Binding NameValidationMessage}"
+                                       AutomationProperties.LiveSetting="Polite"
                                        Foreground="{StaticResource DangerBrush}"
                                        FontSize="{StaticResource FontSizeSm}"/>
                         </StackPanel>
@@ -67,6 +72,7 @@
                                         Width="{StaticResource Space2}"/>
                                 <Button x:Name="btnBrowse"
                                         DockPanel.Dock="Right"
+                                        IsTabStop="False"
                                         Classes="secondary"
                                         Command="{Binding BrowseFileCommand}"
                                         AutomationProperties.Name="{loc:Localize AddEdit_BtnBrowse}"
@@ -82,6 +88,7 @@
                                 </Button>
                                 <TextBox x:Name="txtFilePath"
                                          Text="{Binding FilePath, Mode=TwoWay}"
+                                         TabIndex="2"
                                          AutomationProperties.Name="{loc:Localize AddEdit_LblFilePath}"
                                          FontSize="{StaticResource FontSizeMd}"
                                          Watermark="{loc:Localize AddEdit_PlaceholderFilePath}"
@@ -99,6 +106,7 @@
                                        Foreground="{StaticResource TextPrimary}"/>
                             <TextBox x:Name="txtNotes"
                                      Text="{Binding Notes, Mode=TwoWay}"
+                                     TabIndex="9"
                                      AutomationProperties.Name="{loc:Localize AddEdit_LblNotes}"
                                      FontSize="{StaticResource FontSizeMd}"
                                      Watermark="{loc:Localize AddEdit_PlaceholderNotes}"
@@ -120,8 +128,10 @@
                                            FontSize="{StaticResource FontSizeMd}"
                                            FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
-                                <ComboBox ItemsSource="{Binding Subjects}"
+                                <ComboBox x:Name="cmbCategory"
+                                          ItemsSource="{Binding Subjects}"
                                           SelectedItem="{Binding Subject, Mode=TwoWay}"
+                                          TabIndex="3"
                                           AutomationProperties.Name="{loc:Localize AddEdit_LblCategory}"
                                           IsTextSearchEnabled="True"
                                           PlaceholderText="{loc:Localize AddEdit_PlaceholderCategory}"
@@ -135,8 +145,10 @@
                                            FontSize="{StaticResource FontSizeMd}"
                                            FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
-                                <ComboBox ItemsSource="{Binding Types}"
+                                <ComboBox x:Name="cmbType"
+                                          ItemsSource="{Binding Types}"
                                           SelectedItem="{Binding Type, Mode=TwoWay}"
+                                          TabIndex="4"
                                           AutomationProperties.Name="{loc:Localize AddEdit_LblDocType}"
                                           IsTextSearchEnabled="True"
                                           PlaceholderText="{loc:Localize AddEdit_PlaceholderDocType}"
@@ -160,6 +172,7 @@
                                            Foreground="{StaticResource TextPrimary}"/>
                                 <TextBox x:Name="txtAuthor"
                                          Text="{Binding Author, Mode=TwoWay}"
+                                         TabIndex="5"
                                          AutomationProperties.Name="{loc:Localize AddEdit_LblAuthor}"
                                          FontSize="{StaticResource FontSizeMd}"
                                          Watermark="{loc:Localize AddEdit_PlaceholderAuthor}"
@@ -173,6 +186,7 @@
                                            Foreground="{StaticResource TextPrimary}"/>
                                 <TextBox x:Name="txtTags"
                                          Text="{Binding Tags, Mode=TwoWay}"
+                                         TabIndex="6"
                                          AutomationProperties.Name="{loc:Localize AddEdit_LblTags}"
                                          FontSize="{StaticResource FontSizeMd}"
                                          Watermark="{loc:Localize AddEdit_PlaceholderTags}"
@@ -192,7 +206,11 @@
                                            FontSize="{StaticResource FontSizeMd}"
                                            FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
-                                <DatePicker SelectedDate="{Binding Deadline, Mode=TwoWay}"
+                                <DatePicker x:Name="dateDeadline"
+                                            SelectedDate="{Binding Deadline, Mode=TwoWay}"
+                                            TabIndex="7"
+                                            IsTabStop="True"
+                                            Focusable="True"
                                             AutomationProperties.Name="{loc:Localize AddEdit_LblDeadline}"
                                             FontSize="{StaticResource FontSizeMd}"
                                             HorizontalAlignment="Stretch"/>
@@ -201,6 +219,7 @@
                                         VerticalAlignment="Bottom">
                                 <CheckBox x:Name="chkImportant"
                                           Content="{loc:Localize AddEdit_ChkImportant}"
+                                          TabIndex="8"
                                           AutomationProperties.Name="{loc:Localize AddEdit_ChkImportant}"
                                           FontSize="{StaticResource FontSizeMd}"
                                           IsChecked="{Binding IsImportant, Mode=TwoWay}"/>
@@ -217,6 +236,7 @@
                             Spacing="{StaticResource Space1}"
                             HorizontalAlignment="Right">
                     <Button x:Name="btnSave"
+                        TabIndex="10"
                         Classes="primary"
                         Command="{Binding SaveCommand}"
                         AutomationProperties.Name="{loc:Localize AddEdit_BtnSave}"
@@ -234,6 +254,7 @@
                     </StackPanel>
                 </Button>
                 <Button x:Name="btnCancel"
+                        TabIndex="11"
                         Classes="secondary"
                         Command="{Binding CancelCommand}"
                         AutomationProperties.Name="{loc:Localize AddEdit_BtnCancel}"

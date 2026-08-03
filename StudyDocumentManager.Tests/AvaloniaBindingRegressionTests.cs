@@ -3,7 +3,9 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.VisualTree;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
@@ -145,6 +147,62 @@ public class AvaloniaBindingRegressionTests
 
             Assert.True(model.HasNameValidationError);
             Assert.Same(nameBox, TopLevel.GetTopLevel(view)?.FocusManager?.GetFocusedElement());
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void AddEdit_UsesWorkflowTabOrderAndValidationDescription()
+    {
+        var localization = GetLocalization();
+        var model = new AddEditModel(
+            null!, new CategoryRepositoryStub(), null!, null!, null!, localization);
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            var nameBox = view.FindControl<TextBox>("txtName")!;
+            var expected = new Control[]
+            {
+                nameBox,
+                view.FindControl<TextBox>("txtFilePath")!,
+                view.FindControl<ComboBox>("cmbCategory")!,
+                view.FindControl<ComboBox>("cmbType")!,
+                view.FindControl<TextBox>("txtAuthor")!,
+                view.FindControl<TextBox>("txtTags")!,
+                view.FindControl<DatePicker>("dateDeadline")!,
+                view.FindControl<CheckBox>("chkImportant")!,
+                view.FindControl<TextBox>("txtNotes")!,
+                view.FindControl<Button>("btnSave")!,
+                view.FindControl<Button>("btnCancel")!
+            };
+
+            Assert.True(nameBox.Focus());
+            var topLevel = TopLevel.GetTopLevel(view)!;
+            foreach (var expectedControl in expected)
+            {
+                Assert.Same(expectedControl, topLevel.FocusManager?.GetFocusedElement());
+                topLevel.KeyPress(Key.Tab, RawInputModifiers.None, PhysicalKey.None, null);
+            }
+
+            model.NameValidationMessage = "Document name is required";
+            model.HasNameValidationError = true;
+            FlushAvaloniaBindings();
+
+            var nameError = view.FindControl<TextBlock>("txtNameError")!;
+            Assert.Equal(model.NameValidationMessage,
+                nameBox.GetValue(AutomationProperties.HelpTextProperty));
+            Assert.Equal(model.NameValidationMessage,
+                nameError.GetValue(AutomationProperties.NameProperty));
+            Assert.Equal(AutomationLiveSetting.Polite,
+                nameError.GetValue(AutomationProperties.LiveSettingProperty));
         }
         finally
         {
