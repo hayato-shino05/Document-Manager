@@ -173,6 +173,7 @@ public class AvaloniaBindingRegressionTests
             {
                 nameBox,
                 view.FindControl<TextBox>("txtFilePath")!,
+                view.FindControl<Button>("btnBrowse")!,
                 view.FindControl<ComboBox>("cmbCategory")!,
                 view.FindControl<ComboBox>("cmbType")!,
                 view.FindControl<TextBox>("txtAuthor")!,
@@ -183,6 +184,9 @@ public class AvaloniaBindingRegressionTests
                 view.FindControl<Button>("btnSave")!,
                 view.FindControl<Button>("btnCancel")!
             };
+
+            var browseButton = view.FindControl<Button>("btnBrowse")!;
+            Assert.Same(model.BrowseFileCommand, browseButton.Command);
 
             Assert.True(nameBox.Focus());
             var topLevel = TopLevel.GetTopLevel(view)!;
