@@ -195,6 +195,30 @@ public class Slice4FlowPolishTests
     }
 
     [Fact]
+    public async Task AddEdit_SaveNewDocument_UsesTrimmedPathForFileSize()
+    {
+        var filePath = CreateTempFile("trimmed-size", ".pdf");
+        var repository = new RecordingDocumentRepository();
+        var model = CreateModel(repository: repository);
+        model.Name = "Trimmed path";
+        model.FilePath = $"  {filePath}  ";
+
+        try
+        {
+            await model.SaveCommand.ExecuteAsync(null);
+
+            var saved = Assert.Single(repository.AddedDocuments);
+            Assert.Equal(filePath, saved.FilePath);
+            Assert.NotNull(saved.FileSize);
+            Assert.Equal(4 / (1024.0 * 1024.0), saved.FileSize.Value);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [Fact]
     public async Task AddEdit_SaveEditReturningFalse_ShowsErrorWithoutNavigation()
     {
         var repository = new RecordingDocumentRepository

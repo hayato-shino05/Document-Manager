@@ -136,18 +136,19 @@ public partial class AddEditModel : ModelBase
             return;
         }
 
+        var filePath = FilePath.Trim();
         var doc = new StudyDocument
         {
             Name = Name.Trim(),
             Subject = Subject.Trim(),
             Type = Type.Trim(),
-            FilePath = FilePath.Trim(),
+            FilePath = filePath,
             Notes = Notes.Trim(),
             Author = Author.Trim(),
             Tags = Tags.Trim(),
             IsImportant = IsImportant,
             Deadline = Deadline?.DateTime,
-            FileSize = GetFileSize(FilePath)
+            FileSize = GetFileSize(filePath)
         };
 
         try
