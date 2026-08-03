@@ -1,11 +1,12 @@
 STATUS: DONE
 
-Commit: c563d31
+Commits: c563d31, c6447e0
 
 Implemented responsive AddEdit proof only in StudyDocumentManager.Tests/AvaloniaBindingRegressionTests.cs:
 - Added width checks for 759, 760, 1024 and transition 760 → 520 → 1024.
 - Asserted responsive column/row counts, field positions, Notes RowSpan, and positive in-bounds control rectangles after each resize.
-- Added smallest-width boundary coverage with long Japanese, Vietnamese, Chinese values and a long file path; Save, Cancel, Browse, and ScrollViewer remain reachable with positive bounds.
+- Added smallest-width boundary coverage with long Japanese, Vietnamese, Chinese values and a long file path; actual Japanese/Vietnamese/Chinese resource labels are asserted.
+- Proved scrolling by reducing the viewport height, asserting content extent exceeds the viewport, and verifying a positive scroll offset.
 
 Tests:
 - dotnet test StudyDocumentManager.Tests\\StudyDocumentManager.Tests.csproj -c Debug --no-restore --filter "FullyQualifiedName~AvaloniaBindingRegressionTests"
