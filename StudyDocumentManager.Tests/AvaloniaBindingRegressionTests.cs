@@ -3,7 +3,9 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.VisualTree;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
@@ -65,6 +67,43 @@ public class AvaloniaBindingRegressionTests
             Assert.Contains(
                 view.GetVisualDescendants().OfType<CheckBox>(),
                 checkBox => checkBox.IsChecked == model.IsImportant);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void AddEdit_EditModeUsesEditHeaderIcon()
+    {
+        var localization = GetLocalization();
+        var document = new StudyDocument
+        {
+            Id = 42,
+            Name = "Algorithms notes",
+            Subject = "Computer Science",
+            Type = "PDF",
+            FilePath = "C:/study/algorithms.pdf"
+        };
+        var model = new AddEditModel(
+            new DocumentRepositoryStub(document, returnDocument: true),
+            new CategoryRepositoryStub(),
+            null!, null!, null!, localization);
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            model.LoadDocument(document.Id);
+            window.Show();
+            FlushAvaloniaBindings();
+
+            Assert.True(model.IsEditing);
+            var addHeaderIcon = view.FindControl<Image>("addHeaderIcon")!;
+            var editHeaderIcon = view.FindControl<Image>("editHeaderIcon")!;
+            Assert.False(addHeaderIcon.IsVisible);
+            Assert.True(editHeaderIcon.IsVisible);
         }
         finally
         {
@@ -145,6 +184,66 @@ public class AvaloniaBindingRegressionTests
 
             Assert.True(model.HasNameValidationError);
             Assert.Same(nameBox, TopLevel.GetTopLevel(view)?.FocusManager?.GetFocusedElement());
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void AddEdit_UsesWorkflowTabOrderAndValidationDescription()
+    {
+        var localization = GetLocalization();
+        var model = new AddEditModel(
+            null!, new CategoryRepositoryStub(), null!, null!, null!, localization);
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            var nameBox = view.FindControl<TextBox>("txtName")!;
+            var expected = new Control[]
+            {
+                nameBox,
+                view.FindControl<TextBox>("txtFilePath")!,
+                view.FindControl<Button>("btnBrowse")!,
+                view.FindControl<ComboBox>("cmbCategory")!,
+                view.FindControl<ComboBox>("cmbType")!,
+                view.FindControl<TextBox>("txtAuthor")!,
+                view.FindControl<TextBox>("txtTags")!,
+                view.FindControl<DatePicker>("dateDeadline")!,
+                view.FindControl<CheckBox>("chkImportant")!,
+                view.FindControl<TextBox>("txtNotes")!,
+                view.FindControl<Button>("btnSave")!,
+                view.FindControl<Button>("btnCancel")!
+            };
+
+            var browseButton = view.FindControl<Button>("btnBrowse")!;
+            Assert.Same(model.BrowseFileCommand, browseButton.Command);
+
+            Assert.True(nameBox.Focus());
+            var topLevel = TopLevel.GetTopLevel(view)!;
+            foreach (var expectedControl in expected)
+            {
+                Assert.Same(expectedControl, topLevel.FocusManager?.GetFocusedElement());
+                topLevel.KeyPress(Key.Tab, RawInputModifiers.None, PhysicalKey.None, null);
+            }
+
+            model.NameValidationMessage = "Document name is required";
+            model.HasNameValidationError = true;
+            FlushAvaloniaBindings();
+
+            var nameError = view.FindControl<TextBlock>("txtNameError")!;
+            Assert.Equal(model.NameValidationMessage,
+                nameBox.GetValue(AutomationProperties.HelpTextProperty));
+            Assert.Equal(model.NameValidationMessage,
+                nameError.GetValue(AutomationProperties.NameProperty));
+            Assert.Equal(AutomationLiveSetting.Polite,
+                nameError.GetValue(AutomationProperties.LiveSettingProperty));
         }
         finally
         {
@@ -257,6 +356,155 @@ public class AvaloniaBindingRegressionTests
             Assert.True(scrollViewer.Bounds.Width > 0);
             Assert.True(scrollViewer.Bounds.Height > 0);
             AssertInsideView(view, scrollViewer);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void AddEdit_ResponsiveWidthsKeepGridAndControlsInBoundsAcrossTransitions()
+    {
+        var localization = GetLocalization();
+        var model = new AddEditModel(
+            null!, new CategoryRepositoryStub(), null!, null!, null!, localization)
+        {
+            Name = "Algorithms notes",
+            FilePath = "C:/study/algorithms.pdf",
+            Author = "Ada",
+            Tags = "algorithms",
+            Notes = "Responsive layout proof"
+        };
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Width = 1024, Height = 900, Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            void AssertLayout(int width, bool narrow)
+            {
+                window.Width = width;
+                FlushAvaloniaBindings();
+
+                var formGrid = FindControl<Grid>(view, "formGrid");
+                Assert.Equal(narrow ? 1 : 2, formGrid.ColumnDefinitions.Count);
+                Assert.Equal(narrow ? 6 : 4, formGrid.RowDefinitions.Count);
+
+                var nameField = FindControl<StackPanel>(view, "nameField");
+                var filePathField = FindControl<StackPanel>(view, "filePathField");
+                var categoryTypeFields = FindControl<Grid>(view, "categoryTypeFields");
+                var authorTagsFields = FindControl<Grid>(view, "authorTagsFields");
+                var deadlineImportantFields = FindControl<Grid>(view, "deadlineImportantFields");
+                var notesField = FindControl<StackPanel>(view, "notesField");
+
+                Assert.Equal(0, Grid.GetColumn(nameField));
+                Assert.Equal(0, Grid.GetColumn(filePathField));
+                Assert.Equal(narrow ? 0 : 1, Grid.GetColumn(categoryTypeFields));
+                Assert.Equal(narrow ? 0 : 1, Grid.GetColumn(authorTagsFields));
+                Assert.Equal(narrow ? 0 : 1, Grid.GetColumn(deadlineImportantFields));
+                Assert.Equal(0, Grid.GetColumn(notesField));
+
+                Assert.Equal(0, Grid.GetRow(nameField));
+                Assert.Equal(1, Grid.GetRow(filePathField));
+                Assert.Equal(narrow ? 2 : 0, Grid.GetRow(categoryTypeFields));
+                Assert.Equal(narrow ? 3 : 1, Grid.GetRow(authorTagsFields));
+                Assert.Equal(narrow ? 4 : 2, Grid.GetRow(deadlineImportantFields));
+                Assert.Equal(narrow ? 5 : 2, Grid.GetRow(notesField));
+                Assert.Equal(narrow ? 1 : 2, Grid.GetRowSpan(notesField));
+
+                foreach (var name in new[]
+                {
+                    "txtName", "txtFilePath", "txtAuthor", "txtTags", "txtNotes",
+                    "btnBrowse", "btnSave", "btnCancel", "chkImportant"
+                })
+                    AssertInsideView(view, FindControl<Control>(view, name));
+            }
+
+            AssertLayout(759, true);
+            AssertLayout(760, false);
+            AssertLayout(1024, false);
+
+            AssertLayout(760, false);
+            AssertLayout(520, true);
+            AssertLayout(1024, false);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void AddEdit_LongMultilingualValuesKeepActionsReachableAtSmallestWidth()
+    {
+        var localization = GetLocalization();
+        var model = new AddEditModel(
+            null!, new CategoryRepositoryStub(), null!, null!, null!, localization)
+        {
+            Name = "日本語の非常に長い文書名と学習ノートを使った境界テストです",
+            FilePath = "C:/study/非常に長いフォルダー名/算法与数据结构/" + new string('文', 80) + ".pdf",
+            Author = "Tác giả Việt Nam với tên và mô tả dài để kiểm tra bố cục",
+            Tags = "学习资料,数据结构,算法,边界测试",
+            Notes = "日本語、Tiếng Việt、中文の長い入力が狭い画面で折り返されてもフォームを壊さないことを確認します。"
+        };
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Width = 520, Height = 720, Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            var scrollViewer = view.GetVisualDescendants().OfType<ScrollViewer>()
+                .OrderByDescending(candidate => candidate.Bounds.Width * candidate.Bounds.Height)
+                .First();
+            Assert.True(scrollViewer.Bounds.Width > 0);
+            Assert.True(scrollViewer.Bounds.Height > 0);
+            Assert.Equal(Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
+                scrollViewer.VerticalScrollBarVisibility);
+            AssertInsideView(view, scrollViewer);
+
+            foreach (var language in new[]
+            {
+                Core.SupportedLanguage.Japanese,
+                Core.SupportedLanguage.Vietnamese,
+                Core.SupportedLanguage.Chinese
+            })
+            {
+                localization.SetLanguage(language);
+                FlushAvaloniaBindings();
+                Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(),
+                    text => text.Text == localization["AddEdit_LblDocName"]);
+                Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(),
+                    text => text.Text == localization["AddEdit_LblFilePath"]);
+                Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(),
+                    text => text.Text == localization["AddEdit_LblNotes"]);
+            }
+
+            foreach (var name in new[]
+            {
+                "txtName", "txtFilePath", "txtAuthor", "txtTags", "txtNotes",
+                "btnBrowse", "btnSave", "btnCancel", "chkImportant"
+            })
+                AssertInsideView(view, FindControl<Control>(view, name));
+
+            Assert.Equal(model.FilePath, FindControl<TextBox>(view, "txtFilePath").Text);
+            Assert.False(string.IsNullOrWhiteSpace(FindControl<Button>(view, "btnBrowse")
+                .GetVisualDescendants().OfType<TextBlock>().Single().Text));
+            Assert.False(string.IsNullOrWhiteSpace(FindControl<Button>(view, "btnSave")
+                .GetVisualDescendants().OfType<TextBlock>().Single().Text));
+            Assert.False(string.IsNullOrWhiteSpace(FindControl<Button>(view, "btnCancel")
+                .GetVisualDescendants().OfType<TextBlock>().Single().Text));
+
+            window.Height = 420;
+            FlushAvaloniaBindings();
+            Assert.True(scrollViewer.Extent.Height > scrollViewer.Viewport.Height);
+            scrollViewer.Offset = new Vector(0, 1);
+            FlushAvaloniaBindings();
+            Assert.True(scrollViewer.Offset.Y > 0);
         }
         finally
         {
@@ -514,7 +762,7 @@ public class AvaloniaBindingRegressionTests
         var missingPath = Path.Combine(Path.GetTempPath(), $"missing_{Guid.NewGuid():N}.pdf");
         var document = new StudyDocument { Id = 17, Name = "Missing syllabus", FilePath = missingPath };
         var model = new FileIntegrityCheckModel(
-            new MissingDocumentRepository(document),
+            new DocumentRepositoryStub(document, returnDocument: false),
             null!,
             null!,
             null!,
@@ -650,10 +898,10 @@ public class AvaloniaBindingRegressionTests
     }
 
 
-    private sealed class MissingDocumentRepository(StudyDocument document) : IDocumentRepository
+    private sealed class DocumentRepositoryStub(StudyDocument document, bool returnDocument) : IDocumentRepository
     {
         public List<StudyDocument> GetAll() => [document];
-        public StudyDocument? GetById(int id) => null;
+        public StudyDocument? GetById(int id) => returnDocument && id == document.Id ? document : null;
         public List<StudyDocument> Search(string keyword) => [];
         public List<StudyDocument> Filter(string subject, string type) => [];
         public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => [];

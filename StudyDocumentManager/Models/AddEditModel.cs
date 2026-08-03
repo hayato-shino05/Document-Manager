@@ -16,6 +16,7 @@ public partial class AddEditModel : ModelBase
     private readonly IFileDialogService _fileDialogService;
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
+    private bool _localizationSubscribed;
     private int? _editingId;
 
     [ObservableProperty] private string _name = string.Empty;
@@ -44,14 +45,38 @@ public partial class AddEditModel : ModelBase
         _navigationService = navigationService;
         _loc = loc;
         _loc.LanguageChanged += OnLanguageChanged;
+        _localizationSubscribed = true;
 
         PageTitle = _loc["AddEdit_PageTitleAdd"];
         Subjects = new ObservableCollection<string>(_categoryRepo.GetAllSubjects());
         Types = new ObservableCollection<string>(_categoryRepo.GetAllTypes());
     }
 
+    public void AttachLocalization()
+    {
+        if (_localizationSubscribed)
+            return;
+
+        _loc.LanguageChanged += OnLanguageChanged;
+        _localizationSubscribed = true;
+        OnLanguageChanged(this, EventArgs.Empty);
+    }
+
+    public void DetachLocalization()
+    {
+        if (!_localizationSubscribed)
+            return;
+
+        _loc.LanguageChanged -= OnLanguageChanged;
+        _localizationSubscribed = false;
+    }
+
     private void OnLanguageChanged(object? sender, EventArgs e)
-        => PageTitle = _loc[IsEditing ? "AddEdit_PageTitleEdit" : "AddEdit_PageTitleAdd"];
+    {
+        PageTitle = _loc[IsEditing ? "AddEdit_PageTitleEdit" : "AddEdit_PageTitleAdd"];
+        if (HasNameValidationError)
+            NameValidationMessage = _loc["AddEdit_NameRequired"];
+    }
 
     public void LoadDocument(int documentId)
     {
@@ -136,18 +161,19 @@ public partial class AddEditModel : ModelBase
             return;
         }
 
+        var filePath = FilePath.Trim();
         var doc = new StudyDocument
         {
             Name = Name.Trim(),
             Subject = Subject.Trim(),
             Type = Type.Trim(),
-            FilePath = FilePath.Trim(),
+            FilePath = filePath,
             Notes = Notes.Trim(),
             Author = Author.Trim(),
             Tags = Tags.Trim(),
             IsImportant = IsImportant,
             Deadline = Deadline?.DateTime,
-            FileSize = GetFileSize(FilePath)
+            FileSize = GetFileSize(filePath)
         };
 
         try
