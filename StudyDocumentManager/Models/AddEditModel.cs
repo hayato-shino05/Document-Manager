@@ -51,7 +51,11 @@ public partial class AddEditModel : ModelBase
     }
 
     private void OnLanguageChanged(object? sender, EventArgs e)
-        => PageTitle = _loc[IsEditing ? "AddEdit_PageTitleEdit" : "AddEdit_PageTitleAdd"];
+    {
+        PageTitle = _loc[IsEditing ? "AddEdit_PageTitleEdit" : "AddEdit_PageTitleAdd"];
+        if (HasNameValidationError)
+            NameValidationMessage = _loc["AddEdit_NameRequired"];
+    }
 
     public void LoadDocument(int documentId)
     {
