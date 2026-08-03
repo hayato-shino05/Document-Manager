@@ -327,6 +327,129 @@ public class AvaloniaBindingRegressionTests
     }
 
     [AvaloniaFact]
+    public void AddEdit_ResponsiveWidthsKeepGridAndControlsInBoundsAcrossTransitions()
+    {
+        var localization = GetLocalization();
+        var model = new AddEditModel(
+            null!, new CategoryRepositoryStub(), null!, null!, null!, localization)
+        {
+            Name = "Algorithms notes",
+            FilePath = "C:/study/algorithms.pdf",
+            Author = "Ada",
+            Tags = "algorithms",
+            Notes = "Responsive layout proof"
+        };
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Width = 1024, Height = 900, Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            void AssertLayout(int width, bool narrow)
+            {
+                window.Width = width;
+                FlushAvaloniaBindings();
+
+                var formGrid = FindControl<Grid>(view, "formGrid");
+                Assert.Equal(narrow ? 1 : 2, formGrid.ColumnDefinitions.Count);
+                Assert.Equal(narrow ? 6 : 4, formGrid.RowDefinitions.Count);
+
+                var nameField = FindControl<StackPanel>(view, "nameField");
+                var filePathField = FindControl<StackPanel>(view, "filePathField");
+                var categoryTypeFields = FindControl<Grid>(view, "categoryTypeFields");
+                var authorTagsFields = FindControl<Grid>(view, "authorTagsFields");
+                var deadlineImportantFields = FindControl<Grid>(view, "deadlineImportantFields");
+                var notesField = FindControl<StackPanel>(view, "notesField");
+
+                Assert.Equal(0, Grid.GetColumn(nameField));
+                Assert.Equal(0, Grid.GetColumn(filePathField));
+                Assert.Equal(narrow ? 0 : 1, Grid.GetColumn(categoryTypeFields));
+                Assert.Equal(narrow ? 0 : 1, Grid.GetColumn(authorTagsFields));
+                Assert.Equal(narrow ? 0 : 1, Grid.GetColumn(deadlineImportantFields));
+                Assert.Equal(0, Grid.GetColumn(notesField));
+
+                Assert.Equal(0, Grid.GetRow(nameField));
+                Assert.Equal(1, Grid.GetRow(filePathField));
+                Assert.Equal(narrow ? 2 : 0, Grid.GetRow(categoryTypeFields));
+                Assert.Equal(narrow ? 3 : 1, Grid.GetRow(authorTagsFields));
+                Assert.Equal(narrow ? 4 : 2, Grid.GetRow(deadlineImportantFields));
+                Assert.Equal(narrow ? 5 : 2, Grid.GetRow(notesField));
+                Assert.Equal(narrow ? 1 : 2, Grid.GetRowSpan(notesField));
+
+                foreach (var name in new[]
+                {
+                    "txtName", "txtFilePath", "txtAuthor", "txtTags", "txtNotes",
+                    "btnBrowse", "btnSave", "btnCancel", "chkImportant"
+                })
+                    AssertInsideView(view, FindControl<Control>(view, name));
+            }
+
+            AssertLayout(759, true);
+            AssertLayout(760, false);
+            AssertLayout(1024, false);
+            AssertLayout(520, true);
+            AssertLayout(1024, false);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void AddEdit_LongMultilingualValuesKeepActionsReachableAtSmallestWidth()
+    {
+        var localization = GetLocalization();
+        var model = new AddEditModel(
+            null!, new CategoryRepositoryStub(), null!, null!, null!, localization)
+        {
+            Name = "日本語の非常に長い文書名と学習ノートを使った境界テストです",
+            FilePath = "C:/study/非常に長いフォルダー名/算法与数据结构/" + new string('文', 80) + ".pdf",
+            Author = "Tác giả Việt Nam với tên và mô tả dài để kiểm tra bố cục",
+            Tags = "学习资料,数据结构,算法,边界测试",
+            Notes = "日本語、Tiếng Việt、中文の長い入力が狭い画面で折り返されてもフォームを壊さないことを確認します。"
+        };
+        var view = new AddEdit { DataContext = model };
+        var window = new Window { Width = 520, Height = 720, Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            var scrollViewer = view.GetVisualDescendants().OfType<ScrollViewer>()
+                .OrderByDescending(candidate => candidate.Bounds.Width * candidate.Bounds.Height)
+                .First();
+            Assert.True(scrollViewer.Bounds.Width > 0);
+            Assert.True(scrollViewer.Bounds.Height > 0);
+            Assert.Equal(Avalonia.Controls.Primitives.ScrollBarVisibility.Auto,
+                scrollViewer.VerticalScrollBarVisibility);
+            AssertInsideView(view, scrollViewer);
+
+            foreach (var name in new[]
+            {
+                "txtName", "txtFilePath", "txtAuthor", "txtTags", "txtNotes",
+                "btnBrowse", "btnSave", "btnCancel", "chkImportant"
+            })
+                AssertInsideView(view, FindControl<Control>(view, name));
+
+            Assert.Equal(model.FilePath, FindControl<TextBox>(view, "txtFilePath").Text);
+            Assert.False(string.IsNullOrWhiteSpace(FindControl<Button>(view, "btnBrowse")
+                .GetVisualDescendants().OfType<TextBlock>().Single().Text));
+            Assert.False(string.IsNullOrWhiteSpace(FindControl<Button>(view, "btnSave")
+                .GetVisualDescendants().OfType<TextBlock>().Single().Text));
+            Assert.False(string.IsNullOrWhiteSpace(FindControl<Button>(view, "btnCancel")
+                .GetVisualDescendants().OfType<TextBlock>().Single().Text));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void AddEdit_ShowsInlineErrorTextWhenValidationFails()
     {
         var localization = GetLocalization();
