@@ -190,7 +190,7 @@ public class Slice4FlowPolishTests
         Assert.Equal("algorithms", updated.Tags);
         Assert.Equal(deadline, updated.Deadline);
         Assert.True(updated.IsImportant);
-        Assert.Contains("AddEdit_SaveUpdated", dialog.Messages);
+        Assert.Equal(["AddEdit_SaveUpdated"], dialog.Messages);
         Assert.Equal(["dashboard"], navigation.Routes);
     }
 
@@ -210,7 +210,8 @@ public class Slice4FlowPolishTests
 
         await model.SaveCommand.ExecuteAsync(null);
 
-        Assert.Contains("AddEdit_SaveError", dialog.Messages);
+        Assert.Single(repository.UpdatedDocuments);
+        Assert.Equal(["AddEdit_SaveError"], dialog.Messages);
         Assert.Empty(navigation.Routes);
     }
 
@@ -230,7 +231,8 @@ public class Slice4FlowPolishTests
 
         await model.SaveCommand.ExecuteAsync(null);
 
-        Assert.Contains("AddEdit_SaveError", dialog.Messages);
+        Assert.Equal(1, repository.UpdateCallCount);
+        Assert.Equal(["AddEdit_SaveError"], dialog.Messages);
         Assert.Empty(navigation.Routes);
     }
 
@@ -245,7 +247,8 @@ public class Slice4FlowPolishTests
 
         await model.SaveCommand.ExecuteAsync(null);
 
-        Assert.Contains("AddEdit_SaveError", dialog.Messages);
+        Assert.Single(repository.AddedDocuments);
+        Assert.Equal(["AddEdit_SaveError"], dialog.Messages);
         Assert.Empty(navigation.Routes);
     }
 
@@ -887,13 +890,14 @@ public class Slice4FlowPolishTests
         public Exception? UpdateException { get; init; }
         public List<StudyDocument> AddedDocuments { get; } = [];
         public List<StudyDocument> UpdatedDocuments { get; } = [];
+        public int UpdateCallCount { get; private set; }
 
         public List<StudyDocument> GetAll() => [];
         public StudyDocument? GetById(int id) => Document?.Id == id ? Document : null;
         public List<StudyDocument> Search(string keyword) => [];
         public List<StudyDocument> Filter(string subject, string type) => [];
         public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => [];
-        public bool Add(StudyDocument document) => false;
+        public bool Add(StudyDocument document) => throw new InvalidOperationException("Add should not be called");
         public bool AddWithCatalogs(StudyDocument document)
         {
             AddedDocuments.Add(document);
@@ -901,6 +905,7 @@ public class Slice4FlowPolishTests
         }
         public bool Update(StudyDocument document)
         {
+            UpdateCallCount++;
             if (UpdateException is not null)
                 throw UpdateException;
 
