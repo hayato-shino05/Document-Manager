@@ -111,6 +111,296 @@ public class Slice4FlowPolishTests
 
 
     [Fact]
+    public void AddEdit_LoadDocument_PopulatesEditStateFromRepository()
+    {
+        var deadline = new DateTime(2026, 8, 3, 14, 30, 0);
+        var document = new StudyDocument
+        {
+            Id = 42,
+            Name = "Algorithms notes",
+            Subject = "Computer Science",
+            Type = "PDF",
+            FilePath = "C:/study/algorithms.pdf",
+            Notes = "Read chapter three",
+            Author = "Ada",
+            Tags = "algorithms",
+            Deadline = deadline,
+            IsImportant = true
+        };
+        var repository = new RecordingDocumentRepository { Document = document };
+        var model = CreateModel(repository: repository);
+
+        model.LoadDocument(document.Id);
+
+        Assert.True(model.IsEditing);
+        Assert.Equal("AddEdit_PageTitleEdit", model.PageTitle);
+        Assert.Equal(document.Name, model.Name);
+        Assert.Equal(document.Subject, model.Subject);
+        Assert.Equal(document.Type, model.Type);
+        Assert.Equal(document.FilePath, model.FilePath);
+        Assert.Equal(document.Deadline, model.Deadline!.Value.DateTime);
+        Assert.True(model.IsImportant);
+    }
+
+    [Fact]
+    public void AddEdit_LoadDocument_MissingDocumentKeepsInitialAddState()
+    {
+        var model = CreateModel(repository: new RecordingDocumentRepository());
+
+        model.LoadDocument(404);
+
+        Assert.False(model.IsEditing);
+        Assert.Equal("AddEdit_PageTitleAdd", model.PageTitle);
+        Assert.Equal(string.Empty, model.Name);
+        Assert.Equal(string.Empty, model.FilePath);
+    }
+
+    [Fact]
+    public async Task AddEdit_SaveEdit_TrimsFieldsAndUpdatesExistingDocument()
+    {
+        var deadline = new DateTime(2026, 8, 3, 14, 30, 0);
+        var repository = new RecordingDocumentRepository
+        {
+            Document = new StudyDocument { Id = 42, Name = "Original" }
+        };
+        var dialog = new RecordingDialogService();
+        var navigation = new RecordingNavigationService();
+        var model = CreateModel(dialogService: dialog, navigationService: navigation, repository: repository);
+        model.LoadDocument(42);
+        model.Name = "  Updated name  ";
+        model.Subject = "  Computer Science  ";
+        model.Type = "  PDF  ";
+        model.FilePath = "  C:/study/updated.pdf  ";
+        model.Notes = "  Notes  ";
+        model.Author = "  Ada  ";
+        model.Tags = "  algorithms  ";
+        model.Deadline = new DateTimeOffset(deadline);
+        model.IsImportant = true;
+
+        await model.SaveCommand.ExecuteAsync(null);
+
+        var updated = Assert.Single(repository.UpdatedDocuments);
+        Assert.Equal(42, updated.Id);
+        Assert.Equal("Updated name", updated.Name);
+        Assert.Equal("Computer Science", updated.Subject);
+        Assert.Equal("PDF", updated.Type);
+        Assert.Equal("C:/study/updated.pdf", updated.FilePath);
+        Assert.Equal("Notes", updated.Notes);
+        Assert.Equal("Ada", updated.Author);
+        Assert.Equal("algorithms", updated.Tags);
+        Assert.Equal(deadline, updated.Deadline);
+        Assert.True(updated.IsImportant);
+        Assert.Contains("AddEdit_SaveUpdated", dialog.Messages);
+        Assert.Equal(["dashboard"], navigation.Routes);
+    }
+
+    [Fact]
+    public async Task AddEdit_SaveEditReturningFalse_ShowsErrorWithoutNavigation()
+    {
+        var repository = new RecordingDocumentRepository
+        {
+            Document = new StudyDocument { Id = 42, Name = "Original" },
+            UpdateResult = false
+        };
+        var dialog = new RecordingDialogService();
+        var navigation = new RecordingNavigationService();
+        var model = CreateModel(dialogService: dialog, navigationService: navigation, repository: repository);
+        model.LoadDocument(42);
+        model.Name = "Updated";
+
+        await model.SaveCommand.ExecuteAsync(null);
+
+        Assert.Contains("AddEdit_SaveError", dialog.Messages);
+        Assert.Empty(navigation.Routes);
+    }
+
+    [Fact]
+    public async Task AddEdit_SaveEditException_ShowsErrorWithoutNavigation()
+    {
+        var repository = new RecordingDocumentRepository
+        {
+            Document = new StudyDocument { Id = 42, Name = "Original" },
+            UpdateException = new InvalidOperationException("save failed")
+        };
+        var dialog = new RecordingDialogService();
+        var navigation = new RecordingNavigationService();
+        var model = CreateModel(dialogService: dialog, navigationService: navigation, repository: repository);
+        model.LoadDocument(42);
+        model.Name = "Updated";
+
+        await model.SaveCommand.ExecuteAsync(null);
+
+        Assert.Contains("AddEdit_SaveError", dialog.Messages);
+        Assert.Empty(navigation.Routes);
+    }
+
+    [Fact]
+    public async Task AddEdit_SaveNewReturningFalse_ShowsErrorWithoutNavigation()
+    {
+        var repository = new RecordingDocumentRepository { AddResult = false };
+        var dialog = new RecordingDialogService();
+        var navigation = new RecordingNavigationService();
+        var model = CreateModel(dialogService: dialog, navigationService: navigation, repository: repository);
+        model.Name = "New document";
+
+        await model.SaveCommand.ExecuteAsync(null);
+
+        Assert.Contains("AddEdit_SaveError", dialog.Messages);
+        Assert.Empty(navigation.Routes);
+    }
+
+    [Fact]
+    public async Task AddEdit_BrowseExistingFile_AppliesFileAndPassesLocalizedPickerArguments()
+    {
+        var filePath = CreateTempFile("browse", ".pdf");
+        var fileDialog = new RecordingFileDialogService(filePath);
+        var model = CreateModel(fileDialogService: fileDialog);
+
+        try
+        {
+            await model.BrowseFileCommand.ExecuteAsync(null);
+
+            Assert.Equal(filePath, model.FilePath);
+            Assert.Equal(Path.GetFileNameWithoutExtension(filePath), model.Name);
+            Assert.Equal("PDF", model.Type);
+            Assert.Equal("AddEdit_BrowseFile", fileDialog.Title);
+            Assert.Equal("AddEdit_FileFilter", fileDialog.Filter);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [Fact]
+    public async Task AddEdit_BrowseCancelledFile_KeepsExistingState()
+    {
+        var fileDialog = new RecordingFileDialogService(null);
+        var model = CreateModel(fileDialogService: fileDialog);
+        model.FilePath = "existing.pdf";
+        model.Name = "Existing name";
+        model.Type = "PDF";
+
+        await model.BrowseFileCommand.ExecuteAsync(null);
+
+        Assert.Equal("existing.pdf", model.FilePath);
+        Assert.Equal("Existing name", model.Name);
+        Assert.Equal("PDF", model.Type);
+    }
+
+    [Fact]
+    public async Task AddEdit_BrowseMissingFile_KeepsExistingState()
+    {
+        var fileDialog = new RecordingFileDialogService("Z:/missing-file.pdf");
+        var model = CreateModel(fileDialogService: fileDialog);
+        model.FilePath = "existing.pdf";
+        model.Name = "Existing name";
+        model.Type = "PDF";
+
+        await model.BrowseFileCommand.ExecuteAsync(null);
+
+        Assert.Equal("existing.pdf", model.FilePath);
+        Assert.Equal("Existing name", model.Name);
+        Assert.Equal("PDF", model.Type);
+    }
+
+    [Fact]
+    public void AddEdit_Cancel_NavigatesToDashboardWithoutRepositoryWrites()
+    {
+        var repository = new RecordingDocumentRepository();
+        var navigation = new RecordingNavigationService();
+        var model = CreateModel(repository: repository, navigationService: navigation);
+
+        model.CancelCommand.Execute(null);
+
+        Assert.Equal(["dashboard"], navigation.Routes);
+        Assert.Empty(repository.UpdatedDocuments);
+        Assert.Empty(repository.AddedDocuments);
+    }
+
+    [Fact]
+    public async Task HandleDroppedFilesAsync_AddEditMultipleFiles_RejectsDropWithoutChangingState()
+    {
+        var firstPath = CreateTempFile("multi-a", ".pdf");
+        var secondPath = CreateTempFile("multi-b", ".pdf");
+        var addEdit = CreateModel();
+        addEdit.FilePath = "existing.pdf";
+        addEdit.Name = "Existing name";
+        var importService = new RecordingDroppedFileImportService();
+        var mainWindow = BuildMainWindowModel(addEdit, importService);
+
+        try
+        {
+            await mainWindow.HandleDroppedFilesAsync([firstPath, secondPath]);
+
+            Assert.Equal("BatchImport_InvalidDrop", mainWindow.StatusText);
+            Assert.Equal("existing.pdf", addEdit.FilePath);
+            Assert.Equal("Existing name", addEdit.Name);
+            Assert.Empty(importService.SavedDocuments);
+        }
+        finally
+        {
+            File.Delete(firstPath);
+            File.Delete(secondPath);
+        }
+    }
+
+    [Fact]
+    public void AddEdit_TryApplyFile_BlankOrMissingPath_KeepsExistingState()
+    {
+        var model = CreateModel();
+        model.FilePath = "existing.pdf";
+        model.Name = "Existing name";
+        model.Type = "PDF";
+
+        Assert.False(model.TryApplyFile("   "));
+        Assert.False(model.TryApplyFile("Z:/missing-file.pdf"));
+        Assert.Equal("existing.pdf", model.FilePath);
+        Assert.Equal("Existing name", model.Name);
+        Assert.Equal("PDF", model.Type);
+    }
+
+    [Fact]
+    public void AddEdit_TryApplyFile_PreservesExistingNameAndType()
+    {
+        var filePath = CreateTempFile("preserve", ".docx");
+        var model = CreateModel();
+        model.Name = "Existing name";
+        model.Type = "Custom type";
+
+        try
+        {
+            Assert.True(model.TryApplyFile(filePath));
+            Assert.Equal(filePath, model.FilePath);
+            Assert.Equal("Existing name", model.Name);
+            Assert.Equal("Custom type", model.Type);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [Fact]
+    public void AddEdit_TryApplyFile_UnknownExtensionUsesOtherType()
+    {
+        var filePath = CreateTempFile("unknown", ".unknown");
+        var model = CreateModel();
+
+        try
+        {
+            Assert.True(model.TryApplyFile(filePath));
+            Assert.Equal(filePath, model.FilePath);
+            Assert.Equal(Path.GetFileNameWithoutExtension(filePath), model.Name);
+            Assert.Equal("Other", model.Type);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [Fact]
     public async Task HandleDroppedFilesAsync_AddEditSingleFile_AppliesFileInsteadOfImporting()
     {
         var filePath = CreateTempFile("draft", ".pdf");
@@ -432,10 +722,11 @@ public class Slice4FlowPolishTests
     private static AddEditModel CreateModel(
         IDialogService? dialogService = null,
         IFileDialogService? fileDialogService = null,
-        INavigationService? navigationService = null)
+        INavigationService? navigationService = null,
+        IDocumentRepository? repository = null)
     {
         return new AddEditModel(
-            new FakeDocumentRepository(),
+            repository ?? new FakeDocumentRepository(),
             new FakeCategoryRepository(),
             dialogService ?? new RecordingDialogService(),
             fileDialogService ?? new FakeFileDialogService(),
@@ -540,6 +831,22 @@ public class Slice4FlowPolishTests
             => Task.FromResult<string?>(null);
     }
 
+    private sealed class RecordingFileDialogService(string? path) : IFileDialogService
+    {
+        public string? Title { get; private set; }
+        public string? Filter { get; private set; }
+
+        public Task<string?> ShowOpenFileAsync(string title, string? filter = null)
+        {
+            Title = title;
+            Filter = filter;
+            return Task.FromResult(path);
+        }
+
+        public Task<string?> ShowOpenFolderAsync(string title) => Task.FromResult<string?>(null);
+        public Task<string?> ShowSaveFileAsync(string title, string defaultFileName, string? filter = null) => Task.FromResult<string?>(null);
+    }
+
     private sealed class FakeFileDialogService(string? path = null) : IFileDialogService
     {
         public Task<string?> ShowOpenFileAsync(string title, string? filter = null) => Task.FromResult(path);
@@ -570,6 +877,44 @@ public class Slice4FlowPolishTests
         public bool DeleteDocumentsBySubject(string subjectName) => false;
         public bool DeleteDocumentsByType(string typeName) => false;
         public int GetTotalDocumentCount() => 0;
+    }
+
+    private sealed class RecordingDocumentRepository : IDocumentRepository
+    {
+        public StudyDocument? Document { get; init; }
+        public bool AddResult { get; init; } = true;
+        public bool UpdateResult { get; init; } = true;
+        public Exception? UpdateException { get; init; }
+        public List<StudyDocument> AddedDocuments { get; } = [];
+        public List<StudyDocument> UpdatedDocuments { get; } = [];
+
+        public List<StudyDocument> GetAll() => [];
+        public StudyDocument? GetById(int id) => Document?.Id == id ? Document : null;
+        public List<StudyDocument> Search(string keyword) => [];
+        public List<StudyDocument> Filter(string subject, string type) => [];
+        public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => [];
+        public bool Add(StudyDocument document) => false;
+        public bool AddWithCatalogs(StudyDocument document)
+        {
+            AddedDocuments.Add(document);
+            return AddResult;
+        }
+        public bool Update(StudyDocument document)
+        {
+            if (UpdateException is not null)
+                throw UpdateException;
+
+            UpdatedDocuments.Add(document);
+            return UpdateResult;
+        }
+        public bool Delete(int id) => true;
+        public List<string> GetDistinctSubjects() => [];
+        public List<string> GetDistinctTypes() => [];
+        public List<string> GetDistinctTags() => [];
+        public List<StudyDocument> GetUpcomingDeadlines(int days) => [];
+        public List<StudyDocument> GetOverdueDocuments() => [];
+        public void EnsureSubjectExists(string subject) { }
+        public void EnsureTypeExists(string type) { }
     }
 
     private sealed class FakeDocumentRepository : IDocumentRepository
