@@ -1,6 +1,6 @@
 STATUS: DONE
 
-Commit: pending
+Commit: c563d31
 
 Implemented responsive AddEdit proof only in StudyDocumentManager.Tests/AvaloniaBindingRegressionTests.cs:
 - Added width checks for 759, 760, 1024 and transition 760 → 520 → 1024.
