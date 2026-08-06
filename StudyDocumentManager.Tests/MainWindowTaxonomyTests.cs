@@ -22,19 +22,35 @@ public sealed class MainWindowTaxonomyTests
     public void MainWindow_KeepsLowFrequencyRoutesOutOfToolbar()
     {
         var mainWindow = LoadMainWindow();
+        var toolbarStart = mainWindow.IndexOf("Padding=\"6,3\"", StringComparison.Ordinal);
+        var statusBarStart = mainWindow.IndexOf("<!-- ═══ STATUS BAR", toolbarStart, StringComparison.Ordinal);
 
-        Assert.Equal(1, Count(mainWindow, "CommandParameter=\"recycle\""));
-        Assert.Equal(1, Count(mainWindow, "CommandParameter=\"bulk-delete\""));
-        Assert.Equal(1, Count(mainWindow, "CommandParameter=\"recentfiles\""));
-        Assert.Equal(1, Count(mainWindow, "CommandParameter=\"duplicates\""));
-        Assert.Equal(1, Count(mainWindow, "CommandParameter=\"report\""));
-        Assert.Equal(1, Count(mainWindow, "CommandParameter=\"treemap\""));
-        Assert.Equal(1, Count(mainWindow, "Command=\"{Binding BackupDatabaseCommand}\""));
+        Assert.True(toolbarStart >= 0);
+        Assert.True(statusBarStart > toolbarStart);
+
+        var toolbar = mainWindow[toolbarStart..statusBarStart];
+        Assert.DoesNotContain("CommandParameter=\"recycle\"", toolbar);
+        Assert.DoesNotContain("CommandParameter=\"bulk-delete\"", toolbar);
+        Assert.DoesNotContain("CommandParameter=\"recentfiles\"", toolbar);
+        Assert.DoesNotContain("CommandParameter=\"duplicates\"", toolbar);
+        Assert.DoesNotContain("CommandParameter=\"report\"", toolbar);
+        Assert.DoesNotContain("CommandParameter=\"treemap\"", toolbar);
+        Assert.DoesNotContain("Command=\"{Binding BackupDatabaseCommand}\"", toolbar);
+        Assert.Contains("Command=\"{Binding RefreshCommand}\"", toolbar);
+        Assert.Contains("CommandParameter=\"batch-import\"", toolbar);
     }
 
     private static string LoadMainWindow()
-        => File.ReadAllText(@"D:\Github-Project\study-document-manager\StudyDocumentManager\Views\MainWindow.axaml");
+        => File.ReadAllText(GetSourceFilePath("StudyDocumentManager", "Views", "MainWindow.axaml"));
 
-    private static int Count(string value, string fragment)
-        => (value.Length - value.Replace(fragment, string.Empty, StringComparison.Ordinal).Length) / fragment.Length;
+    private static string GetSourceFilePath(params string[] pathSegments)
+    {
+        for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
+        {
+            if (File.Exists(Path.Combine(directory.FullName, "StudyDocumentManager.sln")))
+                return Path.Combine(directory.FullName, Path.Combine(pathSegments));
+        }
+
+        throw new DirectoryNotFoundException("Could not locate the solution root.");
+    }
 }
