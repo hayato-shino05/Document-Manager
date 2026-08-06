@@ -626,27 +626,6 @@ public partial class DashboardModel : ModelBase
         LoadData();
     }
 
-    // ——— Navigation commands ——— 
-    [RelayCommand]
-    private void OpenBatchImport() => _navigationService.NavigateTo("batchimport");
-
-    [RelayCommand]
-    private void OpenBulkDelete() => _navigationService.NavigateTo("bulkdelete");
-
-    [RelayCommand]
-    private void OpenRecycleBin() => _navigationService.NavigateTo("recyclebin");
-
-    [RelayCommand]
-    private void OpenCategoryManagement() => _navigationService.NavigateTo("categories");
-
-    [RelayCommand]
-    private void OpenCollectionManagement() => _navigationService.NavigateTo("collections");
-
-    [RelayCommand]
-    private void OpenDuplicateDetection() => _navigationService.NavigateTo("duplicates");
-
-    [RelayCommand]
-    private void OpenFileIntegrityCheck() => _navigationService.NavigateTo("fileintegrity");
 
     [RelayCommand]
     private void OpenReport() => _navigationService.NavigateTo("report");
