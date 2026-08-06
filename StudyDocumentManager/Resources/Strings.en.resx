@@ -293,6 +293,10 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="Dashboard_CsvFileFilter" xml:space="preserve"><value>CSV|*.csv|All Files|*.*</value></data>
   <data name="Dashboard_BackupOpenFilter" xml:space="preserve"><value>Database|*.db|All Files|*.*</value></data>
   <data name="Menu_File" xml:space="preserve"><value>File</value></data>
+  <data name="Menu_Organize" xml:space="preserve"><value>Organize</value></data>
+  <data name="Menu_Import" xml:space="preserve"><value>Import</value></data>
+  <data name="Menu_Maintenance" xml:space="preserve"><value>Maintenance</value></data>
+  <data name="Menu_Analytics" xml:space="preserve"><value>Analytics</value></data>
   <data name="Menu_AddNewDocument" xml:space="preserve"><value>Add New Document</value></data>
   <data name="Menu_OpenDocument" xml:space="preserve"><value>Open Document</value></data>
   <data name="Menu_ExportCsv" xml:space="preserve"><value>Export CSV</value></data>

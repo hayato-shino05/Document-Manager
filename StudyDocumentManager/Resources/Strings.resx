@@ -312,6 +312,10 @@
 
   <!-- MainWindow - Menu -->
   <data name="Menu_File" xml:space="preserve"><value>ファイル</value></data>
+  <data name="Menu_Organize" xml:space="preserve"><value>整理</value></data>
+  <data name="Menu_Import" xml:space="preserve"><value>インポート</value></data>
+  <data name="Menu_Maintenance" xml:space="preserve"><value>メンテナンス</value></data>
+  <data name="Menu_Analytics" xml:space="preserve"><value>分析</value></data>
   <data name="Menu_AddNewDocument" xml:space="preserve"><value>新しい文書を追加</value></data>
   <data name="Menu_OpenDocument" xml:space="preserve"><value>文書を開く</value></data>
   <data name="Menu_ExportCsv" xml:space="preserve"><value>CSV出力</value></data>

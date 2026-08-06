@@ -548,6 +548,10 @@
   <data name="Dashboard_CsvFileFilter" xml:space="preserve"><value>CSV|*.csv|所有文件|*.*</value></data>
   <data name="Dashboard_BackupOpenFilter" xml:space="preserve"><value>数据库|*.db|所有文件|*.*</value></data>
   <data name="Menu_File" xml:space="preserve"><value>文件</value></data>
+  <data name="Menu_Organize" xml:space="preserve"><value>整理</value></data>
+  <data name="Menu_Import" xml:space="preserve"><value>导入</value></data>
+  <data name="Menu_Maintenance" xml:space="preserve"><value>维护</value></data>
+  <data name="Menu_Analytics" xml:space="preserve"><value>分析</value></data>
   <data name="Menu_AddNewDocument" xml:space="preserve"><value>添加新文档</value></data>
   <data name="Menu_OpenDocument" xml:space="preserve"><value>打开文档</value></data>
   <data name="Menu_ExportCsv" xml:space="preserve"><value>导出 CSV</value></data>

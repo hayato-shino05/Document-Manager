@@ -548,6 +548,10 @@
   <data name="Dashboard_CsvFileFilter" xml:space="preserve"><value>CSV|*.csv|Tất cả tệp|*.*</value></data>
   <data name="Dashboard_BackupOpenFilter" xml:space="preserve"><value>Cơ sở dữ liệu|*.db|Tất cả tệp|*.*</value></data>
   <data name="Menu_File" xml:space="preserve"><value>Tệp</value></data>
+  <data name="Menu_Organize" xml:space="preserve"><value>Sắp xếp</value></data>
+  <data name="Menu_Import" xml:space="preserve"><value>Nhập</value></data>
+  <data name="Menu_Maintenance" xml:space="preserve"><value>Bảo trì</value></data>
+  <data name="Menu_Analytics" xml:space="preserve"><value>Phân tích</value></data>
   <data name="Menu_AddNewDocument" xml:space="preserve"><value>Thêm tài liệu mới</value></data>
   <data name="Menu_OpenDocument" xml:space="preserve"><value>Mở tài liệu</value></data>
   <data name="Menu_ExportCsv" xml:space="preserve"><value>Xuất CSV</value></data>
