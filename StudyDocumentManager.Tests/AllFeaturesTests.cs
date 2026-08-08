@@ -564,7 +564,7 @@ public class BulkOperationTests : DatabaseTestBase
 }
 
 // ════════════════════════════════════════════════════════════
-// F17: Category Management (CRUD danh mục / loại)
+// F17: カテゴリ管理（CRUD）
 // ════════════════════════════════════════════════════════════
 
 public class CategoryManagementTests : DatabaseTestBase

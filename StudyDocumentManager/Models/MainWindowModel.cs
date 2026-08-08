@@ -35,6 +35,8 @@ public partial class MainWindowModel : ModelBase
     private readonly ILocalizationService _loc;
     private readonly ISettingsService _settingsService;
     private readonly IUpdateService _updateService;
+    private string? _statusKey = "Status_TotalDocs";
+    private object[] _statusArguments = [0];
 
     public MainWindowModel(
         DashboardModel dashboardModel,
@@ -56,7 +58,16 @@ public partial class MainWindowModel : ModelBase
         _settingsService = settingsService;
         _updateService = updateService;
         _currentView = dashboardModel;
-        _statusText = string.Format(_loc["Status_TotalDocs"], 0);
+        _statusText = FormatLocalizedStatus();
+        _loc.LanguageChanged += (_, _) =>
+        {
+            if (_statusKey != null)
+                StatusText = FormatLocalizedStatus();
+            else if (CurrentView is DashboardModel dashboard)
+                StatusText = dashboard.StatusText;
+            else if (CurrentView is CategoryManagementModel categoryManagement)
+                StatusText = categoryManagement.StatusText;
+        };
 
         LoadLanguageFromSettings();
 
@@ -67,26 +78,42 @@ public partial class MainWindowModel : ModelBase
         });
     }
 
+    private string FormatLocalizedStatus()
+        => string.Format(_loc[_statusKey!], _statusArguments);
+
+    private void SetLocalizedStatus(string key, params object[] arguments)
+    {
+        _statusKey = key;
+        _statusArguments = arguments;
+        StatusText = FormatLocalizedStatus();
+    }
+
+    private void SetExternalStatus(string value)
+    {
+        _statusKey = null;
+        StatusText = value;
+    }
+
     [RelayCommand]
     private async Task CheckForUpdateAsync()
     {
-        StatusText = _loc["Status_CheckingUpdate"];
+        SetLocalizedStatus("Status_CheckingUpdate");
         var info = await _updateService.CheckForUpdateAsync();
         if (info == null)
         {
             await _dialogService.ShowMessageAsync(_loc["Main_UpdateTitle"], _loc["Main_CannotConnect"]);
-            StatusText = _loc["Status_CannotCheckUpdate"];
+            SetLocalizedStatus("Status_CannotCheckUpdate");
         }
         else if (!info.HasUpdate)
         {
             await _dialogService.ShowMessageAsync(_loc["Main_UpdateTitle"],
                 string.Format(_loc["Main_AlreadyLatest"], Core.Services.AppVersion.Current));
-            StatusText = _loc["Status_UpToDate"];
+            SetLocalizedStatus("Status_UpToDate");
         }
         else
         {
             await _updateService.HandleUpdateAsync(info);
-            StatusText = string.Format(_loc["Status_NewVersionAvailable"], info.NewVersion);
+            SetLocalizedStatus("Status_NewVersionAvailable", info.NewVersion);
         }
     }
 
@@ -175,17 +202,23 @@ public partial class MainWindowModel : ModelBase
 
     private void UpdateStatusFromDashboard(DashboardModel dashboard)
     {
-        StatusText = dashboard.StatusText;
+        SetExternalStatus(dashboard.StatusText);
     }
 
     partial void OnCurrentViewChanged(ModelBase value)
     {
-        StatusText = value switch
+        switch (value)
         {
-            DashboardModel dashboard => dashboard.StatusText,
-            CategoryManagementModel catMgmt => catMgmt.StatusText,
-            _ => string.Empty
-        };
+            case DashboardModel dashboard:
+                SetExternalStatus(dashboard.StatusText);
+                break;
+            case CategoryManagementModel catMgmt:
+                SetExternalStatus(catMgmt.StatusText);
+                break;
+            default:
+                SetExternalStatus(string.Empty);
+                break;
+        }
         OnPropertyChanged(nameof(CanGoBack));
     }
 
@@ -210,14 +243,15 @@ public partial class MainWindowModel : ModelBase
             switch (CurrentView)
             {
                 case AddEditModel addEdit when validPaths.Count == 1:
-                    StatusText = addEdit.TryApplyFile(validPaths[0])
-                        ? string.Empty
-                        : _loc["BatchImport_InvalidDrop"];
+                    if (addEdit.TryApplyFile(validPaths[0]))
+                        SetExternalStatus(string.Empty);
+                    else
+                        SetLocalizedStatus("BatchImport_InvalidDrop");
                     return;
 
                 case BatchImportModel batchImport:
                     await batchImport.AddDroppedFilesAsync(validPaths);
-                    StatusText = string.Empty;
+                    SetExternalStatus(string.Empty);
                     return;
 
                 case DashboardModel dashboard:
@@ -253,7 +287,7 @@ public partial class MainWindowModel : ModelBase
 
     public void ShowInvalidDropStatus()
     {
-        StatusText = _loc["BatchImport_InvalidDrop"];
+        SetLocalizedStatus("BatchImport_InvalidDrop");
     }
 
     private async Task<int> ImportSingleFileAsync(string filePath, IList<string> subjects, IList<string> types)

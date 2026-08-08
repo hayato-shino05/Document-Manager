@@ -398,7 +398,7 @@
   <data name="SelectCollDialog_BtnAdd" xml:space="preserve">
     <value>添加</value>
   </data>
-  <data name="MainWindow_Title" xml:space="preserve"><value>Study Document Manager - Professional Edition</value></data>
+  <data name="MainWindow_Title" xml:space="preserve"><value>Document Manager - Professional Edition</value></data>
   <data name="AddEdit_PlaceholderTags" xml:space="preserve"><value>标签1、标签2、标签3...</value></data>
   <data name="AddDocDialog_Title" xml:space="preserve"><value>添加文档</value></data>
   <data name="ChangeCategory_DocumentLabel" xml:space="preserve"><value>文档：“{0}”</value></data>
@@ -511,11 +511,11 @@
   <data name="Dashboard_RestoreError" xml:space="preserve"><value>无法恢复：{0}</value></data>
   <data name="Dashboard_NoCollections" xml:space="preserve"><value>暂无收藏集。请先从“收藏集”菜单创建收藏集。</value></data>
   <data name="Dashboard_AlreadyInCollection" xml:space="preserve"><value>此文档已在收藏集“{0}”中</value></data>
-  <data name="Dashboard_About" xml:space="preserve"><value>Study Document Manager v{0}&#xA;&#xA;个人学习文档管理应用程序&#xA;Framework: Avalonia UI (.NET 9)&#xA;Database: SQLite (local)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
+  <data name="Dashboard_About" xml:space="preserve"><value>Document Manager v{0}&#xA;&#xA;个人文档管理应用程序&#xA;Framework: Avalonia UI (.NET 9)&#xA;Database: SQLite (local)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
   <data name="Main_UpdateTitle" xml:space="preserve"><value>更新</value></data>
   <data name="Main_CannotConnect" xml:space="preserve"><value>无法连接到服务器。&#xA;请检查网络连接。</value></data>
   <data name="Main_AlreadyLatest" xml:space="preserve"><value>您正在使用最新版本（v{0}）。</value></data>
-  <data name="Main_About" xml:space="preserve"><value>Study Document Manager&#xA;Professional Edition&#xA;&#xA;版本 {0}&#xA;&#xA;学习文档管理应用程序&#xA;MVVM • Avalonia UI • .NET 9.0&#xA;&#xA;制作：Vũ Đức Dũng - TT601-K14&#xA;指导：Lê Thị Mai&#xA;&#xA;© 2024-2025 hayato-shino05&#xA;GitHub: hayato-shino05/study-document-manager</value></data>
+  <data name="Main_About" xml:space="preserve"><value>Document Manager v{0}&#xA;&#xA;个人文档管理应用程序&#xA;Framework: Avalonia UI (.NET 9)&#xA;Database: SQLite (local)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
   <data name="SelectCollection_None" xml:space="preserve"><value>未选择收藏集</value></data>
   <data name="SelectCollection_Selected" xml:space="preserve"><value>已选择：{0}</value></data>
   <data name="AddEdit_PageTitleAdd" xml:space="preserve"><value>添加文档</value></data>
@@ -762,6 +762,9 @@
   <data name="AddEdit_LblNotes" xml:space="preserve"><value>备注：</value></data>
   <data name="AddEdit_LblTags" xml:space="preserve"><value>标签：</value></data>
   <data name="AddEdit_LblDeadline" xml:space="preserve"><value>截止日期：</value></data>
+  <data name="AddEdit_DateYearFormat" xml:space="preserve"><value>yyyy年</value></data>
+  <data name="AddEdit_DateMonthFormat" xml:space="preserve"><value>M月</value></data>
+  <data name="AddEdit_DateDayFormat" xml:space="preserve"><value>d日</value></data>
   <data name="AddEdit_LblImportant" xml:space="preserve"><value>重要</value></data>
   <data name="AddEdit_BtnBrowse" xml:space="preserve"><value>浏览</value></data>
   <data name="AddEdit_BtnSave" xml:space="preserve"><value>保存</value></data>
@@ -833,4 +836,18 @@
   <data name="Dashboard_DeadlineStatusUrgent" xml:space="preserve"><value>3天内到期</value></data>
   <data name="Dashboard_DeadlineStatusUpcoming" xml:space="preserve"><value>7天内到期</value></data>
   <data name="Dashboard_DeadlineStatusScheduled" xml:space="preserve"><value>近期无到期</value></data>
+  <data name="FileType_PDF" xml:space="preserve"><value>PDF</value></data>
+  <data name="FileType_Word" xml:space="preserve"><value>Word</value></data>
+  <data name="FileType_PowerPoint" xml:space="preserve"><value>PowerPoint</value></data>
+  <data name="FileType_Excel" xml:space="preserve"><value>Excel</value></data>
+  <data name="FileType_Document" xml:space="preserve"><value>文档</value></data>
+  <data name="FileType_Data" xml:space="preserve"><value>数据</value></data>
+  <data name="FileType_Code" xml:space="preserve"><value>代码</value></data>
+  <data name="FileType_Book" xml:space="preserve"><value>电子书</value></data>
+  <data name="FileType_Image" xml:space="preserve"><value>图片</value></data>
+  <data name="FileType_Video" xml:space="preserve"><value>视频</value></data>
+  <data name="FileType_Audio" xml:space="preserve"><value>音频</value></data>
+  <data name="FileType_Archive" xml:space="preserve"><value>压缩包</value></data>
+  <data name="FileType_Design" xml:space="preserve"><value>设计</value></data>
+  <data name="FileType_Other" xml:space="preserve"><value>其他</value></data>
 </root>

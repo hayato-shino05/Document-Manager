@@ -141,7 +141,7 @@ public class CollectionDebugTests : DatabaseTestBase
     }
 
     // ─────────────────────────────────────────────────────────────
-    // 5. Kiểm tra schema — bảng collections có tồn tại không?
+    // 5. スキーマ確認: collections テーブルの存在
     // ─────────────────────────────────────────────────────────────
     [Fact]
     public void Schema_CollectionsTable_Exists()
@@ -184,7 +184,7 @@ public class CollectionDebugTests : DatabaseTestBase
     }
 
     // ─────────────────────────────────────────────────────────────
-    // 6. GetCollections SQL — manual query để xác nhận
+    // 6. GetCollections SQL の手動クエリ確認
     // ─────────────────────────────────────────────────────────────
     [Fact]
     public void GetCollections_AfterInsert_RawSqlConfirms()

@@ -7,6 +7,7 @@
         xmlns:loc="using:StudyDocumentManager.Markup"
         x:Class="StudyDocumentManager.Views.MainWindow"
         x:DataType="vm:MainWindowModel"
+        AutomationProperties.AutomationId="Shell_MainWindow"
         Title="{loc:Localize MainWindow_Title}"
         Width="1280" Height="800"
         MinWidth="960" MinHeight="640"
@@ -61,7 +62,8 @@
                 </Button>
 
                 <Menu Background="Transparent" Padding="4,0">
-                    <MenuItem Header="{loc:Localize Menu_File}">
+                    <MenuItem Header="{loc:Localize Menu_File}"
+                              AutomationProperties.AutomationId="Menu_File">
                         <MenuItem Header="{loc:Localize Menu_AddNewDocument}" Command="{Binding NavigateCommand}" CommandParameter="add" InputGesture="Ctrl+N"/>
                         <MenuItem Header="{loc:Localize Menu_OpenDocument}" Command="{Binding OpenFileCommand}" InputGesture="Ctrl+O"/>
                         <MenuItem Header="{loc:Localize Menu_EditDocument}" Command="{Binding EditDocumentCommand}" InputGesture="Ctrl+U"/>
@@ -75,24 +77,29 @@
                         <Separator/>
                         <MenuItem Header="{loc:Localize Menu_Exit}" Command="{Binding ExitAppCommand}" InputGesture="Alt+F4"/>
                     </MenuItem>
-                    <MenuItem Header="{loc:Localize Menu_Organize}">
+                    <MenuItem Header="{loc:Localize Menu_Organize}"
+                              AutomationProperties.AutomationId="Menu_Organize">
                         <MenuItem Header="{loc:Localize Menu_ManageCategories}" Command="{Binding NavigateCommand}" CommandParameter="categories" InputGesture="Ctrl+M"/>
                         <MenuItem Header="{loc:Localize Menu_Collections}" Command="{Binding NavigateCommand}" CommandParameter="collections"/>
                     </MenuItem>
-                    <MenuItem Header="{loc:Localize Menu_Import}">
+                    <MenuItem Header="{loc:Localize Menu_Import}"
+                              AutomationProperties.AutomationId="Menu_Import">
                         <MenuItem Header="{loc:Localize Menu_BatchImport}" Command="{Binding NavigateCommand}" CommandParameter="batch-import"/>
                     </MenuItem>
-                    <MenuItem Header="{loc:Localize Menu_Maintenance}">
+                    <MenuItem Header="{loc:Localize Menu_Maintenance}"
+                              AutomationProperties.AutomationId="Menu_Maintenance">
                         <MenuItem Header="{loc:Localize Menu_BulkDelete}" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
                         <MenuItem Header="{loc:Localize Menu_FindDuplicates}" Command="{Binding NavigateCommand}" CommandParameter="duplicates"/>
                         <MenuItem Header="{loc:Localize Menu_FileCheck}" Command="{Binding NavigateCommand}" CommandParameter="integrity"/>
                         <MenuItem Header="{loc:Localize Menu_RecycleBin}" Command="{Binding NavigateCommand}" CommandParameter="recycle"/>
                     </MenuItem>
-                    <MenuItem Header="{loc:Localize Menu_Analytics}">
+                    <MenuItem Header="{loc:Localize Menu_Analytics}"
+                              AutomationProperties.AutomationId="Menu_Analytics">
                         <MenuItem Header="{loc:Localize Menu_Statistics}" Command="{Binding NavigateCommand}" CommandParameter="report"/>
                         <MenuItem Header="{loc:Localize TreeMap_Title}" Command="{Binding NavigateCommand}" CommandParameter="treemap"/>
                     </MenuItem>
-                    <MenuItem Header="{loc:Localize Menu_Help}">
+                    <MenuItem Header="{loc:Localize Menu_Help}"
+                              AutomationProperties.AutomationId="Menu_Help">
                         <MenuItem Header="{loc:Localize Menu_CheckUpdate}" Command="{Binding CheckForUpdateCommand}"/>
                         <Separator/>
                         <MenuItem Header="{loc:Localize Menu_About}" Command="{Binding ShowAboutCommand}"/>
@@ -108,19 +115,22 @@
             <DockPanel>
                 <StackPanel Orientation="Horizontal" Spacing="1">
                     <Button Classes="secondary toolbar-btn" Command="{Binding NavigateCommand}" CommandParameter="add"
+                            AutomationProperties.AutomationId="Toolbar_Add"
                             FontWeight="SemiBold">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconAdd}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Toolbar_Add}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary toolbar-btn" Command="{Binding EditDocumentCommand}">
+                    <Button Classes="secondary toolbar-btn" Command="{Binding EditDocumentCommand}"
+                            AutomationProperties.AutomationId="Toolbar_Edit">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconEdit}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Toolbar_Edit}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary toolbar-btn" Command="{Binding DeleteDocumentCommand}">
+                    <Button Classes="secondary toolbar-btn" Command="{Binding DeleteDocumentCommand}"
+                            AutomationProperties.AutomationId="Toolbar_Delete">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconDelete}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Toolbar_Delete}" Classes="toolbar-btn-label"/>
@@ -129,19 +139,22 @@
 
                     <Border Classes="toolbar-sep"/>
 
-                    <Button Classes="secondary toolbar-btn" Command="{Binding OpenFileCommand}">
+                    <Button Classes="secondary toolbar-btn" Command="{Binding OpenFileCommand}"
+                            AutomationProperties.AutomationId="Toolbar_Open">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconOpenFile}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Toolbar_OpenFile}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary toolbar-btn" Command="{Binding ExportCsvCommand}">
+                    <Button Classes="secondary toolbar-btn" Command="{Binding ExportCsvCommand}"
+                            AutomationProperties.AutomationId="Toolbar_Export">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconExport}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Toolbar_Export}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="secondary toolbar-btn" Command="{Binding RefreshCommand}">
+                    <Button Classes="secondary toolbar-btn" Command="{Binding RefreshCommand}"
+                            AutomationProperties.AutomationId="Toolbar_Refresh">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconRefresh}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Action_Refresh}" Classes="toolbar-btn-label"/>
@@ -151,10 +164,30 @@
                     <Border Classes="toolbar-sep"/>
 
                     <Button Classes="secondary toolbar-btn"
-                            Command="{Binding NavigateCommand}" CommandParameter="batch-import">
+                            Command="{Binding NavigateCommand}" CommandParameter="batch-import"
+                            AutomationProperties.AutomationId="Toolbar_Import">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconImport}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Action_Import}" Classes="toolbar-btn-label"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Border Classes="toolbar-sep"/>
+
+                    <Button Classes="secondary toolbar-btn"
+                            Command="{Binding NavigateCommand}" CommandParameter="report"
+                            AutomationProperties.AutomationId="Toolbar_Report">
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconReport}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="{loc:Localize Nav_Reports}" Classes="toolbar-btn-label"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary toolbar-btn"
+                            Command="{Binding NavigateCommand}" CommandParameter="treemap"
+                            AutomationProperties.AutomationId="Toolbar_TreeMap">
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconTreeMap}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="{loc:Localize TreeMap_Title}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -163,6 +196,7 @@
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
                             HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Button Classes="secondary toolbar-btn" Command="{Binding GoBackCommand}"
+                            AutomationProperties.AutomationId="Toolbar_Back"
                             IsVisible="{Binding CanGoBack}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconBack}" Classes="toolbar-btn-icon"/>
@@ -194,7 +228,8 @@
         </Border>
 
         <!-- ═══ MAIN CONTENT ═══ -->
-        <ContentControl Content="{Binding CurrentView}">
+        <ContentControl Content="{Binding CurrentView}"
+                        AutomationProperties.AutomationId="MainShellRoot">
             <ContentControl.DataTemplates>
                 <DataTemplate DataType="{x:Type vm:DashboardModel}">
                     <v:Dashboard />

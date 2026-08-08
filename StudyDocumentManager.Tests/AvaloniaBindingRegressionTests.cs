@@ -273,6 +273,7 @@ public class AvaloniaBindingRegressionTests
             var browseButton = view.FindControl<Button>("btnBrowse")!;
             var saveButton = view.FindControl<Button>("btnSave")!;
             var cancelButton = view.FindControl<Button>("btnCancel")!;
+            var datePicker = view.FindControl<DatePicker>("dateDeadline")!;
             var browseText = Assert.Single(browseButton.GetVisualDescendants().OfType<TextBlock>());
             var saveText = Assert.Single(saveButton.GetVisualDescendants().OfType<TextBlock>());
             var cancelText = Assert.Single(cancelButton.GetVisualDescendants().OfType<TextBlock>());
@@ -281,6 +282,9 @@ public class AvaloniaBindingRegressionTests
             Assert.Equal(localization["AddEdit_BtnBrowse"], browseText.Text);
             Assert.Equal(localization["AddEdit_BtnSave"], saveText.Text);
             Assert.Equal(localization["AddEdit_BtnCancel"], cancelText.Text);
+            Assert.Equal(localization["AddEdit_DateYearFormat"], datePicker.YearFormat);
+            Assert.Equal(localization["AddEdit_DateMonthFormat"], datePicker.MonthFormat);
+            Assert.Equal(localization["AddEdit_DateDayFormat"], datePicker.DayFormat);
 
             localization.SetLanguage(Core.SupportedLanguage.English);
             FlushAvaloniaBindings();
@@ -291,6 +295,9 @@ public class AvaloniaBindingRegressionTests
             Assert.Equal(localization["AddEdit_BtnBrowse"], browseText.Text);
             Assert.Equal(localization["AddEdit_BtnSave"], saveText.Text);
             Assert.Equal(localization["AddEdit_BtnCancel"], cancelText.Text);
+            Assert.Equal(localization["AddEdit_DateYearFormat"], datePicker.YearFormat);
+            Assert.Equal(localization["AddEdit_DateMonthFormat"], datePicker.MonthFormat);
+            Assert.Equal(localization["AddEdit_DateDayFormat"], datePicker.DayFormat);
         }
         finally
         {

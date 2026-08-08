@@ -103,6 +103,31 @@ public class LocalizationResourceIntegrityTests
             Assert.Equal(NormalizeLineEndings(value), NormalizeLineEndings(localization[key]));
     }
 
+    [Fact]
+    public void LocalizationService_UpdatesThreadCultureForDatePickerLocalization()
+    {
+        var originalCulture = System.Globalization.CultureInfo.CurrentCulture;
+        var originalUiCulture = System.Globalization.CultureInfo.CurrentUICulture;
+
+        try
+        {
+            var localization = new LocalizationService();
+
+            Assert.Equal("ja-JP", System.Globalization.CultureInfo.CurrentCulture.Name);
+            Assert.Equal("ja-JP", System.Globalization.CultureInfo.CurrentUICulture.Name);
+
+            localization.SetLanguage(SupportedLanguage.English);
+
+            Assert.Equal("en", System.Globalization.CultureInfo.CurrentCulture.Name);
+            Assert.Equal("en", System.Globalization.CultureInfo.CurrentUICulture.Name);
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentCulture = originalCulture;
+            System.Globalization.CultureInfo.CurrentUICulture = originalUiCulture;
+        }
+    }
+
     [Theory]
     [InlineData("Strings.resx")]
     [InlineData("Strings.en.resx")]
@@ -131,6 +156,34 @@ public class LocalizationResourceIntegrityTests
             Assert.True(resources.TryGetValue(key, out var value), $"{fileName} is missing {key}");
             Assert.False(string.IsNullOrWhiteSpace(value), $"{fileName} has an empty value for {key}");
         }
+    }
+
+    [Fact]
+    public void FileTypeResourceValues_UseExpectedJapaneseAndVietnameseLabels()
+    {
+        var japanese = LoadResources("Strings.resx");
+        var vietnamese = LoadResources("Strings.vi.resx");
+
+        Assert.Equal("画像", japanese["FileType_Image"]);
+        Assert.Equal("動画", japanese["FileType_Video"]);
+        Assert.Equal("音声", japanese["FileType_Audio"]);
+        Assert.Equal("文書", japanese["FileType_Document"]);
+        Assert.Equal("Hình ảnh", vietnamese["FileType_Image"]);
+        Assert.Equal("Video", vietnamese["FileType_Video"]);
+        Assert.Equal("Âm thanh", vietnamese["FileType_Audio"]);
+        Assert.Equal("Tài liệu", vietnamese["FileType_Document"]);
+    }
+
+    [Theory]
+    [InlineData("Strings.resx")]
+    [InlineData("Strings.en.resx")]
+    [InlineData("Strings.vi.resx")]
+    [InlineData("Strings.zh.resx")]
+    public void AboutText_UsesTheSameApplicationIntroductionAcrossEntryPoints(string fileName)
+    {
+        var resources = LoadResources(fileName);
+
+        Assert.Equal(resources["Dashboard_About"], resources["Main_About"]);
     }
 
     private static string NormalizeLineEndings(string value)

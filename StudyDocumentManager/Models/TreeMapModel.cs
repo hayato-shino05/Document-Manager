@@ -18,9 +18,9 @@ public partial class TreeMapModel : ModelBase
     // Predefined colors for tree map blocks
     private static readonly string[] BlockColors =
     {
-        "#3b82f6", "#ef4444", "#22c55e", "#f59e0b", "#8b5cf6",
-        "#06b6d4", "#ec4899", "#14b8a6", "#f97316", "#6366f1",
-        "#84cc16", "#e11d48", "#0ea5e9", "#a855f7", "#eab308"
+        "#1D4ED8", "#B91C1C", "#15803D", "#B45309", "#6D28D9",
+        "#0E7490", "#BE185D", "#0F766E", "#C2410C", "#4338CA",
+        "#4D7C0F", "#9F1239", "#0369A1", "#7E22CE", "#A16207"
     };
 
     public TreeMapModel(INavigationService navigationService, IReportRepository reportRepo)
@@ -79,7 +79,7 @@ public class TreeMapItem
 {
     public string Label { get; set; } = string.Empty;
     public int Count { get; set; }
-    public string Color { get; set; } = "#3b82f6";
+    public string Color { get; set; } = "#1D4ED8";
     public double Percentage { get; set; }
     public string DisplayText { get; set; } = string.Empty;
 }

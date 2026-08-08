@@ -33,11 +33,70 @@ public sealed class MainWindowTaxonomyTests
         Assert.DoesNotContain("CommandParameter=\"bulk-delete\"", toolbar);
         Assert.DoesNotContain("CommandParameter=\"recentfiles\"", toolbar);
         Assert.DoesNotContain("CommandParameter=\"duplicates\"", toolbar);
-        Assert.DoesNotContain("CommandParameter=\"report\"", toolbar);
-        Assert.DoesNotContain("CommandParameter=\"treemap\"", toolbar);
+        Assert.Contains("CommandParameter=\"report\"", toolbar);
+        Assert.Contains("CommandParameter=\"treemap\"", toolbar);
         Assert.DoesNotContain("Command=\"{Binding BackupDatabaseCommand}\"", toolbar);
         Assert.Contains("Command=\"{Binding RefreshCommand}\"", toolbar);
         Assert.Contains("CommandParameter=\"batch-import\"", toolbar);
+    }
+
+    [Fact]
+    public void MainWindow_ExposesStableAutomationIdsForShellMenusAndToolbar()
+    {
+        var mainWindow = LoadMainWindow();
+        var automationIds = new[]
+        {
+            "Shell_MainWindow",
+            "Menu_File",
+            "Menu_Organize",
+            "Menu_Import",
+            "Menu_Maintenance",
+            "Menu_Analytics",
+            "Menu_Help",
+            "Toolbar_Add",
+            "Toolbar_Edit",
+            "Toolbar_Delete",
+            "Toolbar_Open",
+            "Toolbar_Export",
+            "Toolbar_Refresh",
+            "Toolbar_Import",
+            "Toolbar_Report",
+            "Toolbar_TreeMap",
+            "Toolbar_Back",
+            "MainShellRoot"
+        };
+
+        foreach (var automationId in automationIds)
+            Assert.Contains($"AutomationProperties.AutomationId=\"{automationId}\"", mainWindow);
+
+        var dashboard = File.ReadAllText(GetSourceFilePath("StudyDocumentManager", "Views", "Dashboard.axaml"));
+        Assert.Contains("AutomationProperties.AutomationId=\"Screen_Dashboard\"", dashboard);
+        Assert.DoesNotContain("AutomationProperties.AutomationId=\"MainShellRoot\"", dashboard);
+    }
+
+    [Fact]
+    public void Dashboard_ContextMenuExposesAllDocumentActions()
+    {
+        var dashboard = File.ReadAllText(GetSourceFilePath("StudyDocumentManager", "Views", "Dashboard.axaml"));
+        var automationIds = new[]
+        {
+            "Context_OpenFile",
+            "Context_EditDocument",
+            "Context_ChangeCategory",
+            "Context_DeleteToTrash",
+            "Context_CopyName",
+            "Context_CopyPath",
+            "Context_OpenFolder",
+            "Context_EditTags",
+            "Context_EditNotes",
+            "Context_MarkImportant",
+            "Context_PersonalNote",
+            "Context_AddToCollection",
+            "Context_RelatedDocuments"
+        };
+
+        foreach (var automationId in automationIds)
+            Assert.Contains($"AutomationProperties.AutomationId=\"{automationId}\"", dashboard);
     }
 
     private static string LoadMainWindow()

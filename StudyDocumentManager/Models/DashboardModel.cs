@@ -32,7 +32,7 @@ public partial class DashboardModel : ModelBase
     private bool _isLoadingData;
     private bool _isApplyingFilters;
 
-    // â•â•â• Document list â•â•â•
+    // ═══ 文書一覧 ═══
     [ObservableProperty]
     private List<StudyDocument> _documents = new();
 
@@ -119,6 +119,12 @@ public partial class DashboardModel : ModelBase
     [ObservableProperty]
     private ObservableCollection<CategoryTreeItem> _categoryTreeItems = new();
 
+    private readonly List<StudyDocument> _allDocuments = [];
+    private List<string> _availableSubjects = [];
+    private List<string> _availableTypes = [];
+    private string _statusKey = "Status_Ready";
+    private object[] _statusArguments = [];
+
     public DashboardModel(
         IDocumentRepository repository,
         IRecycleBinRepository recycleBinRepo,
@@ -149,11 +155,21 @@ public partial class DashboardModel : ModelBase
         _exportService = exportService;
         _backupService = backupService;
         _loc = localizationService;
-        _statusText = _loc["Status_Ready"];
+        _statusText = _loc[_statusKey];
         _loc.LanguageChanged += (_, _) =>
         {
-            Subjects = [.. Subjects];
-            Types = [.. Types];
+            Subjects = [FILTER_ALL_SUBJECTS_KEY, .._availableSubjects];
+            Types = [FILTER_ALL_TYPES_KEY, .._availableTypes];
+
+            if (_allDocuments.Count > 0 || Documents.Count > 0 || IsEmptyState || HasLoadError)
+                BuildCategoryTree(_allDocuments, _availableSubjects, _availableTypes);
+
+            StateMessage = HasLoadError
+                ? _loc["Dashboard_LoadError"]
+                : IsEmptyState
+                    ? _loc["Dashboard_EmptyState"]
+                    : string.Empty;
+            RefreshLocalizedStatus();
         };
         // DO NOT call LoadData() here — it causes StackOverflowException
         // because DataGrid layout hasn't completed yet.
@@ -182,6 +198,11 @@ public partial class DashboardModel : ModelBase
             var subjects = _categoryRepo.GetAllSubjects();
             var types = _categoryRepo.GetAllTypes();
 
+            _allDocuments.Clear();
+            _allDocuments.AddRange(docs);
+            _availableSubjects = [..subjects];
+            _availableTypes = [..types];
+
             TotalDocuments = docs.Count;
             ImportantDocuments = docs.Count(d => d.IsImportant);
             OverdueDocuments = _repository.GetOverdueDocuments().Count;
@@ -199,7 +220,7 @@ public partial class DashboardModel : ModelBase
             HasLoadError = false;
             IsEmptyState = docs.Count == 0;
             StateMessage = IsEmptyState ? _loc["Dashboard_EmptyState"] : string.Empty;
-            StatusText = string.Format(_loc["Status_TotalSummary"], TotalDocuments, ImportantDocuments, OverdueDocuments);
+            SetLocalizedStatus("Status_TotalSummary", TotalDocuments, ImportantDocuments, OverdueDocuments);
             NotifyStatPropertiesChanged();
         }
         catch
@@ -208,7 +229,7 @@ public partial class DashboardModel : ModelBase
             HasLoadError = true;
             IsEmptyState = false;
             StateMessage = _loc["Dashboard_LoadError"];
-            StatusText = StateMessage;
+            SetLocalizedStatus("Dashboard_LoadError");
             NotifyStatPropertiesChanged();
         }
         finally
@@ -217,6 +238,16 @@ public partial class DashboardModel : ModelBase
             IsLoading = false;
         }
     }
+
+    private void SetLocalizedStatus(string key, params object[] arguments)
+    {
+        _statusKey = key;
+        _statusArguments = arguments;
+        RefreshLocalizedStatus();
+    }
+
+    private void RefreshLocalizedStatus()
+        => StatusText = string.Format(_loc[_statusKey], _statusArguments);
 
     private void NotifyStatPropertiesChanged()
     {
@@ -244,6 +275,30 @@ public partial class DashboardModel : ModelBase
         NotifyStatPropertiesChanged();
     }
 
+    private string LocalizeFileType(string canonicalType)
+    {
+        var key = canonicalType switch
+        {
+            "PDF" => "FileType_PDF",
+            "Word" => "FileType_Word",
+            "PowerPoint" => "FileType_PowerPoint",
+            "Excel" => "FileType_Excel",
+            "Document" => "FileType_Document",
+            "Data" => "FileType_Data",
+            "Code" => "FileType_Code",
+            "Book" => "FileType_Book",
+            "Image" => "FileType_Image",
+            "Video" => "FileType_Video",
+            "Audio" => "FileType_Audio",
+            "Archive" => "FileType_Archive",
+            "Design" => "FileType_Design",
+            "Other" => "FileType_Other",
+            _ => null
+        };
+
+        return key is null ? canonicalType : _loc[key];
+    }
+
     private void BuildCategoryTree(IList<StudyDocument> docs, List<string> subjects, List<string> types)
     {
         var items = new List<CategoryTreeItem>();
@@ -258,7 +313,7 @@ public partial class DashboardModel : ModelBase
             FilterValue = ""
         });
 
-        // ——— Section: Danh mục ——————————————————————
+        // ——— セクション: カテゴリ ——————————————————————
         var subjectItems = subjects
             .Select(s => new { Name = s, Count = docs.Count(d => d.Subject == s) })
             .Where(x => x.Count > 0).ToList();
@@ -282,7 +337,7 @@ public partial class DashboardModel : ModelBase
                 });
         }
 
-        // ——— Section: Loại file ——————————————————————
+        // ——— セクション: ファイル種別 ——————————————————————
         var typeItems = types
             .Select(t => new { Name = t, Count = docs.Count(d => d.Type == t) })
             .Where(x => x.Count > 0).ToList();
@@ -299,14 +354,14 @@ public partial class DashboardModel : ModelBase
             foreach (var t in typeItems)
                 items.Add(new CategoryTreeItem
                 {
-                    Name = t.Name, Count = t.Count,
+                    Name = LocalizeFileType(t.Name), Count = t.Count,
                     IconKey = t.Name,  // resolved to file icon in ResolvedIconSource
                     FilterType = "type", FilterValue = t.Name,
                     IsIndented = true
                 });
         }
 
-        // ——— Quan trọng ——————————————————————————————
+        // ——— 重要 ——————————————————————————————
         items.Add(new CategoryTreeItem
         {
             Name = _loc["CategoryTree_Important"],
@@ -316,7 +371,7 @@ public partial class DashboardModel : ModelBase
             FilterValue = ""
         });
 
-        // ——— Bộ sưu tập ——————————————————————————————
+        // ——— コレクション ——————————————————————————————
         try
         {
             var collections = _collectionRepo.GetAll();
@@ -626,7 +681,7 @@ public partial class DashboardModel : ModelBase
         LoadData();
     }
 
-
+    // ——— Navigation commands ———
     [RelayCommand]
     private void OpenReport() => _navigationService.NavigateTo("report");
 
@@ -785,14 +840,14 @@ public partial class DashboardModel : ModelBase
         catch { }
     }
 
-    // â• â• â•  Deadline quick filters â• â• â• 
+    // 期限クイックフィルター
     // ——— Deadline quick filters ——— 
     [RelayCommand]
     private void ShowUpcomingDeadlines()
     {
         var docs = _repository.GetUpcomingDeadlines(7);
         Documents = docs.ToList();
-        StatusText = string.Format(_loc["Status_UpcomingDeadlines"], docs.Count);
+        SetLocalizedStatus("Status_UpcomingDeadlines", docs.Count);
     }
 
     [RelayCommand]
@@ -800,7 +855,7 @@ public partial class DashboardModel : ModelBase
     {
         var docs = _repository.GetOverdueDocuments();
         Documents = docs.ToList();
-        StatusText = string.Format(_loc["Status_Overdue"], docs.Count);
+        SetLocalizedStatus("Status_Overdue", docs.Count);
     }
 
     // ——— About dialog ——— 

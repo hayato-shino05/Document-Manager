@@ -26,7 +26,7 @@ public sealed class TreeMapModelTests
         Assert.Equal("Math", model.Items[0].Label);
         Assert.Equal(66.666, model.Items[0].Percentage, 2);
         Assert.Contains("66.7%", model.Items[0].DisplayText);
-        Assert.Equal("#3b82f6", model.Items[0].Color);
+        Assert.Equal("#1D4ED8", model.Items[0].Color);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public sealed class TreeMapModelTests
         Assert.Equal(16, model.TotalDocuments);
         Assert.Equal(16, model.Items.Count);
         Assert.Equal("Type0", model.Items[0].Label);
-        Assert.Equal("#3b82f6", model.Items[0].Color);
+        Assert.Equal("#1D4ED8", model.Items[0].Color);
         Assert.Equal(model.Items[0].Color, model.Items[15].Color);
         Assert.Equal(6.25, model.Items[0].Percentage, 2);
         Assert.Equal(1, reports.TypeCalls);
@@ -61,6 +61,45 @@ public sealed class TreeMapModelTests
         model.GoBackCommand.Execute(null);
 
         Assert.Equal(["dashboard"], navigation.Routes);
+    }
+
+    [Fact]
+    public void PaletteKeepsWhiteTextAtAccessibleContrast()
+    {
+        var reports = new ReportStub
+        {
+            Types = Enumerable.Range(0, 15).Select(i => ($"Type{i}", 1)).ToList()
+        };
+        var model = new TreeMapModel(new NavigationStub(), reports);
+
+        model.ShowByTypeCommand.Execute(null);
+
+        Assert.All(model.Items, item =>
+            Assert.True(ContrastRatio(item.Color, "#FFFFFF") >= 4.5, item.Color));
+    }
+
+    private static double ContrastRatio(string foreground, string background)
+    {
+        var foregroundColor = Avalonia.Media.Color.Parse(foreground);
+        var backgroundColor = Avalonia.Media.Color.Parse(background);
+        var foregroundLuminance = RelativeLuminance(foregroundColor);
+        var backgroundLuminance = RelativeLuminance(backgroundColor);
+        var lighter = Math.Max(foregroundLuminance, backgroundLuminance);
+        var darker = Math.Min(foregroundLuminance, backgroundLuminance);
+        return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    private static double RelativeLuminance(Avalonia.Media.Color color)
+    {
+        static double Normalize(byte channel)
+        {
+            var value = channel / 255d;
+            return value <= 0.03928 ? value / 12.92 : Math.Pow((value + 0.055) / 1.055, 2.4);
+        }
+
+        return (0.2126 * Normalize(color.R))
+            + (0.7152 * Normalize(color.G))
+            + (0.0722 * Normalize(color.B));
     }
 
     private sealed class ReportStub : IReportRepository

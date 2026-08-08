@@ -3,7 +3,7 @@
 
     <!--
     ═══════════════════════════════════════════════════════════
-      Study Document Manager — AppTheme v5.0
+      Document Manager — アプリテーマ v5.0
       Icon definitions only. Colors → ColorTokens.axaml
     ═══════════════════════════════════════════════════════════
     -->
@@ -51,6 +51,13 @@
                     Geometry="M11,3 L13,3 L13,13 L16,13 L12,18 L8,13 L11,13 Z"/>
                 <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"
                     Geometry="M5,18 L5,20 C5,20.6 5.4,21 6,21 L18,21 C18.6,21 19,20.6 19,20 L19,18 L17,18 L17,19 L7,19 L7,18 Z"/>
+            </DrawingGroup>
+        </DrawingImage>
+
+        <DrawingImage x:Key="IconImportWhite">
+            <DrawingGroup>
+                <GeometryDrawing Brush="White"
+                    Geometry="M11,3 L13,3 L13,13 L16,13 L12,18 L8,13 L11,13 Z M5,18 L5,20 C5,20.6 5.4,21 6,21 L18,21 C18.6,21 19,20.6 19,20 L19,18 L17,18 L17,19 L7,19 L7,18 Z"/>
             </DrawingGroup>
         </DrawingImage>
 
@@ -159,6 +166,15 @@
             </DrawingGroup>
         </DrawingImage>
 
+        <DrawingImage x:Key="IconSearchWhite">
+            <DrawingGroup>
+                <GeometryDrawing Brush="White"
+                    Geometry="M10,3 A7,7 0 1,0 10,17 A7,7 0 1,0 10,3 Z M10,5 A5,5 0 1,1 10,15 A5,5 0 1,1 10,5 Z"/>
+                <GeometryDrawing Brush="White"
+                    Geometry="M15,15 L20,20 L18.5,21.5 L13.5,16.5 Z"/>
+            </DrawingGroup>
+        </DrawingImage>
+
         <!-- Back -->
         <DrawingImage x:Key="IconBack">
             <GeometryDrawing Brush="{StaticResource BrushIconNeutralLight}"
@@ -228,6 +244,11 @@
         <!-- Checkmark -->
         <DrawingImage x:Key="IconCheck">
             <GeometryDrawing Brush="White"
+                Geometry="M5,12 L10,17 L19,7 L17.5,5.5 L10,14 L6.5,10.5 Z"/>
+        </DrawingImage>
+
+        <DrawingImage x:Key="IconCheckNeutral">
+            <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"
                 Geometry="M5,12 L10,17 L19,7 L17.5,5.5 L10,14 L6.5,10.5 Z"/>
         </DrawingImage>
 
@@ -377,9 +398,14 @@
         <DrawingImage x:Key="IconScan">
             <DrawingGroup>
                 <GeometryDrawing Brush="{StaticResource BrushIconSuccess}"
-                    Geometry="M10,3 A7,7 0 1,0 10,17 A7,7 0 1,0 10,3 Z M10,5 A5,5 0 1,1 10,15 A5,5 0 1,1 10,5 Z"/>
-                <GeometryDrawing Brush="{StaticResource BrushIconSuccess}"
-                    Geometry="M15,15 L20,20 L18.5,21.5 L13.5,16.5 Z"/>
+                    Geometry="M10,3 A7,7 0 1,0 10,17 A7,7 0 1,0 10,3 Z M10,5 A5,5 0 1,1 10,15 A5,5 0 1,1 10,5 Z M15,15 L20,20 L18.5,21.5 L13.5,16.5 Z"/>
+            </DrawingGroup>
+        </DrawingImage>
+
+        <DrawingImage x:Key="IconScanWhite">
+            <DrawingGroup>
+                <GeometryDrawing Brush="White"
+                    Geometry="M10,3 A7,7 0 1,0 10,17 A7,7 0 1,0 10,3 Z M10,5 A5,5 0 1,1 10,15 A5,5 0 1,1 10,5 Z M15,15 L20,20 L18.5,21.5 L13.5,16.5 Z"/>
             </DrawingGroup>
         </DrawingImage>
 
@@ -391,6 +417,12 @@
                 <GeometryDrawing Brush="White"
                     Geometry="M7,2 L17,2 L17,8 L7,8 Z M7,14 L17,14 L17,20 L7,20 Z"/>
             </DrawingGroup>
+        </DrawingImage>
+
+        <!-- White save icon for primary buttons -->
+        <DrawingImage x:Key="IconSaveWhite">
+            <GeometryDrawing Brush="White"
+                Geometry="M17,2 L21,6 L21,20 C21,21.1 20.1,22 19,22 L5,22 C3.9,22 3,21.1 3,20 L3,4 C3,2.9 3.9,2 5,2 Z M7,2 L17,2 L17,8 L7,8 Z M7,14 L17,14 L17,20 L7,20 Z"/>
         </DrawingImage>
 
         <!-- Book/Collection -->

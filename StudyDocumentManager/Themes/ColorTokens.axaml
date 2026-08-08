@@ -1,33 +1,11 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!--
-    ═══════════════════════════════════════════════════════════
-      COLOR TOKENS — Single Source of Truth
-      All colors in the app MUST reference these tokens.
-      DO NOT hardcode hex values anywhere else.
-    ═══════════════════════════════════════════════════════════
 
-    ICON PALETTE (used in DrawingImage / GeometryDrawing)
-    ┌─────────────────────────────────────────────────────────┐
-    │  IconNeutral      #606060   Gray icons (default)        │
-    │  IconNeutralLight #949494   Muted / secondary icons     │
-    │  IconAccent       #0067C0   Blue accent icons           │
-    │  IconSuccess      #107C10   Green success icons         │
-    │  IconWarning      #9A6300   Amber warning icons         │
-    │  IconDanger       #C42B1C   Red danger icons            │
-    │  IconUrgent       #E65100   Orange urgent icons         │
-    │  IconStarFill     #E8A317   Gold star icon              │
-    │  IconFolderBase   #DCA01D   Folder body (dark gold)     │
-    │  IconFolderFlap   #EAC050   Folder flap (light gold)    │
-    │  IconIndigo       #5C6BC0   Note/indigo icons           │
-    │  IconCyan         #0891B2   Tag/link icons              │
-    └─────────────────────────────────────────────────────────┘
-    -->
 
     <Styles.Resources>
 
-        <!-- ── SEMANTIC COLORS (Backgrounds, Text, Borders) ─── -->
+
         <Color x:Key="MicaBase">#F3F3F3</Color>
         <Color x:Key="MicaSoft">#EEEEEE</Color>
         <Color x:Key="CardWhite">#FFFFFF</Color>
@@ -35,32 +13,32 @@
 
         <Color x:Key="TextDark">#1C1C1C</Color>
         <Color x:Key="TextMedium">#606060</Color>
-        <Color x:Key="TextLight">#949494</Color>
+        <Color x:Key="TextLight">#6B7280</Color>
 
         <Color x:Key="BorderSubtle">#E5E5E5</Color>
         <Color x:Key="BorderMedium">#D2D2D2</Color>
 
-        <!-- ── ACCENT ───────────────────────────────────────── -->
+
         <Color x:Key="AccentBlue">#0067C0</Color>
         <Color x:Key="AccentBlueDark">#0054A6</Color>
         <Color x:Key="AccentBlueLight">#60A5FA</Color>
         <Color x:Key="AccentBlueBg">#DBEAFE</Color>
 
-        <!-- ── STATUS ────────────────────────────────────────── -->
+
         <Color x:Key="StatusGreen">#107C10</Color>
         <Color x:Key="StatusAmber">#9A6300</Color>
         <Color x:Key="StatusRed">#C42B1C</Color>
         <Color x:Key="StatusYellow">#EAB308</Color>
 
-        <!-- ── SELECTION ─────────────────────────────────────── -->
+
         <Color x:Key="SelectionBlueBg">#E1EFFF</Color>
         <Color x:Key="HoverBg">#0A000000</Color>
 
-        <!-- ── ON-COLOR OVERLAYS (text trên nền màu đậm, e.g. TreeMap) ── -->
-        <Color x:Key="OnColorPrimary">#FFFFFFCC</Color>
-        <Color x:Key="OnColorSecondary">#FFFFFFAA</Color>
 
-        <!-- ── ICON COLORS (used in DrawingImage GeometryDrawing) -->
+        <Color x:Key="OnColorPrimary">#FFFFFF</Color>
+        <Color x:Key="OnColorSecondary">#FFFFFF</Color>
+
+
         <Color x:Key="IconNeutral">#606060</Color>
         <Color x:Key="IconNeutralLight">#949494</Color>
         <Color x:Key="IconAccent">#0067C0</Color>
@@ -72,9 +50,9 @@
         <Color x:Key="IconFolderFlap">#EAC050</Color>
         <Color x:Key="IconIndigo">#5C6BC0</Color>
         <Color x:Key="IconCyan">#0891B2</Color>
-        <Color x:Key="IconAmberDark">#DE8C00</Color>
+        <Color x:Key="IconAmberDark">#9A6300</Color>
 
-        <!-- Icon color brushes (SolidColorBrush — for binding in XAML if needed) -->
+
         <SolidColorBrush x:Key="BrushIconNeutral"      Color="{StaticResource IconNeutral}"/>
         <SolidColorBrush x:Key="BrushIconNeutralLight" Color="{StaticResource IconNeutralLight}"/>
         <SolidColorBrush x:Key="BrushIconAccent"       Color="{StaticResource IconAccent}"/>
@@ -88,7 +66,7 @@
         <SolidColorBrush x:Key="BrushIconCyan"         Color="{StaticResource IconCyan}"/>
         <SolidColorBrush x:Key="BrushIconAmberDark"   Color="{StaticResource IconAmberDark}"/>
 
-        <!-- ── SEMANTIC BRUSHES (shared across all views) ────── -->
+
         <SolidColorBrush x:Key="SidebarBackground"   Color="{StaticResource SidebarBg}"/>
         <SolidColorBrush x:Key="SidebarHover"        Color="{StaticResource MicaSoft}"/>
         <SolidColorBrush x:Key="ContentBackground"   Color="{StaticResource MicaBase}"/>
@@ -105,71 +83,76 @@
         <SolidColorBrush x:Key="DangerBrush"         Color="{StaticResource StatusRed}"/>
         <SolidColorBrush x:Key="OnColorPrimaryBrush"  Color="{StaticResource OnColorPrimary}"/>
         <SolidColorBrush x:Key="OnColorSecondaryBrush" Color="{StaticResource OnColorSecondary}"/>
-        <!-- Deadline state brushes — dùng Status tokens thay vì hex riêng -->
+
         <SolidColorBrush x:Key="DeadlineOverdueBrush"      Color="{StaticResource StatusRed}"/>
         <SolidColorBrush x:Key="DeadlineUrgentBrush"       Color="{StaticResource StatusAmber}"/>
         <SolidColorBrush x:Key="DeadlineUpcomingBrush"     Color="{StaticResource StatusYellow}"/>
         <SolidColorBrush x:Key="DeadlineOverdueTextBrush"  Color="#FFFFFF"/>
         <SolidColorBrush x:Key="DeadlineUrgentTextBrush"   Color="#FFFFFF"/>
         <SolidColorBrush x:Key="DeadlineUpcomingTextBrush" Color="#1F2937"/>
-        <!-- Toast notification brushes -->
-        <SolidColorBrush x:Key="ToastSuccessBrush"     Color="#10B981"/>
-        <SolidColorBrush x:Key="ToastErrorBrush"       Color="#EF4444"/>
-        <SolidColorBrush x:Key="ToastWarningBrush"     Color="#F59E0B"/>
-        <SolidColorBrush x:Key="ToastInfoBrush"        Color="#3B82F6"/>
-        <SolidColorBrush x:Key="ToastForegroundBrush"  Color="White"/>
+
+        <SolidColorBrush x:Key="ToastSuccessBrush"             Color="#DCFCE7"/>
+        <SolidColorBrush x:Key="ToastErrorBrush"               Color="#FEE2E2"/>
+        <SolidColorBrush x:Key="ToastWarningBrush"             Color="#FEF3C7"/>
+        <SolidColorBrush x:Key="ToastInfoBrush"                Color="#DBEAFE"/>
+        <SolidColorBrush x:Key="ToastSuccessForegroundBrush"  Color="{StaticResource StatusGreen}"/>
+        <SolidColorBrush x:Key="ToastErrorForegroundBrush"    Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="ToastWarningForegroundBrush"  Color="{StaticResource StatusAmber}"/>
+        <SolidColorBrush x:Key="ToastInfoForegroundBrush"     Color="{StaticResource AccentBlueDark}"/>
+        <SolidColorBrush x:Key="ToastForegroundBrush"         Color="{StaticResource TextDark}"/>
         <SolidColorBrush x:Key="IconPaperFoldBrush" Color="{StaticResource BorderSubtle}"/>
 
 
-        <!-- Button semantic color aliases (used by SharedStyles Button.danger/warning/success) -->
-        <!-- Primary danger/warning/success palette -->
+
+
         <Color x:Key="ColorDanger">      #DC2626</Color>
         <Color x:Key="ColorDangerHover"> #B91C1C</Color>
-        <Color x:Key="ColorWarningBtn">  #F59E0B</Color>
-        <Color x:Key="ColorWarningHover">#D97706</Color>
-        <Color x:Key="ColorSuccess">     #059669</Color>
-        <Color x:Key="ColorSuccessHover">#047857</Color>
-        <!-- Chip palette -->
+        <Color x:Key="ColorWarningBtn">  #9A6300</Color>
+        <Color x:Key="ColorWarningHover">#7A4F00</Color>
+        <Color x:Key="ColorSuccess">     #047857</Color>
+        <Color x:Key="ColorSuccessHover">#065F46</Color>
+
         <Color x:Key="ChipBg">          #F0F4FF</Color>
         <Color x:Key="ChipFg">          #3B4EB8</Color>
         <Color x:Key="ChipBorder">      #C7D2FE</Color>
         <Color x:Key="ChipHoverBg">     #DBEAFE</Color>
         <Color x:Key="ChipSelectedBg">  #4F46E5</Color>
         <Color x:Key="ChipSelectedBorder">#4338CA</Color>
-        <!-- Brushes for Button classes -->
+
         <SolidColorBrush x:Key="DangerColor"         Color="{StaticResource ColorDanger}"/>
         <SolidColorBrush x:Key="DangerColorHover"    Color="{StaticResource ColorDangerHover}"/>
         <SolidColorBrush x:Key="WarningColor"        Color="{StaticResource ColorWarningBtn}"/>
         <SolidColorBrush x:Key="WarningColorHover"   Color="{StaticResource ColorWarningHover}"/>
         <SolidColorBrush x:Key="SuccessColor"        Color="{StaticResource ColorSuccess}"/>
         <SolidColorBrush x:Key="SuccessColorHover"   Color="{StaticResource ColorSuccessHover}"/>
-        <!-- Chip brushes -->
+
         <SolidColorBrush x:Key="ChipBgBrush"           Color="{StaticResource ChipBg}"/>
         <SolidColorBrush x:Key="ChipFgBrush"           Color="{StaticResource ChipFg}"/>
         <SolidColorBrush x:Key="ChipBorderBrush"       Color="{StaticResource ChipBorder}"/>
         <SolidColorBrush x:Key="ChipHoverBgBrush"      Color="{StaticResource ChipHoverBg}"/>
         <SolidColorBrush x:Key="ChipSelectedBgBrush"   Color="{StaticResource ChipSelectedBg}"/>
         <SolidColorBrush x:Key="ChipSelectedBorderBrush" Color="{StaticResource ChipSelectedBorder}"/>
-        <!-- DynamicResource aliases — TreeMapView / RecentFilesView still reference these -->
+
         <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource TextDark}"/>
         <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource TextMedium}"/>
         <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardWhite}"/>
         <SolidColorBrush x:Key="BorderBrush"         Color="{StaticResource BorderSubtle}"/>
 
-        <!-- Stat card backgrounds -->
+
         <SolidColorBrush x:Key="StatBlueBg"  Color="{StaticResource AccentBlueBg}"/>
         <SolidColorBrush x:Key="StatGreenBg" Color="#DCFCE7"/>
         <SolidColorBrush x:Key="StatAmberBg" Color="#FEF3C7"/>
         <SolidColorBrush x:Key="StatRedBg"   Color="#FEE2E2"/>
+        <SolidColorBrush x:Key="StatRedFg"   Color="{StaticResource StatusRed}"/>
 
-        <!-- Legacy compat brushes (some views still reference these key names) -->
+
         <SolidColorBrush x:Key="GradientIndigo"  Color="{StaticResource AccentBlue}"/>
         <SolidColorBrush x:Key="GradientEmerald" Color="{StaticResource StatusGreen}"/>
         <SolidColorBrush x:Key="GradientAmber"   Color="{StaticResource StatusAmber}"/>
         <SolidColorBrush x:Key="GradientRose"    Color="{StaticResource StatusRed}"/>
         <SolidColorBrush x:Key="GradientCyan"    Color="{StaticResource IconCyan}"/>
 
-        <!-- Gradient compat -->
+
         <LinearGradientBrush x:Key="GradientStatBlue"  StartPoint="0%,0%" EndPoint="100%,100%">
             <GradientStop Color="#DBEAFE" Offset="0"/>
             <GradientStop Color="#EFF6FF" Offset="1"/>
@@ -187,7 +170,7 @@
             <GradientStop Color="#F0FDF4" Offset="1"/>
         </LinearGradientBrush>
 
-        <!-- Corner radii -->
+
         <CornerRadius x:Key="RadiusXs">3</CornerRadius>
         <CornerRadius x:Key="RadiusSm">4</CornerRadius>
         <CornerRadius x:Key="RadiusMd">6</CornerRadius>
@@ -196,19 +179,7 @@
         <CornerRadius x:Key="RadiusPill">10</CornerRadius>
         <CornerRadius x:Key="RadiusFull">9999</CornerRadius>
 
-        <!--
-        ═══════════════════════════════════════════════════════════
-          SPACING TOKENS
-          Sử dụng các key này thay vì viết số trực tiếp trong XAML
-        ═══════════════════════════════════════════════════════════
-          Space1  = 4px    (rất nhỏ, gap giữa icon & text)
-          Space2  = 6px    (nhỏ)
-          Space3  = 8px    (tiêu chuẩn)
-          Space4  = 12px   (medium)
-          Space5  = 16px   (lớn, padding card / section)
-          Space6  = 20px   (rất lớn)
-          Space8  = 24px   (khoảng cách lớn giữa section)
-        -->
+
         <x:Double x:Key="Space1">4</x:Double>
         <x:Double x:Key="Space2">6</x:Double>
         <x:Double x:Key="Space3">8</x:Double>
@@ -217,26 +188,26 @@
         <x:Double x:Key="Space6">20</x:Double>
         <x:Double x:Key="Space8">24</x:Double>
 
-        <!-- Thickness shortcuts (Padding/Margin tokens) -->
-        <!-- H = horizontal axis padding, V = vertical axis padding -->
-        <Thickness x:Key="PaddingXs">4,2</Thickness>   <!-- icon, badge -->
-        <Thickness x:Key="PaddingSm">8,4</Thickness>   <!-- compact button -->
-        <Thickness x:Key="PaddingMd">12,6</Thickness>  <!-- standard control -->
-        <Thickness x:Key="PaddingLg">16,8</Thickness>  <!-- card, section -->
-        <Thickness x:Key="PaddingXl">20,12</Thickness> <!-- hero section -->
-        <Thickness x:Key="PaddingPage">20</Thickness>  <!-- base wrapper -->
-        <Thickness x:Key="PaddingRow">12,5</Thickness> <!-- toolbar row -->
+
+
+        <Thickness x:Key="PaddingXs">4,2</Thickness>
+        <Thickness x:Key="PaddingSm">8,4</Thickness>
+        <Thickness x:Key="PaddingMd">12,6</Thickness>
+        <Thickness x:Key="PaddingLg">16,8</Thickness>
+        <Thickness x:Key="PaddingXl">20,12</Thickness>
+        <Thickness x:Key="PaddingPage">20</Thickness>
+        <Thickness x:Key="PaddingRow">12,5</Thickness>
         <Thickness x:Key="PaddingSearchBar">12,6</Thickness>
         <Thickness x:Key="PaddingCard">16,12</Thickness>
         <Thickness x:Key="PaddingCardLg">16,10</Thickness>
         <Thickness x:Key="PaddingStatCard">14,10</Thickness>
         <Thickness x:Key="PaddingSidebar">10,6</Thickness>
         <Thickness x:Key="PaddingNavItem">10,7</Thickness>
-        <!-- Button padding variants -->
+
         <Thickness x:Key="PaddingBtn">14,4</Thickness>
         <Thickness x:Key="PaddingBtnSm">10,4</Thickness>
         <Thickness x:Key="PaddingBtnLg">16,6</Thickness>
-        <!-- Badge / chip padding -->
+
         <Thickness x:Key="PaddingChip">8,3</Thickness>
         <Thickness x:Key="PaddingBadge">5,2</Thickness>
         <Thickness x:Key="PaddingBadgeMd">7,2</Thickness>
@@ -245,12 +216,12 @@
         <Thickness x:Key="PaddingBtnPrimary">14,6</Thickness>
         <Thickness x:Key="PaddingSection">16</Thickness>
 
-        <!-- Control heights -->
-        <x:Double x:Key="HeightControl">28</x:Double>  <!-- TextBox, ComboBox, small Button -->
-        <x:Double x:Key="HeightButton">30</x:Double>   <!-- standard Button -->
-        <x:Double x:Key="HeightButtonLg">34</x:Double> <!-- large Button -->
 
-        <!-- Font sizes (CJK-optimized: min 12px for kanji legibility) -->
+        <x:Double x:Key="HeightControl">28</x:Double>
+        <x:Double x:Key="HeightButton">30</x:Double>
+        <x:Double x:Key="HeightButtonLg">34</x:Double>
+
+
         <x:Double x:Key="FontSizeXs">12</x:Double>
         <x:Double x:Key="FontSizeSm">13</x:Double>
         <x:Double x:Key="FontSizeMd">14</x:Double>

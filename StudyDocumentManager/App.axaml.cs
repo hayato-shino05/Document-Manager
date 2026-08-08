@@ -98,11 +98,11 @@ public partial class App : Application
         services.AddSingleton<IUpdateService, Services.UpdateService>();
         services.AddSingleton<IToastService, Services.ToastService>();
 
-        // Models â€” Main
+        // モデル — メイン
         services.AddSingleton<MainWindowModel>();
         services.AddTransient<DashboardModel>();
 
-        // Models â€” Documents
+        // モデル — 文書
         services.AddTransient<AddEditModel>();
         services.AddTransient<BatchImportModel>();
         services.AddTransient<BulkDeleteModel>();
@@ -110,17 +110,17 @@ public partial class App : Application
         services.AddTransient<PersonalNoteModel>();
         services.AddTransient<RelatedDocumentsModel>();
 
-        // Models â€” Management
+        // モデル — 管理
         services.AddTransient<CategoryManagementModel>();
         services.AddTransient<CollectionManagementModel>();
         services.AddTransient<RecycleBinModel>();
         services.AddTransient<FileIntegrityCheckModel>();
 
-        // Models â€” Reports
+        // モデル — レポート
         services.AddTransient<ReportModel>();
         services.AddTransient<TreeMapModel>();
 
-        // Models â€” Utilities
+        // モデル — ユーティリティ
         services.AddTransient<RecentFilesModel>();
     }
 }

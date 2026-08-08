@@ -82,7 +82,7 @@ public class DocumentTypeIconConverter : IValueConverter
                 => GetOrLoadSvg(ref _pptIcon, "file_type_powerpoint_icon_130245.svg"),
 
             // ── Data / Structured (json, xml, yaml, tsv...) ──────────────────
-            "data" or "dữ liệu" or "tsv" or "json" or "xml" or "yaml" or "yml"
+            "data" or "tsv" or "json" or "xml" or "yaml" or "yml"
                 => GetOrLoadSvg(ref _dataIcon, "data_filetype_icon.svg"),
 
             // ── Code ─────────────────────────────────────────────────────────
@@ -94,11 +94,11 @@ public class DocumentTypeIconConverter : IValueConverter
                 => GetOrLoadSvg(ref _codeIcon, "code_filetype_icon.svg"),
 
             // ── eBook ─────────────────────────────────────────────────────────
-            "book" or "sách" or "epub" or "mobi" or "azw" or "azw3" or "fb2"
+            "book" or "epub" or "mobi" or "azw" or "azw3" or "fb2"
                 => GetOrLoadSvg(ref _bookIcon, "ilustracoes_04-10_icon-icons.com_75464.svg"),
 
             // ── Image ────────────────────────────────────────────────────────
-            "image" or "hình ảnh" or "jpeg" or "jpg"
+            "image" or "jpeg" or "jpg"
                 => GetOrLoadBitmap(ref _imgJpgIcon, "jpg.png"),
             "png" or "gif" or "bmp" or "webp" or
             "ico" or "tiff" or "tif" or "raw" or "heic" or "heif" or "svg"
@@ -117,7 +117,7 @@ public class DocumentTypeIconConverter : IValueConverter
                 => GetOrLoadSvg(ref _audioIcon, "ext_audio_generic_filetype_icon_176230.svg"),
 
             // ── Archive / Compressed (+ backward compat: xz, zst) ───────────
-            "archive" or "nén" or "zip" or "rar" or "7z" or "tar" or "gz" or "bz2" or "xz" or "zst"
+            "archive" or "zip" or "rar" or "7z" or "tar" or "gz" or "bz2" or "xz" or "zst"
                 => GetOrLoadSvg(ref _zipIcon, "zip_filetype_icon_177508.svg"),
 
             // ── Design — Adobe Illustrator ────────────────────────────────────
@@ -129,7 +129,7 @@ public class DocumentTypeIconConverter : IValueConverter
                 => GetOrLoadSvg(ref _designXdIcon, "software_adobe_xd_app_computer_icon_191050.svg"),
 
             // ── Design — Photoshop / generic design ─────────────────────────
-            "design" or "thiết kế" or "psd" or "fig" or "sketch" or "indd"
+            "design" or "psd" or "fig" or "sketch" or "indd"
                 => GetOrLoadSvg(ref _designPsdIcon, "psd_file_design_graphic_digital_artwork_adobe_photoshop_icon_191032.svg"),
 
             // ── Default (Document, Report, Guide, Form, Other...) ─────────

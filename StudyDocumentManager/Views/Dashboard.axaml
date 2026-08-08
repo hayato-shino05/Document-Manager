@@ -6,7 +6,8 @@
              xmlns:core="using:StudyDocumentManager.Core.Entities"
         xmlns:loc="using:StudyDocumentManager.Markup"
                      x:Class="StudyDocumentManager.Views.Dashboard"
-             x:DataType="vm:DashboardModel">
+             x:DataType="vm:DashboardModel"
+             AutomationProperties.AutomationId="Screen_Dashboard">
 
     <UserControl.Resources>
         <conv:DeadlineBrushConverter x:Key="DeadlineBrushConverter"/>
@@ -24,9 +25,10 @@
                 <!-- Left: Search + Dropdown filters -->
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}" VerticalAlignment="Center">
-                    <Image Source="{StaticResource IconSearch}" Width="13" Height="13"
-                           VerticalAlignment="Center" Opacity="0.5"/>
+                    <Image Source="{StaticResource IconSearch}" Width="16" Height="16"
+                           VerticalAlignment="Center"/>
                     <TextBox Width="260" Height="{StaticResource HeightControl}" FontSize="{StaticResource FontSizeMd}"
+                             AutomationProperties.AutomationId="Screen_Dashboard"
                              Watermark="{loc:Localize Dashboard_SearchPlaceholder}"
                              AutomationProperties.Name="{loc:Localize Dashboard_SearchPlaceholder}"
                              Text="{Binding SearchKeyword, Mode=TwoWay}"
@@ -34,7 +36,10 @@
                     <Button Classes="primary" Command="{Binding SearchCommand}"
                             Padding="{StaticResource PaddingBtn}" Height="{StaticResource HeightControl}" VerticalAlignment="Center"
                             ToolTip.Tip="{loc:Localize Dashboard_TipSearch}">
-                        <TextBlock Text="{loc:Localize Dashboard_BtnSearch}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16"/>
+                            <TextBlock Text="{loc:Localize Dashboard_BtnSearch}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                        </StackPanel>
                     </Button>
 
                     <Border Width="1" Height="18" Background="{StaticResource CardBorder}" Margin="4,0"/>
@@ -71,7 +76,7 @@
                         Command="{Binding ToggleAdvancedFilterCommand}"
                         ToolTip.Tip="{loc:Localize Dashboard_TipAdvancedFilter}">
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
-                        <Image Source="{StaticResource IconFilter}" Width="12" Height="12"
+                        <Image Source="{StaticResource IconFilter}" Width="14" Height="14"
                                VerticalAlignment="Center"/>
                         <TextBlock Text="{loc:Localize Dashboard_BtnAdvancedFilter}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                         <Image Width="9" Height="9" VerticalAlignment="Center"
@@ -97,7 +102,7 @@
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                     <Grid ColumnDefinitions="*,*,Auto">
 
-                    <!-- ── Group 1: Khoảng thời gian ── -->
+                    <!-- ── グループ 1: 期間 ── -->
                     <Border CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource CardBackground}"
                             BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
                             Padding="{StaticResource PaddingStatCard}" Margin="0,0,8,0">
@@ -126,7 +131,7 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- ── Group 2: Dung lượng + Quan trọng ── -->
+                    <!-- ── グループ 2: サイズ + 重要 ── -->
                     <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource CardBackground}"
                             BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
                             Padding="{StaticResource PaddingStatCard}" Margin="0,0,8,0">
@@ -363,6 +368,7 @@
                     <Border Grid.Row="1" ClipToBounds="True">
                         <Panel>
                         <DataGrid Name="dgvDocuments"
+                                  AutomationProperties.AutomationId="Dashboard_DocumentGrid"
                                   AutoGenerateColumns="False"
                                   CanUserReorderColumns="True"
                                   CanUserResizeColumns="True"
@@ -375,65 +381,78 @@
                             <DataGrid.ContextMenu>
                                 <ContextMenu>
                                     <!-- Primary actions -->
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxOpenFile}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_OpenFile"
+                                              Header="{loc:Localize Dashboard_CtxOpenFile}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenFileCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconDocPage}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxEditDoc}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_EditDocument"
+                                              Header="{loc:Localize Dashboard_CtxEditDoc}"
                                               Command="{Binding $parent[DataGrid].DataContext.EditDocumentCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconEdit}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxChangeCategory}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_ChangeCategory"
+                                              Header="{loc:Localize Dashboard_CtxChangeCategory}"
                                               Command="{Binding $parent[DataGrid].DataContext.ChangeCategoryCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconCategory}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxDeleteToTrash}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_DeleteToTrash"
+                                              Header="{loc:Localize Dashboard_CtxDeleteToTrash}"
                                               Command="{Binding $parent[DataGrid].DataContext.DeleteDocumentCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconDelete}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
                                     <!-- Copy &amp; Open -->
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxCopyName}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_CopyName"
+                                              Header="{loc:Localize Dashboard_CtxCopyName}"
                                               Command="{Binding $parent[DataGrid].DataContext.CopyNameCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconClipboard}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxCopyPath}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_CopyPath"
+                                              Header="{loc:Localize Dashboard_CtxCopyPath}"
                                               Command="{Binding $parent[DataGrid].DataContext.CopyPathCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconExport}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxOpenFolder}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_OpenFolder"
+                                              Header="{loc:Localize Dashboard_CtxOpenFolder}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenFolderCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconOpenFile}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
                                     <!-- Quick-edit hidden fields -->
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxEditTags}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_EditTags"
+                                              Header="{loc:Localize Dashboard_CtxEditTags}"
                                               Command="{Binding $parent[DataGrid].DataContext.QuickEditTagsCommand}"
                                               ToolTip.Tip="{loc:Localize Dashboard_TipEditTags}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconTag}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxEditNotes}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_EditNotes"
+                                              Header="{loc:Localize Dashboard_CtxEditNotes}"
                                               Command="{Binding $parent[DataGrid].DataContext.QuickEditGhiChuCommand}"
                                               ToolTip.Tip="{loc:Localize Dashboard_TipEditNotes}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconNote}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
                                     <!-- Mark &amp; manage -->
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxMarkImportant}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_MarkImportant"
+                                              Header="{loc:Localize Dashboard_CtxMarkImportant}"
                                               Command="{Binding $parent[DataGrid].DataContext.ToggleImportantCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconStar}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxPersonalNote}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_PersonalNote"
+                                              Header="{loc:Localize Dashboard_CtxPersonalNote}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenPersonalNoteCommand}"
                                               ToolTip.Tip="{loc:Localize Dashboard_TipPersonalNote}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconBook}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxAddToCollection}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_AddToCollection"
+                                              Header="{loc:Localize Dashboard_CtxAddToCollection}"
                                               Command="{Binding $parent[DataGrid].DataContext.AddToCollectionCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconAdd}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
-                                    <MenuItem Header="{loc:Localize Dashboard_CtxRelatedDocs}"
+                                    <MenuItem AutomationProperties.AutomationId="Context_RelatedDocuments"
+                                              Header="{loc:Localize Dashboard_CtxRelatedDocs}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenRelatedDocumentsCommand}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconRelatedDocs}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
@@ -572,7 +591,7 @@
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Spacing="3"
                                                 IsVisible="{Binding SelectedDocument.Deadline, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <Image Source="{StaticResource IconClock}" Width="10" Height="10"/>
+                                        <Image Source="{StaticResource IconClock}" Width="14" Height="14"/>
                                         <TextBlock Text="{Binding SelectedDocument.Deadline, StringFormat={loc:Localize Dashboard_PreviewDeadline}}"
                                                    FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource DangerBrush}"/>
                                     </StackPanel>
@@ -597,59 +616,59 @@
                                        VerticalAlignment="Center"/>
 
                             <!-- Quick action buttons -->
-                            <Button Grid.Column="1" Classes="secondary" Padding="{StaticResource PaddingChip}"
+                            <Button Grid.Column="1" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
                                     Command="{Binding RefreshCommand}"
-                                    Margin="4,0" Height="24" VerticalAlignment="Center"
+                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipRefresh}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconRefresh}" Width="10" Height="10"/>
+                                    <Image Source="{StaticResource IconRefresh}" Width="12" Height="12"/>
                                     <TextBlock Text="{loc:Localize Dashboard_BtnRefresh}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="2" Classes="secondary" Padding="{StaticResource PaddingChip}"
+                            <Button Grid.Column="2" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
                                     Command="{Binding ShowUpcomingDeadlinesCommand}"
-                                    Margin="4,0" Height="24" VerticalAlignment="Center"
+                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipUpcoming}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconClock}" Width="10" Height="10"/>
+                                    <Image Source="{StaticResource IconClock}" Width="14" Height="14"/>
                                     <TextBlock Text="{loc:Localize Dashboard_BtnUpcoming}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="3" Classes="secondary" Padding="{StaticResource PaddingChip}"
+                            <Button Grid.Column="3" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
                                     Command="{Binding ShowOverdueCommand}"
-                                    Margin="4,0" Height="24" VerticalAlignment="Center"
+                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipOverdue}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconWarning}" Width="10" Height="10"/>
+                                    <Image Source="{StaticResource IconWarning}" Width="12" Height="12"/>
                                     <TextBlock Text="{loc:Localize Dashboard_BtnOverdue}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="StatusCopyPathButton" Grid.Column="4" Classes="secondary" Padding="{StaticResource PaddingChip}"
+                            <Button x:Name="StatusCopyPathButton" Grid.Column="4" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
                                     Command="{Binding CopyPathCommand}"
                                     IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                    Margin="4,0" Height="24" VerticalAlignment="Center"
+                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipCopyPath}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconClipboard}" Width="10" Height="10"/>
+                                    <Image Source="{StaticResource IconClipboard}" Width="12" Height="12"/>
                                     <TextBlock Text="{loc:Localize Dashboard_CtxCopyPath}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="StatusOpenFolderButton" Grid.Column="5" Classes="secondary" Padding="{StaticResource PaddingChip}"
+                            <Button x:Name="StatusOpenFolderButton" Grid.Column="5" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
                                     Command="{Binding OpenFolderCommand}"
                                     IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                    Margin="4,0" Height="24" VerticalAlignment="Center"
+                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipOpenFolder}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconCategory}" Width="10" Height="10"/>
+                                    <Image Source="{StaticResource IconCategory}" Width="12" Height="12"/>
                                     <TextBlock Text="{loc:Localize Dashboard_BtnOpenFolder}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="6" Classes="secondary" Padding="{StaticResource PaddingChip}"
+                            <Button Grid.Column="6" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
                                     Command="{Binding ShowAboutCommand}"
-                                    Margin="4,0" Height="24" VerticalAlignment="Center"
+                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipAbout}">
                                 <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconInfo}" Width="10" Height="10"/>
+                                    <Image Source="{StaticResource IconInfo}" Width="12" Height="12"/>
                                     <TextBlock Text="{loc:Localize Menu_About}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>

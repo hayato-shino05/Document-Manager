@@ -398,7 +398,7 @@
   <data name="SelectCollDialog_BtnAdd" xml:space="preserve">
     <value>Thêm</value>
   </data>
-  <data name="MainWindow_Title" xml:space="preserve"><value>Study Document Manager - Professional Edition</value></data>
+  <data name="MainWindow_Title" xml:space="preserve"><value>Document Manager - Professional Edition</value></data>
   <data name="AddEdit_PlaceholderTags" xml:space="preserve"><value>thẻ1, thẻ2, thẻ3...</value></data>
   <data name="AddDocDialog_Title" xml:space="preserve"><value>Thêm tài liệu</value></data>
   <data name="ChangeCategory_DocumentLabel" xml:space="preserve"><value>Tài liệu: "{0}"</value></data>
@@ -511,11 +511,11 @@
   <data name="Dashboard_RestoreError" xml:space="preserve"><value>Không thể khôi phục: {0}</value></data>
   <data name="Dashboard_NoCollections" xml:space="preserve"><value>Chưa có bộ sưu tập. Hãy tạo bộ sưu tập từ menu “Bộ sưu tập” trước.</value></data>
   <data name="Dashboard_AlreadyInCollection" xml:space="preserve"><value>Tài liệu này đã có trong bộ sưu tập “{0}”</value></data>
-  <data name="Dashboard_About" xml:space="preserve"><value>Study Document Manager v{0}&#xA;&#xA;Ứng dụng quản lý tài liệu học tập cá nhân&#xA;Framework: Avalonia UI (.NET 9)&#xA;Cơ sở dữ liệu: SQLite (cục bộ)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
+  <data name="Dashboard_About" xml:space="preserve"><value>Document Manager v{0}&#xA;&#xA;Ứng dụng quản lý tài liệu cá nhân&#xA;Framework: Avalonia UI (.NET 9)&#xA;Cơ sở dữ liệu: SQLite (cục bộ)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
   <data name="Main_UpdateTitle" xml:space="preserve"><value>Cập nhật</value></data>
   <data name="Main_CannotConnect" xml:space="preserve"><value>Không thể kết nối với máy chủ.&#xA;Vui lòng kiểm tra kết nối mạng.</value></data>
   <data name="Main_AlreadyLatest" xml:space="preserve"><value>Bạn đang dùng phiên bản mới nhất (v{0}).</value></data>
-  <data name="Main_About" xml:space="preserve"><value>Study Document Manager&#xA;Professional Edition&#xA;&#xA;Phiên bản {0}&#xA;&#xA;Ứng dụng quản lý tài liệu học tập&#xA;MVVM • Avalonia UI • .NET 9.0&#xA;&#xA;Thực hiện: Vũ Đức Dũng - TT601-K14&#xA;Hướng dẫn: Lê Thị Mai&#xA;&#xA;© 2024-2025 hayato-shino05&#xA;GitHub: hayato-shino05/study-document-manager</value></data>
+  <data name="Main_About" xml:space="preserve"><value>Document Manager v{0}&#xA;&#xA;Ứng dụng quản lý tài liệu cá nhân&#xA;Framework: Avalonia UI (.NET 9)&#xA;Cơ sở dữ liệu: SQLite (cục bộ)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
   <data name="SelectCollection_None" xml:space="preserve"><value>Chưa chọn bộ sưu tập</value></data>
   <data name="SelectCollection_Selected" xml:space="preserve"><value>Đang chọn: {0}</value></data>
   <data name="AddEdit_PageTitleAdd" xml:space="preserve"><value>Thêm tài liệu</value></data>
@@ -762,6 +762,9 @@
   <data name="AddEdit_LblNotes" xml:space="preserve"><value>Ghi chú:</value></data>
   <data name="AddEdit_LblTags" xml:space="preserve"><value>Thẻ:</value></data>
   <data name="AddEdit_LblDeadline" xml:space="preserve"><value>Hạn chót:</value></data>
+  <data name="AddEdit_DateYearFormat" xml:space="preserve"><value>yyyy</value></data>
+  <data name="AddEdit_DateMonthFormat" xml:space="preserve"><value>M</value></data>
+  <data name="AddEdit_DateDayFormat" xml:space="preserve"><value>d</value></data>
   <data name="AddEdit_LblImportant" xml:space="preserve"><value>Quan trọng</value></data>
   <data name="AddEdit_BtnBrowse" xml:space="preserve"><value>Duyệt</value></data>
   <data name="AddEdit_BtnSave" xml:space="preserve"><value>Lưu</value></data>
@@ -833,4 +836,18 @@
   <data name="Dashboard_DeadlineStatusUrgent" xml:space="preserve"><value>Hạn trong 3 ngày</value></data>
   <data name="Dashboard_DeadlineStatusUpcoming" xml:space="preserve"><value>Hạn trong 7 ngày</value></data>
   <data name="Dashboard_DeadlineStatusScheduled" xml:space="preserve"><value>Chưa đến hạn gần</value></data>
+  <data name="FileType_PDF" xml:space="preserve"><value>PDF</value></data>
+  <data name="FileType_Word" xml:space="preserve"><value>Word</value></data>
+  <data name="FileType_PowerPoint" xml:space="preserve"><value>PowerPoint</value></data>
+  <data name="FileType_Excel" xml:space="preserve"><value>Excel</value></data>
+  <data name="FileType_Document" xml:space="preserve"><value>Tài liệu</value></data>
+  <data name="FileType_Data" xml:space="preserve"><value>Dữ liệu</value></data>
+  <data name="FileType_Code" xml:space="preserve"><value>Mã nguồn</value></data>
+  <data name="FileType_Book" xml:space="preserve"><value>Sách</value></data>
+  <data name="FileType_Image" xml:space="preserve"><value>Hình ảnh</value></data>
+  <data name="FileType_Video" xml:space="preserve"><value>Video</value></data>
+  <data name="FileType_Audio" xml:space="preserve"><value>Âm thanh</value></data>
+  <data name="FileType_Archive" xml:space="preserve"><value>Lưu trữ</value></data>
+  <data name="FileType_Design" xml:space="preserve"><value>Thiết kế</value></data>
+  <data name="FileType_Other" xml:space="preserve"><value>Khác</value></data>
 </root>
