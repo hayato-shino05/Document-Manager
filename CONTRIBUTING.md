@@ -1,6 +1,6 @@
-# Study Document Manager への貢献
+# Document Manager への貢献
 
-Study Document Manager への貢献を歓迎します。このガイドでは、Avalonia と .NET 9 で構成された現在の開発フローを説明します。
+Document Manager への貢献を歓迎します。このガイドでは、Avalonia と .NET 9 で構成された現在の開発フローを説明します。
 
 ## 目次
 

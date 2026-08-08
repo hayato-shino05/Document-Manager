@@ -1,4 +1,4 @@
-# プロジェクト構成、Study Document Manager
+# プロジェクト構成、Document Manager
 
 この文書では、Avalonia と .NET 9 で構成された現在のコードベースを説明します。`old-version/` 以下の WinForms 実装は、過去の実装を参照するためだけに使用します。
 

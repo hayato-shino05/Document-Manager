@@ -1,6 +1,6 @@
 <div align="center">
 
-# Study Document Manager
+# Document Manager
 
 学習資料と業務文書をローカルで整理する Avalonia デスクトップアプリケーションです。
 
@@ -29,7 +29,7 @@
 
 ## 概要
 
-Study Document Manager は、ローカルの SQLite データベースを使って文書を整理するデスクトップアプリケーションです。検索、分類、期限管理、コレクション管理、レポート表示までを 1 つのアプリケーションで扱えます。
+Document Manager は、ローカルの SQLite データベースを使って文書を整理するデスクトップアプリケーションです。検索、分類、期限管理、コレクション管理、レポート表示までを 1 つのアプリケーションで扱えます。
 
 現在の実装は Avalonia 11.2.7 と .NET 9.0 をベースにしており、表示層は MVVM、データ永続化は `Microsoft.Data.Sqlite` を使っています。日本語を既定ロケールとし、言語設定は SQLite の `app_settings` に保存します。
 
