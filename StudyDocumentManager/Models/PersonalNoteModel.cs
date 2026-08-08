@@ -19,6 +19,9 @@ public partial class PersonalNoteModel : ModelBase
     [ObservableProperty] private string _noteContent = string.Empty;
     [ObservableProperty] private bool _hasExistingNote;
 
+    public bool CanSaveNote => !string.IsNullOrWhiteSpace(NoteContent);
+    public bool HasSavedNotePreview => HasExistingNote && !string.IsNullOrWhiteSpace(NoteContent);
+
     public PersonalNoteModel(IPersonalNoteRepository noteRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
         _noteRepo = noteRepo;
@@ -36,18 +39,41 @@ public partial class PersonalNoteModel : ModelBase
         HasExistingNote = note != null;
     }
 
+    partial void OnNoteContentChanged(string value)
+    {
+        OnPropertyChanged(nameof(CanSaveNote));
+        OnPropertyChanged(nameof(HasSavedNotePreview));
+    }
+
+    partial void OnHasExistingNoteChanged(bool value)
+        => OnPropertyChanged(nameof(HasSavedNotePreview));
+
     [RelayCommand]
     private async Task SaveNoteAsync()
     {
-        if (_noteRepo.SaveNote(DocumentId, NoteContent))
-        {
-            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Note_SaveSuccess"]);
-            HasExistingNote = true;
-        }
-        else
+        var content = NoteContent.Trim();
+        if (content.Length == 0)
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
+            return;
         }
+
+        NoteContent = content;
+        if (!_noteRepo.SaveNote(DocumentId, content))
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
+            return;
+        }
+
+        var persistedContent = _noteRepo.GetNote(DocumentId);
+        if (!string.Equals(persistedContent, content, StringComparison.Ordinal))
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
+            return;
+        }
+
+        HasExistingNote = true;
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Note_SaveSuccess"]);
     }
 
     [RelayCommand]
