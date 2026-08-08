@@ -66,7 +66,7 @@ public partial class ChangeCategoryDialog : Window
             : string.Format(_loc["ChangeCategory_DocumentLabel"], _documentName);
     }
 
-    // Được gọi từ AXAML ItemTemplate DataTemplate Click="OnChipClicked"
+    // AXAML の ItemTemplate から OnChipClicked を呼び出す
     private void OnChipClicked(object? sender, RoutedEventArgs e)
     {
         if (sender is Button { DataContext: string category })

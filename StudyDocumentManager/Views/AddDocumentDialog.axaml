@@ -2,11 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="using:StudyDocumentManager.Markup"
                 x:Class="StudyDocumentManager.Views.AddDocumentDialog"
+        AutomationProperties.AutomationId="Dialog_AddDocument"
         Title="{loc:Localize AddDocDialog_Title}"
         Width="520" Height="480"
         MinWidth="450" MinHeight="400"
         WindowStartupLocation="CenterOwner"
-        CanResize="False"
+        CanResize="True"
         Background="{StaticResource ContentBackground}">
 
     <Border Padding="{StaticResource PaddingPage}">
@@ -21,8 +22,11 @@
 
             <Border DockPanel.Dock="Top" Classes="info-banner">
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Image Source="{StaticResource IconOpenFile}" Width="13" Height="13"/>
-                    <TextBlock Name="txtFilePath" FontSize="{StaticResource FontSizeSm}"
+                    <Image Source="{StaticResource IconOpenFile}" Width="16" Height="16"/>
+                    <TextBlock Name="txtFilePath"
+                               AutomationProperties.AutomationId="Dialog_AddDocument_FilePath"
+                               AutomationProperties.Name="{loc:Localize AddEdit_LblFilePath}"
+                               FontSize="{StaticResource FontSizeSm}"
                                Foreground="{StaticResource TextSecondary}"
                                TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
@@ -31,30 +35,42 @@
 
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="10"
                         HorizontalAlignment="Right" Margin="0,16,0,0">
-                <Button Classes="primary" Name="btnSave" Click="OnSaveClick" Padding="20,8"
+                <Button Classes="primary" Name="btnSave"
+                        AutomationProperties.AutomationId="Dialog_AddDocument_Save"
+                        AutomationProperties.Name="{loc:Localize AddEdit_BtnSave}"
+                        Click="OnSaveClick" Padding="20,8"
                         IsDefault="True">
                     <StackPanel Orientation="Horizontal" Spacing="5">
-                        <Image Source="{StaticResource IconCheck}" Width="13" Height="13"/>
+                        <Image Source="{StaticResource IconCheck}" Width="16" Height="16"/>
                         <TextBlock Text="{loc:Localize AddEdit_BtnSave}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
                     </StackPanel>
                 </Button>
-                <Button Classes="secondary" Name="btnCancel" Click="OnCancelClick" Padding="20,8"
+                <Button Classes="secondary" Name="btnCancel"
+                        AutomationProperties.AutomationId="Dialog_AddDocument_Cancel"
+                        AutomationProperties.Name="{loc:Localize AddEdit_BtnCancel}"
+                        Click="OnCancelClick" Padding="20,8"
                         IsCancel="True">
                     <StackPanel Orientation="Horizontal" Spacing="5">
-                        <Image Source="{StaticResource IconClose}" Width="10" Height="10"/>
+                        <Image Source="{StaticResource IconClose}" Width="14" Height="14"/>
                         <TextBlock Text="{loc:Localize AddEdit_BtnCancel}" FontSize="{StaticResource FontSizeMd}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
 
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto">
                 <StackPanel Spacing="10">
 
                     <StackPanel Spacing="3">
                         <TextBlock Text="{loc:Localize AddEdit_LblName}" Classes="field-label"/>
-                        <TextBox Name="txtTen" FontSize="{StaticResource FontSizeMd}"/>
+                        <TextBox Name="txtTen"
+                                 AutomationProperties.AutomationId="Dialog_AddDocument_Name"
+                                 AutomationProperties.Name="{loc:Localize AddEdit_LblName}"
+                                 FontSize="{StaticResource FontSizeMd}"/>
                         <TextBlock Name="txtNameError"
+                                   AutomationProperties.AutomationId="Dialog_AddDocument_NameError"
+                                   AutomationProperties.LiveSetting="Polite"
                                    IsVisible="False"
                                    Foreground="{StaticResource DangerBrush}"
                                    FontSize="{StaticResource FontSizeSm}"/>
@@ -65,6 +81,8 @@
                         <StackPanel Spacing="3">
                             <TextBlock Text="{loc:Localize AddEdit_LblSubject}" Classes="field-label"/>
                             <ComboBox Name="cboMonHoc"
+                                      AutomationProperties.AutomationId="Dialog_AddDocument_Subject"
+                                      AutomationProperties.Name="{loc:Localize AddEdit_LblSubject}"
                                       IsTextSearchEnabled="True"
                                       FontSize="{StaticResource FontSizeMd}"
                                       HorizontalAlignment="Stretch"/>
@@ -72,6 +90,8 @@
                         <StackPanel Grid.Column="2" Spacing="3">
                             <TextBlock Text="{loc:Localize AddEdit_LblType}" Classes="field-label"/>
                             <ComboBox Name="cboLoai"
+                                      AutomationProperties.AutomationId="Dialog_AddDocument_Type"
+                                      AutomationProperties.Name="{loc:Localize AddEdit_LblType}"
                                       IsTextSearchEnabled="True"
                                       FontSize="{StaticResource FontSizeMd}"
                                       HorizontalAlignment="Stretch"/>
@@ -82,29 +102,44 @@
                     <Grid ColumnDefinitions="*,12,*">
                         <StackPanel Spacing="3">
                             <TextBlock Text="{loc:Localize AddEdit_LblAuthor}" Classes="field-label"/>
-                            <TextBox Name="txtTacGia" FontSize="{StaticResource FontSizeMd}"/>
+                            <TextBox Name="txtTacGia"
+                                 AutomationProperties.AutomationId="Dialog_AddDocument_Author"
+                                 AutomationProperties.Name="{loc:Localize AddEdit_LblAuthor}"
+                                 FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Spacing="3">
                             <TextBlock Text="{loc:Localize AddEdit_LblTags}" Classes="field-label"/>
-                            <TextBox Name="txtTags" Watermark="{loc:Localize AddEdit_PlaceholderTags}" FontSize="{StaticResource FontSizeMd}"/>
+                            <TextBox Name="txtTags"
+                                 AutomationProperties.AutomationId="Dialog_AddDocument_Tags"
+                                 AutomationProperties.Name="{loc:Localize AddEdit_LblTags}"
+                                 Watermark="{loc:Localize AddEdit_PlaceholderTags}" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Grid>
 
 
                     <StackPanel Spacing="3">
                         <TextBlock Text="{loc:Localize AddEdit_LblNotes}" Classes="field-label"/>
-                        <TextBox Name="txtGhiChu" FontSize="{StaticResource FontSizeMd}"
+                        <TextBox Name="txtGhiChu"
+                                 AutomationProperties.AutomationId="Dialog_AddDocument_Notes"
+                                 AutomationProperties.Name="{loc:Localize AddEdit_LblNotes}"
+                                 FontSize="{StaticResource FontSizeMd}"
                                  AcceptsReturn="True" TextWrapping="Wrap" Height="60"/>
                     </StackPanel>
 
 
                     <Grid ColumnDefinitions="Auto,*,Auto,Auto">
-                        <CheckBox Name="chkQuanTrong" Content="{loc:Localize AddEdit_LblImportant}" FontSize="{StaticResource FontSizeMd}"
+                        <CheckBox Name="chkQuanTrong"
+                                  AutomationProperties.AutomationId="Dialog_AddDocument_Important"
+                                  AutomationProperties.Name="{loc:Localize AddEdit_LblImportant}"
+                                  Content="{loc:Localize AddEdit_LblImportant}" FontSize="{StaticResource FontSizeMd}"
                                   VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="2" Text="{loc:Localize AddEdit_LblDeadline}" FontSize="{StaticResource FontSizeSm}"
                                    VerticalAlignment="Center" Margin="0,0,6,0"
                                    Foreground="{StaticResource TextSecondary}"/>
-                        <DatePicker Grid.Column="3" Name="dpDeadline" FontSize="{StaticResource FontSizeMd}"/>
+                        <DatePicker Grid.Column="3" Name="dpDeadline"
+                                    AutomationProperties.AutomationId="Dialog_AddDocument_Deadline"
+                                    AutomationProperties.Name="{loc:Localize AddEdit_LblDeadline}"
+                                    FontSize="{StaticResource FontSizeMd}"/>
                     </Grid>
                 </StackPanel>
             </ScrollViewer>

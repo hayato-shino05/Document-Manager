@@ -2,14 +2,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="using:StudyDocumentManager.Markup"
                 x:Class="StudyDocumentManager.Views.SelectCollectionDialog"
+        AutomationProperties.AutomationId="Dialog_SelectCollection"
         Title="{loc:Localize SelectCollDialog_Title}"
         Width="440" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
-        CanResize="False"
+        CanResize="True"
         ShowInTaskbar="False"
         Background="{StaticResource ContentBackground}">
 
-    <StackPanel Margin="24" Spacing="12">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24" Spacing="12">
 
         <!-- Document name label -->
         <TextBlock x:Name="DocNameLabel"
@@ -24,6 +26,8 @@
 
             <!-- Empty state -->
             <TextBlock x:Name="EmptyStateText"
+                       AutomationProperties.AutomationId="SelectCollection_EmptyState"
+                       AutomationProperties.LiveSetting="Polite"
                        Text="{loc:Localize SelectCollDialog_EmptyState}"
                        FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
                        IsVisible="False" TextWrapping="Wrap"/>
@@ -38,6 +42,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Button Classes="chip"
+                                AutomationProperties.Name="{Binding Label}"
                                 Margin="0,0,6,6"
                                 Tag="{Binding Id}"
                                 Click="OnChipClicked">
@@ -50,6 +55,8 @@
 
         <!-- Selected indicator -->
         <TextBlock x:Name="SelectedLabel"
+                   AutomationProperties.AutomationId="SelectCollection_Selected"
+                   AutomationProperties.LiveSetting="Polite"
                    FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
                    Text="{loc:Localize SelectCollDialog_NoneSelected}"/>
 
@@ -58,6 +65,8 @@
                     HorizontalAlignment="Right"
                     Spacing="8" Margin="0,8,0,0">
             <Button x:Name="OkButton"
+                    AutomationProperties.AutomationId="SelectCollection_Confirm"
+                    AutomationProperties.Name="{loc:Localize SelectCollDialog_BtnAdd}"
                     Content="{loc:Localize SelectCollDialog_BtnAdd}"
                     Classes="primary"
                     IsDefault="True"
@@ -65,11 +74,14 @@
                     MinWidth="100"
                     HorizontalContentAlignment="Center"/>
             <Button x:Name="CancelButton"
+                    AutomationProperties.AutomationId="SelectCollection_Cancel"
+                    AutomationProperties.Name="{loc:Localize Action_Cancel}"
                     Content="{loc:Localize Action_Cancel}"
                     Classes="secondary"
                     IsCancel="True"
                     MinWidth="80"
                     HorizontalContentAlignment="Center"/>
         </StackPanel>
-    </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
 </Window>

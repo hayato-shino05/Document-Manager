@@ -3,13 +3,16 @@
              xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:loc="using:StudyDocumentManager.Markup"
                      x:Class="StudyDocumentManager.Views.BatchImport"
-             x:DataType="vm:BatchImportModel">
+             x:DataType="vm:BatchImportModel"
+             AutomationProperties.AutomationId="Screen_BatchImport">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
         <DockPanel>
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,12">
                 <Image Source="{StaticResource IconImport}" Width="18" Height="18"/>
-                <TextBlock Text="{loc:Localize BatchImport_Title}" FontSize="{StaticResource FontSizeXl}"
+                <TextBlock Text="{loc:Localize BatchImport_Title}"
+                           AutomationProperties.AutomationId="Screen_BatchImport"
+                           FontSize="{StaticResource FontSizeXl}"
                            FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
             </StackPanel>
 
@@ -22,37 +25,49 @@
                                    Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"
                                    Margin="0,0,8,0"/>
                         <Button DockPanel.Dock="Right" Classes="secondary"
+                                AutomationProperties.AutomationId="BatchImport_BrowseFolder"
+                                AutomationProperties.Name="{loc:Localize BatchImport_BtnBrowse}"
                                 Command="{Binding BrowseFolderCommand}" Padding="{StaticResource PaddingBtnMd}" Margin="6,0,0,0">
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="{StaticResource IconCategory}" Width="11" Height="11"/>
+                                <Image Source="{StaticResource IconCategory}" Width="14" Height="14"/>
                                 <TextBlock Text="{loc:Localize BatchImport_BtnBrowse}" FontSize="{StaticResource FontSizeSm}"/>
                             </StackPanel>
                         </Button>
                         <Button DockPanel.Dock="Right" Classes="primary"
+                                AutomationProperties.AutomationId="BatchImport_ScanFolder"
+                                AutomationProperties.Name="{loc:Localize BatchImport_BtnScan}"
                                 Command="{Binding ScanFolderCommand}" Padding="{StaticResource PaddingBtnMd}" Margin="6,0,0,0">
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="{StaticResource IconScan}" Width="11" Height="11"/>
+                                <Image Source="{StaticResource IconScanWhite}" Width="16" Height="16"/>
                                 <TextBlock Text="{loc:Localize BatchImport_BtnScan}" FontSize="{StaticResource FontSizeSm}"/>
                             </StackPanel>
                         </Button>
-                        <TextBox Text="{Binding FolderPath, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                        <TextBox AutomationProperties.AutomationId="BatchImport_FolderPath"
+                                 AutomationProperties.Name="{loc:Localize BatchImport_LblFolder}"
+                                 Text="{Binding FolderPath, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
                                  Height="30"/>
                     </DockPanel>
                     <DockPanel>
                         <TextBlock Text="{loc:Localize BatchImport_LblDefaultSubject}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
                                    Foreground="{StaticResource TextPrimary}" Margin="0,0,8,0"/>
-                        <TextBox Text="{Binding DefaultSubject, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
+                        <TextBox AutomationProperties.AutomationId="BatchImport_DefaultSubject"
+                                 AutomationProperties.Name="{loc:Localize BatchImport_LblDefaultSubject}"
+                                 Text="{Binding DefaultSubject, Mode=TwoWay}" FontSize="{StaticResource FontSizeMd}"
                                  Height="30" Width="250" HorizontalAlignment="Left"/>
                     </DockPanel>
                 </StackPanel>
             </Border>
 
             <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,12">
-                <TextBlock Text="{Binding ImportStatusMessage}"
+                <TextBlock AutomationProperties.AutomationId="BatchImport_Status"
+                           AutomationProperties.LiveSetting="Polite"
+                           Text="{Binding ImportStatusMessage}"
                            IsVisible="{Binding ImportStatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                            FontSize="{StaticResource FontSizeSm}"
                            Foreground="{StaticResource TextSecondary}"/>
-                <TextBlock Text="{Binding ImportErrorMessage}"
+                <TextBlock AutomationProperties.AutomationId="BatchImport_Error"
+                           AutomationProperties.LiveSetting="Polite"
+                           Text="{Binding ImportErrorMessage}"
                            IsVisible="{Binding ImportErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                            FontSize="{StaticResource FontSizeSm}"
                            Foreground="{StaticResource DangerBrush}"/>
@@ -60,26 +75,34 @@
 
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8"
                         HorizontalAlignment="Right" Margin="0,12,0,0">
-                <Button Classes="secondary" Command="{Binding SelectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <Image Source="{StaticResource IconCheck}" Width="11" Height="11"/>
-                        <TextBlock Text="{loc:Localize Bulk_BtnSelectAll}" FontSize="{StaticResource FontSizeSm}"/>
+                <Button Classes="secondary" AutomationProperties.AutomationId="BatchImport_SelectAll"
+                        AutomationProperties.Name="{loc:Localize Bulk_BtnSelectAll}"
+                        Command="{Binding SelectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
+                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <Image Source="{StaticResource IconCheckNeutral}" Width="14" Height="14" VerticalAlignment="Center"/>
+                        <TextBlock Text="{loc:Localize Bulk_BtnSelectAll}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
-                <Button Classes="secondary" Command="{Binding DeselectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
+                <Button Classes="secondary" AutomationProperties.AutomationId="BatchImport_DeselectAll"
+                        AutomationProperties.Name="{loc:Localize Bulk_BtnDeselectAll}"
+                        Command="{Binding DeselectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
-                        <Image Source="{StaticResource IconClose}" Width="11" Height="11"/>
+                        <Image Source="{StaticResource IconClose}" Width="14" Height="14"/>
                         <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{StaticResource FontSizeSm}"/>
                     </StackPanel>
                 </Button>
-                <Button Classes="primary" Command="{Binding ImportCommand}" Padding="{StaticResource PaddingBtnLg}"
+                <Button Classes="primary" AutomationProperties.AutomationId="BatchImport_Import"
+                        AutomationProperties.Name="{loc:Localize BatchImport_BtnImport}"
+                        Command="{Binding ImportCommand}" Padding="{StaticResource PaddingBtnLg}"
                         IsEnabled="{Binding !IsImporting}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
-                        <Image Source="{StaticResource IconImport}" Width="13" Height="13"/>
+                        <Image Source="{StaticResource IconImportWhite}" Width="16" Height="16"/>
                         <TextBlock Text="{loc:Localize BatchImport_BtnImport}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
                     </StackPanel>
                 </Button>
-                <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="{StaticResource PaddingMd}">
+                <Button Classes="secondary" AutomationProperties.AutomationId="BatchImport_Cancel"
+                        AutomationProperties.Name="{loc:Localize AddEdit_BtnCancel}"
+                        Command="{Binding CancelCommand}" Padding="{StaticResource PaddingMd}">
                     <TextBlock Text="{loc:Localize AddEdit_BtnCancel}" FontSize="{StaticResource FontSizeMd}"/>
                 </Button>
             </StackPanel>
@@ -87,7 +110,9 @@
             <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
                     BorderBrush="{StaticResource CardBorder}" BorderThickness="1" ClipToBounds="True">
                 <Panel>
-                    <DataGrid ItemsSource="{Binding Files}"
+                    <DataGrid AutomationProperties.AutomationId="BatchImport_FileGrid"
+                              AutomationProperties.Name="{loc:Localize BatchImport_ColFileName}"
+                              ItemsSource="{Binding Files}"
                               AutoGenerateColumns="False"
                               CanUserSortColumns="True"
                               GridLinesVisibility="Horizontal" HeadersVisibility="Column">

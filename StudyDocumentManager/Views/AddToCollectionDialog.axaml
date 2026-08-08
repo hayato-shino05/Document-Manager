@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="using:StudyDocumentManager.Markup"
                 x:Class="StudyDocumentManager.Views.AddToCollectionDialog"
+        AutomationProperties.AutomationId="Dialog_AddToCollection"
         Title="{loc:Localize AddToCollection_Title}"
         Width="680" Height="520"
         MinWidth="560" MinHeight="400"
@@ -16,10 +17,14 @@
                 BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
                 Padding="{StaticResource PaddingCard}">
             <StackPanel Spacing="2">
-                <TextBlock x:Name="TitleLabel" Text="{loc:Localize AddToCollection_Title}"
+                <TextBlock x:Name="TitleLabel"
+                           AutomationProperties.AutomationId="AddToCollection_Title"
+                           Text="{loc:Localize AddToCollection_Title}"
                            FontSize="{StaticResource FontSizeXl}" FontWeight="SemiBold"
                            Foreground="{StaticResource TextPrimary}"/>
-                <TextBlock x:Name="SubtitleLabel" Text="{loc:Localize AddToCollection_Subtitle}"
+                <TextBlock x:Name="SubtitleLabel"
+                           AutomationProperties.LiveSetting="Polite"
+                           Text="{loc:Localize AddToCollection_Subtitle}"
                            FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"/>
             </StackPanel>
         </Border>
@@ -29,6 +34,8 @@
                 BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1">
             <Grid ColumnDefinitions="*,Auto,Auto">
                 <TextBox x:Name="SearchBox" Grid.Column="0"
+                         AutomationProperties.AutomationId="AddToCollection_Search"
+                         AutomationProperties.Name="{loc:Localize AddToCollection_SearchPlaceholder}"
                          Watermark="{loc:Localize AddToCollection_SearchPlaceholder}"
                          Height="30" VerticalContentAlignment="Center"
                          Padding="12,4,10,4"
@@ -41,10 +48,14 @@
                     </TextBox.InnerLeftContent>
                 </TextBox>
                 <TextBlock x:Name="CountLabel" Grid.Column="1"
+                           AutomationProperties.AutomationId="AddToCollection_Count"
+                           AutomationProperties.LiveSetting="Polite"
                            VerticalAlignment="Center" Margin="10,0,4,0"
                            FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
                            Text="0"/>
                 <Button x:Name="SelectAllBtn" Grid.Column="2"
+                        AutomationProperties.AutomationId="AddToCollection_SelectAll"
+                        AutomationProperties.Name="{loc:Localize Bulk_BtnSelectAll}"
                         Content="{loc:Localize Bulk_BtnSelectAll}" FontSize="{StaticResource FontSizeSm}"
                         Padding="{StaticResource PaddingChip}" VerticalAlignment="Center"
                         Classes="secondary" Margin="4,0,0,0"/>
@@ -62,6 +73,8 @@
                         Padding="{StaticResource PaddingMd}">
                     <Grid ColumnDefinitions="32,*,130,80">
                         <CheckBox x:Name="HeaderCheckBox" Grid.Column="0"
+                                  AutomationProperties.AutomationId="AddToCollection_HeaderSelection"
+                                  AutomationProperties.Name="{loc:Localize Bulk_BtnSelectAll}"
                                   VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="1" Text="{loc:Localize AddEdit_LblName}"
                                    FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
@@ -80,6 +93,8 @@
 
 
                 <ListBox x:Name="DocumentList" Grid.Row="1"
+                         AutomationProperties.AutomationId="AddToCollection_DocumentList"
+                         AutomationProperties.Name="{loc:Localize AddEdit_LblName}"
                          Background="Transparent"
                          SelectionMode="Single"
                          Padding="0"
@@ -103,6 +118,7 @@
                                     BorderThickness="0,0,0,1" Padding="{StaticResource PaddingNavItem}">
                                 <Grid ColumnDefinitions="32,*,130,80">
                                     <CheckBox Grid.Column="0"
+                                              AutomationProperties.Name="{Binding Document.Name}"
                                               IsChecked="{Binding IsSelected}"
                                               VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
@@ -152,7 +168,10 @@
                                VerticalAlignment="Center"/>
                     <Border Background="{StaticResource AccentBrush}" CornerRadius="{StaticResource RadiusPill}"
                             Padding="{StaticResource PaddingBadgeMd}" MinWidth="22">
-                        <TextBlock x:Name="SelectedCountBadge" Text="0"
+                        <TextBlock x:Name="SelectedCountBadge"
+                                   AutomationProperties.AutomationId="AddToCollection_SelectedCount"
+                                   AutomationProperties.LiveSetting="Polite"
+                                   Text="0"
                                    FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
                                    Foreground="White"
                                    HorizontalAlignment="Center"/>
@@ -165,10 +184,16 @@
   
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
                             HorizontalAlignment="Right">
-                    <Button x:Name="ConfirmButton" Content="{loc:Localize AddToCollection_BtnAdd}"
+                    <Button x:Name="ConfirmButton"
+                            AutomationProperties.AutomationId="AddToCollection_Confirm"
+                            AutomationProperties.Name="{loc:Localize AddToCollection_BtnAdd}"
+                            Content="{loc:Localize AddToCollection_BtnAdd}"
                             Classes="primary" Padding="{StaticResource PaddingBtnLg}" FontSize="{StaticResource FontSizeMd}"
                             IsDefault="True" IsEnabled="False"/>
-                    <Button x:Name="CancelButton" Content="{loc:Localize AddEdit_BtnCancel}"
+                    <Button x:Name="CancelButton"
+                            AutomationProperties.AutomationId="AddToCollection_Cancel"
+                            AutomationProperties.Name="{loc:Localize AddEdit_BtnCancel}"
+                            Content="{loc:Localize AddEdit_BtnCancel}"
                             Classes="secondary" Padding="{StaticResource PaddingBtnLg}" FontSize="{StaticResource FontSizeMd}"
                             IsCancel="True"/>
                 </StackPanel>
