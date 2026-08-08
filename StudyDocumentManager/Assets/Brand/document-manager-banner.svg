@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Document Manager</title>
+  <desc id="desc">Japanese-inspired Document Manager banner with Japanese messaging about organizing personal documents.</desc>
+  <rect width="1600" height="900" fill="#FFFDF7"/>
+  <path d="M0 0h1600v900H0z" fill="#FFFDF7"/>
+  <g fill="none" stroke="#E8C86A" stroke-width="4" opacity=".55">
+    <path d="M0 104c54-72 108-72 162 0s108 72 162 0 108-72 162 0 108 72 162 0"/>
+    <path d="M0 132c54-72 108-72 162 0s108 72 162 0 108-72 162 0 108 72 162 0"/>
+    <path d="M1084 784c76-48 152-48 228 0s152 48 228 0 152-48 228 0"/>
+    <path d="M1122 816c76-48 152-48 228 0s152 48 228 0"/>
+  </g>
+  <g fill="#C93B32" opacity=".9">
+    <circle cx="1390" cy="188" r="62"/>
+    <circle cx="1474" cy="246" r="18"/>
+    <circle cx="1320" cy="248" r="14"/>
+  </g>
+  <path d="M1280 188h220M1390 78v220" stroke="#FFFDF7" stroke-width="5" opacity=".65"/>
+  <rect x="132" y="212" width="1336" height="476" rx="28" fill="#F7F0E2" stroke="#E5D6BA" stroke-width="3"/>
+  <image x="230" y="298" width="760" height="190" preserveAspectRatio="xMidYMid meet" href="document-manager-logo.svg" xlink:href="document-manager-logo.svg"/>
+  <g text-anchor="middle" fill="#172B55" font-family="Harano Aji Gothic, Yu Gothic, sans-serif">
+    <text x="800" y="548" font-size="38" font-weight="700">文書を整理し、必要な情報へすばやくアクセス</text>
+    <text x="800" y="610" font-size="34" font-weight="400" letter-spacing="2">個人の文書を、シンプルに管理</text>
+  </g>
+  <rect x="650" y="642" width="300" height="6" rx="3" fill="#C93B32"/>
+  <circle cx="635" cy="645" r="6" fill="#B8963E"/>
+  <circle cx="965" cy="645" r="6" fill="#B8963E"/>
+</svg>

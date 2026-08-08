@@ -1,7 +1,7 @@
-; Inno Setup Script for Study Document Manager v3.1.2
+; Document Manager v4.0.0 用 Inno Setup スクリプト
 
-#define MyAppName "Study Document Manager"
-#define MyAppVersion "3.1.2"
+#define MyAppName "Document Manager"
+#define MyAppVersion "4.0.0"
 #define MyAppPublisher "hayato-shino05"
 #define MyAppURL "https://github.com/hayato-shino05/study-document-manager"
 #define MyAppExeName "study-document-manager.exe"
@@ -20,7 +20,7 @@ DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile=LICENSE
 OutputDir=installer
-OutputBaseFilename=StudyDocumentManager_v{#MyAppVersion}_Setup
+OutputBaseFilename=DocumentManager_v{#MyAppVersion}_Setup
 SetupIconFile=study-document-manager\assets\logo\logo.ico
 Compression=lzma
 SolidCompression=yes
