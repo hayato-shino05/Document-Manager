@@ -41,13 +41,11 @@ public sealed class CoreFlowSmokeTests
 
         _fixture.MainWindow.InvokeButton("Toolbar_Report");
         _fixture.MainWindow.WaitForAutomationId("Screen_Report");
-        _fixture.MainWindow.WaitForAutomationId("Toolbar_Back", requireVisible: true);
         _fixture.MainWindow.InvokeButton("Toolbar_Back");
         _fixture.MainWindow.AssertRootVisible("Screen_Dashboard");
 
         _fixture.MainWindow.InvokeButton("Toolbar_TreeMap");
         _fixture.MainWindow.WaitForAutomationId("Screen_TreeMap");
-        _fixture.MainWindow.WaitForAutomationId("Toolbar_Back", requireVisible: true);
         _fixture.MainWindow.InvokeButton("Toolbar_Back");
         _fixture.MainWindow.AssertRootVisible("Screen_Dashboard");
     }

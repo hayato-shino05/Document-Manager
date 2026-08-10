@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  SOLUTION_FILE: StudyDocumentManager.sln
+  BUILD_CONFIGURATION: Release
+
+jobs:
+  windows-setup:
+    name: Build Windows setup
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_FILE }}
+
+      - name: Run headless tests
+        run: dotnet test StudyDocumentManager.Tests/StudyDocumentManager.Tests.csproj -c ${{ env.BUILD_CONFIGURATION }} --no-restore
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build setup artifact
+        shell: pwsh
+        run: |
+          $version = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME.TrimStart('v') } else { '' }
+          .\scripts\build-windows-setup.ps1 -Version $version -Configuration $env:BUILD_CONFIGURATION
+
+      - name: Upload setup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-setup-${{ github.run_id }}
+          path: artifacts/installer/*.exe
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Publish GitHub Release asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $setup = Get-ChildItem artifacts/installer/*.exe | Select-Object -First 1
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag $setup.FullName --title $tag --notes "Windows setup build for $tag"
+          }
+          else {
+            gh release upload $tag $setup.FullName --clobber
+          }

@@ -24,7 +24,7 @@ public sealed class DesktopAppFixture : IDisposable
         try
         {
             SeedDatabase(PublishFolder);
-            App = Application.Launch(Path.Combine(PublishFolder, "StudyDocumentManager.exe"));
+            App = Application.Launch(Path.Combine(PublishFolder, "DocumentManager.exe"));
             _processId = App.ProcessId;
             _automation = new UIA3Automation();
             Window = WaitUntil(
@@ -89,7 +89,7 @@ public sealed class DesktopAppFixture : IDisposable
         if (string.IsNullOrWhiteSpace(configured))
         {
             throw new InvalidOperationException(
-                "SDM_DESKTOP_SMOKE_APP に StudyDocumentManager の publish folder を指定してください。通常の bin フォルダーは使用できません。");
+                "SDM_DESKTOP_SMOKE_APP に DocumentManager の publish folder を指定してください。通常の bin フォルダーは使用できません。");
         }
 
         var folder = Path.GetFullPath(configured.Trim());
@@ -104,19 +104,22 @@ public sealed class DesktopAppFixture : IDisposable
                 $"SDM_DESKTOP_SMOKE_APP は publish folder を指定してください。working tree の bin フォルダーは使用できません: {folder}");
         }
 
-        var executable = Path.Combine(folder, "StudyDocumentManager.exe");
+        var executable = Path.Combine(folder, "DocumentManager.exe");
         if (!File.Exists(executable))
-            throw new InvalidOperationException($"publish folder に StudyDocumentManager.exe がありません: {folder}");
+            throw new InvalidOperationException($"publish folder に DocumentManager.exe がありません: {folder}");
 
         return folder;
     }
 
     private static string CreateIsolatedPublishFolder(string sourceFolder)
+{
+    var destination = Path.Combine(
+        Path.GetTempPath(),
+        "StudyDocumentManager.DesktopSmokeTests",
+        Guid.NewGuid().ToString("N"));
+
+    try
     {
-        var destination = Path.Combine(
-            Path.GetTempPath(),
-            "StudyDocumentManager.DesktopSmokeTests",
-            Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(destination);
 
         foreach (var directory in Directory.GetDirectories(sourceFolder, "*", SearchOption.AllDirectories))
@@ -133,6 +136,20 @@ public sealed class DesktopAppFixture : IDisposable
 
         return destination;
     }
+    catch (Exception copyError)
+    {
+        try
+        {
+            DeleteDirectory(destination);
+        }
+        catch (Exception cleanupError)
+        {
+            throw new AggregateException(copyError, cleanupError);
+        }
+
+        throw;
+    }
+}
 
     private static void SeedDatabase(string publishFolder)
     {

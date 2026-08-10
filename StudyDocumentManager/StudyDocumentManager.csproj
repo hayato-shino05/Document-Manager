@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <ApplicationIcon>Assets\Brand\document-manager.ico</ApplicationIcon>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -10,7 +11,7 @@
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <RootNamespace>StudyDocumentManager</RootNamespace>
-    <AssemblyName>StudyDocumentManager</AssemblyName>
+    <AssemblyName>DocumentManager</AssemblyName>
     <NeutralResourcesLanguage>ja</NeutralResourcesLanguage>
   </PropertyGroup>
 
