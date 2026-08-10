@@ -19,5 +19,18 @@
 <g fill="#172b55" font-family="Yu Gothic, Hiragino Kaku Gothic ProN, sans-serif"><text x="118" y="120" font-size="24" letter-spacing="8">DOCUMENT WORKSPACE</text><text x="118" y="545" font-size="44" font-weight="700">文書を整理し、必要な情報へ</text><text x="118" y="610" font-size="44" font-weight="700">すばやくアクセス</text><text x="120" y="680" font-size="34" letter-spacing="3">個人の文書を、シンプルに管理</text></g>
 <rect x="118" y="724" width="310" height="7" rx="4" fill="#c93b32"/><circle cx="102" cy="727" r="7" fill="#b8963e"/><circle cx="445" cy="727" r="7" fill="#b8963e"/>
 <rect x="118" y="185" width="690" height="225" rx="18" fill="#f7f0e2" stroke="#e5d6ba" stroke-width="3"/>
-<image x="175" y="235" width="575" height="145" preserveAspectRatio="xMidYMid meet" href="document-manager-logo.svg"/>
+<g transform="translate(175 235) scale(.7566)">
+  <g transform="translate(4 4) scale(.7)">
+    <path d="M24 76c0-12 10-22 22-22h57l19 21h88c12 0 22 10 22 22v91c0 12-10 22-22 22H46c-12 0-22-10-22-22z" fill="#172B55"/>
+    <path d="M24 88h208v100c0 12-10 22-22 22H46c-12 0-22-10-22-22z" fill="#243D70"/>
+    <path d="M70 48h82l32 32v112H70z" fill="#FFFDF7" stroke="#B8963E" stroke-width="6"/>
+    <path d="M152 48v35h32" fill="none" stroke="#B8963E" stroke-width="6"/>
+    <path d="M92 112h70M92 132h70M92 152h48" stroke="#172B55" stroke-width="8" stroke-linecap="round"/>
+    <rect x="169" y="139" width="54" height="54" rx="12" fill="#C93B32"/>
+    <path d="M184 154h24M184 166h24M184 178h14" stroke="#FFFDF7" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="205" y="102" fill="#172B55" font-family="Harano Aji Gothic, Yu Gothic, sans-serif" font-size="48" font-weight="700">Document</text>
+  <text x="205" y="153" fill="#C93B32" font-family="Harano Aji Gothic, Yu Gothic, sans-serif" font-size="48" font-weight="700">Manager</text>
+  <rect x="208" y="166" width="172" height="4" rx="2" fill="#B8963E"/>
+</g>
 </svg>
