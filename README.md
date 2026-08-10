@@ -83,7 +83,22 @@ dotnet build "StudyDocumentManager.sln" -c Debug
 dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c Debug
 ```
 
-現行のテストスイートは xUnit ベースで、795 件のテストを含みます。データベース、repository、model/service の自動検証を行います。CI はビルドとアーティファクト生成を実行しますが、テスト実行はローカル確認に委ねています。Dashboard の deferred lifecycle、drag/drop の event bridge、native dialog、restore 後の再オープンなど、デスクトップ実行が必要な項目は手動確認の対象です。
+現行のテストスイートは xUnit ベースで、871 件のテストを含みます。データベース、repository、model/service の自動検証を行います。CI は build と test を実行し、Debug/Release の成果物を artifact として保存します。Dashboard の deferred lifecycle、drag/drop の event bridge、native dialog、restore 後の再オープンなど、デスクトップ実行が必要な項目は手動確認の対象です。
+
+## Windows セットアップの作成
+
+利用者向けの setup EXE は self-contained publish から生成します。
+
+```powershell
+.\scripts\build-windows-setup.ps1 -Configuration Release
+```
+
+生成物:
+
+- publish: `artifacts\publish\win-x64\`
+- setup EXE: `artifacts\installer\DocumentManager_v4.0.0_Setup.exe`
+
+この setup は .NET Framework 4.8 を要求せず、`win-x64` 向け自己完結型の Windows アプリとして配布します。
 
 ## プロジェクト構成
 

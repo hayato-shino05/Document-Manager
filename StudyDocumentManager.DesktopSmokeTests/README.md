@@ -1,11 +1,11 @@
-# StudyDocumentManager Desktop Smoke Tests
+# Document Manager Desktop Smoke Tests
 
 Windows の実ウィンドウを起動し、FlaUI/UI Automation で Avalonia の shell、主要な画面遷移、root marker を確認する xUnit suite です。headless test の代替ではなく、実 desktop runtime の最小 smoke proof を担当します。
 
 ## 実行条件
 
 - Windows の interactive desktop session が必要です。
-- `StudyDocumentManager.exe` を含む独立した publish folder を用意してください。
+- `DocumentManager.exe` を含む独立した publish folder を用意してください。
 - `SDM_DESKTOP_SMOKE_APP` はその publish folder を指す必要があります。
 - working tree の `bin\Debug` / `bin\Release` は指定できません。fixture が fail-closed で拒否します。
 - CI の non-interactive runner では実行しないでください。環境変数がない場合も、suite は通常の `bin` を推測せず明示的に失敗します。
@@ -15,7 +15,7 @@ Windows の実ウィンドウを起動し、FlaUI/UI Automation で Avalonia の
 リポジトリのルートで実行します。
 
 ```powershell
-$publishDir = Join-Path $env:TEMP "StudyDocumentManager-desktop-smoke-publish"
+$publishDir = Join-Path $env:TEMP "DocumentManager-desktop-smoke-publish"
 dotnet publish ".\StudyDocumentManager\StudyDocumentManager.csproj" `
   -c Debug -r win-x64 --self-contained false -o $publishDir
 
@@ -29,7 +29,7 @@ dotnet test ".\StudyDocumentManager.DesktopSmokeTests\StudyDocumentManager.Deskt
 
 ```powershell
 $smokeApp = $env:SDM_DESKTOP_SMOKE_APP
-$exe = if ($smokeApp) { Join-Path $smokeApp "StudyDocumentManager.exe" }
+$exe = if ($smokeApp) { Join-Path $smokeApp "DocumentManager.exe" }
 
 [bool]$smokeApp -and
 (Test-Path $smokeApp -PathType Container) -and

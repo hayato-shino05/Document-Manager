@@ -10,7 +10,9 @@
 ## 概要
 
 - エンジン: `Microsoft.Data.Sqlite` 経由の SQLite
-- 既定のファイル: `AppDomain.CurrentDomain.BaseDirectory/data/study_documents.db`
+- 既定のファイル: `%LOCALAPPDATA%/DocumentManager/data/study_documents.db`
+- 初回起動時、旧配置 `AppDomain.CurrentDomain.BaseDirectory/data/study_documents.db` が存在し、新配置が未作成なら自動移行します
+- installer の既定インストール先は `%LOCALAPPDATA%/Programs/DocumentManager` です
 - テストでは `InitializeDatabase()` の前に `DatabaseHelper.SetDatabasePath(path)` を呼び出してパスを変更できます
 - スキーマと migration は `DatabaseHelper.InitializeDatabase()` が `DatabaseMigrator.RunMigrations()` を呼び出して管理します
 - 旧 WinForms のスキーマ名は migration の互換入力としてのみ残っています

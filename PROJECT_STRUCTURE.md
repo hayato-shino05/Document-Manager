@@ -1,4 +1,4 @@
-# プロジェクト構成、Document Manager
+# Document Manager のプロジェクト構成
 
 この文書では、Avalonia と .NET 9 で構成された現在のコードベースを説明します。`old-version/` 以下の WinForms 実装は、過去の実装を参照するためだけに使用します。
 
@@ -275,7 +275,7 @@ Dashboard は欠損ファイルと launcher 失敗をエラーとして案内し
 
 ## 12. テスト
 
-`StudyDocumentManager.Tests` は xUnit を使用します。`DatabaseTestBase` はテストクラスのインスタンスごとに一意な一時 SQLite ファイルを作成し、初期化前にデータベースパスを上書きします。現行スイートは 795 テストです。
+`StudyDocumentManager.Tests` は xUnit を使用します。`DatabaseTestBase` はテストクラスのインスタンスごとに一意な一時 SQLite ファイルを作成し、初期化前にデータベースパスを上書きします。現行スイートは 871 テストです。
 
 データベース、repository、model/service の自動検証は強い一方、次の desktop runtime の証跡は手動確認として残ります。drag/drop の event bridge、native dialog、Dashboard の deferred lifecycle、HTTP timeout と browser の `Process.Start`、restore 後の再オープン、実行中の `MainWindow` ローカライズ切り替えです。
 
