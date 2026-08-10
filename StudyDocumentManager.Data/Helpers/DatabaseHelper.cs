@@ -21,11 +21,7 @@ public class DatabaseHelper
     {
         get
         {
-            if (string.IsNullOrEmpty(_databasePath))
-            {
-                string appFolder = AppDomain.CurrentDomain.BaseDirectory;
-                _databasePath = Path.Combine(appFolder, "data", "study_documents.db");
-            }
+            _databasePath ??= GetDefaultDatabasePath();
             return _databasePath;
         }
     }
@@ -52,6 +48,34 @@ public class DatabaseHelper
     }
 
 
+    private static string GetDefaultDatabasePath()
+    {
+        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        return Path.Combine(localAppData, "StudyDocumentManager", "data", "study_documents.db");
+    }
+
+    private static string GetLegacyDatabasePath()
+    {
+        string appFolder = AppDomain.CurrentDomain.BaseDirectory;
+        return Path.Combine(appFolder, "data", "study_documents.db");
+    }
+
+    private void MigrateLegacyDatabaseIfNeeded()
+    {
+        var targetPath = DatabasePath;
+        if (File.Exists(targetPath))
+            return;
+
+        var legacyPath = GetLegacyDatabasePath();
+        if (!File.Exists(legacyPath) || PathsReferToSameFile(targetPath, legacyPath))
+            return;
+
+        using var source = OpenConnection(legacyPath, SqliteOpenMode.ReadOnly, pooling: false, synchronize: false);
+        using var destination = OpenConnection(targetPath, pooling: false, synchronize: false);
+        source.BackupDatabase(destination);
+    }
+
+
 
     public void InitializeDatabase()
     {
@@ -64,6 +88,7 @@ public class DatabaseHelper
                 Directory.CreateDirectory(dataFolder);
             }
 
+            MigrateLegacyDatabaseIfNeeded();
             DatabaseMigrator.RunMigrations(ConnectionString);
         }
         catch (Exception ex)

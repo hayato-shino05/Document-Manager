@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Interactivity;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Models;
 
@@ -25,4 +26,11 @@ public partial class CollectionManagement : UserControl
 
         vm.SelectedDocumentsInCollection = selected;
     }
+
+
+    private void OnSelectAllDocumentsClicked(object? sender, RoutedEventArgs e)
+        => DocumentGrid.SelectAll();
+
+    private void OnDeselectAllDocumentsClicked(object? sender, RoutedEventArgs e)
+        => DocumentGrid.UnselectAll();
 }

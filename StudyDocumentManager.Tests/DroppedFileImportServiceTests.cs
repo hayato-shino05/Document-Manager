@@ -8,6 +8,17 @@ namespace StudyDocumentManager.Tests;
 public class DroppedFileImportServiceTests
 {
     [Fact]
+    public void AvailableCategories_UseCatalogWhenDocumentsHaveNoAssignedCategory()
+    {
+        var service = new DroppedFileImportService(
+            new FakeDocumentRepository(),
+            new FakeCategoryRepository());
+
+        Assert.Equal(["Math", "Finance"], service.GetAvailableSubjects([]));
+        Assert.Equal(["Word"], service.GetAvailableTypes([]));
+    }
+
+    [Fact]
     public void BuildDocumentFromPath_MapsNameTypeAndSize()
     {
         var tempFile = Path.Combine(Path.GetTempPath(), $"sdm_drop_{Guid.NewGuid():N}.pdf");
@@ -30,6 +41,21 @@ public class DroppedFileImportServiceTests
             if (File.Exists(tempFile))
                 File.Delete(tempFile);
         }
+    }
+
+    private sealed class FakeCategoryRepository : ICategoryRepository
+    {
+        public List<string> GetAllSubjects() => ["Math", "Finance"];
+        public List<string> GetAllTypes() => ["Word"];
+        public List<(string Name, int Count)> GetSubjectsWithCount() => [];
+        public List<(string Name, int Count)> GetTypesWithCount() => [];
+        public bool AddSubject(string name) => false;
+        public bool AddType(string name) => false;
+        public bool UpdateSubjectName(string oldName, string newName) => false;
+        public bool UpdateTypeName(string oldName, string newName) => false;
+        public bool DeleteDocumentsBySubject(string subjectName) => false;
+        public bool DeleteDocumentsByType(string typeName) => false;
+        public int GetTotalDocumentCount() => 0;
     }
 
     private sealed class FakeDocumentRepository : IDocumentRepository

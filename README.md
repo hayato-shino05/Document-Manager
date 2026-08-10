@@ -1,6 +1,6 @@
 <div align="center">
 
-# Study Document Manager
+# Document Manager
 
 学習資料と業務文書をローカルで整理する Avalonia デスクトップアプリケーションです。
 
@@ -13,6 +13,8 @@
 [![Downloads](https://img.shields.io/github/downloads/hayato-shino05/study-document-manager/total?style=for-the-badge&color=10B981&logo=github&logoColor=white&label=Downloads)](https://github.com/hayato-shino05/study-document-manager/releases)
 [![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/hayato-shino05/study-document-manager?style=for-the-badge&color=EF4444&logo=github&logoColor=white)](https://github.com/hayato-shino05/study-document-manager)
+
+<img src="./StudyDocumentManager/Assets/Brand/document-manager-banner-04.svg" alt="Document Manager banner" width="800" />
 
 </div>
 
@@ -29,7 +31,7 @@
 
 ## 概要
 
-Study Document Manager は、ローカルの SQLite データベースを使って文書を整理するデスクトップアプリケーションです。検索、分類、期限管理、コレクション管理、レポート表示までを 1 つのアプリケーションで扱えます。
+Document Manager は、ローカルの SQLite データベースを使って文書を整理するデスクトップアプリケーションです。検索、分類、期限管理、コレクション管理、レポート表示までを 1 つのアプリケーションで扱えます。
 
 現在の実装は Avalonia 11.2.7 と .NET 9.0 をベースにしており、表示層は MVVM、データ永続化は `Microsoft.Data.Sqlite` を使っています。日本語を既定ロケールとし、言語設定は SQLite の `app_settings` に保存します。
 
@@ -83,7 +85,22 @@ dotnet build "StudyDocumentManager.sln" -c Debug
 dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c Debug
 ```
 
-現行のテストスイートは xUnit ベースで、795 件のテストを含みます。データベース、repository、model/service の自動検証を行います。CI はビルドとアーティファクト生成を実行しますが、テスト実行はローカル確認に委ねています。Dashboard の deferred lifecycle、drag/drop の event bridge、native dialog、restore 後の再オープンなど、デスクトップ実行が必要な項目は手動確認の対象です。
+現行のテストスイートは xUnit ベースで、871 件のテストを含みます。データベース、repository、model/service の自動検証を行います。CI は build と test を実行し、Debug/Release の成果物を artifact として保存します。Dashboard の deferred lifecycle、drag/drop の event bridge、native dialog、restore 後の再オープンなど、デスクトップ実行が必要な項目は手動確認の対象です。
+
+## Windows セットアップの作成
+
+利用者向けの setup EXE は self-contained publish から生成します。
+
+```powershell
+.\scripts\build-windows-setup.ps1 -Configuration Release
+```
+
+生成物:
+
+- publish: `artifacts\publish\win-x64\`
+- setup EXE: `artifacts\installer\DocumentManager_v4.0.0_Setup.exe`
+
+この setup は .NET Framework 4.8 を要求せず、`win-x64` 向け自己完結型の Windows アプリとして配布します。
 
 ## プロジェクト構成
 

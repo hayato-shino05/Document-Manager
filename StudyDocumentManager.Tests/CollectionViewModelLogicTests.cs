@@ -118,8 +118,8 @@ public class CollectionViewModelLogicTests : DatabaseTestBase
     }
 
     // ─────────────────────────────────────────────────────────────
-    // Test: ConnectionString không bị đè bởi test parallel nào
-    // (xunit.runner.json đã tắt parallel nên test này phải pass)
+    // Test: ConnectionString が並列テストで上書きされないことを確認
+    // xunit.runner.json で並列実行を無効にしているため、このテストは成功する
     // ─────────────────────────────────────────────────────────────
     [Fact]
     public void DatabaseHelper_ConnectionString_MatchesDbPath()
@@ -131,7 +131,7 @@ public class CollectionViewModelLogicTests : DatabaseTestBase
     }
 
     // ─────────────────────────────────────────────────────────────
-    // Test: GetCollections SQL — xác nhận column mapping đúng
+    // Test: GetCollections SQL のカラムマッピングを確認
     // ─────────────────────────────────────────────────────────────
     [Fact]
     public void GetCollections_ItemCount_IsCorrect()

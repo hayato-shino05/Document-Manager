@@ -14,6 +14,7 @@ namespace StudyDocumentManager;
 public partial class App : Application
 {
     public static ServiceProvider? Services { get; private set; }
+    private static int _sessionStarted;
 
     public override void Initialize()
     {
@@ -44,6 +45,11 @@ public partial class App : Application
             {
                 DataContext = mainModel
             };
+
+            var analytics = Services.GetRequiredService<IAnalyticsService>();
+            AnalyticsDispatch.Capture(analytics, "app_opened");
+            if (Interlocked.Exchange(ref _sessionStarted, 1) == 0)
+                AnalyticsDispatch.Capture(analytics, "session_started");
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -80,6 +86,21 @@ public partial class App : Application
         services.AddSingleton<ISettingsService, SettingsRepository>();
 
         // Services
+        services.AddKeyedSingleton<HttpClient>("Analytics", (_, _) =>
+        {
+            var client = new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(10)
+            };
+            var endpoint = Environment.GetEnvironmentVariable("STUDY_DOCUMENT_ANALYTICS_URL");
+            if (Uri.TryCreate(endpoint, UriKind.Absolute, out var baseAddress))
+                client.BaseAddress = baseAddress;
+            return client;
+        });
+        services.AddSingleton<IInstallationIdentityService, InstallationIdentityService>();
+        services.AddSingleton<IAnalyticsService>(sp => new AnalyticsService(
+            sp.GetRequiredKeyedService<HttpClient>("Analytics"),
+            sp.GetRequiredService<IInstallationIdentityService>()));
         services.AddSingleton<NavigationService>();
         services.AddSingleton<INavigationService>(sp => sp.GetRequiredService<NavigationService>());
         services.AddSingleton<DialogService>();
@@ -98,11 +119,11 @@ public partial class App : Application
         services.AddSingleton<IUpdateService, Services.UpdateService>();
         services.AddSingleton<IToastService, Services.ToastService>();
 
-        // Models â€” Main
+        // モデル — メイン
         services.AddSingleton<MainWindowModel>();
         services.AddTransient<DashboardModel>();
 
-        // Models â€” Documents
+        // モデル — 文書
         services.AddTransient<AddEditModel>();
         services.AddTransient<BatchImportModel>();
         services.AddTransient<BulkDeleteModel>();
@@ -110,17 +131,17 @@ public partial class App : Application
         services.AddTransient<PersonalNoteModel>();
         services.AddTransient<RelatedDocumentsModel>();
 
-        // Models â€” Management
+        // モデル — 管理
         services.AddTransient<CategoryManagementModel>();
         services.AddTransient<CollectionManagementModel>();
         services.AddTransient<RecycleBinModel>();
         services.AddTransient<FileIntegrityCheckModel>();
 
-        // Models â€” Reports
+        // モデル — レポート
         services.AddTransient<ReportModel>();
         services.AddTransient<TreeMapModel>();
 
-        // Models â€” Utilities
+        // モデル — ユーティリティ
         services.AddTransient<RecentFilesModel>();
     }
 }

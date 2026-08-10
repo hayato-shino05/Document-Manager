@@ -1,38 +1,15 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!--
-    ╔══════════════════════════════════════════════════════════════════╗
-      SHARED STYLES — Study Document Manager
-      Kế thừa và dùng lại thay vì viết lại mỗi view.
 
-      CÁCH DÙNG:
-        · Classes="page-wrapper"   → Border ngoài cùng của mỗi View
-        · Classes="card"           → Card trắng với border 1px
-        · Classes="card-header"    → Header xám trên cùng của card
-        · Classes="section-title"  → TextBlock tiêu đề trong card
-        · Classes="danger"         → Button đỏ (đã dùng ở một số nơi)
-        · Classes="warning"        → Button vàng
-        · Classes="icon-btn"       → StackPanel icon+text bên trong Button
-    ╚══════════════════════════════════════════════════════════════════╝
-    -->
 
-    <!-- ═══════════════════════════════════════════════════════
-         1. PAGE WRAPPER — Border ngoài cùng của mọi UserControl
-            Thay thế:  <Border Background="{StaticResource ContentBackground}" Padding="20">
-            Dùng:      <Border Classes="page-wrapper">
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="Border.page-wrapper">
         <Setter Property="Background" Value="{StaticResource ContentBackground}"/>
         <Setter Property="Padding" Value="{StaticResource PaddingPage}"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         2. CARD — Container nội dung chính
-            Thay thế:  <Border Background="..." CornerRadius="6"
-                               BorderBrush="..." BorderThickness="1">
-            Dùng:      <Border Classes="card">
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="Border.card">
         <Setter Property="Background" Value="{StaticResource CardBackground}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
@@ -40,7 +17,7 @@
         <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
-    <!-- Card với padding mặc định (dùng trong Report/Category panels) -->
+
     <Style Selector="Border.card-padded">
         <Setter Property="Background" Value="{StaticResource CardBackground}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
@@ -49,27 +26,14 @@
         <Setter Property="Padding" Value="{StaticResource PaddingCard}"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         3. CARD HEADER — Header block ở trên cùng của card
-            Thay thế:  <Border Background="SidebarBackground"
-                               CornerRadius="6,6,0,0" Padding="12,8">
-            Dùng:      <Border Classes="card-header">
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="Border.card-header">
         <Setter Property="Background" Value="{StaticResource SidebarBackground}"/>
         <Setter Property="CornerRadius" Value="6,6,0,0"/>
         <Setter Property="Padding" Value="{StaticResource PaddingRow}"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         4. PAGE HEADER — Tiêu đề trang (Icon + Title)
-            Để trong DockPanel.Dock="Top" Margin="0,0,0,12"
-            Ví dụ:
-              <StackPanel Classes="page-header-stack" DockPanel.Dock="Top" Margin="0,0,0,12">
-                  <Image .../>
-                  <TextBlock Classes="page-title" Text="..."/>
-              </StackPanel>
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="StackPanel.page-header-stack">
         <Setter Property="Orientation" Value="Horizontal"/>
         <Setter Property="Spacing" Value="6"/>
@@ -90,12 +54,7 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         5. BUTTON CLASSES — Nhất quán màu sắc
-            Classes="danger"    → đỏ #DC2626
-            Classes="warning"   → vàng #F59E0B
-            Classes="success"   → xanh lá #059669
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="Button.danger">
         <Setter Property="Background" Value="{StaticResource DangerColor}"/>
         <Setter Property="Foreground" Value="White"/>
@@ -126,7 +85,7 @@
         <Setter Property="Background" Value="{StaticResource SuccessColorHover}"/>
     </Style>
 
-    <!-- ghost: nút không viền, chỉ có text -->
+
     <Style Selector="Button.ghost">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
@@ -138,14 +97,7 @@
         <Setter Property="Background" Value="{StaticResource SidebarBackground}"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         6. EMPTY STATE PANEL — Panel "chưa có dữ liệu"
-            Dùng:
-              <StackPanel Classes="empty-state">
-                  <Image Source="..." Classes="empty-state-icon"/>
-                  <TextBlock Text="..." Classes="empty-state-text"/>
-              </StackPanel>
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="StackPanel.empty-state">
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -165,10 +117,7 @@
         <Setter Property="HorizontalAlignment" Value="Center"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         7. INFO BANNER — Hint/info box xanh nhạt
-            Dùng:  <Border Classes="info-banner" DockPanel.Dock="Top">
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="Border.info-banner">
         <Setter Property="Background" Value="{StaticResource StatBlueBg}"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusMd}"/>
@@ -178,9 +127,7 @@
         <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         8. DATA GRID — Chuẩn hóa chung
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="DataGrid.std">
         <Setter Property="AutoGenerateColumns" Value="False"/>
         <Setter Property="CanUserSortColumns" Value="True"/>
@@ -189,10 +136,7 @@
         <Setter Property="IsReadOnly" Value="True"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         9. FORM FIELD LABEL — Nhãn trường nhập liệu
-            Dùng:  <TextBlock Classes="field-label" Text="Tên ..."/>
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="TextBlock.field-label">
         <Setter Property="FontSize" Value="{StaticResource FontSizeMd}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
@@ -200,21 +144,14 @@
         <Setter Property="Margin" Value="0,0,0,2"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         10. SEPARATOR LINE — Đường kẻ dọc giữa các nút toolbar
-             Dùng:  <Border Classes="toolbar-sep"/>
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="Border.toolbar-sep">
         <Setter Property="Width" Value="1"/>
         <Setter Property="Background" Value="{StaticResource CardBorder}"/>
         <Setter Property="Margin" Value="4,4"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         11. CHIP PILL — Badge chọn lựa (dùng trong dialog Đổi danh mục, Thêm vào BST)
-             Dùng:  <Button Classes="chip" Content="Toán học"/>
-                    <Button Classes="chip chip-selected" Content="Lập trình"/>
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="Button.chip">
         <Setter Property="Background"       Value="{StaticResource ChipBgBrush}"/>
         <Setter Property="Foreground"       Value="{StaticResource ChipFgBrush}"/>
@@ -230,7 +167,7 @@
         <Setter Property="Background" Value="{StaticResource ChipHoverBgBrush}"/>
     </Style>
 
-    <!-- chip-selected: solid accent (indigo) when picked -->
+
     <Style Selector="Button.chip-selected">
         <Setter Property="Background"      Value="{StaticResource ChipSelectedBgBrush}"/>
         <Setter Property="Foreground"      Value="White"/>
@@ -246,25 +183,10 @@
         <Setter Property="Background" Value="{StaticResource ChipSelectedBorderBrush}"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         12. TOOLBAR ACTION BUTTON — Button icon+label chuẩn hóa cho toolbar
-             Thay thế pattern lặp đi lặp lại:
-               <Button Classes="secondary" Padding="10,5">
-                   <StackPanel Orientation="Horizontal" Spacing="4">
-                       <Image Source="..." Width="14" Height="14"/>
-                       <TextBlock Text="..." FontSize="{StaticResource FontSizeSm}"/>
-                   </StackPanel>
-               </Button>
-             Dùng:
-               <Button Classes="secondary toolbar-btn" Command="...">
-                   <StackPanel Classes="toolbar-btn-stack">
-                       <Image Source="..." Classes="toolbar-btn-icon"/>
-                       <TextBlock Text="..." Classes="toolbar-btn-label"/>
-                   </StackPanel>
-               </Button>
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="Button.toolbar-btn">
-        <Setter Property="Padding"      Value="10,5"/>
+        <Setter Property="MinHeight"    Value="36"/>
+        <Setter Property="Padding"      Value="10,6"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
         <Setter Property="Cursor"       Value="Hand"/>
     </Style>
@@ -274,10 +196,9 @@
         <Setter Property="Spacing"     Value="4"/>
     </Style>
 
-    <!-- WARNING: sizing kept at 14 to match toolbar density; first button uses 16 (primary action) -->
     <Style Selector="Image.toolbar-btn-icon">
-        <Setter Property="Width"             Value="14"/>
-        <Setter Property="Height"            Value="14"/>
+        <Setter Property="Width"             Value="16"/>
+        <Setter Property="Height"            Value="16"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
@@ -286,16 +207,7 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         13. STAT CARD — Info card trong Dashboard header
-             Dùng:
-               <Border Classes="stat-card">
-                   <StackPanel Classes="stat-card-body">
-                       <TextBlock Classes="stat-card-value" Text="42"/>
-                       <TextBlock Classes="stat-card-label" Text="Tổng tài liệu"/>
-                   </StackPanel>
-               </Border>
-    ═══════════════════════════════════════════════════════════ -->
+
     <Style Selector="Border.stat-card">
         <Setter Property="Background"      Value="{StaticResource CardBackground}"/>
         <Setter Property="CornerRadius"    Value="{StaticResource RadiusMd}"/>
@@ -320,18 +232,16 @@
         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
     </Style>
 
-    <!-- ═══════════════════════════════════════════════════════
-         14. DIALOG PATTERNS — Shared patterns for all dialog windows
-         ─────────────────────────────────────────────────────── -->
 
-    <!-- Form field label: replaces inline FontSize=11 FontWeight=SemiBold Foreground=TextSecondary -->
+
+
     <Style Selector="TextBlock.field-label">
         <Setter Property="FontSize"   Value="{StaticResource FontSizeSm}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
     </Style>
 
-    <!-- Info banner: replaces inline badge in AddDocumentDialog (file path, etc.) -->
+
     <Style Selector="Border.info-banner">
         <Setter Property="Background"       Value="{StaticResource StatBlueBg}"/>
         <Setter Property="CornerRadius"     Value="{StaticResource RadiusSm}"/>

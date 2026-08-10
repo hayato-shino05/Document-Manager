@@ -3,13 +3,14 @@
              xmlns:vm="using:StudyDocumentManager.Models"
              xmlns:loc="using:StudyDocumentManager.Markup"
              x:Class="StudyDocumentManager.Views.AddEdit"
-             x:DataType="vm:AddEditModel">
+             x:DataType="vm:AddEditModel"
+             AutomationProperties.AutomationId="Screen_AddEdit">
 
     <Border Background="{StaticResource ContentBackground}"
             Padding="{StaticResource PaddingPage}">
         <Grid RowDefinitions="Auto,*,Auto"
               MaxWidth="1040"
-              HorizontalAlignment="Center">
+              HorizontalAlignment="Stretch">
             <StackPanel>
                 <StackPanel Orientation="Horizontal"
                             Spacing="{StaticResource Space1}">
@@ -26,6 +27,7 @@
                            Height="20"
                            VerticalAlignment="Center"/>
                     <TextBlock Text="{Binding PageTitle}"
+                               AutomationProperties.AutomationId="Title_AddEdit"
                                FontSize="{StaticResource FontSizeXl}"
                                FontWeight="Bold"
                                Foreground="{StaticResource TextPrimary}"
@@ -40,13 +42,15 @@
                         CornerRadius="{StaticResource RadiusMd}"
                         BorderBrush="{StaticResource CardBorder}"
                         BorderThickness="1"
-                        Padding="{StaticResource PaddingPage}">
+                        Padding="{StaticResource PaddingCard}"
+                        VerticalAlignment="Top">
                     <Grid x:Name="formGrid"
                           ColumnDefinitions="*,*"
                           RowDefinitions="Auto,Auto,Auto,Auto">
                         <StackPanel x:Name="nameField"
                                     Grid.Row="0"
-                                    Spacing="{StaticResource Space1}">
+                                    Spacing="{StaticResource Space1}"
+                                    Margin="0,0,12,8">
                             <TextBlock Text="{loc:Localize AddEdit_LblDocName}"
                                        FontSize="{StaticResource FontSizeMd}"
                                        FontWeight="SemiBold"
@@ -70,14 +74,15 @@
 
                         <StackPanel x:Name="filePathField"
                                     Grid.Row="1"
-                                    Spacing="{StaticResource Space1}">
+                                    Spacing="{StaticResource Space1}"
+                                    Margin="0,0,12,8">
                             <TextBlock Text="{loc:Localize AddEdit_LblFilePath}"
                                        FontSize="{StaticResource FontSizeMd}"
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
                             <DockPanel>
                                 <Border DockPanel.Dock="Right"
-                                        Width="{StaticResource Space2}"/>
+                                        Width="{StaticResource Space1}"/>
                                 <Button x:Name="btnBrowse"
                                         DockPanel.Dock="Right"
                                         TabIndex="3"
@@ -88,8 +93,8 @@
                                     <StackPanel Orientation="Horizontal"
                                                 Spacing="{StaticResource Space1}">
                                         <Image Source="{StaticResource IconOpenFile}"
-                                               Width="11"
-                                               Height="11"/>
+                                               Width="16"
+                                               Height="16"/>
                                         <TextBlock Text="{loc:Localize AddEdit_BtnBrowse}"
                                                    FontSize="{StaticResource FontSizeSm}"/>
                                     </StackPanel>
@@ -107,7 +112,8 @@
                         <StackPanel x:Name="notesField"
                                     Grid.Row="2"
                                     Grid.RowSpan="2"
-                                    Spacing="{StaticResource Space1}">
+                                    Spacing="{StaticResource Space1}"
+                                    Margin="0,4,12,0">
                             <TextBlock Text="{loc:Localize AddEdit_LblNotes}"
                                        FontSize="{StaticResource FontSizeMd}"
                                        FontWeight="SemiBold"
@@ -120,14 +126,15 @@
                                      Watermark="{loc:Localize AddEdit_PlaceholderNotes}"
                                      AcceptsReturn="True"
                                      TextWrapping="Wrap"
-                                     MinHeight="140"
+                                     MinHeight="112"
                                      VerticalContentAlignment="Top"/>
                         </StackPanel>
 
                         <Grid x:Name="categoryTypeFields"
                               Grid.Column="1"
                               Grid.Row="0"
-                              ColumnDefinitions="*,Auto,*">
+                              ColumnDefinitions="*,Auto,*"
+                              Margin="12,0,0,8">
                             <Border Grid.Column="1"
                                     Width="{StaticResource Space5}"/>
                             <StackPanel Grid.Column="0"
@@ -169,7 +176,8 @@
                         <Grid x:Name="authorTagsFields"
                               Grid.Column="1"
                               Grid.Row="1"
-                              ColumnDefinitions="*,Auto,*">
+                              ColumnDefinitions="*,Auto,*"
+                              Margin="12,0,0,8">
                             <Border Grid.Column="1"
                                     Width="{StaticResource Space5}"/>
                             <StackPanel Grid.Column="0"
@@ -205,7 +213,8 @@
                         <Grid x:Name="deadlineImportantFields"
                               Grid.Column="1"
                               Grid.Row="2"
-                              ColumnDefinitions="*,Auto,Auto">
+                              ColumnDefinitions="*,Auto,Auto"
+                              Margin="12,4,0,0">
                             <Border Grid.Column="1"
                                     Width="{StaticResource Space5}"/>
                             <StackPanel Grid.Column="0"
@@ -221,6 +230,9 @@
                                             Focusable="True"
                                             AutomationProperties.Name="{loc:Localize AddEdit_LblDeadline}"
                                             FontSize="{StaticResource FontSizeMd}"
+                                            YearFormat="{loc:Localize AddEdit_DateYearFormat}"
+                                            MonthFormat="{loc:Localize AddEdit_DateMonthFormat}"
+                                            DayFormat="{loc:Localize AddEdit_DateDayFormat}"
                                             HorizontalAlignment="Stretch"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2"
@@ -253,9 +265,9 @@
                         ToolTip.Tip="{loc:Localize AddEdit_TipSave}">
                     <StackPanel Orientation="Horizontal"
                                 Spacing="{StaticResource Space1}">
-                        <Image Source="{StaticResource IconSave}"
-                               Width="13"
-                               Height="13"/>
+                        <Image Source="{StaticResource IconSaveWhite}"
+                               Width="16"
+                               Height="16"/>
                         <TextBlock Text="{loc:Localize AddEdit_BtnSave}"
                                    FontSize="{StaticResource FontSizeLg}"
                                    FontWeight="SemiBold"/>

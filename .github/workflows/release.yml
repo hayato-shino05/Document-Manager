@@ -3,125 +3,64 @@ name: Release
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 env:
-  APP_NAME: StudyDocumentManager
+  SOLUTION_FILE: StudyDocumentManager.sln
+  BUILD_CONFIGURATION: Release
 
 jobs:
-  release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+  windows-setup:
+    name: Build Windows setup
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          fetch-depth: 0
+          dotnet-version: 9.0.x
 
-      - name: Get version from tag
-        id: version
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_FILE }}
+
+      - name: Run headless tests
+        run: dotnet test StudyDocumentManager.Tests/StudyDocumentManager.Tests.csproj -c ${{ env.BUILD_CONFIGURATION }} --no-restore
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build setup artifact
+        shell: pwsh
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          $version = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME.TrimStart('v') } else { '' }
+          .\scripts\build-windows-setup.ps1 -Version $version -Configuration $env:BUILD_CONFIGURATION
 
-      - name: Verify pre-built files exist
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          SETUP="installer/${{ env.APP_NAME }}_v${VERSION}_Setup.exe"
-          PORTABLE="installer/${{ env.APP_NAME }}_v${VERSION}_Portable.zip"
-
-          if [ ! -f "$SETUP" ]; then
-            echo "ERROR: $SETUP not found!"
-            echo "Please build the installer locally before creating the tag."
-            exit 1
-          fi
-
-          if [ ! -f "$PORTABLE" ]; then
-            echo "ERROR: $PORTABLE not found!"
-            echo "Please create the portable zip locally before creating the tag."
-            exit 1
-          fi
-
-          echo "Found installer files:"
-          ls -la installer/
-
-      - name: Generate release notes
-        id: release_notes
-        run: |
-          # Get commits since last tag
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          if [ -n "$PREV_TAG" ]; then
-            COMMITS=$(git log $PREV_TAG..HEAD --pretty=format:"- %s (%h)" --no-merges | head -20)
-            COMPARE_URL="${{ github.server_url }}/${{ github.repository }}/compare/$PREV_TAG...${{ github.ref_name }}"
-          else
-            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges -10)
-            COMPARE_URL="${{ github.server_url }}/${{ github.repository }}/commits/${{ github.ref_name }}"
-          fi
-
-          # Create release notes
-          cat << EOF > release_notes.md
-          ## What's New
-
-          $COMMITS
-
-          ## Downloads
-
-          | Platform | Download |
-          |----------|----------|
-          | Windows (Installer) | \`${{ env.APP_NAME }}_v${{ steps.version.outputs.version }}_Setup.exe\` |
-          | Windows (Portable) | \`${{ env.APP_NAME }}_v${{ steps.version.outputs.version }}_Portable.zip\` |
-
-          ## System Requirements
-
-          - Windows 10 or later
-          - .NET 9 Desktop Runtime
-
-          ## Full Changelog
-
-          $COMPARE_URL
-          EOF
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: Upload setup artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: "${{ github.ref_name }}"
-          body_path: release_notes.md
-          files: |
-            installer/${{ env.APP_NAME }}_v${{ steps.version.outputs.version }}_Setup.exe
-            installer/${{ env.APP_NAME }}_v${{ steps.version.outputs.version }}_Portable.zip
-          draft: false
-          prerelease: false
+          name: windows-setup-${{ github.run_id }}
+          path: artifacts/installer/*.exe
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Publish GitHub Release asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  notify:
-    name: Discord Notification
-    needs: release
-    runs-on: ubuntu-latest
-    if: always()
-
-    steps:
-      - name: Discord notification (release)
-        if: ${{ needs.release.result == 'success' }}
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
-          if [ -n "$DISCORD_WEBHOOK" ]; then
-            curl -H "Content-Type: application/json" \
-              -d "{\"embeds\": [{\"title\": \"Study Document Manager ${{ github.ref_name }} Released!\", \"description\": \"New version available for download.\n\n[Download on GitHub](${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }})\", \"color\": 5793266}]}" \
-              $DISCORD_WEBHOOK
-          fi
-
-      - name: Discord notification (failure)
-        if: ${{ needs.release.result == 'failure' }}
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: |
-          if [ -n "$DISCORD_WEBHOOK" ]; then
-            curl -H "Content-Type: application/json" \
-              -d "{\"embeds\": [{\"title\": \"Study Document Manager Release Failed\", \"description\": \"**Tag:** \`${{ github.ref_name }}\`\n\n[View Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\", \"color\": 15158332}]}" \
-              $DISCORD_WEBHOOK
-          fi
+          $tag = $env:GITHUB_REF_NAME
+          $setup = Get-ChildItem artifacts/installer/*.exe | Select-Object -First 1
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag $setup.FullName --title $tag --notes "Windows setup build for $tag"
+          }
+          else {
+            gh release upload $tag $setup.FullName --clobber
+          }

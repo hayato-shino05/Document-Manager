@@ -13,7 +13,7 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
 
     private static readonly Dictionary<SupportedLanguage, string> CultureMap = new()
     {
-        { SupportedLanguage.Japanese, "" },
+        { SupportedLanguage.Japanese, "ja-JP" },
         { SupportedLanguage.English, "en" },
         { SupportedLanguage.Vietnamese, "vi" },
         { SupportedLanguage.Chinese, "zh" }
@@ -25,8 +25,9 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
             "StudyDocumentManager.Resources.Strings",
             typeof(LocalizationService).Assembly);
 
-        _culture = CultureInfo.InvariantCulture;
         CurrentLanguage = SupportedLanguage.Japanese;
+        _culture = new CultureInfo(CultureMap[CurrentLanguage]);
+        ApplyCurrentCulture();
     }
 
     private int _indexerCallCount;
@@ -56,10 +57,8 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
         }
 
         CurrentLanguage = language;
-        var cultureCode = CultureMap[language];
-        _culture = string.IsNullOrEmpty(cultureCode)
-            ? CultureInfo.InvariantCulture
-            : new CultureInfo(cultureCode);
+        _culture = new CultureInfo(CultureMap[language]);
+        ApplyCurrentCulture();
 
         System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] Culture set to '{_culture.Name}', firing events...");
         LanguageChanged?.Invoke(this, EventArgs.Empty);
@@ -67,6 +66,12 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
         System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] PropertyChanged fired, indexer re-reads={_indexerCallCount}, subscribers={PropertyChanged?.GetInvocationList().Length ?? 0}");
+    }
+
+    private void ApplyCurrentCulture()
+    {
+        CultureInfo.CurrentCulture = _culture;
+        CultureInfo.CurrentUICulture = _culture;
     }
 
     public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } =

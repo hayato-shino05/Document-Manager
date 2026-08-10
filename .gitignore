@@ -13,8 +13,8 @@ rule/
 .codegraph/
 .agents/
 gemini.md
-docs/
 .harness-core/
+docs/
 codegrove.sqlite
 .superpowers/
 # User-specific files
@@ -372,6 +372,4 @@ redist/
 .gitnexus
 .harness-backup/
 docs/
-!docs/
-!docs/TEST_MATRIX.md
 scripts/

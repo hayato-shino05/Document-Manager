@@ -163,25 +163,36 @@ public sealed class ToastService : IToastService
         rootPanel.Children.Add(_container);
     }
 
+    private static IBrush GetBrush(string key, IBrush fallback)
+    {
+        if (Application.Current?.TryGetResource(key, Avalonia.Styling.ThemeVariant.Default, out var resource) == true
+            && resource is IBrush brush)
+        {
+            return brush;
+        }
+
+        return fallback;
+    }
+
     private static (IBrush bg, IBrush fg, string icon) ResolveVisuals(ToastType type)
     {
         return type switch
         {
             ToastType.Success => (
-                new SolidColorBrush(Color.Parse("#F0FDF4")),
-                new SolidColorBrush(Color.Parse("#166534")),
+                GetBrush("ToastSuccessBrush", Brushes.Transparent),
+                GetBrush("ToastSuccessForegroundBrush", Brushes.Black),
                 "✓"),
             ToastType.Error => (
-                new SolidColorBrush(Color.Parse("#FEF2F2")),
-                new SolidColorBrush(Color.Parse("#991B1B")),
+                GetBrush("ToastErrorBrush", Brushes.Transparent),
+                GetBrush("ToastErrorForegroundBrush", Brushes.Black),
                 "✕"),
             ToastType.Warning => (
-                new SolidColorBrush(Color.Parse("#FFFBEB")),
-                new SolidColorBrush(Color.Parse("#92400E")),
+                GetBrush("ToastWarningBrush", Brushes.Transparent),
+                GetBrush("ToastWarningForegroundBrush", Brushes.Black),
                 "⚠"),
             _ => (
-                new SolidColorBrush(Color.Parse("#EFF6FF")),
-                new SolidColorBrush(Color.Parse("#1E40AF")),
+                GetBrush("ToastInfoBrush", Brushes.Transparent),
+                GetBrush("ToastInfoForegroundBrush", Brushes.Black),
                 "ℹ"),
         };
     }

@@ -1,10 +1,12 @@
 using System.Globalization;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using StudyDocumentManager.Converters;
 using StudyDocumentManager.Core;
+using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Models;
 using StudyDocumentManager.Services;
@@ -18,7 +20,7 @@ public sealed class DashboardTreeMapRegressionTests
     [AvaloniaFact]
     public void TreeMap_RendersWithoutPaddingCastFailure()
     {
-        var model = new TreeMapModel(new NavigationStub(), new ReportStub
+        var model = new TreeMapModel(new NavigationStub(), new DocumentRepositoryStub(), new ReportStub
         {
             Subjects = [("数学", 2)]
         });
@@ -29,6 +31,33 @@ public sealed class DashboardTreeMapRegressionTests
         {
             window.Show();
             Assert.Contains(view.GetVisualDescendants().OfType<TextBlock>(), text => text.Text == "数学");
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void TreeMap_ExposesAllItemsMode()
+    {
+        var model = new TreeMapModel(
+            new NavigationStub(),
+            new DocumentRepositoryStub(new StudyDocument { Id = 1, Name = "Guide" }),
+            new ReportStub());
+        var view = new TreeMap { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            window.Show();
+            var allItemsButton = view.GetVisualDescendants().OfType<Button>()
+                .Single(button => AutomationProperties.GetAutomationId(button) == "TreeMap_AllItems");
+
+            allItemsButton.Command!.Execute(null);
+
+            Assert.Equal("all", model.SelectedMode);
+            Assert.Equal("Guide", model.Items[0].Label);
         }
         finally
         {

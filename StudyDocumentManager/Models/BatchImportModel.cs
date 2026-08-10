@@ -15,6 +15,7 @@ public partial class BatchImportModel : ModelBase
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
     private readonly IDroppedFileImportService _droppedFileImportService;
+    private readonly IAnalyticsService? _analytics;
 
     [ObservableProperty] private string _folderPath = string.Empty;
     [ObservableProperty] private string _defaultSubject = string.Empty;
@@ -33,13 +34,15 @@ public partial class BatchImportModel : ModelBase
         IFileDialogService fileDialogService,
         INavigationService navigationService,
         ILocalizationService loc,
-        IDroppedFileImportService droppedFileImportService)
+        IDroppedFileImportService droppedFileImportService,
+        IAnalyticsService? analytics = null)
     {
         _dialogService = dialogService;
         _fileDialogService = fileDialogService;
         _navigationService = navigationService;
         _loc = loc;
         _droppedFileImportService = droppedFileImportService;
+        _analytics = analytics;
     }
 
     [RelayCommand]
@@ -202,6 +205,9 @@ public partial class BatchImportModel : ModelBase
             ImportErrorMessage = string.Format(_loc["BatchImport_FailuresRemain"], FailedCount);
             return;
         }
+
+        if (_analytics is not null)
+            AnalyticsDispatch.Capture(_analytics, "batch_import_completed");
 
         await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"], ImportStatusMessage);
         _navigationService.NavigateTo("dashboard");

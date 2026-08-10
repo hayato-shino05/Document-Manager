@@ -21,15 +21,17 @@ namespace StudyDocumentManager.Tests;
 public class DatabaseHelperDefaultPathTests
 {
     [Fact]
-    public void DatabasePath_WhenNotSet_ReturnsDefaultAppBaseDir()
+    public void DatabasePath_WhenNotSet_ReturnsLocalApplicationDataPath()
     {
         var db = new DatabaseHelper();
 
         var path = db.DatabasePath;
+        var expectedRoot = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
         Assert.False(string.IsNullOrEmpty(path));
         Assert.EndsWith("study_documents.db", path);
-        Assert.Contains("data", path);
+        Assert.Contains(Path.Combine("StudyDocumentManager", "data"), path);
+        Assert.StartsWith(expectedRoot, path, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -354,6 +356,64 @@ public class DashboardFlowTests : DatabaseTestBase
 
         Assert.Same(document, model.SelectedDocument);
     }
+
+    [Fact]
+    public async Task ContextMenuActions_UseSelectedDocumentAndPreserveRoutes()
+    {
+        var filePath = Path.GetTempFileName();
+        var document = new StudyDocument
+        {
+            Id = 11,
+            Name = "Context document",
+            FilePath = filePath,
+            Subject = "Math",
+            Tags = "old",
+            Notes = "old note"
+        };
+        var dialog = new DashboardDialogService { InputResult = "updated value" };
+        var customDialog = new DashboardCustomDialogService { ChangeCategoryResult = "Physics" };
+        var navigation = new DashboardNavigationService();
+        var clipboard = new DashboardClipboardService();
+        var process = new DashboardProcessLauncherService();
+        var model = new DashboardModel(
+            new DashboardDocumentRepository([document]), new DashboardRecycleBinRepository(),
+            new DashboardCategoryRepository(), new DashboardCollectionRepository(),
+            new DashboardRecentFileRepository(), dialog, new DashboardFileDialogService(),
+            customDialog, navigation, clipboard, process, new DashboardExportService(),
+            new DashboardBackupService(), new DashboardLocalizationService())
+        {
+            SelectedDocument = document
+        };
+
+        try
+        {
+            await model.CopyNameCommand.ExecuteAsync(null);
+            await model.CopyPathCommand.ExecuteAsync(null);
+            model.OpenFolderCommand.Execute(null);
+            model.EditDocumentCommand.Execute(null);
+            model.OpenPersonalNoteCommand.Execute(null);
+            model.OpenRelatedDocumentsCommand.Execute(null);
+            await model.ChangeCategoryCommand.ExecuteAsync(null);
+            model.SelectedDocument = document;
+            await model.QuickEditTagsCommand.ExecuteAsync(null);
+            model.SelectedDocument = document;
+            await model.QuickEditGhiChuCommand.ExecuteAsync(null);
+            model.SelectedDocument = document;
+            await model.ToggleImportantCommand.ExecuteAsync(null);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+
+        Assert.Equal([document.Name, filePath], clipboard.Values);
+        Assert.Equal([filePath], process.RevealedPaths);
+        Assert.Equal(["addedit", "personal-note", "related-docs"], navigation.Routes);
+        Assert.Equal("Physics", document.Subject);
+        Assert.Equal("updated value", document.Tags);
+        Assert.Equal("updated value", document.Notes);
+        Assert.True(document.IsImportant);
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -491,10 +551,12 @@ file sealed class DashboardFileDialogService : IFileDialogService
 
 file sealed class DashboardCustomDialogService : ICustomDialogService
     {
+        public string? ChangeCategoryResult { get; set; }
         public Task<string?> ShowOpenFileAsync(string title, string? filter = null) => Task.FromResult<string?>(null);
         public Task<string?> ShowOpenFolderAsync(string title) => Task.FromResult<string?>(null);
         public Task<string?> ShowSaveFileAsync(string title, string defaultFileName, string? filter = null) => Task.FromResult<string?>(null);
-        public Task<string?> ShowChangeCategoryAsync(string documentName, IList<string> existingCategories, string currentCategory) => Task.FromResult<string?>(null);
+        public Task<string?> ShowChangeCategoryAsync(string documentName, IList<string> existingCategories, string currentCategory)
+            => Task.FromResult(ChangeCategoryResult);
         public Task<StudyDocumentManager.Core.DTOs.AddDocumentDraft?> ShowAddDocumentAsync(string filePath, IList<string> subjects, IList<string> types) => Task.FromResult<StudyDocumentManager.Core.DTOs.AddDocumentDraft?>(null);
         public Task<List<StudyDocument>?> ShowDocumentPickerAsync(string collectionName, IEnumerable<StudyDocument> allDocuments, IEnumerable<int> alreadyInCollection) => Task.FromResult<List<StudyDocument>?>(null);
         public Task<int> ShowSelectCollectionAsync(string documentName, IList<(int Id, string Name, int DocCount)> collections) => Task.FromResult(-1);
@@ -511,13 +573,19 @@ file sealed class DashboardNavigationService : INavigationService
 
 file sealed class DashboardClipboardService : IClipboardService
     {
-        public Task SetTextAsync(string text) => Task.CompletedTask;
+        public List<string> Values { get; } = [];
+        public Task SetTextAsync(string text)
+        {
+            Values.Add(text);
+            return Task.CompletedTask;
+        }
     }
 
 file sealed class DashboardProcessLauncherService : IProcessLauncherService
     {
         public bool ThrowOnOpen { get; set; }
         public List<string> OpenedFiles { get; } = [];
+        public List<string> RevealedPaths { get; } = [];
         public void OpenFile(string filePath)
         {
             if (ThrowOnOpen)
@@ -525,7 +593,7 @@ file sealed class DashboardProcessLauncherService : IProcessLauncherService
             OpenedFiles.Add(filePath);
         }
         public void OpenFolderAndSelect(string filePath) { }
-        public void RevealInExplorer(string filePath) { }
+        public void RevealInExplorer(string filePath) => RevealedPaths.Add(filePath);
         public void OpenUrl(string url) { }
     }
 
@@ -604,7 +672,7 @@ public class AddEditLogicTests : DatabaseTestBase
     public void EscapeCsv_PlainText_ReturnsAsIs()
     {
         Assert.Equal("Hello World", EscapeCsvHelper("Hello World"));
-        Assert.Equal("Study Document Manager", EscapeCsvHelper("Study Document Manager"));
+        Assert.Equal("Document Manager", EscapeCsvHelper("Document Manager"));
     }
 
     [Fact]

@@ -3,21 +3,26 @@
              xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:loc="using:StudyDocumentManager.Markup"
                      x:Class="StudyDocumentManager.Views.Report"
-             x:DataType="vm:ReportModel">
+             x:DataType="vm:ReportModel"
+             AutomationProperties.AutomationId="Screen_Report">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
         <DockPanel>
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <Image Source="{StaticResource IconReport}" Width="18" Height="18"/>
-                    <TextBlock Text="{loc:Localize Report_Title}" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
+                    <TextBlock Text="{loc:Localize Report_Title}"
+                               AutomationProperties.AutomationId="Title_Report"
+                               FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
                                Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
                 <Button DockPanel.Dock="Right" Classes="secondary"
+                        AutomationProperties.AutomationId="Report_Refresh"
+                        AutomationProperties.Name="{loc:Localize Report_BtnRefresh}"
                         Command="{Binding LoadAllDataCommand}" Padding="{StaticResource PaddingBtnMd}"
                         HorizontalAlignment="Right">
                     <StackPanel Orientation="Horizontal" Spacing="4">
-                        <Image Source="{StaticResource IconRefresh}" Width="12" Height="12"/>
+                        <Image Source="{StaticResource IconRefresh}" Width="16" Height="16"/>
                         <TextBlock Text="{loc:Localize Report_BtnRefresh}" FontSize="{StaticResource FontSizeSm}"/>
                     </StackPanel>
                 </Button>
@@ -35,7 +40,9 @@
                                 <TextBlock Text="{loc:Localize Report_TabSubject}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
                             </StackPanel>
-                            <ItemsControl ItemsSource="{Binding BySubjectData}">
+                            <ItemsControl AutomationProperties.AutomationId="Report_BySubject"
+                                          AutomationProperties.Name="{loc:Localize Report_TabSubject}"
+                                          ItemsSource="{Binding BySubjectData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
                                         <Grid ColumnDefinitions="140,*,60" Margin="0,2">
@@ -58,7 +65,8 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            <TextBlock Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                            <TextBlock AutomationProperties.LiveSetting="Polite"
+                                       Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
                                        IsVisible="{Binding !BySubjectData.Count}" Margin="0,8"/>
                         </StackPanel>
                     </Border>
@@ -72,7 +80,9 @@
                                 <TextBlock Text="{loc:Localize Report_ByTypeChart}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
                             </StackPanel>
-                            <ItemsControl ItemsSource="{Binding ByTypeData}">
+                            <ItemsControl AutomationProperties.AutomationId="Report_ByType"
+                                          AutomationProperties.Name="{loc:Localize Report_ByTypeChart}"
+                                          ItemsSource="{Binding ByTypeData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
                                         <Grid ColumnDefinitions="140,*,60" Margin="0,2">
@@ -95,7 +105,8 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            <TextBlock Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                            <TextBlock AutomationProperties.LiveSetting="Polite"
+                                       Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
                                        IsVisible="{Binding !ByTypeData.Count}" Margin="0,8"/>
                         </StackPanel>
                     </Border>
@@ -109,7 +120,9 @@
                                 <TextBlock Text="{loc:Localize Report_Last7Days}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
                             </StackPanel>
-                            <ItemsControl ItemsSource="{Binding ByDayData}">
+                            <ItemsControl AutomationProperties.AutomationId="Report_ByDay"
+                                          AutomationProperties.Name="{loc:Localize Report_Last7Days}"
+                                          ItemsSource="{Binding ByDayData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
                                         <Grid ColumnDefinitions="100,*,60" Margin="0,2">
@@ -132,7 +145,8 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            <TextBlock Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                            <TextBlock AutomationProperties.LiveSetting="Polite"
+                                       Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
                                        IsVisible="{Binding !HasDayData}" Margin="0,8"/>
                         </StackPanel>
                     </Border>
@@ -146,7 +160,9 @@
                                 <TextBlock Text="{loc:Localize Report_Last12Months}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
                                            Foreground="{StaticResource TextPrimary}"/>
                             </StackPanel>
-                            <ItemsControl ItemsSource="{Binding ByMonthData}">
+                            <ItemsControl AutomationProperties.AutomationId="Report_ByMonth"
+                                          AutomationProperties.Name="{loc:Localize Report_Last12Months}"
+                                          ItemsSource="{Binding ByMonthData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
                                         <Grid ColumnDefinitions="100,*,60" Margin="0,2">
@@ -169,7 +185,8 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            <TextBlock Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                            <TextBlock AutomationProperties.LiveSetting="Polite"
+                                       Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
                                        IsVisible="{Binding !HasMonthData}" Margin="0,8"/>
                         </StackPanel>
                     </Border>

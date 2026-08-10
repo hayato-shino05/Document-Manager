@@ -3,14 +3,16 @@
              xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:loc="using:StudyDocumentManager.Markup"
                      x:Class="StudyDocumentManager.Views.CategoryManagement"
-             x:DataType="vm:CategoryManagementModel">
+             x:DataType="vm:CategoryManagementModel"
+             AutomationProperties.AutomationId="Screen_CategoryManagement">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
         <DockPanel>
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <Image Source="{StaticResource IconCategory}" Width="18" Height="18"/>
-                    <TextBlock Text="{loc:Localize CategoryMgmt_Title}" FontSize="{StaticResource FontSizeXl}"
+                    <TextBlock AutomationProperties.AutomationId="Title_CategoryManagement"
+                               Text="{loc:Localize CategoryMgmt_Title}" FontSize="{StaticResource FontSizeXl}"
                                FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
             </DockPanel>
@@ -26,7 +28,8 @@
                 </StackPanel>
             </Border>
 
-            <Grid ColumnDefinitions="*,20,*">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Grid ColumnDefinitions="*,20,*">
 
                 <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
                         BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
@@ -41,23 +44,25 @@
                                 </StackPanel>
                                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4"
                                             HorizontalAlignment="Right">
-                                    <Button Classes="primary" Command="{Binding AddSubjectCommand}" Padding="{StaticResource PaddingSm}">
+                                    <Button Classes="primary" AutomationProperties.Name="{loc:Localize CategoryMgmt_BtnAdd}"
+                                            Command="{Binding AddSubjectCommand}" Padding="{StaticResource PaddingSm}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
+                                            <Image Source="{StaticResource IconAddWhite}" Width="16" Height="16"/>
                                             <TextBlock Text="{loc:Localize CategoryMgmt_BtnAdd}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="secondary" Command="{Binding RenameSubjectCommand}" Padding="{StaticResource PaddingSm}"
                                             IsEnabled="{Binding SelectedSubject, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconEdit}" Width="11" Height="11"/>
+                                            <Image Source="{StaticResource IconEdit}" Width="16" Height="16"/>
                                             <TextBlock Text="{loc:Localize CategoryMgmt_BtnRename}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
-                                    <Button Classes="danger" Command="{Binding DeleteSubjectCommand}" Padding="{StaticResource PaddingSm}"
+                                    <Button Classes="danger" AutomationProperties.Name="{loc:Localize CategoryMgmt_BtnDelete}"
+                                            Command="{Binding DeleteSubjectCommand}" Padding="{StaticResource PaddingSm}"
                                             IsEnabled="{Binding SelectedSubject, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
+                                            <Image Source="{StaticResource IconDeleteWhite}" Width="16" Height="16"/>
                                             <TextBlock Text="{loc:Localize CategoryMgmt_BtnDelete}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
@@ -98,21 +103,21 @@
                                             HorizontalAlignment="Right">
                                     <Button Classes="primary" Command="{Binding AddTypeCommand}" Padding="{StaticResource PaddingSm}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
+                                            <Image Source="{StaticResource IconAddWhite}" Width="16" Height="16"/>
                                             <TextBlock Text="{loc:Localize CategoryMgmt_BtnAdd}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="secondary" Command="{Binding RenameTypeCommand}" Padding="{StaticResource PaddingSm}"
                                             IsEnabled="{Binding SelectedType, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconEdit}" Width="11" Height="11"/>
+                                            <Image Source="{StaticResource IconEdit}" Width="16" Height="16"/>
                                             <TextBlock Text="{loc:Localize CategoryMgmt_BtnRename}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="danger" Command="{Binding DeleteTypeCommand}" Padding="{StaticResource PaddingSm}"
                                             IsEnabled="{Binding SelectedType, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
+                                            <Image Source="{StaticResource IconDeleteWhite}" Width="16" Height="16"/>
                                             <TextBlock Text="{loc:Localize CategoryMgmt_BtnDelete}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
@@ -137,7 +142,8 @@
                         </ListBox>
                     </DockPanel>
                 </Border>
-            </Grid>
+                </Grid>
+            </ScrollViewer>
         </DockPanel>
     </Border>
 

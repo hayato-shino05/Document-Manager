@@ -3,27 +3,32 @@
              xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:loc="using:StudyDocumentManager.Markup"
                      x:Class="StudyDocumentManager.Views.CollectionManagement"
-             x:DataType="vm:CollectionManagementModel">
+             x:DataType="vm:CollectionManagementModel"
+             AutomationProperties.AutomationId="Screen_CollectionManagement">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
         <DockPanel>
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <Image Source="{StaticResource IconCollection}" Width="20" Height="20"/>
-                    <TextBlock Text="{loc:Localize CollectionMgmt_Title}" FontSize="{StaticResource FontSizeXl}"
+                    <TextBlock AutomationProperties.AutomationId="Title_CollectionManagement"
+                               Text="{loc:Localize CollectionMgmt_Title}" FontSize="{StaticResource FontSizeXl}"
                                FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
-                    <Button Classes="primary" Command="{Binding CreateCollectionCommand}">
+                    <Button Classes="primary" AutomationProperties.AutomationId="CollectionManagement_Create"
+                            AutomationProperties.Name="{loc:Localize CollectionMgmt_BtnCreate}"
+                            Command="{Binding CreateCollectionCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconAddWhite}" Width="12" Height="12"/>
+                            <Image Source="{StaticResource IconAddWhite}" Width="16" Height="16"/>
                             <TextBlock Text="{loc:Localize CollectionMgmt_BtnCreate}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
             </DockPanel>
 
-            <Grid ColumnDefinitions="300,16,*">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Grid ColumnDefinitions="300,16,*">
 
                 <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
                         BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
@@ -85,6 +90,20 @@
                                             <TextBlock Text="{loc:Localize CollectionMgmt_BtnRename}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
+                                    <Button Classes="secondary" Click="OnSelectAllDocumentsClicked"
+                                            AutomationProperties.AutomationId="CollectionManagement_SelectAllDocuments"
+                                            AutomationProperties.Name="{loc:Localize Bulk_BtnSelectAll}"
+                                            IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                            Padding="{StaticResource PaddingSm}">
+                                        <TextBlock Text="{loc:Localize Bulk_BtnSelectAll}" FontSize="{StaticResource FontSizeSm}"/>
+                                    </Button>
+                                    <Button Classes="secondary" Click="OnDeselectAllDocumentsClicked"
+                                            AutomationProperties.AutomationId="CollectionManagement_DeselectAllDocuments"
+                                            AutomationProperties.Name="{loc:Localize Bulk_BtnDeselectAll}"
+                                            IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                            Padding="{StaticResource PaddingSm}">
+                                        <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{StaticResource FontSizeSm}"/>
+                                    </Button>
                                     <Button Classes="danger" Command="{Binding RemoveSelectedDocumentsCommand}" Padding="{StaticResource PaddingSm}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
@@ -107,7 +126,9 @@
                             <StackPanel IsVisible="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNull}}"
                                         VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
                                 <Image Source="{StaticResource IconCollection}" Width="36" Height="36" Opacity="0.4"/>
-                                <TextBlock Text="{loc:Localize CollectionMgmt_EmptyState}"
+                                <TextBlock AutomationProperties.AutomationId="CollectionManagement_EmptyState"
+                                           AutomationProperties.LiveSetting="Polite"
+                                           Text="{loc:Localize CollectionMgmt_EmptyState}"
                                            FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
@@ -122,11 +143,14 @@
                                     </StackPanel>
                                 </Border>
 
-                                <ListBox x:Name="DocumentGrid" ItemsSource="{Binding DocumentsInCollection}" SelectionMode="Multiple" Padding="{StaticResource PaddingIcon}">
+                                <ListBox x:Name="DocumentGrid"
+                                         AutomationProperties.AutomationId="CollectionManagement_DocumentGrid"
+                                         AutomationProperties.Name="{loc:Localize CollectionMgmt_DetailHeader}"
+                                         ItemsSource="{Binding DocumentsInCollection}" SelectionMode="Multiple" Padding="{StaticResource PaddingIcon}">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" Spacing="8" Margin="6,4">
-                                                <Image Source="{StaticResource IconDocPage}" Width="12" Height="12"/>
+                                                <Image Source="{StaticResource IconDocPage}" Width="16" Height="16"/>
                                                 <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMd}"
                                                            Foreground="{StaticResource TextPrimary}"/>
                                             </StackPanel>
@@ -137,7 +161,8 @@
                         </Panel>
                     </DockPanel>
                 </Border>
-            </Grid>
+                </Grid>
+            </ScrollViewer>
         </DockPanel>
     </Border>
 

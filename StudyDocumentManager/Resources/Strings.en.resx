@@ -235,9 +235,9 @@ The related {1} document(s) will be moved to the recycle bin.</value></data>
   <data name="Dashboard_AddedToCollection" xml:space="preserve"><value>Added '{0}' to collection '{1}'</value></data>
   <data name="Dashboard_AlreadyInCollection" xml:space="preserve"><value>This document is already in collection '{0}'</value></data>
   <data name="Dashboard_FileMissingMessage" xml:space="preserve"><value>This file is missing. Open File Integrity to relink the path or clear it?</value></data>
-  <data name="Dashboard_About" xml:space="preserve"><value>Study Document Manager v{0}
+  <data name="Dashboard_About" xml:space="preserve"><value>Document Manager v{0}
 
-A personal study document management application
+A personal document management application
 Framework: Avalonia UI (.NET 9)
 Database: SQLite (local)
 
@@ -247,19 +247,7 @@ GitHub: github.com/hayato-shino05/study-document-manager</value></data>
   <data name="Main_CannotConnect" xml:space="preserve"><value>Cannot connect to the server.
 Please check your network connection.</value></data>
   <data name="Main_AlreadyLatest" xml:space="preserve"><value>You are using the latest version (v{0}).</value></data>
-  <data name="Main_About" xml:space="preserve"><value>Study Document Manager
-Professional Edition
-
-Version {0}
-
-Study document management application
-MVVM • Avalonia UI • .NET 9.0
-
-Created by: Vũ Đức Dũng - TT601-K14
-Instructor: Lê Thị Mai
-
-© 2024-2025 hayato-shino05
-GitHub: hayato-shino05/study-document-manager</value></data>
+  <data name="Main_About" xml:space="preserve"><value>Document Manager v{0}&#xA;&#xA;A personal document management application&#xA;Framework: Avalonia UI (.NET 9)&#xA;Database: SQLite (local)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
   <data name="SelectCollection_None" xml:space="preserve"><value>No collection selected</value></data>
   <data name="SelectCollection_Selected" xml:space="preserve"><value>Selected: {0}</value></data>
   <data name="AddEdit_PageTitleAdd" xml:space="preserve"><value>Add Document</value></data>
@@ -293,6 +281,10 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="Dashboard_CsvFileFilter" xml:space="preserve"><value>CSV|*.csv|All Files|*.*</value></data>
   <data name="Dashboard_BackupOpenFilter" xml:space="preserve"><value>Database|*.db|All Files|*.*</value></data>
   <data name="Menu_File" xml:space="preserve"><value>File</value></data>
+  <data name="Menu_Organize" xml:space="preserve"><value>Organize</value></data>
+  <data name="Menu_Import" xml:space="preserve"><value>Import</value></data>
+  <data name="Menu_Maintenance" xml:space="preserve"><value>Maintenance</value></data>
+  <data name="Menu_Analytics" xml:space="preserve"><value>Analytics</value></data>
   <data name="Menu_AddNewDocument" xml:space="preserve"><value>Add New Document</value></data>
   <data name="Menu_OpenDocument" xml:space="preserve"><value>Open Document</value></data>
   <data name="Menu_ExportCsv" xml:space="preserve"><value>Export CSV</value></data>
@@ -533,6 +525,9 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="AddEdit_LblNotes" xml:space="preserve"><value>Notes:</value></data>
   <data name="AddEdit_LblTags" xml:space="preserve"><value>Tags:</value></data>
   <data name="AddEdit_LblDeadline" xml:space="preserve"><value>Deadline:</value></data>
+  <data name="AddEdit_DateYearFormat" xml:space="preserve"><value>yyyy</value></data>
+  <data name="AddEdit_DateMonthFormat" xml:space="preserve"><value>M</value></data>
+  <data name="AddEdit_DateDayFormat" xml:space="preserve"><value>d</value></data>
   <data name="AddEdit_LblImportant" xml:space="preserve"><value>Important</value></data>
   <data name="AddEdit_BtnBrowse" xml:space="preserve"><value>Browse</value></data>
   <data name="AddEdit_BtnSave" xml:space="preserve"><value>Save</value></data>
@@ -608,7 +603,7 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="Dashboard_RestoreRestartRequired" xml:space="preserve"><value>The database was restored. Please reopen the application.</value></data>
   <data name="Dashboard_ExportWriteFailed" xml:space="preserve"><value>Could not write the CSV file</value></data>
   <data name="BatchImport_InvalidDrop" xml:space="preserve"><value>Files cannot be dropped on this screen</value></data>
-  <data name="MainWindow_Title" xml:space="preserve"><value>Study Document Manager - Professional Edition</value></data>
+  <data name="MainWindow_Title" xml:space="preserve"><value>Document Manager - Professional Edition</value></data>
   <data name="AddEdit_PlaceholderTags" xml:space="preserve"><value>tag1, tag2, tag3...</value></data>
   <data name="ChangeCategory_DocumentLabel" xml:space="preserve"><value>Document: "{0}"</value></data>
   <data name="ChangeCategory_ChipHint" xml:space="preserve"><value>Click an existing category to reuse it</value></data>
@@ -636,4 +631,18 @@ GitHub: hayato-shino05/study-document-manager</value></data>
   <data name="Dashboard_DeadlineStatusUrgent" xml:space="preserve"><value>Due within 3 days</value></data>
   <data name="Dashboard_DeadlineStatusUpcoming" xml:space="preserve"><value>Due within 7 days</value></data>
   <data name="Dashboard_DeadlineStatusScheduled" xml:space="preserve"><value>No imminent deadline</value></data>
+  <data name="FileType_PDF" xml:space="preserve"><value>PDF</value></data>
+  <data name="FileType_Word" xml:space="preserve"><value>Word</value></data>
+  <data name="FileType_PowerPoint" xml:space="preserve"><value>PowerPoint</value></data>
+  <data name="FileType_Excel" xml:space="preserve"><value>Excel</value></data>
+  <data name="FileType_Document" xml:space="preserve"><value>Document</value></data>
+  <data name="FileType_Data" xml:space="preserve"><value>Data</value></data>
+  <data name="FileType_Code" xml:space="preserve"><value>Code</value></data>
+  <data name="FileType_Book" xml:space="preserve"><value>Book</value></data>
+  <data name="FileType_Image" xml:space="preserve"><value>Image</value></data>
+  <data name="FileType_Video" xml:space="preserve"><value>Video</value></data>
+  <data name="FileType_Audio" xml:space="preserve"><value>Audio</value></data>
+  <data name="FileType_Archive" xml:space="preserve"><value>Archive</value></data>
+  <data name="FileType_Design" xml:space="preserve"><value>Design</value></data>
+  <data name="FileType_Other" xml:space="preserve"><value>Other</value></data>
 </root>

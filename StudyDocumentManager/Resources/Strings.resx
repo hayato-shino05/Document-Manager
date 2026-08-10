@@ -247,13 +247,13 @@
   <data name="Dashboard_AddedToCollection" xml:space="preserve"><value>'{0}' をコレクション '{1}' に追加しました</value></data>
   <data name="Dashboard_AlreadyInCollection" xml:space="preserve"><value>この文書は既にコレクション '{0}' に含まれています</value></data>
   <data name="Dashboard_FileMissingMessage" xml:space="preserve"><value>ファイルが見つかりません。ファイル整合性を開いてパスを再リンクまたはクリアしますか？</value></data>
-  <data name="Dashboard_About" xml:space="preserve"><value>Study Document Manager v{0}&#xA;&#xA;個人向け学習文書管理アプリケーション&#xA;Framework: Avalonia UI (.NET 9)&#xA;Database: SQLite (local)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
+  <data name="Dashboard_About" xml:space="preserve"><value>Document Manager v{0}&#xA;&#xA;個人向け文書管理アプリケーション&#xA;Framework: Avalonia UI (.NET 9)&#xA;Database: SQLite (local)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
 
   <!-- MainWindow -->
   <data name="Main_UpdateTitle" xml:space="preserve"><value>アップデート</value></data>
   <data name="Main_CannotConnect" xml:space="preserve"><value>サーバーに接続できません。&#xA;ネットワーク接続を確認してください。</value></data>
   <data name="Main_AlreadyLatest" xml:space="preserve"><value>最新バージョン (v{0}) をご利用中です。</value></data>
-  <data name="Main_About" xml:space="preserve"><value>Study Document Manager&#xA;Professional Edition&#xA;&#xA;バージョン {0}&#xA;&#xA;学習文書管理アプリケーション&#xA;MVVM • Avalonia UI • .NET 9.0&#xA;&#xA;制作: Vũ Đức Dũng - TT601-K14&#xA;指導: Lê Thị Mai&#xA;&#xA;© 2024-2025 hayato-shino05&#xA;GitHub: hayato-shino05/study-document-manager</value></data>
+  <data name="Main_About" xml:space="preserve"><value>Document Manager v{0}&#xA;&#xA;個人向け文書管理アプリケーション&#xA;Framework: Avalonia UI (.NET 9)&#xA;Database: SQLite (local)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
 
   <!-- SelectCollectionDialog -->
   <data name="SelectCollection_None" xml:space="preserve"><value>コレクションが未選択です</value></data>
@@ -312,6 +312,10 @@
 
   <!-- MainWindow - Menu -->
   <data name="Menu_File" xml:space="preserve"><value>ファイル</value></data>
+  <data name="Menu_Organize" xml:space="preserve"><value>整理</value></data>
+  <data name="Menu_Import" xml:space="preserve"><value>インポート</value></data>
+  <data name="Menu_Maintenance" xml:space="preserve"><value>メンテナンス</value></data>
+  <data name="Menu_Analytics" xml:space="preserve"><value>分析</value></data>
   <data name="Menu_AddNewDocument" xml:space="preserve"><value>新しい文書を追加</value></data>
   <data name="Menu_OpenDocument" xml:space="preserve"><value>文書を開く</value></data>
   <data name="Menu_ExportCsv" xml:space="preserve"><value>CSV出力</value></data>
@@ -610,6 +614,9 @@
   <data name="AddEdit_LblNotes" xml:space="preserve"><value>メモ:</value></data>
   <data name="AddEdit_LblTags" xml:space="preserve"><value>タグ:</value></data>
   <data name="AddEdit_LblDeadline" xml:space="preserve"><value>期限:</value></data>
+  <data name="AddEdit_DateYearFormat" xml:space="preserve"><value>yyyy年</value></data>
+  <data name="AddEdit_DateMonthFormat" xml:space="preserve"><value>M月</value></data>
+  <data name="AddEdit_DateDayFormat" xml:space="preserve"><value>d日</value></data>
   <data name="AddEdit_LblImportant" xml:space="preserve"><value>重要</value></data>
   <data name="AddEdit_BtnBrowse" xml:space="preserve"><value>参照</value></data>
   <data name="AddEdit_BtnSave" xml:space="preserve"><value>保存</value></data>
@@ -704,7 +711,7 @@
   <data name="Collection_AddToTitle" xml:space="preserve"><value>"{0}" に文書を追加</value></data>
 
   <data name="BatchImport_InvalidDrop" xml:space="preserve"><value>この画面ではファイルをドロップできません</value></data>
-  <data name="MainWindow_Title" xml:space="preserve"><value>Study Document Manager - Professional Edition</value></data>
+  <data name="MainWindow_Title" xml:space="preserve"><value>Document Manager - Professional Edition</value></data>
   <data name="AddEdit_PlaceholderTags" xml:space="preserve"><value>tag1, tag2, tag3...</value></data>
   <data name="ChangeCategory_DocumentLabel" xml:space="preserve"><value>文書: "{0}"</value></data>
   <data name="ChangeCategory_ChipHint" xml:space="preserve"><value>既存カテゴリをクリックすると入力欄に反映されます</value></data>
@@ -732,6 +739,20 @@
   <data name="Dashboard_DeadlineStatusUrgent" xml:space="preserve"><value>3日以内が期限</value></data>
   <data name="Dashboard_DeadlineStatusUpcoming" xml:space="preserve"><value>7日以内が期限</value></data>
   <data name="Dashboard_DeadlineStatusScheduled" xml:space="preserve"><value>期限に余裕あり</value></data>
+  <data name="FileType_PDF" xml:space="preserve"><value>PDF</value></data>
+  <data name="FileType_Word" xml:space="preserve"><value>Word文書</value></data>
+  <data name="FileType_PowerPoint" xml:space="preserve"><value>PowerPoint</value></data>
+  <data name="FileType_Excel" xml:space="preserve"><value>Excel</value></data>
+  <data name="FileType_Document" xml:space="preserve"><value>文書</value></data>
+  <data name="FileType_Data" xml:space="preserve"><value>データ</value></data>
+  <data name="FileType_Code" xml:space="preserve"><value>コード</value></data>
+  <data name="FileType_Book" xml:space="preserve"><value>電子書籍</value></data>
+  <data name="FileType_Image" xml:space="preserve"><value>画像</value></data>
+  <data name="FileType_Video" xml:space="preserve"><value>動画</value></data>
+  <data name="FileType_Audio" xml:space="preserve"><value>音声</value></data>
+  <data name="FileType_Archive" xml:space="preserve"><value>アーカイブ</value></data>
+  <data name="FileType_Design" xml:space="preserve"><value>デザイン</value></data>
+  <data name="FileType_Other" xml:space="preserve"><value>その他</value></data>
 </root>
 
 

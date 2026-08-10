@@ -17,7 +17,11 @@ public partial class PersonalNoteModel : ModelBase
     [ObservableProperty] private int _documentId;
     [ObservableProperty] private string _documentName = string.Empty;
     [ObservableProperty] private string _noteContent = string.Empty;
+    [ObservableProperty] private string _savedNoteContent = string.Empty;
     [ObservableProperty] private bool _hasExistingNote;
+
+    public bool CanSaveNote => !string.IsNullOrWhiteSpace(NoteContent);
+    public bool HasSavedNotePreview => HasExistingNote && !string.IsNullOrWhiteSpace(SavedNoteContent);
 
     public PersonalNoteModel(IPersonalNoteRepository noteRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
@@ -33,21 +37,46 @@ public partial class PersonalNoteModel : ModelBase
         DocumentName = docName;
         var note = _noteRepo.GetNote(docId);
         NoteContent = note ?? string.Empty;
+        SavedNoteContent = note ?? string.Empty;
         HasExistingNote = note != null;
     }
+
+    partial void OnNoteContentChanged(string value)
+        => OnPropertyChanged(nameof(CanSaveNote));
+
+    partial void OnSavedNoteContentChanged(string value)
+        => OnPropertyChanged(nameof(HasSavedNotePreview));
+
+    partial void OnHasExistingNoteChanged(bool value)
+        => OnPropertyChanged(nameof(HasSavedNotePreview));
 
     [RelayCommand]
     private async Task SaveNoteAsync()
     {
-        if (_noteRepo.SaveNote(DocumentId, NoteContent))
-        {
-            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Note_SaveSuccess"]);
-            HasExistingNote = true;
-        }
-        else
+        var content = NoteContent.Trim();
+        if (content.Length == 0)
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
+            return;
         }
+
+        NoteContent = content;
+        if (!_noteRepo.SaveNote(DocumentId, content))
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
+            return;
+        }
+
+        var persistedContent = _noteRepo.GetNote(DocumentId);
+        if (!string.Equals(persistedContent, content, StringComparison.Ordinal))
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
+            return;
+        }
+
+        SavedNoteContent = content;
+        HasExistingNote = true;
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Note_SaveSuccess"]);
     }
 
     [RelayCommand]
@@ -61,6 +90,7 @@ public partial class PersonalNoteModel : ModelBase
         if (_noteRepo.DeleteNote(DocumentId))
         {
             NoteContent = string.Empty;
+            SavedNoteContent = string.Empty;
             HasExistingNote = false;
             await _dialogService.ShowMessageAsync(_loc["Dialog_Deleted"], _loc["Note_DeleteSuccess"]);
         }
