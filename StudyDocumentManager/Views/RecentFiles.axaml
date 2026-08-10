@@ -14,11 +14,11 @@
                 <StackPanel Classes="page-header-stack" Margin="0">
                     <Image Source="{StaticResource IconCalendar}" Width="18" Height="18"/>
                     <TextBlock Classes="page-title"
-                               AutomationProperties.AutomationId="Screen_RecentFiles"
+                               AutomationProperties.AutomationId="Title_RecentFiles"
                                Text="{loc:Localize RecentFiles_Title}"/>
                 </StackPanel>
                 <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center"
-                           Text="{Binding RecentFiles.Count, StringFormat={}{0}}"
+                           Text="{Binding RecentFiles.Count, StringFormat={loc:Localize RecentFiles_CountFormat}}"
                            FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
             </DockPanel>
 
@@ -35,7 +35,7 @@
                 </Button>
                 <Button Classes="danger" AutomationProperties.AutomationId="RecentFiles_ClearHistory"
                         AutomationProperties.Name="{loc:Localize RecentFiles_BtnClear}"
-                        Command="{Binding ClearHistoryCommand}" Padding="12,5">
+                        Command="{Binding ClearHistoryCommand}" IsEnabled="{Binding HasRecentFiles}" Padding="12,5">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconDelete}" Width="16" Height="16"/>
                         <TextBlock Text="{loc:Localize RecentFiles_BtnClear}" FontSize="{StaticResource FontSizeSm}"/>

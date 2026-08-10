@@ -15,7 +15,7 @@
                 <StackPanel Classes="page-header-stack" Margin="0">
                     <Image Source="{StaticResource IconRecycle}" Width="18" Height="18"/>
                     <TextBlock Classes="page-title"
-                               AutomationProperties.AutomationId="Screen_RecycleBin"
+                               AutomationProperties.AutomationId="Title_RecycleBin"
                                Text="{loc:Localize RecycleBin_Title}"/>
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"

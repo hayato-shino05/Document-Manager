@@ -143,6 +143,19 @@
             </DrawingGroup>
         </DrawingImage>
 
+        <DrawingImage x:Key="IconTreeMap">
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource BrushIconAccent}"
+                    Geometry="M3,3 L12,3 L12,11 L3,11 Z"/>
+                <GeometryDrawing Brush="{StaticResource BrushIconSuccess}"
+                    Geometry="M14,3 L21,3 L21,7 L14,7 Z"/>
+                <GeometryDrawing Brush="{StaticResource BrushIconNeutralLight}"
+                    Geometry="M14,9 L21,9 L21,21 L14,21 Z"/>
+                <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"
+                    Geometry="M3,13 L12,13 L12,21 L3,21 Z"/>
+            </DrawingGroup>
+        </DrawingImage>
+
         <!-- Refresh -->
         <!-- Refresh — two-arc circular arrows (Material Design style) -->
         <DrawingImage x:Key="IconRefresh">

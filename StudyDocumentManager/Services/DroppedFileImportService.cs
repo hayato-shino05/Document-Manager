@@ -4,19 +4,30 @@ using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Core.Services;
 namespace StudyDocumentManager.Services;
 
-public class DroppedFileImportService(IDocumentRepository repository) : IDroppedFileImportService
+public class DroppedFileImportService(
+    IDocumentRepository repository,
+    ICategoryRepository? categoryRepository = null) : IDroppedFileImportService
 {
     private readonly IDocumentRepository _repository = repository;
+    private readonly ICategoryRepository? _categoryRepository = categoryRepository;
 
     public List<string> GetAvailableSubjects(IReadOnlyList<string> fallbackSubjects)
     {
-        var subjects = _repository.GetDistinctSubjects();
+        var subjects = _categoryRepository?.GetAllSubjects() ?? [];
+        if (subjects.Count > 0)
+            return subjects;
+
+        subjects = _repository.GetDistinctSubjects();
         return subjects.Count > 0 ? subjects : fallbackSubjects.ToList();
     }
 
     public List<string> GetAvailableTypes(IReadOnlyList<string> fallbackTypes)
     {
-        var types = _repository.GetDistinctTypes();
+        var types = _categoryRepository?.GetAllTypes() ?? [];
+        if (types.Count > 0)
+            return types;
+
+        types = _repository.GetDistinctTypes();
         return types.Count > 0 ? types : fallbackTypes.ToList();
     }
 

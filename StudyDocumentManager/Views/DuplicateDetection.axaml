@@ -11,7 +11,7 @@
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <Image Source="{StaticResource IconDuplicate}" Width="20" Height="20"/>
-                    <TextBlock AutomationProperties.AutomationId="Screen_DuplicateDetection"
+                    <TextBlock AutomationProperties.AutomationId="Title_DuplicateDetection"
                                Text="{loc:Localize DuplicateDetection_Title}" FontSize="{StaticResource FontSizeXl}"
                                FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>

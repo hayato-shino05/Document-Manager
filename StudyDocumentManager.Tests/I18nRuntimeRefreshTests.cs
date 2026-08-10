@@ -110,6 +110,30 @@ public class I18nRuntimeRefreshTests
     }
 
     [Fact]
+    public void DashboardModel_FilteredStatus_RemainsLocalizedAfterLanguageChange()
+    {
+        var localization = new ToggleLocalizationService();
+        var model = new DashboardModel(
+            new DashboardDocumentRepositoryStub(
+                new StudyDocument { Id = 1, Name = "Notes", Subject = "Math", Type = "PDF", IsImportant = true },
+                new StudyDocument { Id = 2, Name = "Other", Subject = "Science", Type = "PDF" }),
+            new DashboardRecycleBinRepositoryStub(),
+            new DashboardCategoryRepositoryStub(),
+            new DashboardCollectionRepositoryStub(),
+            null!, null!, null!, null!, null!, null!, null!, null!, null!, localization);
+
+        model.Initialize();
+        model.SearchKeyword = "Notes";
+        model.SearchCommand.Execute(null);
+
+        Assert.Equal("summary-jp:1/1/0", model.StatusText);
+
+        localization.SetLanguage(SupportedLanguage.English);
+
+        Assert.Equal("summary-en:1/1/0", model.StatusText);
+    }
+
+    [Fact]
     public void MainWindowModel_LanguageChange_RefreshesMaterializedFooterStatus()
     {
         var localization = new ToggleLocalizationService();
@@ -248,7 +272,9 @@ public class I18nRuntimeRefreshTests
         public StudyDocument? GetById(int id) => documents.FirstOrDefault(document => document.Id == id);
         public List<StudyDocument> Search(string keyword) => [];
         public List<StudyDocument> Filter(string subject, string type) => [];
-        public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => [];
+        public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant)
+            => documents.Where(document => string.IsNullOrWhiteSpace(keyword)
+                || document.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
         public bool Add(StudyDocument document) => false;
         public bool AddWithCatalogs(StudyDocument document) => false;
         public bool Update(StudyDocument document) => false;

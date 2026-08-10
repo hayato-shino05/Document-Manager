@@ -13,7 +13,7 @@
                 <StackPanel Classes="page-header-stack" Margin="0">
                     <Image Source="{StaticResource IconTreeMap}" Width="18" Height="18"/>
                     <TextBlock Classes="page-title"
-                               AutomationProperties.AutomationId="Screen_TreeMap"
+                               AutomationProperties.AutomationId="Title_TreeMap"
                                Text="{loc:Localize TreeMap_Title}"/>
                 </StackPanel>
             </DockPanel>
@@ -23,6 +23,11 @@
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <TextBlock Text="{loc:Localize TreeMap_LblGroupBy}" VerticalAlignment="Center"
                                FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
+                    <Button Classes="secondary"
+                            AutomationProperties.AutomationId="TreeMap_AllItems"
+                            AutomationProperties.Name="{loc:Localize Filter_AllItems}"
+                            Content="{loc:Localize Filter_AllItems}"
+                            Command="{Binding ShowAllCommand}" Padding="{StaticResource PaddingBtnSm}" FontSize="{StaticResource FontSizeSm}"/>
                     <Button Classes="primary"
                             AutomationProperties.AutomationId="TreeMap_ByCategory"
                             AutomationProperties.Name="{loc:Localize TreeMap_BtnByCategory}"
@@ -41,7 +46,8 @@
 
             <!-- TreeMap grid -->
             <Border Classes="card" Padding="{StaticResource PaddingCard}">
-                <ScrollViewer>
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding Items}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -50,7 +56,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:TreeMapItem">
-                                <Border MinWidth="120" MinHeight="80"
+                                <Border MinWidth="120" MaxWidth="240" MinHeight="80"
                                         AutomationProperties.Name="{Binding DisplayText}"
                                         Margin="4" Padding="{StaticResource PaddingCard}" CornerRadius="{StaticResource RadiusMd}"
                                         Background="{Binding Color}">

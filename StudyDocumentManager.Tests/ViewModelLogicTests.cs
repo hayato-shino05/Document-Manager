@@ -21,15 +21,17 @@ namespace StudyDocumentManager.Tests;
 public class DatabaseHelperDefaultPathTests
 {
     [Fact]
-    public void DatabasePath_WhenNotSet_ReturnsDefaultAppBaseDir()
+    public void DatabasePath_WhenNotSet_ReturnsLocalApplicationDataPath()
     {
         var db = new DatabaseHelper();
 
         var path = db.DatabasePath;
+        var expectedRoot = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
         Assert.False(string.IsNullOrEmpty(path));
         Assert.EndsWith("study_documents.db", path);
-        Assert.Contains("data", path);
+        Assert.Contains(Path.Combine("StudyDocumentManager", "data"), path);
+        Assert.StartsWith(expectedRoot, path, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

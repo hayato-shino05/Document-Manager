@@ -11,7 +11,7 @@
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <Image Source="{StaticResource IconCollection}" Width="20" Height="20"/>
-                    <TextBlock AutomationProperties.AutomationId="Screen_CollectionManagement"
+                    <TextBlock AutomationProperties.AutomationId="Title_CollectionManagement"
                                Text="{loc:Localize CollectionMgmt_Title}" FontSize="{StaticResource FontSizeXl}"
                                FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
@@ -89,6 +89,20 @@
                                             <Image Source="{StaticResource IconEdit}" Width="11" Height="11"/>
                                             <TextBlock Text="{loc:Localize CollectionMgmt_BtnRename}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
+                                    </Button>
+                                    <Button Classes="secondary" Click="OnSelectAllDocumentsClicked"
+                                            AutomationProperties.AutomationId="CollectionManagement_SelectAllDocuments"
+                                            AutomationProperties.Name="{loc:Localize Bulk_BtnSelectAll}"
+                                            IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                            Padding="{StaticResource PaddingSm}">
+                                        <TextBlock Text="{loc:Localize Bulk_BtnSelectAll}" FontSize="{StaticResource FontSizeSm}"/>
+                                    </Button>
+                                    <Button Classes="secondary" Click="OnDeselectAllDocumentsClicked"
+                                            AutomationProperties.AutomationId="CollectionManagement_DeselectAllDocuments"
+                                            AutomationProperties.Name="{loc:Localize Bulk_BtnDeselectAll}"
+                                            IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                            Padding="{StaticResource PaddingSm}">
+                                        <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{StaticResource FontSizeSm}"/>
                                     </Button>
                                     <Button Classes="danger" Command="{Binding RemoveSelectedDocumentsCommand}" Padding="{StaticResource PaddingSm}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">

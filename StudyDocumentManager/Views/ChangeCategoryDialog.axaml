@@ -4,7 +4,7 @@
                 x:Class="StudyDocumentManager.Views.ChangeCategoryDialog"
         AutomationProperties.AutomationId="Dialog_ChangeCategory"
         Title="{loc:Localize ChangeCategory_Title}"
-        Width="420" SizeToContent="Height"
+        Width="420" MaxHeight="520" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="True"
         ShowInTaskbar="False"
@@ -17,7 +17,7 @@
         </Style>
     </Window.Styles>
 
-    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24" Spacing="12">
 
 

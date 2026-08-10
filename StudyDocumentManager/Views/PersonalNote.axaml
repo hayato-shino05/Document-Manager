@@ -39,7 +39,7 @@
                            Width="20"
                            Height="20"
                            VerticalAlignment="Center"/>
-                    <TextBlock AutomationProperties.AutomationId="Screen_PersonalNote"
+                    <TextBlock AutomationProperties.AutomationId="Title_PersonalNote"
                                Text="{loc:Localize PersonalNote_Title}"
                                FontSize="{StaticResource FontSizeXl}"
                                FontWeight="Bold"
@@ -81,13 +81,13 @@
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource TextSecondary}"/>
                         <TextBlock x:Name="txtSavedNotePreview"
-                                   Text="{Binding NoteContent}"
+                                   Text="{Binding SavedNoteContent}"
                                    FontSize="{StaticResource FontSizeMd}"
                                    Foreground="{StaticResource TextPrimary}"
                                    TextWrapping="Wrap"
                                    MaxLines="3"
                                    TextTrimming="CharacterEllipsis"
-                                   ToolTip.Tip="{Binding NoteContent}"
+                                   ToolTip.Tip="{Binding SavedNoteContent}"
                                    AutomationProperties.Name="{loc:Localize AddEdit_LblNotes}"/>
                     </StackPanel>
                 </Border>

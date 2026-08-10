@@ -573,6 +573,48 @@ public class AvaloniaBindingRegressionTests
     }
 
     [AvaloniaFact]
+    public void AddDocumentDialog_LongPathStaysInsideViewport()
+    {
+        GetLocalization();
+        var longPath = "C:/Users/ADMIN/Downloads/" + new string('長', 80) + ".docx";
+        var dialog = new AddDocumentDialog(longPath, ["Study"], ["Word"]);
+        dialog.Show();
+
+        try
+        {
+            var pathText = dialog.FindControl<TextBlock>("txtFilePath");
+
+            Assert.NotNull(pathText);
+            Assert.True(pathText!.Bounds.Right <= dialog.Bounds.Width + 1);
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
+
+    [AvaloniaFact]
+    public void AddDocumentDialog_DeadlineStaysInsideViewport()
+    {
+        GetLocalization();
+        var dialog = new AddDocumentDialog("C:/drop/test.pdf", ["Study"], ["PDF"]);
+        dialog.Show();
+
+        try
+        {
+            var deadlinePicker = dialog.FindControl<DatePicker>("dpDeadline");
+
+            Assert.NotNull(deadlinePicker);
+            Assert.True(deadlinePicker!.Bounds.Bottom <= dialog.Bounds.Height + 1);
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void AddDocumentDialog_BlankName_ShowsInlineErrorAndKeepsFocusOnName()
     {
         var localization = GetLocalization();
@@ -594,6 +636,52 @@ public class AvaloniaBindingRegressionTests
             Assert.True(error!.IsVisible);
             Assert.Equal(localization["AddEdit_NameRequired"], error.Text);
             Assert.Same(nameBox, TopLevel.GetTopLevel(dialog)?.FocusManager?.GetFocusedElement());
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void AddDocumentDialog_PopulatesSubjectCatalog()
+    {
+        GetLocalization();
+        var dialog = new AddDocumentDialog("C:/drop/test.pdf", ["Study", "Finance"], ["PDF"]);
+        dialog.Show();
+
+        try
+        {
+            var subjectBox = dialog.FindControl<ComboBox>("cboMonHoc");
+
+            Assert.NotNull(subjectBox);
+            Assert.Equal(["Study", "Finance"], subjectBox!.Items.Cast<string>().ToArray());
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void ChangeCategoryDialog_WrapsCategoriesAndKeepsActionsVisible()
+    {
+        var localization = GetLocalization();
+        var categories = Enumerable.Range(1, 12)
+            .Select(index => $"Category {index}")
+            .ToList();
+        var dialog = new ChangeCategoryDialog("Algorithms notes", categories, "Category 1", localization);
+        dialog.Show();
+
+        try
+        {
+            var saveButton = dialog.FindControl<Button>("OkButton");
+            var cancelButton = dialog.FindControl<Button>("CancelButton");
+
+            Assert.NotNull(saveButton);
+            Assert.NotNull(cancelButton);
+            Assert.True(saveButton!.Bounds.Right <= dialog.Bounds.Width + 1);
+            Assert.True(cancelButton!.Bounds.Right <= dialog.Bounds.Width + 1);
         }
         finally
         {
@@ -740,6 +828,20 @@ public class AvaloniaBindingRegressionTests
             Assert.Same(model.DocumentsInCollection, documentGrid!.ItemsSource);
             Assert.Equal(SelectionMode.Multiple, documentGrid.SelectionMode);
 
+            var selectionButtons = view.GetVisualDescendants().OfType<Button>().ToList();
+            var selectAllButton = selectionButtons.Single(button =>
+                AutomationProperties.GetAutomationId(button) == "CollectionManagement_SelectAllDocuments");
+            var deselectAllButton = selectionButtons.Single(button =>
+                AutomationProperties.GetAutomationId(button) == "CollectionManagement_DeselectAllDocuments");
+
+            selectAllButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+            FlushAvaloniaBindings();
+            Assert.Equal(model.DocumentsInCollection.Count, model.SelectedDocumentsInCollection.Count);
+
+            deselectAllButton!.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+            FlushAvaloniaBindings();
+            Assert.Empty(model.SelectedDocumentsInCollection.Cast<StudyDocument>());
+
             var texts = view.GetVisualDescendants().OfType<TextBlock>().Select(text => text.Text);
             Assert.Contains("Calculus", texts);
 
@@ -758,6 +860,39 @@ public class AvaloniaBindingRegressionTests
         finally
         {
             window.Close();
+        }
+    }
+
+
+    [AvaloniaFact]
+    public void AddToCollectionDialog_ItemCheckboxUpdatesConfirmState()
+    {
+        var localization = GetLocalization();
+        var dialog = new AddToCollectionDialog(
+            [new StudyDocument { Id = 1, Name = "Guide" }],
+            [],
+            "Collection",
+            localization);
+        dialog.Show();
+
+        try
+        {
+            FlushAvaloniaBindings();
+            var checkbox = dialog.GetVisualDescendants().OfType<CheckBox>()
+                .Single(control => AutomationProperties.GetName(control) == "Guide");
+            var confirmButton = dialog.FindControl<Button>("ConfirmButton");
+
+            Assert.NotNull(confirmButton);
+            Assert.False(confirmButton!.IsEnabled);
+
+            checkbox.IsChecked = true;
+            FlushAvaloniaBindings();
+
+            Assert.True(confirmButton.IsEnabled);
+        }
+        finally
+        {
+            dialog.Close();
         }
     }
 

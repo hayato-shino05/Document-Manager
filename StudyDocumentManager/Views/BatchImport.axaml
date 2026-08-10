@@ -11,7 +11,7 @@
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,12">
                 <Image Source="{StaticResource IconImport}" Width="18" Height="18"/>
                 <TextBlock Text="{loc:Localize BatchImport_Title}"
-                           AutomationProperties.AutomationId="Screen_BatchImport"
+                           AutomationProperties.AutomationId="Title_BatchImport"
                            FontSize="{StaticResource FontSizeXl}"
                            FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
             </StackPanel>

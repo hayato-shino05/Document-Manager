@@ -4,8 +4,8 @@
                 x:Class="StudyDocumentManager.Views.AddDocumentDialog"
         AutomationProperties.AutomationId="Dialog_AddDocument"
         Title="{loc:Localize AddDocDialog_Title}"
-        Width="520" Height="480"
-        MinWidth="450" MinHeight="400"
+        Width="520" Height="560"
+        MinWidth="450" MinHeight="440"
         WindowStartupLocation="CenterOwner"
         CanResize="True"
         Background="{StaticResource ContentBackground}">
@@ -21,15 +21,18 @@
 
 
             <Border DockPanel.Dock="Top" Classes="info-banner">
-                <StackPanel Orientation="Horizontal" Spacing="6">
+                <Grid ColumnDefinitions="Auto,*">
                     <Image Source="{StaticResource IconOpenFile}" Width="16" Height="16"/>
-                    <TextBlock Name="txtFilePath"
+                    <TextBlock Grid.Column="1"
+                               Name="txtFilePath"
                                AutomationProperties.AutomationId="Dialog_AddDocument_FilePath"
                                AutomationProperties.Name="{loc:Localize AddEdit_LblFilePath}"
                                FontSize="{StaticResource FontSizeSm}"
                                Foreground="{StaticResource TextSecondary}"
-                               TextTrimming="CharacterEllipsis"/>
-                </StackPanel>
+                               Margin="6,0,0,0"
+                               TextTrimming="CharacterEllipsis"
+                               HorizontalAlignment="Stretch"/>
+                </Grid>
             </Border>
 
 
@@ -58,7 +61,7 @@
             </StackPanel>
 
 
-            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                           VerticalScrollBarVisibility="Auto">
                 <StackPanel Spacing="10">
 

@@ -11,7 +11,7 @@
         <DockPanel>
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,12">
                 <Image Source="{StaticResource IconBulkDelete}" Width="18" Height="18"/>
-                <TextBlock AutomationProperties.AutomationId="Screen_BulkDelete"
+                <TextBlock AutomationProperties.AutomationId="Title_BulkDelete"
                            Text="{loc:Localize BulkDelete_Title}" FontSize="{StaticResource FontSizeXl}"
                            FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
             </StackPanel>
@@ -51,60 +51,69 @@
 
             <Border DockPanel.Dock="Bottom" Background="{StaticResource SidebarBackground}"
                     CornerRadius="{StaticResource RadiusMd}" Padding="{StaticResource PaddingMd}" Margin="0,12,0,0">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                    <Grid ColumnDefinitions="*,Auto">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="{Binding SelectedCountText}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
-                                   Foreground="{StaticResource TextSecondary}" Margin="0,0,8,0"/>
-                        <Button Classes="secondary" Command="{Binding SelectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
+                <StackPanel Spacing="8">
+                    <WrapPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding SelectedCountText}" FontSize="{StaticResource FontSizeSm}"
+                                   VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="0,0,8,0"/>
+                        <Button Classes="secondary" Command="{Binding SelectAllCommand}"
+                                AutomationProperties.AutomationId="BulkDelete_SelectAll"
+                                AutomationProperties.Name="{loc:Localize Bulk_BtnSelectAll}"
+                                Margin="0,0,8,8" Padding="{StaticResource PaddingBtnMd}">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconCheck}" Width="14" Height="14"/>
                                 <TextBlock Text="{loc:Localize Bulk_BtnSelectAll}" FontSize="{StaticResource FontSizeSm}"/>
                             </StackPanel>
                         </Button>
-                        <Button Classes="secondary" Command="{Binding DeselectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
+                        <Button Classes="secondary" Command="{Binding DeselectAllCommand}"
+                                AutomationProperties.AutomationId="BulkDelete_DeselectAll"
+                                AutomationProperties.Name="{loc:Localize Bulk_BtnDeselectAll}"
+                                IsEnabled="{Binding HasSelection}"
+                                Margin="0,0,8,8" Padding="{StaticResource PaddingBtnMd}">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconClose}" Width="14" Height="14"/>
                                 <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{StaticResource FontSizeSm}"/>
                             </StackPanel>
                         </Button>
+                    </WrapPanel>
 
-                        <Border Width="1" Height="22" Background="{StaticResource CardBorder}" Margin="4,0"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Padding="{StaticResource PaddingBtnMd}" Command="{Binding MarkImportantCommand}"
+                                        IsEnabled="{Binding HasSelection}" Classes="warning">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <Image Source="{StaticResource IconStar}" Width="12" Height="12"/>
+                                        <TextBlock Text="{loc:Localize BulkDelete_BtnMarkImportant}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
 
-                        <Button Padding="{StaticResource PaddingBtnMd}" Command="{Binding MarkImportantCommand}"
-                                Classes="warning">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="{StaticResource IconStar}" Width="12" Height="12"/>
-                                <TextBlock Text="{loc:Localize BulkDelete_BtnMarkImportant}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
+                                <ComboBox Name="cboNewSubject" Width="130" FontSize="{StaticResource FontSizeSm}" Height="28" VerticalAlignment="Center"/>
+                                <Button Padding="{StaticResource PaddingBtnMd}" Command="{Binding ChangeSubjectCommand}"
+                                        IsEnabled="{Binding HasSelection}" Classes="primary">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <Image Source="{StaticResource IconCategory}" Width="12" Height="12"/>
+                                        <TextBlock Text="{loc:Localize BulkDelete_BtnChangeSubject}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
                             </StackPanel>
-                        </Button>
+                        </ScrollViewer>
 
-                        <ComboBox Name="cboNewSubject" Width="130" FontSize="{StaticResource FontSizeSm}" Height="28" VerticalAlignment="Center"/>
-                        <Button Padding="{StaticResource PaddingBtnMd}" Command="{Binding ChangeSubjectCommand}"
-                                Classes="primary">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="{StaticResource IconCategory}" Width="12" Height="12"/>
-                                <TextBlock Text="{loc:Localize BulkDelete_BtnChangeSubject}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                        <Button AutomationProperties.AutomationId="BulkDelete_DeleteSelected"
-                                AutomationProperties.Name="{loc:Localize BulkDelete_BtnDelete}"
-                                Padding="{StaticResource PaddingBtnPrimary}" Command="{Binding DeleteSelectedCommand}"
-                                Classes="danger">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
-                                <TextBlock Text="{loc:Localize BulkDelete_BtnDelete}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="{StaticResource PaddingMd}">
-                            <TextBlock Text="{loc:Localize Toolbar_GoBack}" FontSize="{StaticResource FontSizeMd}"/>
-                        </Button>
-                    </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <Button AutomationProperties.AutomationId="BulkDelete_DeleteSelected"
+                                    AutomationProperties.Name="{loc:Localize BulkDelete_BtnDelete}"
+                                    Padding="{StaticResource PaddingBtnPrimary}" Command="{Binding DeleteSelectedCommand}"
+                                    IsEnabled="{Binding HasSelection}" Classes="danger">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
+                                    <TextBlock Text="{loc:Localize BulkDelete_BtnDelete}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="{StaticResource PaddingMd}">
+                                <TextBlock Text="{loc:Localize Toolbar_GoBack}" FontSize="{StaticResource FontSizeMd}"/>
+                            </Button>
+                        </StackPanel>
                     </Grid>
-                </ScrollViewer>
+                </StackPanel>
             </Border>
 
             <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
@@ -122,7 +131,7 @@
                               CanUserSortColumns="True"
                               GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                         <DataGrid.Columns>
-                            <DataGridCheckBoxColumn Header="✓" Binding="{Binding IsSelected}" Width="40"/>
+                            <DataGridCheckBoxColumn Header="✓" Binding="{Binding IsSelected, Mode=TwoWay}" Width="40"/>
                             <DataGridTemplateColumn Header="{loc:Localize AddEdit_LblName}" Width="*" MinWidth="200" SortMemberPath="Document.Name">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="vm:SelectableDocument">

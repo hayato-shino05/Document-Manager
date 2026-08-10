@@ -271,7 +271,7 @@ public partial class DashboardModel : ModelBase
         IsEmptyState = documents.Count == 0;
         HasLoadError = false;
         StateMessage = IsEmptyState ? _loc["Dashboard_EmptyState"] : string.Empty;
-        StatusText = string.Format(_loc["Status_TotalSummary"], TotalDocuments, ImportantDocuments, OverdueDocuments);
+        SetLocalizedStatus("Status_TotalSummary", TotalDocuments, ImportantDocuments, OverdueDocuments);
         NotifyStatPropertiesChanged();
     }
 

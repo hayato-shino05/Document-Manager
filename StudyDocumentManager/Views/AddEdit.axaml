@@ -27,7 +27,7 @@
                            Height="20"
                            VerticalAlignment="Center"/>
                     <TextBlock Text="{Binding PageTitle}"
-                               AutomationProperties.AutomationId="Screen_AddEdit"
+                               AutomationProperties.AutomationId="Title_AddEdit"
                                FontSize="{StaticResource FontSizeXl}"
                                FontWeight="Bold"
                                Foreground="{StaticResource TextPrimary}"

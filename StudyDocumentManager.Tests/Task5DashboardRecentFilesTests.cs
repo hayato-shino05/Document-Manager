@@ -81,6 +81,18 @@ public sealed class Task5DashboardRecentFilesTests
     }
 
     [Fact]
+    public void RecentFiles_ExposesHistoryAvailability()
+    {
+        var withHistory = CreateRecent(
+            new Task5RecentRepository((7, "Notes", "Math", "PDF", null, DateTime.Now)),
+            new Task5Launcher());
+        var withoutHistory = CreateRecent(new Task5RecentRepository(), new Task5Launcher());
+
+        Assert.True(withHistory.HasRecentFiles);
+        Assert.False(withoutHistory.HasRecentFiles);
+    }
+
+    [Fact]
     public void RecentFiles_ExistingFile_LaunchesThenAddsHistory()
     {
         var path = Path.GetTempFileName();

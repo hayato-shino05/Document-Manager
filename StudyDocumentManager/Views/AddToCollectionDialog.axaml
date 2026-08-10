@@ -120,6 +120,7 @@
                                     <CheckBox Grid.Column="0"
                                               AutomationProperties.Name="{Binding Document.Name}"
                                               IsChecked="{Binding IsSelected}"
+                                              IsCheckedChanged="OnItemSelectionChanged"
                                               VerticalAlignment="Center"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
                                         <TextBlock Text="{Binding Document.Name}"

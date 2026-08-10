@@ -33,6 +33,7 @@ public partial class BulkDeleteModel : ModelBase
     [ObservableProperty] private string _statusText = "";
     public int SelectedCount => Documents.Count(d => d.IsSelected);
     public string SelectedCountText => string.Format(_loc["Bulk_SelectedCount"], SelectedCount);
+    public bool HasSelection => SelectedCount > 0;
 
     public BulkDeleteModel(IDocumentRepository repository, IBulkOperationRepository bulkRepo, ICategoryRepository categoryRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
@@ -111,7 +112,7 @@ public partial class BulkDeleteModel : ModelBase
     {
         OnPropertyChanged(nameof(SelectedCount));
         OnPropertyChanged(nameof(SelectedCountText));
-        OnPropertyChanged(nameof(Documents));
+        OnPropertyChanged(nameof(HasSelection));
     }
 
     [RelayCommand]

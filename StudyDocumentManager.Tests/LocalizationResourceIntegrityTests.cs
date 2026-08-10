@@ -95,12 +95,23 @@ public class LocalizationResourceIntegrityTests
     [InlineData(SupportedLanguage.Chinese, "Strings.zh.resx")]
     public void LocalizationService_ResolvesEveryLocalizedResourceValue(SupportedLanguage language, string fileName)
     {
-        var expected = LoadResources(fileName);
-        var localization = new LocalizationService();
-        localization.SetLanguage(language);
+        var originalCulture = System.Globalization.CultureInfo.CurrentCulture;
+        var originalUiCulture = System.Globalization.CultureInfo.CurrentUICulture;
 
-        foreach (var (key, value) in expected)
-            Assert.Equal(NormalizeLineEndings(value), NormalizeLineEndings(localization[key]));
+        try
+        {
+            var expected = LoadResources(fileName);
+            var localization = new LocalizationService();
+            localization.SetLanguage(language);
+
+            foreach (var (key, value) in expected)
+                Assert.Equal(NormalizeLineEndings(value), NormalizeLineEndings(localization[key]));
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentCulture = originalCulture;
+            System.Globalization.CultureInfo.CurrentUICulture = originalUiCulture;
+        }
     }
 
     [Fact]

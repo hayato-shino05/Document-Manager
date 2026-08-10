@@ -43,8 +43,10 @@ public class IconResourceConsistencyTests
     [Fact]
     public void AppTheme_DefinesWhiteAndNeutralIconVariants()
     {
-        var appTheme = System.IO.File.ReadAllText(@"D:\Github-Project\study-document-manager\StudyDocumentManager\Themes\AppTheme.axaml");
+        var appTheme = File.ReadAllText(
+            GetSourceFilePath("StudyDocumentManager", "Themes", "AppTheme.axaml"));
 
+        Assert.Contains("x:Key=\"IconTreeMap\"", appTheme);
         Assert.Contains("x:Key=\"IconSaveWhite\"", appTheme);
         Assert.Contains("x:Key=\"IconCheckNeutral\"", appTheme);
         Assert.Contains("x:Key=\"IconSearchWhite\"", appTheme);
@@ -72,5 +74,19 @@ public class IconResourceConsistencyTests
     }
 
     private static string LoadView(string fileName)
-        => System.IO.File.ReadAllText($@"D:\Github-Project\study-document-manager\StudyDocumentManager\Views\{fileName}");
+        => File.ReadAllText(
+            GetSourceFilePath("StudyDocumentManager", "Views", fileName));
+
+    private static string GetSourceFilePath(params string[] pathSegments)
+    {
+        for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
+             directory is not null;
+             directory = directory.Parent)
+        {
+            if (File.Exists(Path.Combine(directory.FullName, "StudyDocumentManager.sln")))
+                return Path.Combine(directory.FullName, Path.Combine(pathSegments));
+        }
+
+        throw new DirectoryNotFoundException("Could not locate the solution root.");
+    }
 }

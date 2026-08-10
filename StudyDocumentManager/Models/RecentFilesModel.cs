@@ -16,6 +16,8 @@ public partial class RecentFilesModel : ModelBase
 
     [ObservableProperty] private ObservableCollection<RecentFileItem> _recentFiles = new();
 
+    public bool HasRecentFiles => RecentFiles.Count > 0;
+
     public RecentFilesModel(
         IDialogService dialogService,
         INavigationService navigationService,
@@ -51,6 +53,8 @@ public partial class RecentFilesModel : ModelBase
                 FileMissingLabel = _loc["Recent_FileMissing"]
             });
         }
+
+        OnPropertyChanged(nameof(HasRecentFiles));
     }
 
     [RelayCommand]

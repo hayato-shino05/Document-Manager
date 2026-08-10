@@ -17,10 +17,11 @@ public partial class PersonalNoteModel : ModelBase
     [ObservableProperty] private int _documentId;
     [ObservableProperty] private string _documentName = string.Empty;
     [ObservableProperty] private string _noteContent = string.Empty;
+    [ObservableProperty] private string _savedNoteContent = string.Empty;
     [ObservableProperty] private bool _hasExistingNote;
 
     public bool CanSaveNote => !string.IsNullOrWhiteSpace(NoteContent);
-    public bool HasSavedNotePreview => HasExistingNote && !string.IsNullOrWhiteSpace(NoteContent);
+    public bool HasSavedNotePreview => HasExistingNote && !string.IsNullOrWhiteSpace(SavedNoteContent);
 
     public PersonalNoteModel(IPersonalNoteRepository noteRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
     {
@@ -36,14 +37,15 @@ public partial class PersonalNoteModel : ModelBase
         DocumentName = docName;
         var note = _noteRepo.GetNote(docId);
         NoteContent = note ?? string.Empty;
+        SavedNoteContent = note ?? string.Empty;
         HasExistingNote = note != null;
     }
 
     partial void OnNoteContentChanged(string value)
-    {
-        OnPropertyChanged(nameof(CanSaveNote));
-        OnPropertyChanged(nameof(HasSavedNotePreview));
-    }
+        => OnPropertyChanged(nameof(CanSaveNote));
+
+    partial void OnSavedNoteContentChanged(string value)
+        => OnPropertyChanged(nameof(HasSavedNotePreview));
 
     partial void OnHasExistingNoteChanged(bool value)
         => OnPropertyChanged(nameof(HasSavedNotePreview));
@@ -72,6 +74,7 @@ public partial class PersonalNoteModel : ModelBase
             return;
         }
 
+        SavedNoteContent = content;
         HasExistingNote = true;
         await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Note_SaveSuccess"]);
     }
@@ -87,6 +90,7 @@ public partial class PersonalNoteModel : ModelBase
         if (_noteRepo.DeleteNote(DocumentId))
         {
             NoteContent = string.Empty;
+            SavedNoteContent = string.Empty;
             HasExistingNote = false;
             await _dialogService.ShowMessageAsync(_loc["Dialog_Deleted"], _loc["Note_DeleteSuccess"]);
         }

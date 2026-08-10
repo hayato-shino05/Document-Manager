@@ -12,7 +12,7 @@
                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <Image Source="{StaticResource IconReport}" Width="18" Height="18"/>
                     <TextBlock Text="{loc:Localize Report_Title}"
-                               AutomationProperties.AutomationId="Screen_Report"
+                               AutomationProperties.AutomationId="Title_Report"
                                FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
                                Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>

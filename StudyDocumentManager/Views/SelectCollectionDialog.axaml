@@ -4,13 +4,13 @@
                 x:Class="StudyDocumentManager.Views.SelectCollectionDialog"
         AutomationProperties.AutomationId="Dialog_SelectCollection"
         Title="{loc:Localize SelectCollDialog_Title}"
-        Width="440" SizeToContent="Height"
+        Width="440" MaxHeight="520" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="True"
         ShowInTaskbar="False"
         Background="{StaticResource ContentBackground}">
 
-    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24" Spacing="12">
 
         <!-- Document name label -->

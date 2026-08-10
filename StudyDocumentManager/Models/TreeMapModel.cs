@@ -9,23 +9,27 @@ namespace StudyDocumentManager.Models;
 public partial class TreeMapModel : ModelBase
 {
     private readonly INavigationService _navigationService;
+    private readonly IDocumentRepository _documentRepository;
     private readonly IReportRepository _reportRepo;
 
     [ObservableProperty] private ObservableCollection<TreeMapItem> _items = new();
-    [ObservableProperty] private string _selectedMode = "subject"; // "subject" or "type"
+    [ObservableProperty] private string _selectedMode = "subject";
     [ObservableProperty] private int _totalDocuments;
 
-    // Predefined colors for tree map blocks
     private static readonly string[] BlockColors =
     {
-        "#1D4ED8", "#B91C1C", "#15803D", "#B45309", "#6D28D9",
-        "#0E7490", "#BE185D", "#0F766E", "#C2410C", "#4338CA",
-        "#4D7C0F", "#9F1239", "#0369A1", "#7E22CE", "#A16207"
+        "#1D4ED8", "#B91C1C", "#15803D", "#B45309", "#0E7490",
+        "#0F766E", "#C2410C", "#4D7C0F", "#0369A1", "#A16207",
+        "#9A3412", "#166534", "#075985", "#92400E", "#7F1D1D"
     };
 
-    public TreeMapModel(INavigationService navigationService, IReportRepository reportRepo)
+    public TreeMapModel(
+        INavigationService navigationService,
+        IDocumentRepository documentRepository,
+        IReportRepository reportRepo)
     {
         _navigationService = navigationService;
+        _documentRepository = documentRepository;
         _reportRepo = reportRepo;
         LoadData();
     }
@@ -35,17 +39,22 @@ public partial class TreeMapModel : ModelBase
     [RelayCommand]
     private void LoadData()
     {
-        var data = SelectedMode == "type"
-            ? _reportRepo.GetByType()
-            : _reportRepo.GetBySubject();
+        var data = SelectedMode switch
+        {
+            "all" => _documentRepository.GetAll()
+                .Select(document => (Label: document.Name, Count: 1))
+                .ToList(),
+            "type" => _reportRepo.GetByType(),
+            _ => _reportRepo.GetBySubject()
+        };
 
-        TotalDocuments = data.Sum(d => d.Count);
+        TotalDocuments = data.Sum(item => item.Count);
 
         var list = new ObservableCollection<TreeMapItem>();
-        for (int i = 0; i < data.Count; i++)
+        for (var i = 0; i < data.Count; i++)
         {
             var item = data[i];
-            double percentage = TotalDocuments > 0 ? (double)item.Count / TotalDocuments * 100 : 0;
+            var percentage = TotalDocuments > 0 ? (double)item.Count / TotalDocuments * 100 : 0;
             list.Add(new TreeMapItem
             {
                 Label = item.Label,
@@ -57,6 +66,12 @@ public partial class TreeMapModel : ModelBase
         }
 
         Items = list;
+    }
+
+    [RelayCommand]
+    private void ShowAll()
+    {
+        SelectedMode = "all";
     }
 
     [RelayCommand]

@@ -28,7 +28,7 @@
                     <Image Source="{StaticResource IconSearch}" Width="16" Height="16"
                            VerticalAlignment="Center"/>
                     <TextBox Width="260" Height="{StaticResource HeightControl}" FontSize="{StaticResource FontSizeMd}"
-                             AutomationProperties.AutomationId="Screen_Dashboard"
+                             AutomationProperties.AutomationId="Dashboard_SearchInput"
                              Watermark="{loc:Localize Dashboard_SearchPlaceholder}"
                              AutomationProperties.Name="{loc:Localize Dashboard_SearchPlaceholder}"
                              Text="{Binding SearchKeyword, Mode=TwoWay}"

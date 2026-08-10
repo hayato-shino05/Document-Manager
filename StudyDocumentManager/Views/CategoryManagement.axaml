@@ -11,7 +11,7 @@
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <Image Source="{StaticResource IconCategory}" Width="18" Height="18"/>
-                    <TextBlock AutomationProperties.AutomationId="Screen_CategoryManagement"
+                    <TextBlock AutomationProperties.AutomationId="Title_CategoryManagement"
                                Text="{loc:Localize CategoryMgmt_Title}" FontSize="{StaticResource FontSizeXl}"
                                FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>

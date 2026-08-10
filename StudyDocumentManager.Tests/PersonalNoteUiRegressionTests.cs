@@ -52,6 +52,7 @@ public sealed class PersonalNoteUiRegressionTests
         {
             DocumentName = "Algebra",
             NoteContent = "Saved note content",
+            SavedNoteContent = "Saved note content",
             HasExistingNote = true
         };
         var view = new PersonalNote { DataContext = model };
@@ -83,6 +84,7 @@ public sealed class PersonalNoteUiRegressionTests
         {
             DocumentName = "Algebra",
             NoteContent = string.Empty,
+            SavedNoteContent = string.Empty,
             HasExistingNote = true
         };
         var view = new PersonalNote { DataContext = model };
@@ -151,6 +153,41 @@ public sealed class PersonalNoteUiRegressionTests
             Assert.Equal("Runtime note", repository.GetNote(7));
             Assert.True(model.HasExistingNote);
             Assert.True(model.CanSaveNote);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void PersonalNote_DoesNotShowUnsavedEditorChangesAsSavedPreview()
+    {
+        var model = new PersonalNoteModel(
+            new PersonalNoteRepositoryStub(),
+            new DialogServiceStub(),
+            new NavigationServiceStub(),
+            new LocalizationServiceStub())
+        {
+            DocumentName = "Algebra",
+            NoteContent = "Draft note",
+            SavedNoteContent = "Saved note",
+            HasExistingNote = true
+        };
+        var view = new PersonalNote { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            window.Show();
+            var preview = view.FindControl<TextBlock>("txtSavedNotePreview");
+
+            Assert.NotNull(preview);
+            Assert.Equal("Saved note", preview!.Text);
+
+            model.NoteContent = "Changed draft";
+
+            Assert.Equal("Saved note", preview.Text);
         }
         finally
         {

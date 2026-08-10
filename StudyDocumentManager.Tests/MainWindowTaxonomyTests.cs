@@ -22,22 +22,22 @@ public sealed class MainWindowTaxonomyTests
     public void MainWindow_KeepsLowFrequencyRoutesOutOfToolbar()
     {
         var mainWindow = LoadMainWindow();
-        var toolbarStart = mainWindow.IndexOf("Padding=\"6,3\"", StringComparison.Ordinal);
+        var toolbarStart = mainWindow.IndexOf("<!-- ═══ TOOLBAR", StringComparison.Ordinal);
         var statusBarStart = mainWindow.IndexOf("<!-- ═══ STATUS BAR", toolbarStart, StringComparison.Ordinal);
 
         Assert.True(toolbarStart >= 0);
         Assert.True(statusBarStart > toolbarStart);
 
         var toolbar = mainWindow[toolbarStart..statusBarStart];
-        Assert.DoesNotContain("CommandParameter=\"recycle\"", toolbar);
-        Assert.DoesNotContain("CommandParameter=\"bulk-delete\"", toolbar);
-        Assert.DoesNotContain("CommandParameter=\"recentfiles\"", toolbar);
-        Assert.DoesNotContain("CommandParameter=\"duplicates\"", toolbar);
-        Assert.Contains("CommandParameter=\"report\"", toolbar);
-        Assert.Contains("CommandParameter=\"treemap\"", toolbar);
-        Assert.DoesNotContain("Command=\"{Binding BackupDatabaseCommand}\"", toolbar);
+        Assert.Contains("Command=\"{Binding NavigateCommand}\" CommandParameter=\"add\"", toolbar);
+        Assert.Contains("Command=\"{Binding OpenFileCommand}\"", toolbar);
+        Assert.Contains("Command=\"{Binding ExportCsvCommand}\"", toolbar);
         Assert.Contains("Command=\"{Binding RefreshCommand}\"", toolbar);
         Assert.Contains("CommandParameter=\"batch-import\"", toolbar);
+        Assert.Contains("CommandParameter=\"report\"", toolbar);
+        Assert.Contains("CommandParameter=\"treemap\"", toolbar);
+        Assert.DoesNotContain("Toolbar_Edit", toolbar);
+        Assert.DoesNotContain("Toolbar_Delete", toolbar);
     }
 
     [Fact]
@@ -54,8 +54,6 @@ public sealed class MainWindowTaxonomyTests
             "Menu_Analytics",
             "Menu_Help",
             "Toolbar_Add",
-            "Toolbar_Edit",
-            "Toolbar_Delete",
             "Toolbar_Open",
             "Toolbar_Export",
             "Toolbar_Refresh",
@@ -71,7 +69,29 @@ public sealed class MainWindowTaxonomyTests
 
         var dashboard = File.ReadAllText(GetSourceFilePath("StudyDocumentManager", "Views", "Dashboard.axaml"));
         Assert.Contains("AutomationProperties.AutomationId=\"Screen_Dashboard\"", dashboard);
+        Assert.Contains("AutomationProperties.AutomationId=\"Dashboard_SearchInput\"", dashboard);
         Assert.DoesNotContain("AutomationProperties.AutomationId=\"MainShellRoot\"", dashboard);
+
+        var titleIds = new[]
+        {
+            ("AddEdit.axaml", "Title_AddEdit"),
+            ("BatchImport.axaml", "Title_BatchImport"),
+            ("BulkDelete.axaml", "Title_BulkDelete"),
+            ("CategoryManagement.axaml", "Title_CategoryManagement"),
+            ("CollectionManagement.axaml", "Title_CollectionManagement"),
+            ("DuplicateDetection.axaml", "Title_DuplicateDetection"),
+            ("PersonalNote.axaml", "Title_PersonalNote"),
+            ("RecentFiles.axaml", "Title_RecentFiles"),
+            ("RecycleBin.axaml", "Title_RecycleBin"),
+            ("Report.axaml", "Title_Report"),
+            ("TreeMap.axaml", "Title_TreeMap")
+        };
+
+        foreach (var (fileName, titleId) in titleIds)
+        {
+            var view = File.ReadAllText(GetSourceFilePath("StudyDocumentManager", "Views", fileName));
+            Assert.Contains($"AutomationProperties.AutomationId=\"{titleId}\"", view);
+        }
     }
 
     [Fact]

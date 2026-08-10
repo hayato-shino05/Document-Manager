@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Models.Items;
@@ -89,10 +90,8 @@ public partial class AddToCollectionDialog : Window
     }
 
     // ─── Footer / Confirm button ─────────────────────────────────────
-    private void OnItemSelectionChanged(object? sender, EventArgs e)
-    {
-        SyncStateToView();
-    }
+    private void OnItemSelectionChanged(object? sender, RoutedEventArgs e)
+        => Dispatcher.UIThread.Post(SyncStateToView, DispatcherPriority.Background);
 
     // ─── Confirm / Cancel ───────────────────────────────────────────
     private void OnConfirmClicked(object? sender, RoutedEventArgs e)

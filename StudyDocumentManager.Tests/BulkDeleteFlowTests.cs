@@ -34,6 +34,30 @@ public class BulkDeleteFlowTests
         Assert.Equal(1, model.SelectedCount);
     }
 
+
+    [Fact]
+    public void SelectAllAndDeselectAll_UpdateSelectionState()
+    {
+        var repository = new BulkDocumentRepository([
+            new StudyDocument { Id = 1, Name = "A", Subject = "Math", Type = "PDF" },
+            new StudyDocument { Id = 2, Name = "B", Subject = "Math", Type = "PDF" }
+        ]);
+        var model = CreateModel(repository, new BulkOperationRepositoryStub(repository), new BulkDialogService());
+        model.Initialize();
+
+        model.SelectAllCommand.Execute(null);
+
+        Assert.True(model.HasSelection);
+        Assert.Equal(2, model.SelectedCount);
+        Assert.All(model.Documents, document => Assert.True(document.IsSelected));
+
+        model.DeselectAllCommand.Execute(null);
+
+        Assert.False(model.HasSelection);
+        Assert.Equal(0, model.SelectedCount);
+        Assert.All(model.Documents, document => Assert.False(document.IsSelected));
+    }
+
     [Fact]
     public async Task MarkImportant_Success_RetainsSelectedIds()
     {
