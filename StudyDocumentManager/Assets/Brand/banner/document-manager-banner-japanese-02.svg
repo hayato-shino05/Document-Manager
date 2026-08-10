@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+<title id="title">Document Manager Japanese Banner 02</title>
+<desc id="desc">Japanese editorial banner with an ink circle, papers, logo and messaging.</desc>
+<rect width="1600" height="900" fill="#f8f1e5"/>
+<path d="M0 0h1600v900H0z" fill="#fffdf7" opacity=".5"/>
+<g fill="none" stroke="#d9b955" stroke-width="4" opacity=".55"><path d="M0 760c100-70 200-70 300 0s200 70 300 0"/><path d="M0 800c100-70 200-70 300 0s200 70 300 0"/><path d="M1150 74c84-45 168-45 252 0s168 45 252 0"/><path d="M1180 112c84-45 168-45 252 0s168 45 252 0"/></g>
+<path d="M990 420a260 260 0 1 1-105-208" fill="none" stroke="#1e3158" stroke-width="45" stroke-linecap="round"/>
+<g transform="translate(900 270) rotate(-7)"><rect x="0" y="30" width="285" height="340" rx="5" fill="#d8c8aa" stroke="#26304a" stroke-width="4"/><rect x="25" y="0" width="285" height="340" rx="5" fill="#fffdf7" stroke="#26304a" stroke-width="4"/><path d="M58 72h135M58 104h190M58 136h170" stroke="#b9aa90" stroke-width="7"/><path d="M58 214h120" stroke="#1f6a68" stroke-width="16"/><path d="M58 252h180M58 280h150" stroke="#b9aa90" stroke-width="6"/></g>
+<rect x="145" y="175" width="650" height="220" rx="22" fill="#fffdf7" stroke="#eadfc9" stroke-width="3"/>
+<image x="185" y="220" width="575" height="155" preserveAspectRatio="xMidYMid meet" href="../document-manager-logo.svg"/>
+<rect x="150" y="425" width="670" height="245" rx="22" fill="#fffdf7" stroke="#eadfc9" stroke-width="3"/>
+<g fill="#1e3158" font-family="Yu Gothic, Hiragino Kaku Gothic ProN, sans-serif"><text x="210" y="485" font-size="40" font-weight="700">文書を整理し、必要な情報へ</text><text x="210" y="545" font-size="40" font-weight="700">すばやくアクセス</text><text x="214" y="610" font-size="32" letter-spacing="3">個人の文書を、シンプルに管理</text></g>
+<rect x="210" y="660" width="260" height="7" rx="4" fill="#c83f35"/><g fill="#c83f35"><circle cx="195" cy="663" r="7"/><circle cx="485" cy="663" r="7"/></g>
+<g transform="translate(1330 690)"><rect width="70" height="92" fill="#c83f35"/><path d="M16 16h38v60H16zM26 29h18M26 43h28M26 57h22" fill="none" stroke="#fffdf7" stroke-width="4"/></g>
+</svg>

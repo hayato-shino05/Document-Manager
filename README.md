@@ -14,6 +14,8 @@
 [![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/hayato-shino05/study-document-manager?style=for-the-badge&color=EF4444&logo=github&logoColor=white)](https://github.com/hayato-shino05/study-document-manager)
 
+<img src="./StudyDocumentManager/Assets/Brand/document-manager-banner-04.svg" alt="Document Manager banner" width="800" />
+
 </div>
 
 ## 目次

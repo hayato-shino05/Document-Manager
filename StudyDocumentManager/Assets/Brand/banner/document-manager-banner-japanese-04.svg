@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+<title id="title">Document Manager Japanese Banner 04</title>
+<desc id="desc">Contemporary Japanese editorial banner with a navy panel, document sheets and Japanese messaging.</desc>
+<defs>
+  <pattern id="seigaiha" width="92" height="54" patternUnits="userSpaceOnUse"><path d="M0 54a46 46 0 0 1 92 0M12 54a34 34 0 0 1 68 0M25 54a21 21 0 0 1 42 0" fill="none" stroke="#d5b45d" stroke-width="3" opacity=".45"/></pattern>
+</defs>
+<rect width="1600" height="900" fill="#fffdf7"/>
+<path d="M945 0h655v900H945z" fill="#172b55"/>
+<path d="M945 0h655v900H945z" fill="url(#seigaiha)" opacity=".18"/>
+<path d="M930 0c-16 110 13 235-5 350s18 230 0 350 12 150 0 200" fill="none" stroke="#f7f0e2" stroke-width="18" opacity=".9"/>
+<circle cx="1395" cy="180" r="108" fill="#c93b32"/>
+<circle cx="1395" cy="180" r="82" fill="none" stroke="#f7f0e2" stroke-width="3" opacity=".38"/>
+<path d="M1245 354l142-73 103 198-143 74z" fill="#fffdf7" stroke="#dfceb0" stroke-width="4" transform="rotate(-8 1348 391)"/>
+<path d="M1285 328l48-24 8 16-48 24zM1282 367l118-58M1291 386l112-55M1300 405l78-38" stroke="#7c817e" stroke-width="8" opacity=".65" transform="rotate(-8 1348 391)"/>
+<path d="M1120 690l188-168 170 190-188 168z" fill="#f7f0e2" stroke="#dfceb0" stroke-width="4" transform="rotate(-7 1300 690)"/>
+<path d="M1178 620h58v24h-58zM1175 674h145M1175 700h128M1175 726h95" fill="none" stroke="#1f6a68" stroke-width="12" transform="rotate(-7 1300 690)"/>
+<path d="M1440 548c42 50 55 108 42 175M1468 584c-36 20-66 49-87 85M1490 626c-35 8-64 25-91 53M1510 670c-32 0-58 9-84 27" fill="none" stroke="#172b55" stroke-width="13" stroke-linecap="round"/>
+<rect x="1080" y="735" width="62" height="84" rx="5" fill="#c93b32"/><path d="M1095 752h32M1095 770h32M1095 788h22" stroke="#fffdf7" stroke-width="5" stroke-linecap="round"/>
+<g fill="#172b55" font-family="Yu Gothic, Hiragino Kaku Gothic ProN, sans-serif"><text x="118" y="120" font-size="24" letter-spacing="8">DOCUMENT WORKSPACE</text><text x="118" y="545" font-size="44" font-weight="700">文書を整理し、必要な情報へ</text><text x="118" y="610" font-size="44" font-weight="700">すばやくアクセス</text><text x="120" y="680" font-size="34" letter-spacing="3">個人の文書を、シンプルに管理</text></g>
+<rect x="118" y="724" width="310" height="7" rx="4" fill="#c93b32"/><circle cx="102" cy="727" r="7" fill="#b8963e"/><circle cx="445" cy="727" r="7" fill="#b8963e"/>
+<rect x="118" y="185" width="690" height="225" rx="18" fill="#f7f0e2" stroke="#e5d6ba" stroke-width="3"/>
+<image x="175" y="235" width="575" height="145" preserveAspectRatio="xMidYMid meet" href="../document-manager-logo.svg"/>
+</svg>
