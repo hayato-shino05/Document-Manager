@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 38 33% 97%;
+  --foreground: 24 10% 13%;
+  --card: 0 0% 100%;
+  --card-foreground: 24 10% 13%;
+  --border: 30 12% 86%;
+  --muted: 36 20% 93%;
+  --muted-foreground: 25 8% 42%;
+  --primary: 174 62% 28%;
+  --primary-foreground: 0 0% 100%;
+  --warning: 32 72% 42%;
+}
+
+* { box-sizing: border-box; border-color: hsl(var(--border)); }
+html { min-height: 100%; }
+body {
+  min-height: 100vh;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+button, a { min-height: 44px; }
