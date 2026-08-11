@@ -112,13 +112,15 @@ dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c De
 bash ./scripts/build-debian-package.sh
 ```
 
-生成物は `artifacts/installer/document-manager_<version>_amd64.deb` です。Debian/Ubuntu ではローカルファイルを指定してインストールします。
+生成物は `artifacts/installer/` に作成されます。Debian/Ubuntu では生成したパッケージを変数へ取得してインストールします。
 
 ```bash
-sudo apt install ./artifacts/installer/document-manager_<version>_amd64.deb
+package="$(find artifacts/installer -maxdepth 1 -type f -name 'document-manager_*_amd64.deb' -print -quit)"
+test -n "$package"
+sudo apt install "$package"
 ```
 
-アプリケーション本体は `/usr/lib/document-manager/`、起動コマンドは `/usr/bin/document-manager` に配置されます。ユーザーデータはパッケージ領域に書き込みません。データベースは .NET が解決する `LocalApplicationData` の `StudyDocumentManager/data/study_documents.db` に保存されます。Linux では `XDG_DATA_HOME` を設定している場合はその値を確認し、未設定時は通常 `$HOME/.local/share` を確認してください。
+アプリケーション本体は `/usr/lib/document-manager/`、起動コマンドは `/usr/bin/document-manager` に配置されます。ユーザーデータはパッケージ領域に書き込みません。データベースは `XDG_DATA_HOME` または `$HOME/.local/share` 配下の `StudyDocumentManager/data/study_documents.db` に保存されます。
 
 現時点では Debian/Ubuntu の amd64 を対象とします。ARM、AppImage、Flatpak、Snap、RPM、リポジトリ署名、Linux 向け自動更新は提供していません。Avalonia の native 依存関係はホスト環境が提供する必要があり、Wayland/X11 の実行互換性や native dialog は CI のパッケージ検証だけでは保証しません。
 

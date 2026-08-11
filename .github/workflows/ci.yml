@@ -10,6 +10,9 @@ env:
   SOLUTION_FILE: StudyDocumentManager.sln
   BUILD_CONFIGURATION: Release
 
+permissions:
+  contents: read
+
 jobs:
   check:
     name: Check & Build
@@ -17,6 +20,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -56,6 +61,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -89,6 +96,7 @@ jobs:
         run: |
           package=$(find artifacts/installer -maxdepth 1 -type f -name 'document-manager_*_amd64.deb' -print -quit)
           test -n "$package" || { echo "::error::Expected Debian package was not created in artifacts/installer/."; exit 1; }
+          test "$(dpkg-deb --field "$package" Architecture)" = "amd64"
           dpkg-deb --info "$package"
           dpkg-deb --contents "$package"
 
@@ -108,7 +116,7 @@ jobs:
 
     steps:
       - name: Discord notification (success)
-        if: ${{ needs.check.result == 'success' }}
+        if: ${{ needs.check.result == 'success' && needs.linux-package.result == 'success' }}
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
@@ -119,7 +127,7 @@ jobs:
           fi
 
       - name: Discord notification (failure)
-        if: ${{ needs.check.result == 'failure' }}
+        if: ${{ needs.check.result != 'success' || needs.linux-package.result != 'success' }}
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |

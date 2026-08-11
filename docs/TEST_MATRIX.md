@@ -33,7 +33,8 @@ This file maps product behavior to proof.
 | Recycle Bin selection cleanup | Success paths clear stale selection while failures preserve it | yes | no | no | no | implemented | `RecycleBinModelTests` covers failure preservation plus restore/permanent-delete success clearing |
 | Bulk selection retention | Selected count updates and non-destructive bulk actions retain visible selections | yes | no | no | no | implemented | `BulkDeleteFlowTests` proves count notification, count text, and retention after Mark Important / Change Subject |
 | Report semantic empty states | Day/month charts preserve zero-filled series and show empty-state only when all values are zero | yes | limited | no | yes | implemented | `ReportFlowTests` covers model flags, DB internal gap characterization, and headless empty-state rendering |
-| Linux Debian package | Ubuntu CI restores, builds, tests, creates a self-contained `linux-x64` `.deb`, and inspects its metadata and contents | yes | limited | no | Ubuntu CI package inspection | in_progress | `scripts/build-debian-package.sh`, `dpkg-deb --info`, and `dpkg-deb --contents`; GUI startup and native dialog behavior remain manual Linux proof |
+| Linux Debian package | Ubuntu CI restores, builds, tests, creates a self-contained `linux-x64` `.deb`, and inspects its metadata and contents | yes | limited | no | Ubuntu CI package inspection | implemented | `scripts/build-debian-package.sh`, `dpkg-deb --info`, and `dpkg-deb --contents`; GUI startup and native dialog behavior remain manual Linux proof |
+
 ## Evidence Rules
 
 - Unit proof covers pure domain and application rules.
@@ -81,8 +82,10 @@ dotnet restore "StudyDocumentManager.sln"
 dotnet build "StudyDocumentManager.sln" -c Release --no-restore
 dotnet test "StudyDocumentManager.Tests/StudyDocumentManager.Tests.csproj" -c Release --no-build
 bash ./scripts/build-debian-package.sh
-dpkg-deb --info artifacts/installer/document-manager_<version>_amd64.deb
-dpkg-deb --contents artifacts/installer/document-manager_<version>_amd64.deb
+package="$(find artifacts/installer -maxdepth 1 -type f -name 'document-manager_*_amd64.deb' -print -quit)"
+test -n "$package"
+dpkg-deb --info "$package"
+dpkg-deb --contents "$package"
 ```
 
 この検証は package の生成と構成を対象にします。GUI を起動する end-to-end test ではないため、Debian/Ubuntu のデスクトップ環境で起動、StorageProvider を使う native dialog、ユーザーデータの保存先を手動確認してください。

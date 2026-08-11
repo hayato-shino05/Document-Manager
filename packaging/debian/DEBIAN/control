@@ -3,7 +3,7 @@ Version: @VERSION@
 Section: education
 Priority: optional
 Architecture: amd64
-Depends: libfontconfig1, libfreetype6, libice6, libsm6, libx11-6, libxext6, libxrender1, libxtst6, zlib1g
+Depends: libfontconfig1, libfreetype6, libice6, libsm6, libx11-6, libxext6, libxrender1, libxtst6, xdg-utils, zlib1g
 Maintainer: Study Document Manager maintainers <noreply@invalid>
 Description: Study document management desktop application
  Organize and search study documents on a local desktop.

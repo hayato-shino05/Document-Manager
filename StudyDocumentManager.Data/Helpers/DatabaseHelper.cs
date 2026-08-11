@@ -50,7 +50,17 @@ public class DatabaseHelper
 
     private static string GetDefaultDatabasePath()
     {
-        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var localAppData = Environment.GetFolderPath(
+            Environment.SpecialFolder.LocalApplicationData,
+            Environment.SpecialFolderOption.DoNotVerify);
+        if (string.IsNullOrWhiteSpace(localAppData) || !Path.IsPathFullyQualified(localAppData))
+        {
+            localAppData = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                ".local",
+                "share");
+        }
+
         return Path.Combine(localAppData, "StudyDocumentManager", "data", "study_documents.db");
     }
 

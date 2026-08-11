@@ -91,7 +91,7 @@ public sealed class InstallationIdentityService : IInstallationIdentityService
     private static string GetDefaultLinuxInstallationIdFilePath()
     {
         var dataDirectory = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
-        var baseDirectory = string.IsNullOrWhiteSpace(dataDirectory)
+        var baseDirectory = string.IsNullOrWhiteSpace(dataDirectory) || !Path.IsPathFullyQualified(dataDirectory)
             ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share")
             : dataDirectory;
 
