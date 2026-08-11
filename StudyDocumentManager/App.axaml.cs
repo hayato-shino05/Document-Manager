@@ -97,10 +97,12 @@ public partial class App : Application
                 client.BaseAddress = baseAddress;
             return client;
         });
+        services.AddSingleton<IPlatformInfo, PlatformInfo>();
         services.AddSingleton<IInstallationIdentityService, InstallationIdentityService>();
         services.AddSingleton<IAnalyticsService>(sp => new AnalyticsService(
             sp.GetRequiredKeyedService<HttpClient>("Analytics"),
-            sp.GetRequiredService<IInstallationIdentityService>()));
+            sp.GetRequiredService<IInstallationIdentityService>(),
+            sp.GetRequiredService<IPlatformInfo>()));
         services.AddSingleton<NavigationService>();
         services.AddSingleton<INavigationService>(sp => sp.GetRequiredService<NavigationService>());
         services.AddSingleton<DialogService>();

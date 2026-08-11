@@ -25,6 +25,8 @@
 - [技術スタック](#技術スタック)
 - [セットアップ](#セットアップ)
 - [ビルドとテスト](#ビルドとテスト)
+- [Windows セットアップの作成](#windows-セットアップの作成)
+- [Linux（Debian/Ubuntu）パッケージ](#linuxdebianubuntuパッケージ)
 - [プロジェクト構成](#プロジェクト構成)
 - [貢献](#貢献)
 - [ライセンス](#ライセンス)
@@ -101,6 +103,26 @@ dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c De
 - setup EXE: `artifacts\installer\DocumentManager_v4.0.0_Setup.exe`
 
 この setup は .NET Framework 4.8 を要求せず、`win-x64` 向け自己完結型の Windows アプリとして配布します。
+
+## Linux（Debian/Ubuntu）パッケージ
+
+初期サポートは Debian/Ubuntu の `linux-x64`（amd64）向けです。自己完結型 publish を含む `.deb` パッケージは、Linux 環境で次のコマンドから作成します。
+
+```bash
+bash ./scripts/build-debian-package.sh
+```
+
+生成物は `artifacts/installer/` に作成されます。Debian/Ubuntu では生成したパッケージを変数へ取得してインストールします。
+
+```bash
+package="$(find artifacts/installer -maxdepth 1 -type f -name 'document-manager_*_amd64.deb' -print -quit)"
+test -n "$package"
+sudo apt install "$package"
+```
+
+アプリケーション本体は `/usr/lib/document-manager/`、起動コマンドは `/usr/bin/document-manager` に配置されます。ユーザーデータはパッケージ領域に書き込みません。データベースは `XDG_DATA_HOME` または `$HOME/.local/share` 配下の `StudyDocumentManager/data/study_documents.db` に保存されます。
+
+現時点では Debian/Ubuntu の amd64 を対象とします。ARM、AppImage、Flatpak、Snap、RPM、リポジトリ署名、Linux 向け自動更新は提供していません。Avalonia の native 依存関係はホスト環境が提供する必要があり、Wayland/X11 の実行互換性や native dialog は CI のパッケージ検証だけでは保証しません。
 
 ## プロジェクト構成
 

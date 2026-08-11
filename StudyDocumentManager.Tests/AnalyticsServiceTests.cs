@@ -18,7 +18,7 @@ public sealed class AnalyticsServiceTests
         {
             BaseAddress = new Uri("https://analytics.example/")
         };
-        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"));
+        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"), new PlatformInfoStub(isLinux: false));
 
         await service.CaptureAsync("app_opened");
 
@@ -39,6 +39,22 @@ public sealed class AnalyticsServiceTests
     }
 
     [Fact]
+    public async Task CaptureAsync_LinuxPlatform_SendsLinuxPayload()
+    {
+        var handler = new RecordingHandler(HttpStatusCode.Accepted);
+        using var client = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://analytics.example/")
+        };
+        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"), new PlatformInfoStub(isLinux: true));
+
+        await service.CaptureAsync("app_opened");
+
+        using var payload = JsonDocument.Parse(handler.RequestBody!);
+        Assert.Equal("linux", payload.RootElement.GetProperty("platform").GetString());
+    }
+
+    [Fact]
     public async Task CaptureAsync_UnknownEvent_DoesNotSendRequest()
     {
         var handler = new RecordingHandler(HttpStatusCode.Accepted);
@@ -46,7 +62,7 @@ public sealed class AnalyticsServiceTests
         {
             BaseAddress = new Uri("https://analytics.example/")
         };
-        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"));
+        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"), new PlatformInfoStub(isLinux: false));
 
         await service.CaptureAsync("document_path_copied");
 
@@ -60,7 +76,7 @@ public sealed class AnalyticsServiceTests
         {
             BaseAddress = new Uri("https://analytics.example/")
         };
-        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"));
+        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"), new PlatformInfoStub(isLinux: false));
 
         await service.CaptureAsync("document_opened");
     }
@@ -73,7 +89,7 @@ public sealed class AnalyticsServiceTests
             BaseAddress = new Uri("https://analytics.example/"),
             Timeout = TimeSpan.FromMilliseconds(50)
         };
-        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"));
+        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"), new PlatformInfoStub(isLinux: false));
 
         await service.CaptureAsync("session_started");
     }
@@ -86,7 +102,7 @@ public sealed class AnalyticsServiceTests
         {
             BaseAddress = new Uri("https://analytics.example/")
         };
-        var service = new AnalyticsService(client, new ThrowingInstallationIdentityStub());
+        var service = new AnalyticsService(client, new ThrowingInstallationIdentityStub(), new PlatformInfoStub(isLinux: false));
 
         await service.CaptureAsync("app_opened");
 
@@ -101,7 +117,7 @@ public sealed class AnalyticsServiceTests
         {
             BaseAddress = new Uri("https://analytics.example/")
         };
-        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"));
+        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"), new PlatformInfoStub(isLinux: false));
         using var cancellationTokenSource = new CancellationTokenSource();
         cancellationTokenSource.Cancel();
 
@@ -119,12 +135,19 @@ public sealed class AnalyticsServiceTests
             BaseAddress = new Uri("https://analytics.example/"),
             Timeout = Timeout.InfiniteTimeSpan
         };
-        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"));
+        var service = new AnalyticsService(client, new InstallationIdentityStub("installation-123"), new PlatformInfoStub(isLinux: false));
         var deadline = DateTimeOffset.UtcNow.AddSeconds(12);
 
         await service.CaptureAsync("session_started");
 
         Assert.True(DateTimeOffset.UtcNow < deadline);
+    }
+
+    private sealed class PlatformInfoStub(bool isLinux) : IPlatformInfo
+    {
+        public bool IsLinux => isLinux;
+
+        public string AnalyticsPlatform => isLinux ? "linux" : "windows";
     }
 
     private sealed class InstallationIdentityStub(string installationId) : IInstallationIdentityService
