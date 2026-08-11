@@ -19,7 +19,7 @@ This file maps product behavior to proof.
 | Story | Contract | Unit | Integration | E2E | Platform | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | DB Schema Neutralization | English-only table/column names | yes | yes | no | no | implemented | 795/795 xUnit pass in current Debug and Release verification |
-| Entity Property Rename | Core entities use English props | yes | yes | no | no | implemented | Debug/Release build は 0 errors。TreeMap/Update proof test の未使用 event に CS0067 warning が 2 件残ります。 |
+| Entity Property Rename | Core entities use English props | yes | yes | no | no | implemented | Debug/Release build は 0 warnings, 0 errors。 |
 | AXAML Binding Update | Views bind to English properties | no | no | no | yes | implemented | `AvaloniaBindingRegressionTests` renders Add/Edit, Related Documents, and File Integrity; Dashboard grid binding descriptors load headlessly without attach/timer |
 | Test Suite Cleanup | Tests reference English schema | yes | no | no | no | implemented | 795/795 xUnit pass in current Debug and Release verification |
 | i18n Infrastructure | ResX multi-language support | yes | limited | no | limited | implemented | `LocalizationResourceIntegrityTests` verifies decoded vi/zh sample strings and Slice 4B keys; `Strings.vi.resx` and `Strings.zh.resx` parse cleanly after repair |
