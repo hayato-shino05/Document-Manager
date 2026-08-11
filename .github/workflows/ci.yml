@@ -50,9 +50,59 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  linux-package:
+    name: Linux package
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-linux-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-linux-
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_FILE }} -p:Configuration=${{ env.BUILD_CONFIGURATION }}
+
+      - name: Build solution
+        run: dotnet build ${{ env.SOLUTION_FILE }} -c ${{ env.BUILD_CONFIGURATION }} --no-restore
+
+      - name: Run tests
+        run: dotnet test StudyDocumentManager.Tests/StudyDocumentManager.Tests.csproj -c ${{ env.BUILD_CONFIGURATION }} --no-build
+
+      - name: Verify Debian packaging script
+        run: test -f scripts/build-debian-package.sh || { echo "::error::scripts/build-debian-package.sh is required for Linux package CI."; exit 1; }
+
+      - name: Build Debian package
+        run: bash scripts/build-debian-package.sh
+
+      - name: Inspect Debian package
+        shell: bash
+        run: |
+          package=$(find artifacts/installer -maxdepth 1 -type f -name 'document-manager_*_amd64.deb' -print -quit)
+          test -n "$package" || { echo "::error::Expected Debian package was not created in artifacts/installer/."; exit 1; }
+          dpkg-deb --info "$package"
+          dpkg-deb --contents "$package"
+
+      - name: Upload Debian package
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-debian-package-${{ github.sha }}
+          path: artifacts/installer/document-manager_*_amd64.deb
+          if-no-files-found: error
+          retention-days: 7
+
   notify:
     name: Discord Notification
-    needs: check
+    needs: [check, linux-package]
     runs-on: ubuntu-latest
     if: always() && github.event_name == 'push'
 

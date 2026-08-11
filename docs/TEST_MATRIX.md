@@ -33,6 +33,7 @@ This file maps product behavior to proof.
 | Recycle Bin selection cleanup | Success paths clear stale selection while failures preserve it | yes | no | no | no | implemented | `RecycleBinModelTests` covers failure preservation plus restore/permanent-delete success clearing |
 | Bulk selection retention | Selected count updates and non-destructive bulk actions retain visible selections | yes | no | no | no | implemented | `BulkDeleteFlowTests` proves count notification, count text, and retention after Mark Important / Change Subject |
 | Report semantic empty states | Day/month charts preserve zero-filled series and show empty-state only when all values are zero | yes | limited | no | yes | implemented | `ReportFlowTests` covers model flags, DB internal gap characterization, and headless empty-state rendering |
+| Linux Debian package | Ubuntu CI restores, builds, tests, creates a self-contained `linux-x64` `.deb`, and inspects its metadata and contents | yes | limited | no | Ubuntu CI package inspection | in_progress | `scripts/build-debian-package.sh`, `dpkg-deb --info`, and `dpkg-deb --contents`; GUI startup and native dialog behavior remain manual Linux proof |
 ## Evidence Rules
 
 - Unit proof covers pure domain and application rules.
@@ -60,6 +61,7 @@ The repository already has implementation and test coverage.
 | Collections, relations, notes, recent files | limited | yes | no | no | collection membership と related document の追加・削除・復旧を integration tests で検証。 |
 | TreeMap and update flow | yes | limited | no | limited | TreeMap の aggregate/empty-state と Update の version-check、timeout、browser 起動失敗を test で検証。HTTP timeout と `Process.Start` の実 desktop 挙動は手動確認です。 |
 | Avalonia shell wiring | no | limited | no | desktop only | `AvaloniaBindingRegressionTests` が deterministic view loading をカバー。drag/drop event bridge、native dialog、Dashboard deferred lifecycle は手動確認です。 |
+| Linux Debian package | no | limited | no | Ubuntu CI package inspection | `linux-x64` self-contained publish、`.deb` の metadata/content 検査、artifact upload を CI で確認します。GUI 起動、Wayland/X11、native dialog は手動 Linux proof です。 |
 | Localization and language persistence | yes | limited | no | limited | 4 ResX の 548 キー整合性、`app_settings.language` の保存・復元を自動検証。日本語が既定ロケールで、未翻訳キーは日本語へフォールバックします。起動時復元と live `MainWindow` 切り替えは手動確認です。 |
 
 ## Current verification commands
@@ -71,3 +73,16 @@ dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c De
 dotnet build "StudyDocumentManager.sln" -c Release --no-restore
 dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c Release --no-build
 ```
+
+Ubuntu の package CI は次を実行します。
+
+```bash
+dotnet restore "StudyDocumentManager.sln"
+dotnet build "StudyDocumentManager.sln" -c Release --no-restore
+dotnet test "StudyDocumentManager.Tests/StudyDocumentManager.Tests.csproj" -c Release --no-build
+bash ./scripts/build-debian-package.sh
+dpkg-deb --info artifacts/installer/document-manager_<version>_amd64.deb
+dpkg-deb --contents artifacts/installer/document-manager_<version>_amd64.deb
+```
+
+この検証は package の生成と構成を対象にします。GUI を起動する end-to-end test ではないため、Debian/Ubuntu のデスクトップ環境で起動、StorageProvider を使う native dialog、ユーザーデータの保存先を手動確認してください。
