@@ -24,11 +24,16 @@ public sealed class AnalyticsService : IAnalyticsService
 
     private readonly HttpClient _httpClient;
     private readonly IInstallationIdentityService _installationIdentityService;
+    private readonly IPlatformInfo _platformInfo;
 
-    public AnalyticsService(HttpClient httpClient, IInstallationIdentityService installationIdentityService)
+    public AnalyticsService(
+        HttpClient httpClient,
+        IInstallationIdentityService installationIdentityService,
+        IPlatformInfo platformInfo)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _installationIdentityService = installationIdentityService ?? throw new ArgumentNullException(nameof(installationIdentityService));
+        _platformInfo = platformInfo ?? throw new ArgumentNullException(nameof(platformInfo));
     }
 
     public async Task CaptureAsync(string eventName, CancellationToken cancellationToken = default)
@@ -44,7 +49,7 @@ public sealed class AnalyticsService : IAnalyticsService
                 _installationIdentityService.GetInstallationId(),
                 eventName,
                 AppVersion.Current,
-                "windows",
+                _platformInfo.AnalyticsPlatform,
                 DateTimeOffset.UtcNow);
 
             using var requestCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
