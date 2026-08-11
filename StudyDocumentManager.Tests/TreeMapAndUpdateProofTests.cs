@@ -239,7 +239,8 @@ public sealed class UpdateServiceProofTests
     {
         public string this[string key] => key;
         public SupportedLanguage CurrentLanguage => SupportedLanguage.Japanese;
-        public void SetLanguage(SupportedLanguage language) { }
+        public void SetLanguage(SupportedLanguage language)
+            => LanguageChanged?.Invoke(this, EventArgs.Empty);
         public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = Enum.GetValues<SupportedLanguage>();
         public event EventHandler? LanguageChanged;
     }
@@ -330,7 +331,8 @@ public sealed class MainWindowUpdateProofTests
             _ => key
         };
         public SupportedLanguage CurrentLanguage => SupportedLanguage.Japanese;
-        public void SetLanguage(SupportedLanguage language) { }
+        public void SetLanguage(SupportedLanguage language)
+            => LanguageChanged?.Invoke(this, EventArgs.Empty);
         public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = Enum.GetValues<SupportedLanguage>();
         public event EventHandler? LanguageChanged;
     }

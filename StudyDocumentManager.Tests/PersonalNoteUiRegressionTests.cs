@@ -229,7 +229,8 @@ public sealed class PersonalNoteUiRegressionTests
         public string this[string key] => key;
         public StudyDocumentManager.Core.SupportedLanguage CurrentLanguage => StudyDocumentManager.Core.SupportedLanguage.Japanese;
         public IReadOnlyList<StudyDocumentManager.Core.SupportedLanguage> AvailableLanguages => [StudyDocumentManager.Core.SupportedLanguage.Japanese];
-        public void SetLanguage(StudyDocumentManager.Core.SupportedLanguage language) { }
+        public void SetLanguage(StudyDocumentManager.Core.SupportedLanguage language)
+            => LanguageChanged?.Invoke(this, EventArgs.Empty);
         public event EventHandler? LanguageChanged;
     }
 }

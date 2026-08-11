@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using System.Runtime.Versioning;
 using StudyDocumentManager.Core.Interfaces;
 
 namespace StudyDocumentManager.Services;
@@ -42,9 +43,16 @@ public sealed class InstallationIdentityService : IInstallationIdentityService
         _linuxInstallationIdFilePath = linuxInstallationIdFilePath;
     }
 
-    public string GetInstallationId() => _platformInfo.IsLinux
-        ? GetLinuxInstallationId()
-        : GetWindowsInstallationId();
+    public string GetInstallationId()
+    {
+        if (_platformInfo.IsLinux)
+            return GetLinuxInstallationId();
+
+        if (OperatingSystem.IsWindows())
+            return GetWindowsInstallationId();
+
+        throw new PlatformNotSupportedException("Installation identity is supported on Windows and Linux only.");
+    }
 
     public void DeleteInstallationId()
     {
@@ -54,10 +62,14 @@ public sealed class InstallationIdentityService : IInstallationIdentityService
             return;
         }
 
+        if (!OperatingSystem.IsWindows())
+            throw new PlatformNotSupportedException("Installation identity is supported on Windows and Linux only.");
+
         using var key = Registry.CurrentUser.OpenSubKey(_registryPath, writable: true);
         key?.DeleteValue(InstallationIdValueName, throwOnMissingValue: false);
     }
 
+    [SupportedOSPlatform("windows")]
     private string GetWindowsInstallationId()
     {
         using var key = Registry.CurrentUser.CreateSubKey(_registryPath, writable: true)
