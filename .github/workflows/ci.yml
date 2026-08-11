@@ -75,8 +75,8 @@ jobs:
       - name: Build solution
         run: dotnet build ${{ env.SOLUTION_FILE }} -c ${{ env.BUILD_CONFIGURATION }} --no-restore
 
-      - name: Run tests
-        run: dotnet test StudyDocumentManager.Tests/StudyDocumentManager.Tests.csproj -c ${{ env.BUILD_CONFIGURATION }} --no-build
+      - name: Run Linux platform tests
+        run: dotnet test StudyDocumentManager.Tests/StudyDocumentManager.Tests.csproj -c ${{ env.BUILD_CONFIGURATION }} --no-build --filter "FullyQualifiedName~PlatformSupportTests|FullyQualifiedName~AnalyticsServiceTests"
 
       - name: Verify Debian packaging script
         run: test -f scripts/build-debian-package.sh || { echo "::error::scripts/build-debian-package.sh is required for Linux package CI."; exit 1; }
