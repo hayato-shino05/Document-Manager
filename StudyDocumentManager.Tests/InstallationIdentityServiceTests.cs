@@ -10,7 +10,7 @@ public sealed class InstallationIdentityServiceTests : IDisposable
 {
     private readonly string _registryPath = $@"Software\DocumentManager.Tests\{Guid.NewGuid():N}";
 
-    [Fact]
+    [WindowsFact]
     public void GetInstallationId_FirstCall_CreatesValidGuid()
     {
         var installationId = CreateService().GetInstallationId();
@@ -18,7 +18,7 @@ public sealed class InstallationIdentityServiceTests : IDisposable
         Assert.True(Guid.TryParse(installationId, out _));
     }
 
-    [Fact]
+    [WindowsFact]
     public void GetInstallationId_RepeatedCalls_ReturnSameValue()
     {
         var service = CreateService();
@@ -29,7 +29,7 @@ public sealed class InstallationIdentityServiceTests : IDisposable
         Assert.Equal(firstInstallationId, repeatedInstallationId);
     }
 
-    [Fact]
+    [WindowsFact]
     public void DeleteInstallationId_NextCall_CreatesDifferentValue()
     {
         var service = CreateService();
@@ -48,4 +48,15 @@ public sealed class InstallationIdentityServiceTests : IDisposable
     }
 
     private InstallationIdentityService CreateService() => new(_registryPath);
+}
+
+
+[AttributeUsage(AttributeTargets.Method)]
+internal sealed class WindowsFactAttribute : FactAttribute
+{
+    public WindowsFactAttribute()
+    {
+        if (!OperatingSystem.IsWindows())
+            Skip = "Windows Registry tests require Windows.";
+    }
 }

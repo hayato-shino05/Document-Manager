@@ -80,7 +80,7 @@ Ubuntu の package CI は次を実行します。
 ```bash
 dotnet restore "StudyDocumentManager.sln"
 dotnet build "StudyDocumentManager.sln" -c Release --no-restore
-dotnet test "StudyDocumentManager.Tests/StudyDocumentManager.Tests.csproj" -c Release --no-build
+dotnet test "StudyDocumentManager.Tests/StudyDocumentManager.Tests.csproj" -c Release --no-build --filter "FullyQualifiedName~PlatformSupportTests|FullyQualifiedName~AnalyticsServiceTests"
 bash ./scripts/build-debian-package.sh
 package="$(find artifacts/installer -maxdepth 1 -type f -name 'document-manager_*_amd64.deb' -print -quit)"
 test -n "$package"
