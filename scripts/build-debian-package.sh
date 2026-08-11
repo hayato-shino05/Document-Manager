@@ -40,7 +40,8 @@ output_file="$output_dir/document-manager_${version}_amd64.deb"
 
 mkdir -p "$output_dir"
 package_dir="$(mktemp -d "$output_dir/.document-manager.XXXXXX")"
-trap 'rm -rf "$package_dir"' EXIT
+contents_file="$(mktemp "$output_dir/.document-manager-contents.XXXXXX")"
+trap 'rm -rf "$package_dir" "$contents_file"' EXIT
 
 rm -rf "$publish_dir"
 dotnet publish "$repo_root/StudyDocumentManager/StudyDocumentManager.csproj" \
@@ -66,8 +67,9 @@ rm -f "$output_file"
 dpkg-deb --build --root-owner-group "$package_dir" "$output_file"
 
 dpkg-deb --info "$output_file"
-dpkg-deb --contents "$output_file" | grep -q 'usr/lib/document-manager/DocumentManager$'
-dpkg-deb --contents "$output_file" | grep -q 'usr/bin/document-manager$'
-dpkg-deb --contents "$output_file" | grep -q 'usr/share/applications/document-manager.desktop$'
-dpkg-deb --contents "$output_file" | grep -q 'usr/share/icons/hicolor/scalable/apps/document-manager.svg$'
+dpkg-deb --contents "$output_file" > "$contents_file"
+grep -q 'usr/lib/document-manager/DocumentManager$' "$contents_file"
+grep -q 'usr/bin/document-manager$' "$contents_file"
+grep -q 'usr/share/applications/document-manager.desktop$' "$contents_file"
+grep -q 'usr/share/icons/hicolor/scalable/apps/document-manager.svg$' "$contents_file"
 printf 'DebianPackage=%s\n' "$output_file"
