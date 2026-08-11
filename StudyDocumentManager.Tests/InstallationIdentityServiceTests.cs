@@ -1,9 +1,11 @@
 using Microsoft.Win32;
+using System.Runtime.Versioning;
 using StudyDocumentManager.Services;
 using Xunit;
 
 namespace StudyDocumentManager.Tests;
 
+[SupportedOSPlatform("windows")]
 public sealed class InstallationIdentityServiceTests : IDisposable
 {
     private readonly string _registryPath = $@"Software\DocumentManager.Tests\{Guid.NewGuid():N}";
