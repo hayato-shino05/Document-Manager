@@ -34,7 +34,7 @@ version="${version:-$app_version}"
 dpkg --validate-version "$version" || fail "Invalid Debian package version: $version"
 
 publish_dir="$repo_root/artifacts/publish/linux-x64"
-output_dir="$repo_root/artifacts/debian"
+output_dir="$repo_root/artifacts/installer"
 template_dir="$repo_root/packaging/debian"
 output_file="$output_dir/document-manager_${version}_amd64.deb"
 
