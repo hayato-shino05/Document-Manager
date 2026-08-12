@@ -4,7 +4,8 @@
         xmlns:loc="using:StudyDocumentManager.Markup"
                      x:Class="StudyDocumentManager.Views.TreeMap"
              x:DataType="vm:TreeMapModel"
-             AutomationProperties.AutomationId="Screen_TreeMap">
+             AutomationProperties.AutomationId="Screen_TreeMap"
+             AutomationProperties.AccessibilityView="Control">
 
     <Border Classes="page-wrapper">
         <DockPanel>

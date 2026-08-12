@@ -23,9 +23,18 @@ public sealed class DesktopAppFixture : IDisposable
 
         try
         {
-            SeedDatabase(PublishFolder);
-            App = Application.Launch(Path.Combine(PublishFolder, "DocumentManager.exe"));
-            _processId = App.ProcessId;
+            var databasePath = SeedDatabase(PublishFolder);
+            var startInfo = new ProcessStartInfo(Path.Combine(PublishFolder, "DocumentManager.exe"))
+            {
+                WorkingDirectory = PublishFolder,
+                UseShellExecute = false
+            };
+            startInfo.Environment["SDM_DATABASE_PATH"] = databasePath;
+
+            using var process = Process.Start(startInfo)
+                ?? throw new InvalidOperationException("DocumentManager process を開始できませんでした。");
+            _processId = process.Id;
+            App = Application.Attach(process.Id);
             _automation = new UIA3Automation();
             Window = WaitUntil(
                 () => App.GetMainWindow(_automation!)!,
@@ -151,14 +160,15 @@ public sealed class DesktopAppFixture : IDisposable
     }
 }
 
-    private static void SeedDatabase(string publishFolder)
+    private static string SeedDatabase(string publishFolder)
     {
         var dataFolder = Path.Combine(publishFolder, "data");
         if (Directory.Exists(dataFolder))
             Directory.Delete(dataFolder, recursive: true);
 
+        var databasePath = Path.Combine(dataFolder, "study_documents.db");
         var database = new DatabaseHelper();
-        database.SetDatabasePath(Path.Combine(dataFolder, "study_documents.db"));
+        database.SetDatabasePath(databasePath);
         database.InitializeDatabase();
         database.InsertDocumentWithCatalogs(new StudyDocument
         {
@@ -168,6 +178,7 @@ public sealed class DesktopAppFixture : IDisposable
             Notes = "Seeded for desktop smoke tests"
         });
         database.CloseAllConnections();
+        return databasePath;
     }
 
     private void RequestProcessClose()

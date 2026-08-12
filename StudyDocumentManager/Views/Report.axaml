@@ -4,7 +4,8 @@
         xmlns:loc="using:StudyDocumentManager.Markup"
                      x:Class="StudyDocumentManager.Views.Report"
              x:DataType="vm:ReportModel"
-             AutomationProperties.AutomationId="Screen_Report">
+             AutomationProperties.AutomationId="Screen_Report"
+             AutomationProperties.AccessibilityView="Control">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
         <DockPanel>

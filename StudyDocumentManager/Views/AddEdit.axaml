@@ -4,7 +4,8 @@
              xmlns:loc="using:StudyDocumentManager.Markup"
              x:Class="StudyDocumentManager.Views.AddEdit"
              x:DataType="vm:AddEditModel"
-             AutomationProperties.AutomationId="Screen_AddEdit">
+             AutomationProperties.AutomationId="Screen_AddEdit"
+             AutomationProperties.AccessibilityView="Control">
 
     <Border Background="{StaticResource ContentBackground}"
             Padding="{StaticResource PaddingPage}">
