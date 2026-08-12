@@ -5,8 +5,8 @@ namespace StudyDocumentManager.Services;
 
 public static class SupportedLanguageResolver
 {
-    public static SupportedLanguage FromCulture(CultureInfo culture)
-        => culture.TwoLetterISOLanguageName.ToLowerInvariant() switch
+    public static SupportedLanguage FromCulture(CultureInfo? culture)
+        => culture?.TwoLetterISOLanguageName.ToLowerInvariant() switch
         {
             "en" => SupportedLanguage.English,
             "vi" => SupportedLanguage.Vietnamese,

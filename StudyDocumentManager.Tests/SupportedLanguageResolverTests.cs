@@ -17,6 +17,14 @@ public sealed class SupportedLanguageResolverTests
         => Assert.Equal(expected, SupportedLanguageResolver.FromCulture(new CultureInfo(cultureName)));
 
     [Fact]
+    public void FromCulture_NullFallsBackToJapanese()
+        => Assert.Equal(SupportedLanguage.Japanese, SupportedLanguageResolver.FromCulture(null));
+
+    [Fact]
+    public void FromCulture_HandlesNeutralCulture()
+        => Assert.Equal(SupportedLanguage.English, SupportedLanguageResolver.FromCulture(new CultureInfo("en")));
+
+    [Fact]
     public void Resolve_PrefersSavedLanguage()
         => Assert.Equal(
             SupportedLanguage.English,
