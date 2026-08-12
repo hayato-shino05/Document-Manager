@@ -40,7 +40,7 @@ SolidCompression=yes
 WizardStyle=modern
 LanguageDetectionMethod=uilanguage
 ShowLanguageDialog=auto
-PrivilegesRequired=admin
+PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 

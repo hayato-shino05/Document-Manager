@@ -39,11 +39,9 @@ if (Test-Path $workPath) {
 
 New-Item -ItemType Directory -Path (Split-Path -Parent $databasePath) | Out-Null
 
-function Invoke-SetupProcess([string]$fileName, [string[]]$arguments, [hashtable]$environment) {
+function Invoke-SetupProcess([string]$fileName, [string[]]$arguments) {
     $startInfo = [System.Diagnostics.ProcessStartInfo]::new($fileName)
-    $startInfo.UseShellExecute = $false
-    $startInfo.CreateNoWindow = $true
-
+    $startInfo.UseShellExecute = $true
     $startInfo.Arguments = ($arguments | ForEach-Object {
         if ($_ -match '[\s"]') {
             '"' + $_.Replace('"', '\"') + '"'
@@ -52,10 +50,6 @@ function Invoke-SetupProcess([string]$fileName, [string[]]$arguments, [hashtable
             $_
         }
     }) -join ' '
-
-    foreach ($entry in $environment.GetEnumerator()) {
-        $startInfo.EnvironmentVariables[$entry.Key] = $entry.Value
-    }
 
     $process = [System.Diagnostics.Process]::Start($startInfo)
     $process.WaitForExit()
@@ -66,8 +60,7 @@ function Invoke-SetupProcess([string]$fileName, [string[]]$arguments, [hashtable
 }
 
 try {
-    $environment = @{ SDM_DATABASE_PATH = $databasePath }
-    Invoke-SetupProcess $setupPath @("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-", "/DIR=$installPath") $environment
+    Invoke-SetupProcess $setupPath @("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-", "/DIR=$installPath")
 
     $installedExe = Join-Path $installPath "DocumentManager.exe"
     if (-not (Test-Path $installedExe -PathType Leaf)) {
@@ -110,8 +103,7 @@ try {
         throw "Uninstaller was not found: $uninstaller"
     }
 
-    Invoke-SetupProcess $uninstaller @("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-") $environment
-
+    Invoke-SetupProcess $uninstaller @("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-")
     if (Test-Path $installedExe -PathType Leaf) {
         throw "Application executable still exists after uninstall: $installedExe"
     }
