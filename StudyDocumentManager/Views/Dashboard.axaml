@@ -7,7 +7,8 @@
         xmlns:loc="using:StudyDocumentManager.Markup"
                      x:Class="StudyDocumentManager.Views.Dashboard"
              x:DataType="vm:DashboardModel"
-             AutomationProperties.AutomationId="Screen_Dashboard">
+             AutomationProperties.AutomationId="Screen_Dashboard"
+             AutomationProperties.AccessibilityView="Control">
 
     <UserControl.Resources>
         <conv:DeadlineBrushConverter x:Key="DeadlineBrushConverter"/>

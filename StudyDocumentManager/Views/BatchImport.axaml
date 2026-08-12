@@ -4,7 +4,8 @@
         xmlns:loc="using:StudyDocumentManager.Markup"
                      x:Class="StudyDocumentManager.Views.BatchImport"
              x:DataType="vm:BatchImportModel"
-             AutomationProperties.AutomationId="Screen_BatchImport">
+             AutomationProperties.AutomationId="Screen_BatchImport"
+             AutomationProperties.AccessibilityView="Control">
 
     <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
         <DockPanel>
