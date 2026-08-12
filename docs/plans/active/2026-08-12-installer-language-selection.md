@@ -69,7 +69,7 @@ Out of scope:
 ## Validation
 
 - Focused proof: `SupportedLanguageResolverTests`, 8 passing cases for supported, unsupported, saved, and invalid values.
-- Integration or end-to-end proof: Release build succeeded with 0 warnings and 0 errors; Release test suite passed 900/900. Inno Setup 6.7.0 built `DocumentManager_v4.0.0_Setup.exe`; `Check & Build`, Linux package, and Vercel Preview checks passed on PR #33.
+- Integration or end-to-end proof: Release build succeeded with 0 warnings and 0 errors; Release test suite passed 901/901. Inno Setup 6.7.0 built `DocumentManager_v4.0.0_Setup.exe`; `Check & Build`, Linux package, and Vercel Preview checks passed on PR #33.
 - Repository-required checks: `git diff --check` passed. The remaining installer proof requires a clean Windows VM for standard-user/UAC behavior and user-data retention.
 
 ## Result

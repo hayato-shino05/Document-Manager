@@ -80,7 +80,9 @@ try {
         $appStartInfo.UseShellExecute = $false
         $appStartInfo.EnvironmentVariables["SDM_DATABASE_PATH"] = $databasePath
         $appProcess = [System.Diagnostics.Process]::Start($appStartInfo)
-            ?? throw "Installed application process could not be started."
+        if ($null -eq $appProcess) {
+            throw "Installed application process could not be started."
+        }
         try {
             if ($appProcess.WaitForExit(5000)) {
                 throw "Application exited during launch smoke with exit code $($appProcess.ExitCode)."
