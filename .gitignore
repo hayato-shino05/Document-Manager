@@ -377,3 +377,4 @@ scripts/
 !scripts/
 scripts/*
 !scripts/build-windows-setup.ps1
+!scripts/verify-windows-installer.ps1
