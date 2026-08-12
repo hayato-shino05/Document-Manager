@@ -26,19 +26,46 @@ public sealed class SupportedLanguageResolverTests
 
     [Fact]
     public void Resolve_PrefersSavedLanguage()
-        => Assert.Equal(
-            SupportedLanguage.English,
-            SupportedLanguageResolver.Resolve("English", new CultureInfo("ja-JP")));
+    {
+        var resolution = SupportedLanguageResolver.Resolve("English", new CultureInfo("ja-JP"));
+
+        Assert.Equal(SupportedLanguage.English, resolution.Language);
+        Assert.True(resolution.UsedSavedLanguage);
+    }
 
     [Fact]
     public void Resolve_UsesOsCultureWhenLanguageIsMissing()
-        => Assert.Equal(
-            SupportedLanguage.Vietnamese,
-            SupportedLanguageResolver.Resolve(null, new CultureInfo("vi-VN")));
+    {
+        var resolution = SupportedLanguageResolver.Resolve(null, new CultureInfo("vi-VN"));
+
+        Assert.Equal(SupportedLanguage.Vietnamese, resolution.Language);
+        Assert.False(resolution.UsedSavedLanguage);
+    }
 
     [Fact]
     public void Resolve_UsesOsCultureWhenSavedLanguageIsInvalid()
-        => Assert.Equal(
-            SupportedLanguage.Chinese,
-            SupportedLanguageResolver.Resolve("unsupported", new CultureInfo("zh-CN")));
+    {
+        var resolution = SupportedLanguageResolver.Resolve("unsupported", new CultureInfo("zh-CN"));
+
+        Assert.Equal(SupportedLanguage.Chinese, resolution.Language);
+        Assert.False(resolution.UsedSavedLanguage);
+    }
+
+    [Fact]
+    public void Resolve_UsesOsCultureWhenSavedLanguageIsNumeric()
+    {
+        var resolution = SupportedLanguageResolver.Resolve("3", new CultureInfo("en-US"));
+
+        Assert.Equal(SupportedLanguage.English, resolution.Language);
+        Assert.False(resolution.UsedSavedLanguage);
+    }
+
+    [Fact]
+    public void Resolve_PrefersSavedLanguageWhenWhitespaceCanBeTrimmed()
+    {
+        var resolution = SupportedLanguageResolver.Resolve(" English ", new CultureInfo("ja-JP"));
+
+        Assert.Equal(SupportedLanguage.English, resolution.Language);
+        Assert.True(resolution.UsedSavedLanguage);
+    }
 }

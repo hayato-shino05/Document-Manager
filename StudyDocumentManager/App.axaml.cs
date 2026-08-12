@@ -26,6 +26,7 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         RemoveDataAnnotationsValidationPlugin();
+        var osCulture = CultureInfo.CurrentUICulture;
         var services = new ServiceCollection();
         ConfigureServices(services);
         Services = services.BuildServiceProvider();
@@ -35,7 +36,7 @@ public partial class App : Application
 
         var localization = Services.GetRequiredService<LocalizationService>();
         var settings = Services.GetRequiredService<ISettingsService>();
-        InitializeLanguage(localization, settings);
+        InitializeLanguage(localization, settings, osCulture);
 
         // Avalonia needs the concrete type (implements INotifyPropertyChanged) for indexer binding refresh
         Resources["Loc"] = localization;
@@ -62,15 +63,15 @@ public partial class App : Application
     }
 
 
-    private static void InitializeLanguage(LocalizationService localization, ISettingsService settings)
+    private static void InitializeLanguage(LocalizationService localization, ISettingsService settings, CultureInfo osCulture)
     {
         var savedLanguage = settings.GetSetting("language");
-        var language = SupportedLanguageResolver.Resolve(savedLanguage, CultureInfo.CurrentUICulture);
+        var resolution = SupportedLanguageResolver.Resolve(savedLanguage, osCulture);
 
-        if (!Enum.TryParse<SupportedLanguage>(savedLanguage, ignoreCase: true, out _))
-            settings.SetSetting("language", language.ToString());
+        if (!resolution.UsedSavedLanguage)
+            settings.SetSetting("language", resolution.Language.ToString());
 
-        localization.SetLanguage(language);
+        localization.SetLanguage(resolution.Language);
     }
 
     private static void RemoveDataAnnotationsValidationPlugin()
