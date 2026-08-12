@@ -64,8 +64,6 @@ function Invoke-SetupProcess([string]$fileName, [string[]]$arguments, [hashtable
     }
 }
 
-$appProcess = $null
-
 try {
     $environment = @{ LOCALAPPDATA = $localAppDataPath }
     Invoke-SetupProcess $setupPath @("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-", "/DIR=$installPath") $environment
@@ -75,16 +73,20 @@ try {
         throw "Installed application executable was not found: $installedExe"
     }
 
-    $appStartInfo = [System.Diagnostics.ProcessStartInfo]::new($installedExe)
-    $appStartInfo.UseShellExecute = $false
-    $appStartInfo.EnvironmentVariables["LOCALAPPDATA"] = $localAppDataPath
-    $appProcess = [System.Diagnostics.Process]::Start($appStartInfo)
-
-    if (-not $appProcess.WaitForExit(5000)) {
-        $appProcess.Kill()
-        $appProcess.WaitForExit()
+    $appProcess = Start-Process -FilePath $installedExe -PassThru
+    try {
+        if (-not $appProcess.WaitForExit(5000)) {
+            $appProcess.Kill()
+            $appProcess.WaitForExit()
+        }
     }
-    $appProcess.Dispose()
+    finally {
+        if (-not $appProcess.HasExited) {
+            $appProcess.Kill()
+            $appProcess.WaitForExit()
+        }
+        $appProcess.Dispose()
+    }
 
     $uninstaller = Join-Path $installPath "unins000.exe"
     if (-not (Test-Path $uninstaller -PathType Leaf)) {
@@ -100,20 +102,6 @@ try {
     Write-Host "InstallPath=$installPath"
 }
 finally {
-    if ($appProcess) {
-        try {
-            if (-not $appProcess.HasExited) {
-                $appProcess.Kill()
-                $appProcess.WaitForExit()
-            }
-        }
-        catch [System.InvalidOperationException] {
-        }
-        finally {
-            $appProcess.Dispose()
-        }
-    }
-
     if (Test-Path $workPath) {
         for ($attempt = 1; $attempt -le 20; $attempt++) {
             try {
