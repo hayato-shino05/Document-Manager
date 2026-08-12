@@ -147,7 +147,9 @@ public class DocumentTypeIconConverter : IValueConverter
         if (cache != null) return cache;
         try
         {
-            var uri = new Uri($"avares://StudyDocumentManager/Assets/Icons/Types/{filename}");
+            var assemblyName = typeof(DocumentTypeIconConverter).Assembly.GetName().Name
+                ?? throw new InvalidOperationException("The document manager assembly name is unavailable.");
+            var uri = new Uri($"avares://{assemblyName}/Assets/Icons/Types/{filename}");
             var stream = AssetLoader.Open(uri);
             cache = new Bitmap(stream);
             return cache;
@@ -163,7 +165,9 @@ public class DocumentTypeIconConverter : IValueConverter
         if (cache != null) return cache;
         try
         {
-            var uri = new Uri($"avares://StudyDocumentManager/Assets/Icons/Types/{filename}");
+            var assemblyName = typeof(DocumentTypeIconConverter).Assembly.GetName().Name
+                ?? throw new InvalidOperationException("The document manager assembly name is unavailable.");
+            var uri = new Uri($"avares://{assemblyName}/Assets/Icons/Types/{filename}");
             var stream = AssetLoader.Open(uri);
             var source = SvgSource.LoadFromStream(stream);
             cache = new SvgImage { Source = source };

@@ -15,6 +15,7 @@ rule/
 gemini.md
 .harness-core/
 docs/
+docs/TEST_MATRIX.md
 codegrove.sqlite
 .superpowers/
 # User-specific files
