@@ -1,7 +1,9 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using StudyDocumentManager.Core;
 using StudyDocumentManager.Models;
 using StudyDocumentManager.Views;
 using StudyDocumentManager.Core.Interfaces;
@@ -31,8 +33,12 @@ public partial class App : Application
         var db = Services.GetRequiredService<DatabaseHelper>();
         db.InitializeDatabase();
 
+        var localization = Services.GetRequiredService<LocalizationService>();
+        var settings = Services.GetRequiredService<ISettingsService>();
+        InitializeLanguage(localization, settings);
+
         // Avalonia needs the concrete type (implements INotifyPropertyChanged) for indexer binding refresh
-        Resources["Loc"] = Services.GetRequiredService<LocalizationService>();
+        Resources["Loc"] = localization;
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -55,6 +61,17 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
+
+    private static void InitializeLanguage(LocalizationService localization, ISettingsService settings)
+    {
+        var savedLanguage = settings.GetSetting("language");
+        var language = SupportedLanguageResolver.Resolve(savedLanguage, CultureInfo.CurrentUICulture);
+
+        if (!Enum.TryParse<SupportedLanguage>(savedLanguage, ignoreCase: true, out _))
+            settings.SetSetting("language", language.ToString());
+
+        localization.SetLanguage(language);
+    }
 
     private static void RemoveDataAnnotationsValidationPlugin()
     {
