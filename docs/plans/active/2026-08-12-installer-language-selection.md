@@ -57,8 +57,8 @@ Out of scope:
 - [x] Apply language before `Resources["Loc"]` registration and `MainWindowModel` creation.
 - [x] Add four Inno Setup language entries and Windows UI language detection.
 - [x] Add resolver tests and run Debug/Release verification.
-- [ ] Run Inno Setup compiler syntax/build verification when `ISCC.exe` is available.
-- [ ] Re-read review threads and CI, then mark Issue and PR verification complete.
+- [x] Run Inno Setup compiler syntax/build verification with Inno Setup 6.7.0 and verify `DocumentManager_v4.0.0_Setup.exe` output.
+- [ ] Run installer lifecycle verification from a clean Windows environment, then re-read review threads and CI.
 
 ## Decisions
 
