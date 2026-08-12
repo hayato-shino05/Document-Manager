@@ -1,7 +1,8 @@
 param(
     [Parameter(Mandatory)]
     [string]$SetupExe,
-    [string]$WorkingDirectory = (Join-Path ([System.IO.Path]::GetTempPath()) "DocumentManager-installer-smoke")
+    [string]$WorkingDirectory = (Join-Path ([System.IO.Path]::GetTempPath()) "DocumentManager-installer-smoke"),
+    [switch]$VerifyLaunch
 )
 
 $ErrorActionPreference = "Stop"
@@ -13,7 +14,7 @@ if (-not (Test-Path $setupPath -PathType Leaf)) {
 
 $workPath = [System.IO.Path]::GetFullPath($WorkingDirectory)
 $installPath = Join-Path $workPath "app"
-$localAppDataPath = Join-Path $workPath "local-app-data"
+$databasePath = Join-Path $workPath "data\study_documents.db"
 
 if (Test-Path $workPath) {
     for ($attempt = 1; $attempt -le 20; $attempt++) {
@@ -36,7 +37,7 @@ if (Test-Path $workPath) {
     }
 }
 
-New-Item -ItemType Directory -Path $localAppDataPath | Out-Null
+New-Item -ItemType Directory -Path (Split-Path -Parent $databasePath) | Out-Null
 
 function Invoke-SetupProcess([string]$fileName, [string[]]$arguments, [hashtable]$environment) {
     $startInfo = [System.Diagnostics.ProcessStartInfo]::new($fileName)
@@ -65,7 +66,7 @@ function Invoke-SetupProcess([string]$fileName, [string[]]$arguments, [hashtable
 }
 
 try {
-    $environment = @{ LOCALAPPDATA = $localAppDataPath }
+    $environment = @{ SDM_DATABASE_PATH = $databasePath }
     Invoke-SetupProcess $setupPath @("/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-", "/DIR=$installPath") $environment
 
     $installedExe = Join-Path $installPath "DocumentManager.exe"
@@ -73,19 +74,33 @@ try {
         throw "Installed application executable was not found: $installedExe"
     }
 
-    $appProcess = Start-Process -FilePath $installedExe -PassThru
-    try {
-        if (-not $appProcess.WaitForExit(5000)) {
-            $appProcess.Kill()
-            $appProcess.WaitForExit()
+    if ($VerifyLaunch) {
+        $appStartInfo = [System.Diagnostics.ProcessStartInfo]::new($installedExe)
+        $appStartInfo.WorkingDirectory = $installPath
+        $appStartInfo.UseShellExecute = $false
+        $appStartInfo.EnvironmentVariables["SDM_DATABASE_PATH"] = $databasePath
+        $appProcess = [System.Diagnostics.Process]::Start($appStartInfo)
+            ?? throw "Installed application process could not be started."
+        try {
+            if ($appProcess.WaitForExit(5000)) {
+                throw "Application exited during launch smoke with exit code $($appProcess.ExitCode)."
+            }
+            if (-not $appProcess.CloseMainWindow() -or -not $appProcess.WaitForExit(10000)) {
+                $appProcess.Kill()
+                $appProcess.WaitForExit()
+            }
         }
-    }
-    finally {
-        if (-not $appProcess.HasExited) {
-            $appProcess.Kill()
-            $appProcess.WaitForExit()
+        finally {
+            if (-not $appProcess.HasExited) {
+                $appProcess.Kill()
+                $appProcess.WaitForExit()
+            }
+            $appProcess.Dispose()
         }
-        $appProcess.Dispose()
+
+        if (-not (Test-Path $databasePath -PathType Leaf)) {
+            throw "The isolated application database was not created: $databasePath"
+        }
     }
 
     $uninstaller = Join-Path $installPath "unins000.exe"
@@ -99,7 +114,14 @@ try {
         throw "Application executable still exists after uninstall: $installedExe"
     }
 
+    if ($VerifyLaunch -and -not (Test-Path $databasePath -PathType Leaf)) {
+        throw "The isolated application database was removed by uninstall: $databasePath"
+    }
+
     Write-Host "InstallPath=$installPath"
+    if ($VerifyLaunch) {
+        Write-Host "DatabasePath=$databasePath"
+    }
 }
 finally {
     if (Test-Path $workPath) {

@@ -69,9 +69,9 @@ Out of scope:
 ## Validation
 
 - Focused proof: `SupportedLanguageResolverTests`, 8 passing cases for supported, unsupported, saved, and invalid values.
-- Integration or end-to-end proof: Release build succeeded with 0 warnings and 0 errors; Release test suite passed 896/896. Linux package and Vercel checks passed on PR #29.
-- Repository-required checks: `git diff --check` passed. Inno Setup compiler syntax check is pending because `ISCC.exe` is unavailable in the current environment.
+- Integration or end-to-end proof: Release build succeeded with 0 warnings and 0 errors; Release test suite passed 900/900. Inno Setup 6.7.0 built `DocumentManager_v4.0.0_Setup.exe`; `Check & Build`, Linux package, and Vercel Preview checks passed on PR #33.
+- Repository-required checks: `git diff --check` passed. The remaining installer proof requires a clean Windows VM for standard-user/UAC behavior and user-data retention.
 
 ## Result
 
-Pending final review and installer compiler verification. The implementation is not complete until valid review findings are resolved, CI is green, and the remaining verification limitation is either proven by CI or documented as an external dependency.
+Installer language entries and OS-locale startup resolution are implemented and compiler-verified. The clean-VM installer lifecycle and desktop runtime smoke gates remain release requirements; valid review findings and CI failures must be resolved before a marketing release.

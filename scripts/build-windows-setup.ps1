@@ -47,6 +47,9 @@ dotnet publish "StudyDocumentManager\StudyDocumentManager.csproj" `
     -p:DebugSymbols=false `
     -p:Version=$Version `
     -o $publishDir
+if ($LASTEXITCODE -ne 0) {
+    throw "dotnet publish failed with exit code $LASTEXITCODE"
+}
 
 $publishedExe = Join-Path $publishDir "DocumentManager.exe"
 if (-not (Test-Path $publishedExe)) {
@@ -54,6 +57,9 @@ if (-not (Test-Path $publishedExe)) {
 }
 
 & $isccPath "/DMyAppVersion=$Version" "/DPublishDir=$publishDir" "/DOutputDir=$installerDir" $setupScript
+if ($LASTEXITCODE -ne 0) {
+    throw "ISCC.exe failed with exit code $LASTEXITCODE"
+}
 
 $setupExe = Join-Path $installerDir "DocumentManager_v${Version}_Setup.exe"
 if (-not (Test-Path $setupExe)) {
