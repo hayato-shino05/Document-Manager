@@ -11,6 +11,7 @@ namespace StudyDocumentManager.Data.Helpers;
 /// </summary>
 public class DatabaseHelper
 {
+    private const string DatabasePathEnvironmentVariable = "SDM_DATABASE_PATH";
     private string? _databasePath;
     private string? _connectionString;
 
@@ -50,6 +51,15 @@ public class DatabaseHelper
 
     private static string GetDefaultDatabasePath()
     {
+        var configuredPath = Environment.GetEnvironmentVariable(DatabasePathEnvironmentVariable);
+        if (!string.IsNullOrWhiteSpace(configuredPath))
+        {
+            if (!Path.IsPathFullyQualified(configuredPath))
+                throw new InvalidOperationException($"{DatabasePathEnvironmentVariable} must be an absolute path.");
+
+            return Path.GetFullPath(configuredPath);
+        }
+
         var localAppData = Environment.GetFolderPath(
             Environment.SpecialFolder.LocalApplicationData,
             Environment.SpecialFolderOption.DoNotVerify);

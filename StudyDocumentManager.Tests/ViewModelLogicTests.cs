@@ -35,6 +35,24 @@ public class DatabaseHelperDefaultPathTests
     }
 
     [Fact]
+    public void DatabasePath_WhenEnvironmentOverrideIsSet_ReturnsConfiguredPath()
+    {
+        var originalPath = Environment.GetEnvironmentVariable("SDM_DATABASE_PATH");
+        var configuredPath = Path.Combine(Path.GetTempPath(), $"sdm_override_{Guid.NewGuid():N}.db");
+
+        try
+        {
+            Environment.SetEnvironmentVariable("SDM_DATABASE_PATH", configuredPath);
+
+            Assert.Equal(Path.GetFullPath(configuredPath), new DatabaseHelper().DatabasePath);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("SDM_DATABASE_PATH", originalPath);
+        }
+    }
+
+    [Fact]
     public void InitializeDatabase_WhenDataFolderMissing_CreatesIt()
     {
         var tempRoot = Path.Combine(Path.GetTempPath(), $"sdm_mkdirtest_{Guid.NewGuid():N}");
