@@ -33,8 +33,8 @@ public sealed class DesktopAppFixture : IDisposable
 
             using var process = Process.Start(startInfo)
                 ?? throw new InvalidOperationException("DocumentManager process を開始できませんでした。");
-            App = Application.Attach(process.Id);
             _processId = process.Id;
+            App = Application.Attach(process.Id);
             _automation = new UIA3Automation();
             Window = WaitUntil(
                 () => App.GetMainWindow(_automation!)!,
