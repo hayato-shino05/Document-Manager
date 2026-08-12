@@ -1,7 +1,9 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using StudyDocumentManager.Core;
 using StudyDocumentManager.Models;
 using StudyDocumentManager.Views;
 using StudyDocumentManager.Core.Interfaces;
@@ -24,6 +26,7 @@ public partial class App : Application
     public override void OnFrameworkInitializationCompleted()
     {
         RemoveDataAnnotationsValidationPlugin();
+        var osCulture = CultureInfo.CurrentUICulture;
         var services = new ServiceCollection();
         ConfigureServices(services);
         Services = services.BuildServiceProvider();
@@ -31,8 +34,12 @@ public partial class App : Application
         var db = Services.GetRequiredService<DatabaseHelper>();
         db.InitializeDatabase();
 
+        var localization = Services.GetRequiredService<LocalizationService>();
+        var settings = Services.GetRequiredService<ISettingsService>();
+        InitializeLanguage(localization, settings, osCulture);
+
         // Avalonia needs the concrete type (implements INotifyPropertyChanged) for indexer binding refresh
-        Resources["Loc"] = Services.GetRequiredService<LocalizationService>();
+        Resources["Loc"] = localization;
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -55,6 +62,17 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
+
+    private static void InitializeLanguage(LocalizationService localization, ISettingsService settings, CultureInfo osCulture)
+    {
+        var savedLanguage = settings.GetSetting("language");
+        var resolution = SupportedLanguageResolver.Resolve(savedLanguage, osCulture);
+
+        if (!resolution.UsedSavedLanguage)
+            settings.SetSetting("language", resolution.Language.ToString());
+
+        localization.SetLanguage(resolution.Language);
+    }
 
     private static void RemoveDataAnnotationsValidationPlugin()
     {
