@@ -61,6 +61,24 @@ public sealed class SupportedLanguageResolverTests
     }
 
     [Fact]
+    public void Resolve_UsesOsCultureWhenInstallerLanguageIsInvalid()
+    {
+        var resolution = SupportedLanguageResolver.Resolve(null, "unsupported", new CultureInfo("zh-CN"));
+
+        Assert.Equal(SupportedLanguage.Chinese, resolution.Language);
+        Assert.False(resolution.UsedSavedLanguage);
+    }
+
+    [Fact]
+    public void Resolve_FallsBackToJapaneseWhenSavedAndInstallerLanguagesAreInvalid()
+    {
+        var resolution = SupportedLanguageResolver.Resolve("unsupported", "also-unsupported", new CultureInfo("fr-FR"));
+
+        Assert.Equal(SupportedLanguage.Japanese, resolution.Language);
+        Assert.False(resolution.UsedSavedLanguage);
+    }
+
+    [Fact]
     public void Resolve_UsesOsCultureWhenSavedLanguageIsInvalid()
     {
         var resolution = SupportedLanguageResolver.Resolve("unsupported", new CultureInfo("zh-CN"));
