@@ -32,7 +32,9 @@ public static class SupportedLanguageResolver
                 ? new SupportedLanguageResolution(installed, UsedSavedLanguage: false)
                 : new SupportedLanguageResolution(FromCulture(culture), UsedSavedLanguage: false);
 
-    public static InstallerLanguageHandoff? TryClaimInstallerLanguage(string? localAppData = null)
+    public static InstallerLanguageHandoff? TryClaimInstallerLanguage(
+        string? localAppData = null,
+        TimeSpan? mutexTimeout = null)
     {
         localAppData ??= Environment.GetFolderPath(
             Environment.SpecialFolder.LocalApplicationData,
@@ -45,7 +47,7 @@ public static class SupportedLanguageResolver
         {
             try
             {
-                if (!mutex.WaitOne(TimeSpan.FromSeconds(5)))
+                if (!mutex.WaitOne(mutexTimeout ?? TimeSpan.FromSeconds(5)))
                 {
                     mutex.Dispose();
                     return null;

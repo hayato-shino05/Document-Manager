@@ -201,7 +201,7 @@ public sealed class SupportedLanguageResolverTests
         {
             using var first = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData);
             SupportedLanguageResolver.InstallerLanguageHandoff? second = null;
-            var thread = new Thread(() => second = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData));
+            var thread = new Thread(() => second = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData, TimeSpan.FromMilliseconds(100)));
 
             Assert.NotNull(first);
             thread.Start();
