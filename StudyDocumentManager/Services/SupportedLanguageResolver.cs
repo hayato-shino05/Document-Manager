@@ -64,6 +64,7 @@ public static class SupportedLanguageResolver
                 .Select(line => line.Trim())
                 .SkipWhile(line => !line.Equals("[Installer]", StringComparison.OrdinalIgnoreCase))
                 .Skip(1)
+                .TakeWhile(line => !line.StartsWith("[", StringComparison.Ordinal))
                 .Select(line => line.Split('=', 2))
                 .Where(parts => parts.Length == 2
                     && parts[0].Trim().Equals("Language", StringComparison.OrdinalIgnoreCase))
@@ -105,8 +106,16 @@ public static class SupportedLanguageResolver
     {
         try
         {
-            if (File.Exists(consumingPath) && !File.Exists(filePath))
-                File.Move(consumingPath, filePath);
+            if (!File.Exists(consumingPath))
+                return;
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(consumingPath);
+                return;
+            }
+
+            File.Move(consumingPath, filePath);
         }
         catch (IOException)
         {
@@ -117,19 +126,7 @@ public static class SupportedLanguageResolver
     }
 
     private static void RestoreHandoffFile(string consumingPath, string filePath)
-    {
-        try
-        {
-            if (File.Exists(consumingPath) && !File.Exists(filePath))
-                File.Move(consumingPath, filePath);
-        }
-        catch (IOException)
-        {
-        }
-        catch (UnauthorizedAccessException)
-        {
-        }
-    }
+        => RecoverStaleHandoffFile(consumingPath, filePath);
 
     private static SupportedLanguage? TryResolveSavedLanguage(string? savedLanguage)
     {

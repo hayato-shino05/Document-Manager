@@ -120,6 +120,51 @@ public sealed class SupportedLanguageResolverTests
     }
 
     [Fact]
+    public void ReadInstallerLanguage_PrefersFreshHandoffOverStaleClaim()
+    {
+        var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
+        var directory = Path.Combine(localAppData, "StudyDocumentManager");
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, "installer-language.ini");
+        var consumingPath = filePath + ".consuming";
+        File.WriteAllText(filePath, "[Installer]\nLanguage=Vietnamese\n");
+        File.WriteAllText(consumingPath, "[Installer]\nLanguage=English\n");
+
+        try
+        {
+            Assert.Equal(nameof(SupportedLanguage.Vietnamese), SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
+            Assert.False(File.Exists(filePath));
+            Assert.False(File.Exists(consumingPath));
+        }
+        finally
+        {
+            if (Directory.Exists(localAppData))
+                Directory.Delete(localAppData, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ReadInstallerLanguage_IgnoresLanguageKeyOutsideInstallerSection()
+    {
+        var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
+        var directory = Path.Combine(localAppData, "StudyDocumentManager");
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, "installer-language.ini");
+        File.WriteAllText(filePath, "[Installer]\nOther=Value\n[Other]\nLanguage=English\n");
+
+        try
+        {
+            Assert.Null(SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
+            Assert.True(File.Exists(filePath));
+        }
+        finally
+        {
+            if (Directory.Exists(localAppData))
+                Directory.Delete(localAppData, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Resolve_UsesInstallerLanguageBeforeOsCulture()
     {
         var resolution = SupportedLanguageResolver.Resolve(null, nameof(SupportedLanguage.English), new CultureInfo("vi-VN"));
