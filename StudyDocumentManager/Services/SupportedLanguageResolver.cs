@@ -31,9 +31,9 @@ public static class SupportedLanguageResolver
                 ? new SupportedLanguageResolution(installed, UsedSavedLanguage: false)
                 : new SupportedLanguageResolution(FromCulture(culture), UsedSavedLanguage: false);
 
-    public static string? ReadInstallerLanguage()
+    public static string? ReadInstallerLanguage(string? localAppData = null)
     {
-        var localAppData = Environment.GetFolderPath(
+        localAppData ??= Environment.GetFolderPath(
             Environment.SpecialFolder.LocalApplicationData,
             Environment.SpecialFolderOption.DoNotVerify);
         if (string.IsNullOrWhiteSpace(localAppData))

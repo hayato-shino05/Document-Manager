@@ -34,6 +34,27 @@ public sealed class SupportedLanguageResolverTests
     }
 
     [Fact]
+    public void ReadInstallerLanguage_ReadsAndConsumesHandoffFile()
+    {
+        var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
+        var directory = Path.Combine(localAppData, "StudyDocumentManager");
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, "installer-language.ini");
+        File.WriteAllText(filePath, "[Installer]\nLanguage=Vietnamese\n");
+
+        try
+        {
+            Assert.Equal(nameof(SupportedLanguage.Vietnamese), SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
+            Assert.False(File.Exists(filePath));
+        }
+        finally
+        {
+            if (Directory.Exists(localAppData))
+                Directory.Delete(localAppData, recursive: true);
+        }
+    }
+
+    [Fact]
     public void Resolve_UsesInstallerLanguageBeforeOsCulture()
     {
         var resolution = SupportedLanguageResolver.Resolve(null, nameof(SupportedLanguage.English), new CultureInfo("vi-VN"));
