@@ -55,7 +55,7 @@ public sealed class SupportedLanguageResolverTests
     }
 
     [Fact]
-    public void ReadInstallerLanguage_RestoresInvalidHandoffFile()
+    public void ReadInstallerLanguage_RestoresMalformedHandoffFile()
     {
         var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
         var directory = Path.Combine(localAppData, "StudyDocumentManager");
@@ -67,6 +67,50 @@ public sealed class SupportedLanguageResolverTests
         {
             Assert.Null(SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
             Assert.True(File.Exists(filePath));
+        }
+        finally
+        {
+            if (Directory.Exists(localAppData))
+                Directory.Delete(localAppData, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ReadInstallerLanguage_RestoresUnsupportedLanguageFile()
+    {
+        var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
+        var directory = Path.Combine(localAppData, "StudyDocumentManager");
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, "installer-language.ini");
+        File.WriteAllText(filePath, "[Installer]\nLanguage=Unsupported\n");
+
+        try
+        {
+            Assert.Null(SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
+            Assert.True(File.Exists(filePath));
+        }
+        finally
+        {
+            if (Directory.Exists(localAppData))
+                Directory.Delete(localAppData, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ReadInstallerLanguage_RecoversStaleConsumingFile()
+    {
+        var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
+        var directory = Path.Combine(localAppData, "StudyDocumentManager");
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, "installer-language.ini");
+        var consumingPath = filePath + ".consuming";
+        File.WriteAllText(consumingPath, "[Installer]\nLanguage=English\n");
+
+        try
+        {
+            Assert.Equal(nameof(SupportedLanguage.English), SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
+            Assert.False(File.Exists(filePath));
+            Assert.False(File.Exists(consumingPath));
         }
         finally
         {

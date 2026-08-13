@@ -40,10 +40,11 @@ public static class SupportedLanguageResolver
             return null;
 
         var filePath = Path.Combine(localAppData, "StudyDocumentManager", InstallerLanguageFileName);
+        var consumingPath = filePath + ".consuming";
+        RecoverStaleHandoffFile(consumingPath, filePath);
         if (!File.Exists(filePath))
             return null;
 
-        var consumingPath = filePath + ".consuming";
         try
         {
             File.Move(filePath, consumingPath);
@@ -69,7 +70,7 @@ public static class SupportedLanguageResolver
                 .Select(parts => parts[1].Trim())
                 .FirstOrDefault();
 
-            if (string.IsNullOrWhiteSpace(language))
+            if (TryResolveSavedLanguage(language) is null)
             {
                 RestoreHandoffFile(consumingPath, filePath);
                 return null;
@@ -97,6 +98,21 @@ public static class SupportedLanguageResolver
         {
             RestoreHandoffFile(consumingPath, filePath);
             return null;
+        }
+    }
+
+    private static void RecoverStaleHandoffFile(string consumingPath, string filePath)
+    {
+        try
+        {
+            if (File.Exists(consumingPath) && !File.Exists(filePath))
+                File.Move(consumingPath, filePath);
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
         }
     }
 
