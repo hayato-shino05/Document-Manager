@@ -10,6 +10,7 @@ public readonly record struct SupportedLanguageResolution(
 public static class SupportedLanguageResolver
 {
     private const string InstallerLanguageFileName = "installer-language.ini";
+    private const string InstallerLanguageMutexName = @"Local\StudyDocumentManager.InstallerLanguageHandoff.v1";
 
     public static SupportedLanguage FromCulture(CultureInfo? culture)
         => culture?.TwoLetterISOLanguageName.ToLowerInvariant() switch
@@ -31,7 +32,7 @@ public static class SupportedLanguageResolver
                 ? new SupportedLanguageResolution(installed, UsedSavedLanguage: false)
                 : new SupportedLanguageResolution(FromCulture(culture), UsedSavedLanguage: false);
 
-    public static string? ReadInstallerLanguage(string? localAppData = null)
+    public static InstallerLanguageHandoff? TryClaimInstallerLanguage(string? localAppData = null)
     {
         localAppData ??= Environment.GetFolderPath(
             Environment.SpecialFolder.LocalApplicationData,
@@ -39,68 +40,71 @@ public static class SupportedLanguageResolver
         if (string.IsNullOrWhiteSpace(localAppData))
             return null;
 
-        var filePath = Path.Combine(localAppData, "StudyDocumentManager", InstallerLanguageFileName);
-        var consumingPath = filePath + ".consuming";
-        RecoverStaleHandoffFile(consumingPath, filePath);
-        if (!File.Exists(filePath))
-            return null;
-
+        var mutex = new Mutex(initiallyOwned: false, InstallerLanguageMutexName);
         try
         {
-            File.Move(filePath, consumingPath);
-        }
-        catch (IOException)
-        {
-            return null;
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return null;
-        }
-
-        try
-        {
-            var language = File.ReadAllLines(consumingPath)
-                .Select(line => line.Trim())
-                .SkipWhile(line => !line.Equals("[Installer]", StringComparison.OrdinalIgnoreCase))
-                .Skip(1)
-                .TakeWhile(line => !line.StartsWith("[", StringComparison.Ordinal))
-                .Select(line => line.Split('=', 2))
-                .Where(parts => parts.Length == 2
-                    && parts[0].Trim().Equals("Language", StringComparison.OrdinalIgnoreCase))
-                .Select(parts => parts[1].Trim())
-                .FirstOrDefault();
-
-            if (TryResolveSavedLanguage(language) is null)
+            try
             {
-                RestoreHandoffFile(consumingPath, filePath);
+                if (!mutex.WaitOne(0))
+                {
+                    mutex.Dispose();
+                    return null;
+                }
+            }
+            catch (AbandonedMutexException)
+            {
+            }
+
+            var filePath = Path.Combine(localAppData, "StudyDocumentManager", InstallerLanguageFileName);
+            var consumingPath = filePath + ".consuming";
+            RecoverStaleHandoffFile(consumingPath, filePath);
+            if (!File.Exists(filePath))
+            {
+                mutex.ReleaseMutex();
+                mutex.Dispose();
                 return null;
             }
 
             try
             {
-                File.Delete(consumingPath);
+                File.Move(filePath, consumingPath);
+                var language = ReadLanguage(consumingPath);
+                if (TryResolveSavedLanguage(language) is not null)
+                    return new InstallerLanguageHandoff(language!, filePath, consumingPath, mutex);
+
+                RestoreHandoffFile(consumingPath, filePath);
             }
             catch (IOException)
             {
+                RestoreHandoffFile(consumingPath, filePath);
             }
             catch (UnauthorizedAccessException)
             {
+                RestoreHandoffFile(consumingPath, filePath);
             }
 
-            return language;
-        }
-        catch (IOException)
-        {
-            RestoreHandoffFile(consumingPath, filePath);
+            mutex.ReleaseMutex();
+            mutex.Dispose();
             return null;
         }
-        catch (UnauthorizedAccessException)
+        catch
         {
-            RestoreHandoffFile(consumingPath, filePath);
-            return null;
+            mutex.Dispose();
+            throw;
         }
     }
+
+    private static string? ReadLanguage(string filePath)
+        => File.ReadAllLines(filePath)
+            .Select(line => line.Trim())
+            .SkipWhile(line => !line.Equals("[Installer]", StringComparison.OrdinalIgnoreCase))
+            .Skip(1)
+            .TakeWhile(line => !line.StartsWith("[", StringComparison.Ordinal))
+            .Select(line => line.Split('=', 2))
+            .Where(parts => parts.Length == 2
+                && parts[0].Trim().Equals("Language", StringComparison.OrdinalIgnoreCase))
+            .Select(parts => parts[1].Trim())
+            .FirstOrDefault();
 
     private static void RecoverStaleHandoffFile(string consumingPath, string filePath)
     {
@@ -142,5 +146,50 @@ public static class SupportedLanguageResolver
         return saved.ToString().Equals(savedLanguage.Trim(), StringComparison.OrdinalIgnoreCase)
             ? saved
             : null;
+    }
+
+    public sealed class InstallerLanguageHandoff : IDisposable
+    {
+        private readonly string _filePath;
+        private readonly string _consumingPath;
+        private readonly Mutex _mutex;
+        private bool _completed;
+
+        internal InstallerLanguageHandoff(string language, string filePath, string consumingPath, Mutex mutex)
+        {
+            Language = language;
+            _filePath = filePath;
+            _consumingPath = consumingPath;
+            _mutex = mutex;
+        }
+
+        public string Language { get; }
+
+        public void Complete()
+        {
+            if (_completed)
+                return;
+
+            _completed = true;
+            try
+            {
+                File.Delete(_consumingPath);
+            }
+            catch (IOException)
+            {
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+        }
+
+        public void Dispose()
+        {
+            if (!_completed)
+                RestoreHandoffFile(_consumingPath, _filePath);
+
+            _mutex.ReleaseMutex();
+            _mutex.Dispose();
+        }
     }
 }

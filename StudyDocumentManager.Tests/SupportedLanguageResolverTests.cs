@@ -34,7 +34,36 @@ public sealed class SupportedLanguageResolverTests
     }
 
     [Fact]
-    public void ReadInstallerLanguage_ReadsAndConsumesHandoffFile()
+    public void TryClaimInstallerLanguage_DeletesHandoffOnlyAfterCompletion()
+    {
+        var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
+        var directory = Path.Combine(localAppData, "StudyDocumentManager");
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, "installer-language.ini");
+        var consumingPath = filePath + ".consuming";
+        File.WriteAllText(filePath, "[Installer]\nLanguage=Vietnamese\n");
+
+        try
+        {
+            using var handoff = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData);
+
+            Assert.NotNull(handoff);
+            Assert.Equal(nameof(SupportedLanguage.Vietnamese), handoff.Language);
+            Assert.False(File.Exists(filePath));
+            Assert.True(File.Exists(consumingPath));
+
+            handoff.Complete();
+            Assert.False(File.Exists(consumingPath));
+        }
+        finally
+        {
+            if (Directory.Exists(localAppData))
+                Directory.Delete(localAppData, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void TryClaimInstallerLanguage_RestoresHandoffWhenNotCompleted()
     {
         var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
         var directory = Path.Combine(localAppData, "StudyDocumentManager");
@@ -44,8 +73,10 @@ public sealed class SupportedLanguageResolverTests
 
         try
         {
-            Assert.Equal(nameof(SupportedLanguage.Vietnamese), SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
-            Assert.False(File.Exists(filePath));
+            using (var handoff = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData))
+                Assert.NotNull(handoff);
+
+            Assert.True(File.Exists(filePath));
         }
         finally
         {
@@ -65,7 +96,7 @@ public sealed class SupportedLanguageResolverTests
 
         try
         {
-            Assert.Null(SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
+            Assert.Null(SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData));
             Assert.True(File.Exists(filePath));
         }
         finally
@@ -86,7 +117,7 @@ public sealed class SupportedLanguageResolverTests
 
         try
         {
-            Assert.Null(SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
+            Assert.Null(SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData));
             Assert.True(File.Exists(filePath));
         }
         finally
@@ -108,7 +139,11 @@ public sealed class SupportedLanguageResolverTests
 
         try
         {
-            Assert.Equal(nameof(SupportedLanguage.English), SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
+            using var handoff = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData);
+
+            Assert.NotNull(handoff);
+            Assert.Equal(nameof(SupportedLanguage.English), handoff.Language);
+            handoff.Complete();
             Assert.False(File.Exists(filePath));
             Assert.False(File.Exists(consumingPath));
         }
@@ -132,9 +167,40 @@ public sealed class SupportedLanguageResolverTests
 
         try
         {
-            Assert.Equal(nameof(SupportedLanguage.Vietnamese), SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
+            using var handoff = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData);
+
+            Assert.NotNull(handoff);
+            Assert.Equal(nameof(SupportedLanguage.Vietnamese), handoff.Language);
+            handoff.Complete();
             Assert.False(File.Exists(filePath));
             Assert.False(File.Exists(consumingPath));
+        }
+        finally
+        {
+            if (Directory.Exists(localAppData))
+                Directory.Delete(localAppData, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void TryClaimInstallerLanguage_DoesNotClaimWhileAnotherClaimIsActive()
+    {
+        var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
+        var directory = Path.Combine(localAppData, "StudyDocumentManager");
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, "installer-language.ini");
+        File.WriteAllText(filePath, "[Installer]\nLanguage=English\n");
+
+        try
+        {
+            using var first = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData);
+            SupportedLanguageResolver.InstallerLanguageHandoff? second = null;
+            var thread = new Thread(() => second = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData));
+
+            Assert.NotNull(first);
+            thread.Start();
+            thread.Join();
+            Assert.Null(second);
         }
         finally
         {
@@ -154,7 +220,7 @@ public sealed class SupportedLanguageResolverTests
 
         try
         {
-            Assert.Null(SupportedLanguageResolver.ReadInstallerLanguage(localAppData));
+            Assert.Null(SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData));
             Assert.True(File.Exists(filePath));
         }
         finally
