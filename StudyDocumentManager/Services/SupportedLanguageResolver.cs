@@ -163,7 +163,7 @@ public static class SupportedLanguageResolver
 
         public void Complete()
         {
-            if (_completed)
+            if (_completed || Language is null)
                 return;
 
             try

@@ -86,7 +86,7 @@ public sealed class SupportedLanguageResolverTests
     }
 
     [Fact]
-    public void ReadInstallerLanguage_RestoresMalformedHandoffFile()
+    public void TryClaimInstallerLanguage_RestoresMalformedHandoffFile()
     {
         var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
         var directory = Path.Combine(localAppData, "StudyDocumentManager");
@@ -110,7 +110,7 @@ public sealed class SupportedLanguageResolverTests
     }
 
     [Fact]
-    public void ReadInstallerLanguage_RestoresUnsupportedLanguageFile()
+    public void TryClaimInstallerLanguage_RestoresUnsupportedLanguageFile()
     {
         var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
         var directory = Path.Combine(localAppData, "StudyDocumentManager");
@@ -134,7 +134,7 @@ public sealed class SupportedLanguageResolverTests
     }
 
     [Fact]
-    public void ReadInstallerLanguage_RecoversStaleConsumingFile()
+    public void TryClaimInstallerLanguage_RecoversStaleConsumingFile()
     {
         var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
         var directory = Path.Combine(localAppData, "StudyDocumentManager");
@@ -161,7 +161,7 @@ public sealed class SupportedLanguageResolverTests
     }
 
     [Fact]
-    public void ReadInstallerLanguage_PrefersFreshHandoffOverStaleClaim()
+    public void TryClaimInstallerLanguage_PrefersFreshHandoffOverStaleClaim()
     {
         var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
         var directory = Path.Combine(localAppData, "StudyDocumentManager");
@@ -216,7 +216,7 @@ public sealed class SupportedLanguageResolverTests
     }
 
     [Fact]
-    public void ReadInstallerLanguage_IgnoresLanguageKeyOutsideInstallerSection()
+    public void TryClaimInstallerLanguage_IgnoresLanguageKeyOutsideInstallerSection()
     {
         var localAppData = Path.Combine(Path.GetTempPath(), $"sdm-language-{Guid.NewGuid():N}");
         var directory = Path.Combine(localAppData, "StudyDocumentManager");
