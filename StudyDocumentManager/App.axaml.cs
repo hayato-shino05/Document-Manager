@@ -66,11 +66,18 @@ public partial class App : Application
     private static void InitializeLanguage(LocalizationService localization, ISettingsService settings, CultureInfo osCulture)
     {
         var savedLanguage = settings.GetSetting("language");
-        var resolution = SupportedLanguageResolver.Resolve(savedLanguage, osCulture);
+        using var handoff = SupportedLanguageResolver.TryClaimInstallerLanguage();
+        if (handoff is null)
+        {
+            localization.SetLanguage(SupportedLanguageResolver.Resolve(savedLanguage, osCulture).Language);
+            return;
+        }
 
+        var resolution = SupportedLanguageResolver.Resolve(savedLanguage, handoff.Language, osCulture);
         if (!resolution.UsedSavedLanguage)
             settings.SetSetting("language", resolution.Language.ToString());
 
+        handoff.Complete();
         localization.SetLanguage(resolution.Language);
     }
 

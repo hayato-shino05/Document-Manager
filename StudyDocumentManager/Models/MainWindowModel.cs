@@ -69,7 +69,7 @@ public partial class MainWindowModel : ModelBase
                 StatusText = categoryManagement.StatusText;
         };
 
-        LoadLanguageFromSettings();
+        SelectedLanguage = _loc.CurrentLanguage;
 
         _ = Task.Run(async () =>
         {
@@ -314,20 +314,6 @@ public partial class MainWindowModel : ModelBase
         }
 
         return imported;
-    }
-
-    private void LoadLanguageFromSettings()
-    {
-        var saved = _settingsService.GetSetting("language");
-        if (Enum.TryParse<SupportedLanguage>(saved, out var lang))
-        {
-            _loc.SetLanguage(lang);
-            SelectedLanguage = lang;
-        }
-        else
-        {
-            SelectedLanguage = _loc.CurrentLanguage;
-        }
     }
 
     partial void OnSelectedLanguageChanged(SupportedLanguage value)
