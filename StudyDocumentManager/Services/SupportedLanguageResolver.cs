@@ -45,7 +45,7 @@ public static class SupportedLanguageResolver
         {
             try
             {
-                if (!mutex.WaitOne(0))
+                if (!mutex.WaitOne(TimeSpan.FromSeconds(5)))
                 {
                     mutex.Dispose();
                     return null;
@@ -59,18 +59,14 @@ public static class SupportedLanguageResolver
             var consumingPath = filePath + ".consuming";
             RecoverStaleHandoffFile(consumingPath, filePath);
             if (!File.Exists(filePath))
-            {
-                mutex.ReleaseMutex();
-                mutex.Dispose();
-                return null;
-            }
+                return new InstallerLanguageHandoff(null, filePath, consumingPath, mutex);
 
             try
             {
                 File.Move(filePath, consumingPath);
                 var language = ReadLanguage(consumingPath);
                 if (TryResolveSavedLanguage(language) is not null)
-                    return new InstallerLanguageHandoff(language!, filePath, consumingPath, mutex);
+                    return new InstallerLanguageHandoff(language, filePath, consumingPath, mutex);
 
                 RestoreHandoffFile(consumingPath, filePath);
             }
@@ -83,9 +79,7 @@ public static class SupportedLanguageResolver
                 RestoreHandoffFile(consumingPath, filePath);
             }
 
-            mutex.ReleaseMutex();
-            mutex.Dispose();
-            return null;
+            return new InstallerLanguageHandoff(null, filePath, consumingPath, mutex);
         }
         catch
         {
@@ -155,7 +149,7 @@ public static class SupportedLanguageResolver
         private readonly Mutex _mutex;
         private bool _completed;
 
-        internal InstallerLanguageHandoff(string language, string filePath, string consumingPath, Mutex mutex)
+        internal InstallerLanguageHandoff(string? language, string filePath, string consumingPath, Mutex mutex)
         {
             Language = language;
             _filePath = filePath;
@@ -163,7 +157,7 @@ public static class SupportedLanguageResolver
             _mutex = mutex;
         }
 
-        public string Language { get; }
+        public string? Language { get; }
 
         public void Complete()
         {

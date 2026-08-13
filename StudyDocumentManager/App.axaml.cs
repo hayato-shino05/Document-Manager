@@ -67,12 +67,17 @@ public partial class App : Application
     {
         var savedLanguage = settings.GetSetting("language");
         using var handoff = SupportedLanguageResolver.TryClaimInstallerLanguage();
-        var resolution = SupportedLanguageResolver.Resolve(savedLanguage, handoff?.Language, osCulture);
+        if (handoff is null)
+        {
+            localization.SetLanguage(SupportedLanguageResolver.Resolve(savedLanguage, osCulture).Language);
+            return;
+        }
 
+        var resolution = SupportedLanguageResolver.Resolve(savedLanguage, handoff.Language, osCulture);
         if (!resolution.UsedSavedLanguage)
             settings.SetSetting("language", resolution.Language.ToString());
 
-        handoff?.Complete();
+        handoff.Complete();
         localization.SetLanguage(resolution.Language);
     }
 

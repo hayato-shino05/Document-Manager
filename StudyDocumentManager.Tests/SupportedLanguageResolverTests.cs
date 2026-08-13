@@ -96,7 +96,10 @@ public sealed class SupportedLanguageResolverTests
 
         try
         {
-            Assert.Null(SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData));
+            using var handoff = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData);
+
+            Assert.NotNull(handoff);
+            Assert.Null(handoff.Language);
             Assert.True(File.Exists(filePath));
         }
         finally
@@ -117,7 +120,10 @@ public sealed class SupportedLanguageResolverTests
 
         try
         {
-            Assert.Null(SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData));
+            using var handoff = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData);
+
+            Assert.NotNull(handoff);
+            Assert.Null(handoff.Language);
             Assert.True(File.Exists(filePath));
         }
         finally
@@ -220,7 +226,10 @@ public sealed class SupportedLanguageResolverTests
 
         try
         {
-            Assert.Null(SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData));
+            using var handoff = SupportedLanguageResolver.TryClaimInstallerLanguage(localAppData);
+
+            Assert.NotNull(handoff);
+            Assert.Null(handoff.Language);
             Assert.True(File.Exists(filePath));
         }
         finally
