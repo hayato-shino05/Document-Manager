@@ -43,19 +43,10 @@ public static class SupportedLanguageResolver
         if (!File.Exists(filePath))
             return null;
 
+        var consumingPath = filePath + ".consuming";
         try
         {
-            var language = File.ReadAllLines(filePath)
-                .Select(line => line.Trim())
-                .SkipWhile(line => !line.Equals("[Installer]", StringComparison.OrdinalIgnoreCase))
-                .Skip(1)
-                .Select(line => line.Split('=', 2))
-                .Where(parts => parts.Length == 2
-                    && parts[0].Trim().Equals("Language", StringComparison.OrdinalIgnoreCase))
-                .Select(parts => parts[1].Trim())
-                .FirstOrDefault();
-            File.Delete(filePath);
-            return language;
+            File.Move(filePath, consumingPath);
         }
         catch (IOException)
         {
@@ -64,6 +55,63 @@ public static class SupportedLanguageResolver
         catch (UnauthorizedAccessException)
         {
             return null;
+        }
+
+        try
+        {
+            var language = File.ReadAllLines(consumingPath)
+                .Select(line => line.Trim())
+                .SkipWhile(line => !line.Equals("[Installer]", StringComparison.OrdinalIgnoreCase))
+                .Skip(1)
+                .Select(line => line.Split('=', 2))
+                .Where(parts => parts.Length == 2
+                    && parts[0].Trim().Equals("Language", StringComparison.OrdinalIgnoreCase))
+                .Select(parts => parts[1].Trim())
+                .FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(language))
+            {
+                RestoreHandoffFile(consumingPath, filePath);
+                return null;
+            }
+
+            try
+            {
+                File.Delete(consumingPath);
+            }
+            catch (IOException)
+            {
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
+
+            return language;
+        }
+        catch (IOException)
+        {
+            RestoreHandoffFile(consumingPath, filePath);
+            return null;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            RestoreHandoffFile(consumingPath, filePath);
+            return null;
+        }
+    }
+
+    private static void RestoreHandoffFile(string consumingPath, string filePath)
+    {
+        try
+        {
+            if (File.Exists(consumingPath) && !File.Exists(filePath))
+                File.Move(consumingPath, filePath);
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
         }
     }
 
