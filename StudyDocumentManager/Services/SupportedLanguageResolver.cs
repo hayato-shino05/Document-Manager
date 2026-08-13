@@ -170,10 +170,10 @@ public static class SupportedLanguageResolver
             if (_completed)
                 return;
 
-            _completed = true;
             try
             {
                 File.Delete(_consumingPath);
+                _completed = true;
             }
             catch (IOException)
             {
