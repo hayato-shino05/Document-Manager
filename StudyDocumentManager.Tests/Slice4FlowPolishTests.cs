@@ -709,12 +709,13 @@ public class Slice4FlowPolishTests
     }
 
     [Fact]
-    public void MainWindow_LoadsSavedLanguageFromSettings()
+    public void MainWindow_UsesStartupLanguageWithoutReReadingSettings()
     {
         var loc = new TestLocalizationService();
+        loc.SetLanguage(SupportedLanguage.English);
         var settings = new FakeSettingsService(new Dictionary<string, string>
         {
-            ["language"] = nameof(SupportedLanguage.English)
+            ["language"] = nameof(SupportedLanguage.Japanese)
         });
 
         var mainWindow = BuildMainWindowModel(

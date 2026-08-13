@@ -34,6 +34,24 @@ public sealed class SupportedLanguageResolverTests
     }
 
     [Fact]
+    public void Resolve_UsesInstallerLanguageBeforeOsCulture()
+    {
+        var resolution = SupportedLanguageResolver.Resolve(null, nameof(SupportedLanguage.English), new CultureInfo("vi-VN"));
+
+        Assert.Equal(SupportedLanguage.English, resolution.Language);
+        Assert.False(resolution.UsedSavedLanguage);
+    }
+
+    [Fact]
+    public void Resolve_PrefersSavedLanguageBeforeInstallerLanguage()
+    {
+        var resolution = SupportedLanguageResolver.Resolve(nameof(SupportedLanguage.Chinese), nameof(SupportedLanguage.English), new CultureInfo("ja-JP"));
+
+        Assert.Equal(SupportedLanguage.Chinese, resolution.Language);
+        Assert.True(resolution.UsedSavedLanguage);
+    }
+
+    [Fact]
     public void Resolve_UsesOsCultureWhenLanguageIsMissing()
     {
         var resolution = SupportedLanguageResolver.Resolve(null, new CultureInfo("vi-VN"));
