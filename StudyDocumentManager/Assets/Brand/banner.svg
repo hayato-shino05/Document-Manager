@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img">
+  <defs>
+    <pattern id="seigaiha1" width="80" height="46" patternUnits="userSpaceOnUse">
+      <path d="M0 46a40 40 0 0 1 80 0M10 46a30 30 0 0 1 60 0M20 46a20 20 0 0 1 40 0" fill="none" stroke="#b8963e" stroke-width="2" opacity=".35"/>
+    </pattern>
+    <filter id="shadow1" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Left Light Background -->
+  <rect width="1600" height="900" fill="#FFFDF7"/>
+
+  <!-- Right Navy Section -->
+  <path d="M900 0 L1600 0 L1600 900 L820 900 Z" fill="#172B55"/>
+  <path d="M900 0 L1600 0 L1600 900 L820 900 Z" fill="url(#seigaiha1)" opacity=".25"/>
+
+  <!-- Gold Dividing Wave Accent -->
+  <path d="M898 0 L818 900" stroke="#B8963E" stroke-width="6" opacity=".85"/>
+
+  <!-- Left Content -->
+  <g transform="translate(100, 140)">
+    <!-- Category Badge -->
+    <rect width="260" height="40" rx="8" fill="#F0F4FF" stroke="#243D70" stroke-width="1.5"/>
+    <text x="130" y="26" fill="#172B55" font-family="'Segoe UI', 'Yu Gothic', sans-serif" font-size="16" font-weight="700" text-anchor="middle" letter-spacing="3">AVALONIA DESKTOP APP</text>
+
+    <!-- Main Title -->
+    <text x="0" y="110" fill="#172B55" font-family="'Harano Aji Gothic', 'Yu Gothic', sans-serif" font-size="62" font-weight="800">Document</text>
+    <text x="315" y="110" fill="#C93B32" font-family="'Harano Aji Gothic', 'Yu Gothic', sans-serif" font-size="62" font-weight="800">Manager</text>
+    <rect x="0" y="128" width="600" height="5" rx="2.5" fill="#B8963E"/>
+
+    <text x="0" y="210" fill="#172B55" font-family="'Yu Gothic', sans-serif" font-size="36" font-weight="700">学習資料と業務文書を</text>
+    <text x="0" y="265" fill="#172B55" font-family="'Yu Gothic', sans-serif" font-size="36" font-weight="700">ローカルで美しく整理する</text>
+
+    <text x="0" y="335" fill="#606060" font-family="'Yu Gothic', sans-serif" font-size="22" letter-spacing="1">検索・分類・期限管理・コレクション・レポートを 1 つに集約</text>
+
+    <!-- Feature Pills -->
+    <g transform="translate(0, 390)">
+      <!-- Pill 1 -->
+      <rect x="0" y="0" width="160" height="46" rx="23" fill="#172B55"/>
+      <text x="80" y="29" fill="#FFFDF7" font-family="'Segoe UI', sans-serif" font-size="16" font-weight="600" text-anchor="middle">.NET 9.0</text>
+      <!-- Pill 2 -->
+      <rect x="175" y="0" width="180" height="46" rx="23" fill="#172B55"/>
+      <text x="265" y="29" fill="#FFFDF7" font-family="'Segoe UI', sans-serif" font-size="16" font-weight="600" text-anchor="middle">Avalonia 11.2.7</text>
+      <!-- Pill 3 -->
+      <rect x="370" y="0" width="170" height="46" rx="23" fill="#172B55"/>
+      <text x="455" y="29" fill="#FFFDF7" font-family="'Segoe UI', sans-serif" font-size="16" font-weight="600" text-anchor="middle">SQLite Local</text>
+    </g>
+
+    <!-- Version & Quality Indicator -->
+    <g transform="translate(0, 480)">
+      <circle cx="10" cy="10" r="8" fill="#107C10"/>
+      <text x="30" y="16" fill="#172B55" font-family="'Segoe UI', sans-serif" font-size="18" font-weight="600">4.0.0 Ready </text>
+    </g>
+  </g>
+
+  <!-- Right Floating Card with Official Logo -->
+  <g transform="translate(1080, 240)" filter="url(#shadow1)">
+    <!-- White Backing Card -->
+    <rect width="400" height="420" rx="32" fill="#FFFDF7" stroke="#B8963E" stroke-width="4"/>
+    <!-- Stamp Accent -->
+    <circle cx="340" cy="70" r="36" fill="#C93B32"/>
+    <text x="340" y="77" fill="#FFFDF7" font-family="'Yu Gothic', sans-serif" font-size="18" font-weight="700" text-anchor="middle">公式</text>
+    <!-- Centered Official Logo -->
+    <g transform="translate(72, 70) scale(1)">
+      
+<g id="official-mark">
+  <path d="M24 76c0-12 10-22 22-22h57l19 21h88c12 0 22 10 22 22v91c0 12-10 22-22 22H46c-12 0-22-10-22-22z" fill="#172B55"/>
+  <path d="M24 88h208v100c0 12-10 22-22 22H46c-12 0-22-10-22-22z" fill="#243D70"/>
+  <path d="M70 48h82l32 32v112H70z" fill="#FFFDF7" stroke="#B8963E" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M152 48v35h32" fill="none" stroke="#B8963E" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M92 112h70M92 132h70M92 152h48" stroke="#172B55" stroke-width="8" stroke-linecap="round"/>
+  <rect x="169" y="139" width="54" height="54" rx="12" fill="#C93B32"/>
+  <path d="M184 154h24M184 166h24M184 178h14" stroke="#FFFDF7" stroke-width="5" stroke-linecap="round"/>
+</g>
+    </g>
+  </g>
+</svg>

@@ -19,6 +19,17 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AvaloniaXaml Remove="Interfaces\**" />
+    <AvaloniaXaml Remove="Messages\**" />
+    <Compile Remove="Interfaces\**" />
+    <Compile Remove="Messages\**" />
+    <EmbeddedResource Remove="Interfaces\**" />
+    <EmbeddedResource Remove="Messages\**" />
+    <None Remove="Interfaces\**" />
+    <None Remove="Messages\**" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.2.7" />
@@ -37,11 +48,6 @@
   <ItemGroup>
     <ProjectReference Include="..\StudyDocumentManager.Core\StudyDocumentManager.Core.csproj" />
     <ProjectReference Include="..\StudyDocumentManager.Data\StudyDocumentManager.Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Messages\" />
   </ItemGroup>
 
 
