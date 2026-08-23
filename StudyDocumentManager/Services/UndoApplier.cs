@@ -28,9 +28,7 @@ public sealed class UndoApplier : IUndoApplier
 
         if (entry.DeletedIds.Count > 0)
         {
-            var restored = _recycleBin.RestoreDocuments(entry.DeletedIds);
-            if (restored != entry.DeletedIds.Count)
-                throw new InvalidOperationException("Undo restore did not restore every document.");
+            _recycleBin.RestoreDocuments(entry.DeletedIds);
         }
         else if (entry.Collection is { } snapshot)
         {
@@ -73,6 +71,8 @@ public sealed class UndoApplier : IUndoApplier
             {
                 foreach (var item in currentDocuments)
                 {
+                    if (item.Current == null)
+                        continue;
                     if (!_documents.Update(item.Original))
                         throw new InvalidOperationException("Undo document restoration failed.");
                     updatedDocuments.Add(item.Original);
@@ -80,9 +80,8 @@ public sealed class UndoApplier : IUndoApplier
 
                 foreach (var membership in entry.AddedCollectionMemberships)
                 {
-                    if (!_collections.RemoveDocument(membership.CollectionId, membership.DocumentId))
-                        throw new InvalidOperationException("Undo collection membership removal failed.");
-                    removedMemberships.Add(membership);
+                    if (_collections.RemoveDocument(membership.CollectionId, membership.DocumentId))
+                        removedMemberships.Add(membership);
                 }
             }
             catch (Exception undoFailure)

@@ -63,7 +63,8 @@
                     Padding="{StaticResource PaddingMd}" Margin="0,0,0,12">
                 <Expander Header="{loc:Localize BE_SectionTitle}" IsExpanded="False"
                           HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-                    <UniformGrid Columns="2" Margin="0,8,0,0">
+                    <StackPanel>
+                        <UniformGrid Columns="2" Margin="0,8,0,0">
                         <StackPanel Spacing="{StaticResource Space1}" Margin="0,0,12,8">
                             <CheckBox AutomationProperties.AutomationId="BulkEdit_EnableSubject"
                                       Content="{loc:Localize BE_Field_Subject}"
@@ -145,7 +146,18 @@
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                         </StackPanel>
-                    </UniformGrid>
+                        </UniformGrid>
+                        <Button Classes="primary"
+                                AutomationProperties.AutomationId="BulkEdit_Apply"
+                                AutomationProperties.Name="{loc:Localize BE_ConfirmApply}"
+                                Command="{Binding ApplyBulkEditCommand}"
+                                Margin="0,12,0,0" Padding="{StaticResource PaddingBtnMd}" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Image Source="{StaticResource IconCheck}" Width="14" Height="14"/>
+                                <TextBlock Text="{loc:Localize BE_ConfirmApply}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
                 </Expander>
             </Border>
 

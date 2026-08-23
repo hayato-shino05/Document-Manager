@@ -20,6 +20,7 @@ public partial class BulkDeleteModel : ModelBase
     private readonly ICollectionRepository? _collectionRepo;
     private readonly IUndoService _undo;
     private readonly IUndoApplier? _undoApplier;
+    private readonly IRecycleBinRepository? _recycleBinRepo;
 
     private const string AllFilter = "All";
 
@@ -67,7 +68,7 @@ public partial class BulkDeleteModel : ModelBase
         || (EnableCollectionAdd && SelectedCollectionId.HasValue);
 
     public BulkDeleteModel(IDocumentRepository repository, IBulkOperationRepository bulkRepo, ICategoryRepository categoryRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc,
-        ICustomDialogService? customDialogService = null, ICollectionRepository? collectionRepo = null, IUndoService? undoService = null, IUndoApplier? undoApplier = null)
+        ICustomDialogService? customDialogService = null, ICollectionRepository? collectionRepo = null, IUndoService? undoService = null, IUndoApplier? undoApplier = null, IRecycleBinRepository? recycleBinRepository = null)
     {
         _repository = repository;
         _bulkRepo = bulkRepo;
@@ -79,6 +80,7 @@ public partial class BulkDeleteModel : ModelBase
         _collectionRepo = collectionRepo;
         _undo = undoService ?? new UndoService();
         _undoApplier = undoApplier;
+        _recycleBinRepo = recycleBinRepository;
     }
 
     /// <summary>
@@ -301,20 +303,34 @@ public partial class BulkDeleteModel : ModelBase
 
         try
         {
+            string detail;
             if (_undoApplier != null)
             {
                 _undoApplier.ApplyLast();
                 LoadData();
+                detail = string.Format(_loc[entry.DescriptionKey], entry.DescriptionArgs ?? []);
+            }
+            else if (entry.DeletedIds.Count > 0)
+            {
+                if (_recycleBinRepo == null)
+                    throw new InvalidOperationException("Recycle bin repository is required to undo deleted documents.");
+
+                var restored = _recycleBinRepo.RestoreDocuments(entry.DeletedIds);
+                LoadData();
+                _undo.Pop();
+                detail = restored == entry.DeletedIds.Count
+                    ? string.Format(_loc[entry.DescriptionKey], entry.DescriptionArgs ?? [])
+                    : string.Format(_loc["BE_Result_Partial"], restored, entry.DeletedIds.Count);
             }
             else
             {
-                _ = _undo.Pop() ?? throw new InvalidOperationException("Nothing to undo.");
                 foreach (var original in entry.Originals)
                     _repository.Update(original);
                 LoadData([.. entry.Originals.Select(o => o.Id)]);
+                _undo.Pop();
+                detail = string.Format(_loc[entry.DescriptionKey], entry.DescriptionArgs ?? []);
             }
 
-            var detail = string.Format(_loc[entry.DescriptionKey], entry.DescriptionArgs ?? []);
             StatusText = string.Format(_loc["UN_Applied"], detail);
         }
         catch (OperationCanceledException)

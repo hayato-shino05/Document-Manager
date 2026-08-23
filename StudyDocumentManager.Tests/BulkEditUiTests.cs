@@ -1,7 +1,15 @@
+using Avalonia;
+using Avalonia.Automation;
+using Avalonia.Controls;
+using Avalonia.Headless;
+using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using StudyDocumentManager.Core;
 using StudyDocumentManager.Core.DTOs;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
+using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Data.Repositories;
 using StudyDocumentManager.Models;
 using StudyDocumentManager.Services;
@@ -342,6 +350,131 @@ public class BulkEditUiTests : DatabaseTestBase
     }
 
     private sealed class BulkEditLocalizationStub : ILocalizationService
+    {
+        public string this[string key] => key;
+        public SupportedLanguage CurrentLanguage => SupportedLanguage.Japanese;
+        public void SetLanguage(SupportedLanguage language) { }
+        public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = [];
+        public event EventHandler? LanguageChanged { add { } remove { } }
+    }
+}
+
+public sealed class BulkDeleteApplyButtonBindingTests : IDisposable
+{
+    private readonly string _dbPath = Path.Combine(Path.GetTempPath(), $"sdm_test_{Guid.NewGuid():N}.db");
+    private readonly DatabaseHelper _db;
+    private readonly DocumentRepository _repo;
+
+    public BulkDeleteApplyButtonBindingTests()
+    {
+        _db = new DatabaseHelper();
+        _db.SetDatabasePath(_dbPath);
+        _db.InitializeDatabase();
+        _repo = new DocumentRepository(_db);
+    }
+
+    [AvaloniaFact]
+    public void ApplyButton_BindsApplyBulkEditCommand_AndExecutesWhenSelectionAndChangesValid()
+    {
+        Application.Current!.Resources["Loc"] = new LocalizationService();
+        _repo.Add(new StudyDocument { Name = "Alpha", Subject = "Math", Type = "PDF" });
+
+        var model = new BulkDeleteModel(
+            _repo,
+            _repo,
+            new CategoryRepository(_db),
+            new ApplyDialogStub(),
+            new ApplyNavigationStub(),
+            new ApplyLocalizationStub(),
+            new ApplyPreviewDialogs { PreviewResult = true },
+            new CollectionRepository(_db),
+            new UndoService());
+
+        var view = new Views.BulkDelete { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.NotEmpty(model.Documents);
+            var expander = view.GetVisualDescendants().OfType<Expander>().Single();
+            expander.IsExpanded = true;
+            Dispatcher.UIThread.RunJobs();
+
+            foreach (var row in model.Documents)
+                row.IsSelected = true;
+            model.EnableSubject = true;
+            model.NewSubject = "Physics";
+            Dispatcher.UIThread.RunJobs();
+
+            var button = Assert.Single(view.GetVisualDescendants().OfType<Button>(),
+                b => AutomationProperties.GetAutomationId(b) == "BulkEdit_Apply");
+
+            Assert.Same(model.ApplyBulkEditCommand, button.Command);
+            Assert.True(button.IsEnabled);
+            Assert.True(button.Command!.CanExecute(null));
+
+            button.Command.Execute(null);
+            Dispatcher.UIThread.RunJobs();
+            AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.All(_repo.GetAll(), d => Assert.Equal("Physics", d.Subject));
+            Assert.True(model.UndoLastCommand.CanExecute(null));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    public void Dispose()
+    {
+        _db.CloseAllConnections();
+        try { if (File.Exists(_dbPath)) File.Delete(_dbPath); }
+        catch { }
+    }
+
+    private sealed class ApplyDialogStub : IDialogService
+    {
+        public Task ShowMessageAsync(string title, string message) => Task.CompletedTask;
+        public Task ShowErrorAsync(string title, string message) => Task.CompletedTask;
+        public Task<bool> ShowConfirmAsync(string title, string message) => Task.FromResult(true);
+        public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false) => Task.FromResult(true);
+        public Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "") => Task.FromResult<string?>(null);
+    }
+
+    private sealed class ApplyPreviewDialogs : ICustomDialogService
+    {
+        public bool PreviewResult { get; set; }
+
+        public Task<bool> ShowBulkEditPreviewAsync(int affectedCount, IReadOnlyList<(string FieldLabel, string NewValue)> changes)
+            => Task.FromResult(PreviewResult);
+
+        public Task<string?> ShowChangeCategoryAsync(string documentName, IList<string> existingCategories, string currentCategory)
+            => Task.FromResult<string?>(null);
+
+        public Task<int> ShowSelectCollectionAsync(string documentName, IList<(int Id, string Name, int DocCount)> collections)
+            => Task.FromResult(-1);
+
+        public Task<List<StudyDocument>?> ShowDocumentPickerAsync(string collectionName, IEnumerable<StudyDocument> allDocuments, IEnumerable<int> alreadyInCollection)
+            => Task.FromResult<List<StudyDocument>?>(null);
+
+        public Task<AddDocumentDraft?> ShowAddDocumentAsync(string filePath, IList<string> subjects, IList<string> types)
+            => Task.FromResult<AddDocumentDraft?>(null);
+    }
+
+    private sealed class ApplyNavigationStub : INavigationService
+    {
+        public bool CanGoBack => false;
+        public void NavigateTo(string viewKey) { }
+        public void NavigateTo(string viewKey, object? parameter) { }
+        public void GoBack() { }
+    }
+
+    private sealed class ApplyLocalizationStub : ILocalizationService
     {
         public string this[string key] => key;
         public SupportedLanguage CurrentLanguage => SupportedLanguage.Japanese;

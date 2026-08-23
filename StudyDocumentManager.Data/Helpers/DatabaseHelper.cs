@@ -373,6 +373,8 @@ public class DatabaseHelper
         {
             foreach (var original in originals)
             {
+                if (!DocumentRowExists(connection, transaction, original.Id))
+                    continue;
                 if (!UpdateDocumentCore(connection, transaction, original))
                     throw new InvalidOperationException("Undo document restoration failed.");
             }
@@ -384,8 +386,7 @@ public class DatabaseHelper
                 command.CommandText = "DELETE FROM collection_items WHERE collection_id = @collectionId AND document_id = @documentId";
                 command.Parameters.AddWithValue("@collectionId", membership.CollectionId);
                 command.Parameters.AddWithValue("@documentId", membership.DocumentId);
-                if (command.ExecuteNonQuery() == 0)
-                    throw new InvalidOperationException("Undo collection membership removal failed.");
+                command.ExecuteNonQuery();
             }
 
             transaction.Commit();
@@ -395,6 +396,15 @@ public class DatabaseHelper
             transaction.Rollback();
             throw;
         }
+    }
+
+    private static bool DocumentRowExists(SqliteConnection connection, SqliteTransaction transaction, int id)
+    {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = "SELECT COUNT(*) FROM documents WHERE id = @id";
+        command.Parameters.AddWithValue("@id", id);
+        return Convert.ToInt32(command.ExecuteScalar()) > 0;
     }
 
     public bool DeleteDocument(int id)
@@ -543,12 +553,6 @@ public class DatabaseHelper
         {
             if (RestoreDocumentCore(conn, transaction, id))
                 restored++;
-        }
-
-        if (restored != distinctIds.Count)
-        {
-            transaction.Rollback();
-            throw new InvalidOperationException("Undo restore did not restore every document.");
         }
 
         transaction.Commit();
@@ -1742,22 +1746,44 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
 
         try
         {
+            var targetCollectionMissing = false;
+            if (changes.AddToCollectionId is int requestedCollectionId)
+            {
+                using var collectionCheck = conn.CreateCommand();
+                collectionCheck.Transaction = transaction;
+                collectionCheck.CommandText = "SELECT COUNT(*) FROM collections WHERE id = @collectionId";
+                collectionCheck.Parameters.AddWithValue("@collectionId", requestedCollectionId);
+                targetCollectionMissing = Convert.ToInt32(collectionCheck.ExecuteScalar()) == 0;
+            }
+
             foreach (var id in ids)
             {
                 var succeeded = false;
-                try
+                var statusAllowed = changes.Status is null || DocumentStatus.IsValid(changes.Status);
+                if (!targetCollectionMissing && statusAllowed)
                 {
-                    // whitelist check must precede the UPDATE so a rejected field-set never partially applies
-                    if (changes.Status is null || DocumentStatus.IsValid(changes.Status))
+                    try
                     {
-                        succeeded = ExecuteBulkEditMetadataUpdate(conn, transaction, id, changes);
-                        if (succeeded && changes.AddToCollectionId is int collectionId)
-                            InsertBulkEditCollectionLink(conn, transaction, collectionId, id);
+                        transaction.Save(BulkEditItemSavepoint);
+                        try
+                        {
+                            // whitelist check must precede the UPDATE so a rejected field-set never partially applies
+                            succeeded = ExecuteBulkEditMetadataUpdate(conn, transaction, id, changes);
+                            if (succeeded && changes.AddToCollectionId is int collectionId)
+                                InsertBulkEditCollectionLink(conn, transaction, collectionId, id);
+                            transaction.Release(BulkEditItemSavepoint);
+                        }
+                        catch
+                        {
+                            transaction.Rollback(BulkEditItemSavepoint);
+                            transaction.Release(BulkEditItemSavepoint);
+                            throw;
+                        }
                     }
-                }
-                catch (SqliteException)
-                {
-                    succeeded = false;
+                    catch (SqliteException)
+                    {
+                        succeeded = false;
+                    }
                 }
                 results.Add(new BulkItemResult(id, succeeded));
             }
@@ -1779,6 +1805,8 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
             Items = results
         };
     }
+
+    private const string BulkEditItemSavepoint = "bulk_edit_item";
 
     private static bool ExecuteBulkEditMetadataUpdate(
         SqliteConnection conn, SqliteTransaction transaction, int id, BulkEditChanges changes)

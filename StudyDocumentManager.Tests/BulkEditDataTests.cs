@@ -229,6 +229,60 @@ public class BulkEditDataTests : DatabaseTestBase
         }
     }
 
+    [Fact]
+    public void BulkEditMetadata_NonexistentTargetCollection_FailsAllItemsWithoutAnyWrite()
+    {
+        var docA = new StudyDocument { Name = "Doc A", Subject = "Before", Status = DocumentStatus.Unread };
+        var docB = new StudyDocument { Name = "Doc B", Subject = "Before", Status = DocumentStatus.Unread };
+        Assert.True(Repo.Add(docA));
+        Assert.True(Repo.Add(docB));
+
+        const int missingCollectionId = 987654321;
+        var outcome = Repo.BulkEditMetadata(
+            [docA.Id, docB.Id],
+            new BulkEditChanges { Subject = "Physics", Status = DocumentStatus.Read, AddToCollectionId = missingCollectionId });
+
+        Assert.Equal(2, outcome.Requested);
+        Assert.Equal(0, outcome.Succeeded);
+        Assert.Equal([docA.Id, docB.Id], outcome.FailedIds);
+
+        foreach (var doc in new[] { docA, docB })
+        {
+            var loaded = Repo.GetById(doc.Id)!;
+            Assert.Equal("Before", loaded.Subject);
+            Assert.Equal(DocumentStatus.Unread, loaded.Status);
+            Assert.Equal(0, CountLinks(missingCollectionId, doc.Id));
+        }
+        Assert.DoesNotContain("Physics", new CategoryRepository(Db).GetAllSubjects());
+    }
+
+    [Fact]
+    public void BulkEditMetadata_CollectionLinkWithSoftDeletedId_FailedItemKeepsMetadataUntouched()
+    {
+        var active = new StudyDocument { Name = "Active", Subject = "Before" };
+        var softDeleted = new StudyDocument { Name = "Deleted", Subject = "Before", Status = DocumentStatus.Unread };
+        Assert.True(Repo.Add(active));
+        Assert.True(Repo.Add(softDeleted));
+        Assert.True(Repo.Delete(softDeleted.Id));
+
+        var collectionId = Db.CreateCollection("Atomic target");
+        var changes = new BulkEditChanges { Subject = "Physics", AddToCollectionId = collectionId };
+
+        var outcome = Repo.BulkEditMetadata([active.Id, softDeleted.Id], changes);
+
+        Assert.Equal(2, outcome.Requested);
+        Assert.Equal(1, outcome.Succeeded);
+        Assert.Equal([softDeleted.Id], outcome.FailedIds);
+        Assert.Equal("Physics", Repo.GetById(active.Id)!.Subject);
+        Assert.Equal("Before", Repo.GetById(softDeleted.Id)!.Subject);
+        Assert.Equal(0, CountLinks(collectionId, softDeleted.Id));
+
+        Repo.BulkEditMetadata([active.Id, softDeleted.Id], changes);
+
+        Assert.Equal(1, CountLinks(collectionId, active.Id));
+        Assert.Equal(0, CountLinks(collectionId, softDeleted.Id));
+    }
+
     private int CountLinks(int collectionId, int documentId)
     {
         using var connection = new SqliteConnection(Db.ConnectionString);
