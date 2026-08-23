@@ -496,14 +496,21 @@ public class DatabaseHelper
         if (ids is null || ids.Count == 0)
             return 0;
 
+        var distinctIds = ids.Distinct().ToList();
         using var conn = OpenConnection();
         using var transaction = conn.BeginTransaction();
 
         var restored = 0;
-        foreach (var id in ids.Distinct())
+        foreach (var id in distinctIds)
         {
             if (RestoreDocumentCore(conn, transaction, id))
                 restored++;
+        }
+
+        if (restored != distinctIds.Count)
+        {
+            transaction.Rollback();
+            throw new InvalidOperationException("Undo restore did not restore every document.");
         }
 
         transaction.Commit();

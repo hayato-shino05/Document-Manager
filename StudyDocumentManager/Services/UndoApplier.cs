@@ -52,16 +52,36 @@ public sealed class UndoApplier : IUndoApplier
         }
         else
         {
-            foreach (var original in entry.Originals)
-            {
-                if (!_documents.Update(original))
-                    throw new InvalidOperationException("Undo document restoration failed.");
-            }
+            var currentDocuments = entry.Originals
+                .Select(original => (Original: original, Current: _documents.GetById(original.Id)))
+                .ToList();
+            var updatedDocuments = new List<StudyDocument>();
+            var removedMemberships = new List<CollectionMembership>();
 
-            foreach (var membership in entry.AddedCollectionMemberships)
+            try
             {
-                if (!_collections.RemoveDocument(membership.CollectionId, membership.DocumentId))
-                    throw new InvalidOperationException("Undo collection membership removal failed.");
+                foreach (var item in currentDocuments)
+                {
+                    if (!_documents.Update(item.Original))
+                        throw new InvalidOperationException("Undo document restoration failed.");
+                    updatedDocuments.Add(item.Original);
+                }
+
+                foreach (var membership in entry.AddedCollectionMemberships)
+                {
+                    if (!_collections.RemoveDocument(membership.CollectionId, membership.DocumentId))
+                        throw new InvalidOperationException("Undo collection membership removal failed.");
+                    removedMemberships.Add(membership);
+                }
+            }
+            catch
+            {
+                foreach (var item in currentDocuments.Where(item => item.Current != null && updatedDocuments.Contains(item.Original)))
+                    _documents.Update(item.Current!);
+
+                foreach (var membership in removedMemberships)
+                    _collections.AddDocument(membership.CollectionId, membership.DocumentId);
+                throw;
             }
         }
 

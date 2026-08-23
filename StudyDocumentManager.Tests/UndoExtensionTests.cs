@@ -141,6 +141,28 @@ public class UndoApplierRoutingTests
     }
 
     [Fact]
+    public void ApplyLast_WhenMembershipRemovalFails_RestoresDocumentAndKeepsUndoEntry()
+    {
+        var undo = new UndoService();
+        var original = new StudyDocument { Id = 5, Name = "Before" };
+        undo.Push(new UndoEntry
+        {
+            DescriptionKey = "BE_UndoDescription",
+            Originals = [original],
+            AddedCollectionMemberships = [new CollectionMembership(42, 5)]
+        });
+
+        var documents = new RecordingDocuments();
+        var collections = new RecordingCollections { RemoveResult = false };
+        var applier = new UndoApplier(undo, documents, new RecordingRecycleBin(), collections);
+
+        Assert.Throws<InvalidOperationException>(applier.ApplyLast);
+        Assert.Equal(2, documents.Updated.Count);
+        Assert.Same(original, documents.Updated[0]);
+        Assert.True(undo.CanUndo);
+    }
+
+    [Fact]
     public void ApplyLast_EmptyStack_Throws()
     {
         var applier = new UndoApplier(new UndoService(), new RecordingDocuments(), new RecordingRecycleBin(), new RecordingCollections());
@@ -172,6 +194,7 @@ public class UndoApplierRoutingTests
         public List<(string Name, string? Description)> Created { get; } = [];
         public List<(int CollectionId, int DocumentId)> AddedDocs { get; } = [];
         public List<(int CollectionId, int DocumentId)> RemovedDocs { get; } = [];
+        public bool RemoveResult { get; init; } = true;
 
         public List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetAll() => [];
 
@@ -194,7 +217,7 @@ public class UndoApplierRoutingTests
         public bool RemoveDocument(int collectionId, int documentId)
         {
             RemovedDocs.Add((collectionId, documentId));
-            return true;
+            return RemoveResult;
         }
     }
 
@@ -204,7 +227,7 @@ public class UndoApplierRoutingTests
         public bool UpdateResult { get; init; } = true;
 
         public List<StudyDocument> GetAll() => [];
-        public StudyDocument? GetById(int id) => null;
+        public StudyDocument? GetById(int id) => new() { Id = id, Name = "After" };
         public List<StudyDocument> Search(string keyword) => [];
         public List<StudyDocument> Filter(string subject, string type) => [];
         public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => [];
