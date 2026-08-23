@@ -260,7 +260,9 @@ public partial class BulkDeleteModel : ModelBase
                 {
                     DescriptionKey = "BE_UndoDescription",
                     DescriptionArgs = [outcome.Succeeded],
-                    Originals = originals,
+                    Originals = originals
+                        .Where(original => outcome.Items.Any(item => item.DocumentId == original.Id && item.Success))
+                        .ToList(),
                     AddedCollectionMemberships = addedMemberships,
                     CreatedAt = DateTime.Now
                 });

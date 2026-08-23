@@ -152,9 +152,11 @@ public class BulkEditUiTests : DatabaseTestBase
         Assert.Equal(DocumentStatus.Archived, documentRepo.GetById(id3)!.Status);
 
         Assert.True(model.UndoLastCommand.CanExecute(null));
+        Assert.True(documentRepo.Delete(id2));
+        Assert.True(documentRepo.PermanentDeleteDocument(id2));
         await model.UndoLastCommand.ExecuteAsync(null);
         Assert.Equal(DocumentStatus.Unread, documentRepo.GetById(id1)!.Status);
-        Assert.Equal(DocumentStatus.Read, documentRepo.GetById(id2)!.Status);
+        Assert.Null(documentRepo.GetById(id2));
         Assert.Equal(DocumentStatus.InProgress, documentRepo.GetById(id3)!.Status);
     }
 
