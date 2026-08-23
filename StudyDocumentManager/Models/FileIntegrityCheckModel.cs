@@ -14,6 +14,7 @@ public partial class FileIntegrityCheckModel : ModelBase
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
     private readonly ILocalizationService _loc;
+    private readonly Action<int>? _scanProgress;
     private CancellationTokenSource? _checkCancellation;
     private string _statusKey = "Status_ScanPrompt";
     private object[] _statusArguments = [];
@@ -25,13 +26,14 @@ public partial class FileIntegrityCheckModel : ModelBase
     [ObservableProperty] private int _missingCount;
     [ObservableProperty] private string _statusText = string.Empty;
 
-    public FileIntegrityCheckModel(IDocumentRepository repository, IFileIntegrityRepository fileIntegrityRepo, IDialogService dialogService, IFileDialogService fileDialogService, ILocalizationService loc)
+    public FileIntegrityCheckModel(IDocumentRepository repository, IFileIntegrityRepository fileIntegrityRepo, IDialogService dialogService, IFileDialogService fileDialogService, ILocalizationService loc, Action<int>? scanProgress = null)
     {
         _repository = repository;
         _fileIntegrityRepo = fileIntegrityRepo;
         _dialogService = dialogService;
         _fileDialogService = fileDialogService;
         _loc = loc;
+        _scanProgress = scanProgress;
         _loc.LanguageChanged += (_, _) => RefreshLocalizedStrings();
         SetLocalizedStatus("Status_ScanPrompt");
     }
@@ -121,6 +123,7 @@ public partial class FileIntegrityCheckModel : ModelBase
                 missingDocuments.Add(document);
 
             processed++;
+            _scanProgress?.Invoke(processed);
         }
 
         return new ScanResult(processed, documents.Count, missingDocuments, cancellationToken.IsCancellationRequested);
@@ -157,6 +160,11 @@ public partial class FileIntegrityCheckModel : ModelBase
             TotalChecked = scan.Processed;
             foreach (var document in scan.MissingDocuments)
                 Results.Add(CreateMissingResult(document));
+            if (scan.IsCancelled)
+            {
+                foreach (var document in documents.Skip(scan.Processed))
+                    Results.Add(CreateMissingResult(document));
+            }
             MissingCount = Results.Count;
 
             if (scan.IsCancelled)

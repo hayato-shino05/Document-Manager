@@ -90,28 +90,89 @@ public class ScanRecoveryTests
     }
 
     [Fact]
-    public async Task RetryMissingAsync_CancelledBeforeWorkerStarts_PreservesResultCountConsistency()
+    public async Task RetryMissingAsync_CancelledDuringScan_PreservesUnprocessedResultsInOrder()
     {
-        var documents = Enumerable.Range(1, 100_000)
+        var documents = Enumerable.Range(1, 3)
             .Select(id => new StudyDocument { Id = id, FilePath = $"missing-{id}.pdf" })
             .ToList();
+        using var scanStarted = new ManualResetEventSlim();
+        using var releaseScan = new ManualResetEventSlim();
         var model = new FileIntegrityCheckModel(
             new ThrowingDocumentRepository { ThrowOnGetAll = false },
             new FileIntegrityRepositoryStub(),
             new RecordingDialogService(),
             new FileDialogServiceStub(),
-            new LocalizationServiceStub());
+            new LocalizationServiceStub(),
+            processed =>
+            {
+                if (processed != 1)
+                    return;
+                scanStarted.Set();
+                releaseScan.Wait();
+            });
         foreach (var document in documents)
             model.Results.Add(new IntegrityResult { Document = document, FilePath = document.FilePath });
         model.MissingCount = model.Results.Count;
 
         var retryTask = model.RetryMissingCommand.ExecuteAsync(null);
+        Assert.True(scanStarted.Wait(TimeSpan.FromSeconds(5)));
         model.CancelCheckCommand.Execute(null);
+        releaseScan.Set();
         await retryTask;
 
         Assert.False(model.IsChecking);
         Assert.True(model.IsCheckCancelled);
-        Assert.Equal(model.Results.Count, model.MissingCount);
+        Assert.Equal(1, model.TotalChecked);
+        Assert.Equal([1, 2, 3], model.Results.Select(result => result.Document.Id));
+        Assert.Equal(3, model.MissingCount);
+    }
+
+    [Fact]
+    public async Task RetryMissingAsync_CancelledAfterResolvedItem_PreservesOnlyUnprocessedMissingResults()
+    {
+        var existingPath = Path.GetTempFileName();
+        try
+        {
+            var documents = new[]
+            {
+                new StudyDocument { Id = 1, FilePath = existingPath },
+                new StudyDocument { Id = 2, FilePath = "missing-2.pdf" },
+                new StudyDocument { Id = 3, FilePath = "missing-3.pdf" }
+            };
+            using var scanStarted = new ManualResetEventSlim();
+            using var releaseScan = new ManualResetEventSlim();
+            var model = new FileIntegrityCheckModel(
+                new ThrowingDocumentRepository { ThrowOnGetAll = false },
+                new FileIntegrityRepositoryStub(),
+                new RecordingDialogService(),
+                new FileDialogServiceStub(),
+                new LocalizationServiceStub(),
+                processed =>
+                {
+                    if (processed != 1)
+                        return;
+                    scanStarted.Set();
+                    releaseScan.Wait();
+                });
+            foreach (var document in documents)
+                model.Results.Add(new IntegrityResult { Document = document, FilePath = document.FilePath });
+            model.MissingCount = model.Results.Count;
+
+            var retryTask = model.RetryMissingCommand.ExecuteAsync(null);
+            Assert.True(scanStarted.Wait(TimeSpan.FromSeconds(5)));
+            model.CancelCheckCommand.Execute(null);
+            releaseScan.Set();
+            await retryTask;
+
+            Assert.True(model.IsCheckCancelled);
+            Assert.Equal(1, model.TotalChecked);
+            Assert.Equal([2, 3], model.Results.Select(result => result.Document.Id));
+            Assert.Equal(2, model.MissingCount);
+        }
+        finally
+        {
+            File.Delete(existingPath);
+        }
     }
 
     [Fact]
