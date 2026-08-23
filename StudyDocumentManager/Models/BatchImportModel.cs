@@ -16,6 +16,8 @@ public partial class BatchImportModel : ModelBase
     private readonly ILocalizationService _loc;
     private readonly IDroppedFileImportService _droppedFileImportService;
     private readonly IAnalyticsService? _analytics;
+    private readonly OperationProgress _operationProgress = new();
+    private CancellationTokenSource? _importCancellation;
 
     [ObservableProperty] private string _folderPath = string.Empty;
     [ObservableProperty] private string _defaultSubject = string.Empty;
@@ -24,10 +26,17 @@ public partial class BatchImportModel : ModelBase
     [ObservableProperty] private int _skippedDuplicateCount;
     [ObservableProperty] private int _failedCount;
     [ObservableProperty] private bool _isImporting;
+    [ObservableProperty] private bool _isImportCancelled;
+    [ObservableProperty] private int _processedCount;
+    [ObservableProperty] private int _totalCount;
     [ObservableProperty] private string _importStatusMessage = string.Empty;
     [ObservableProperty] private string _importErrorMessage = string.Empty;
 
     public bool HasFiles => Files.Count > 0;
+    public bool HasFailedItems => Files.Any(file => file.IsFailed);
+    public IReadOnlyList<string> FailedItems => _operationProgress.FailedItems;
+    public int SucceededCount => _operationProgress.Succeeded;
+    public int SkippedCount => _operationProgress.Skipped;
 
     public BatchImportModel(
         IDialogService dialogService,
@@ -129,35 +138,66 @@ public partial class BatchImportModel : ModelBase
     }
 
     [RelayCommand]
-    private async Task ImportAsync()
+    private Task ImportAsync() => ImportSelectedAsync(Files.Where(file => file.IsSelected).ToList());
+
+    [RelayCommand]
+    private Task RetryFailedAsync()
+        => ImportSelectedAsync(Files.Where(file => file.IsFailed).ToList(), preserveCounters: true);
+
+    private async Task ImportSelectedAsync(
+        IReadOnlyList<FileImportItem> selected,
+        bool preserveCounters = false)
     {
         if (IsImporting)
             return;
 
-        var selected = Files.Where(file => file.IsSelected).ToList();
         if (selected.Count == 0)
         {
-            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Import_NoFileSelected"]);
+            if (!preserveCounters)
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Import_NoFileSelected"]);
             return;
         }
 
         IsImporting = true;
-        ImportedCount = 0;
-        SkippedDuplicateCount = 0;
-        FailedCount = 0;
+        IsImportCancelled = false;
+        if (!preserveCounters)
+        {
+            ImportedCount = 0;
+            SkippedDuplicateCount = 0;
+            FailedCount = 0;
+            _operationProgress.Start(selected.Count);
+        }
+        else
+        {
+            _operationProgress.Start(selected.Count);
+        }
+
+        ProcessedCount = 0;
+        TotalCount = selected.Count;
         ImportErrorMessage = string.Empty;
         ImportStatusMessage = _loc["BatchImport_StatusImporting"];
+        _importCancellation = new CancellationTokenSource();
+
+        var cancellation = _importCancellation;
+        var failureReason = _loc["BatchImport_ItemFailed"];
 
         try
         {
-            await Task.Yield();
+            var defaultSubject = DefaultSubject.Trim();
 
             foreach (var item in selected)
             {
+                if (cancellation?.IsCancellationRequested == true)
+                {
+                    _operationProgress.Cancel();
+                    IsImportCancelled = true;
+                    break;
+                }
+
                 var document = new StudyDocument
                 {
                     Name = item.FileName,
-                    Subject = DefaultSubject,
+                    Subject = defaultSubject,
                     Type = item.FileType,
                     FilePath = item.FilePath,
                     FileSize = item.FileSizeMB
@@ -166,7 +206,15 @@ public partial class BatchImportModel : ModelBase
                 DocumentImportOutcome outcome;
                 try
                 {
-                    outcome = _droppedFileImportService.SaveDocument(document);
+                    outcome = await Task.Run(
+                        () => _droppedFileImportService.SaveDocument(document),
+                        cancellation?.Token ?? CancellationToken.None);
+                }
+                catch (OperationCanceledException) when (cancellation?.IsCancellationRequested == true)
+                {
+                    _operationProgress.Cancel();
+                    IsImportCancelled = true;
+                    break;
                 }
                 catch (Exception)
                 {
@@ -177,21 +225,54 @@ public partial class BatchImportModel : ModelBase
                 {
                     case DocumentImportOutcome.Imported:
                         ImportedCount++;
+                        if (preserveCounters && item.IsFailed)
+                            FailedCount--;
                         item.IsSelected = false;
+                        item.IsFailed = false;
+                        item.FailureReason = string.Empty;
+                        _operationProgress.RecordSuccess(item.FilePath);
                         break;
                     case DocumentImportOutcome.SkippedDuplicate:
                         SkippedDuplicateCount++;
+                        if (preserveCounters && item.IsFailed)
+                            FailedCount--;
                         item.IsSelected = false;
+                        item.IsFailed = false;
+                        item.FailureReason = string.Empty;
+                        _operationProgress.RecordSkipped(item.FilePath);
                         break;
                     case DocumentImportOutcome.Failed:
-                        FailedCount++;
+                        if (!item.IsFailed)
+                            FailedCount++;
+                        item.IsFailed = true;
+                        item.FailureReason = failureReason;
+                        _operationProgress.RecordFailure(item.FilePath);
                         break;
                 }
+
+                ProcessedCount = _operationProgress.Processed;
+                OnPropertyChanged(nameof(FailedItems));
+                OnPropertyChanged(nameof(SucceededCount));
+                OnPropertyChanged(nameof(SkippedCount));
+                OnPropertyChanged(nameof(HasFailedItems));
             }
         }
         finally
         {
+            _operationProgress.Stop();
             IsImporting = false;
+            _importCancellation.Dispose();
+            _importCancellation = null;
+        }
+
+        if (IsImportCancelled)
+        {
+            ImportStatusMessage = string.Format(
+                _loc["BatchImport_Cancelled"],
+                ProcessedCount,
+                TotalCount);
+            ImportErrorMessage = string.Empty;
+            return;
         }
 
         ImportStatusMessage = string.Format(
@@ -228,7 +309,16 @@ public partial class BatchImportModel : ModelBase
     }
 
     [RelayCommand]
-    private void Cancel() => _navigationService.NavigateTo("dashboard");
+    private void Cancel()
+    {
+        if (IsImporting)
+        {
+            _importCancellation?.Cancel();
+            return;
+        }
+
+        _navigationService.NavigateTo("dashboard");
+    }
 }
 
 public partial class FileImportItem : ObservableObject
@@ -238,4 +328,6 @@ public partial class FileImportItem : ObservableObject
     [ObservableProperty] private string _fileType = string.Empty;
     [ObservableProperty] private double _fileSizeMB;
     [ObservableProperty] private bool _isSelected = true;
+    [ObservableProperty] private bool _isFailed;
+    [ObservableProperty] private string _failureReason = string.Empty;
 }

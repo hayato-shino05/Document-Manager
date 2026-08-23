@@ -620,8 +620,13 @@ Please check your network connection.</value></data>
   <data name="BatchImport_BtnScan" xml:space="preserve"><value>Scan</value></data>
   <data name="BatchImport_ColPath" xml:space="preserve"><value>Path</value></data>
   <data name="BatchImport_ColSize" xml:space="preserve"><value>Size</value></data>
+  <data name="BatchImport_ColFailure" xml:space="preserve"><value>Failure reason</value></data>
+  <data name="BatchImport_ItemFailed" xml:space="preserve"><value>Import failed</value></data>
   <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>Default Subject</value></data>
   <data name="BatchImport_LblFolder" xml:space="preserve"><value>Folder</value></data>
+  <data name="BatchImport_BtnRetryFailed" xml:space="preserve"><value>Retry failed</value></data>
+  <data name="BatchImport_ProgressLabel" xml:space="preserve"><value>Progress:</value></data>
+  <data name="BatchImport_Cancelled" xml:space="preserve"><value>Import cancelled: {1} files total, {0} processed.</value></data>
   <data name="Bulk_BtnDeselectAll" xml:space="preserve"><value>Deselect All</value></data>
   <data name="BulkDelete_ColDateAdded" xml:space="preserve"><value>Date Added</value></data>
   <data name="Menu_ChangeLanguage" xml:space="preserve"><value>Change Language</value></data>

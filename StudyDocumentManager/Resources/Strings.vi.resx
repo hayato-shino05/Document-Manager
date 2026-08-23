@@ -825,8 +825,13 @@
   <data name="BatchImport_BtnScan" xml:space="preserve"><value>Quét</value></data>
   <data name="BatchImport_ColPath" xml:space="preserve"><value>Đường dẫn</value></data>
   <data name="BatchImport_ColSize" xml:space="preserve"><value>Kích thước</value></data>
+  <data name="BatchImport_ColFailure" xml:space="preserve"><value>Lý do lỗi</value></data>
+  <data name="BatchImport_ItemFailed" xml:space="preserve"><value>Nhập tài liệu thất bại</value></data>
   <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>Danh mục mặc định</value></data>
   <data name="BatchImport_LblFolder" xml:space="preserve"><value>Thư mục</value></data>
+  <data name="BatchImport_BtnRetryFailed" xml:space="preserve"><value>Thử lại mục lỗi</value></data>
+  <data name="BatchImport_ProgressLabel" xml:space="preserve"><value>Tiến độ:</value></data>
+  <data name="BatchImport_Cancelled" xml:space="preserve"><value>Đã hủy nhập: tổng cộng {1} tệp, đã xử lý {0}.</value></data>
   <data name="Bulk_BtnDeselectAll" xml:space="preserve"><value>Bỏ chọn tất cả</value></data>
   <data name="BulkDelete_ColDateAdded" xml:space="preserve"><value>Ngày thêm</value></data>
   <data name="Menu_ChangeLanguage" xml:space="preserve"><value>Đổi ngôn ngữ</value></data>

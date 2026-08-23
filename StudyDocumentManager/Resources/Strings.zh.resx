@@ -825,8 +825,13 @@
   <data name="BatchImport_BtnScan" xml:space="preserve"><value>扫描</value></data>
   <data name="BatchImport_ColPath" xml:space="preserve"><value>路径</value></data>
   <data name="BatchImport_ColSize" xml:space="preserve"><value>大小</value></data>
+  <data name="BatchImport_ColFailure" xml:space="preserve"><value>失败原因</value></data>
+  <data name="BatchImport_ItemFailed" xml:space="preserve"><value>导入失败</value></data>
   <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>默认分类</value></data>
   <data name="BatchImport_LblFolder" xml:space="preserve"><value>文件夹</value></data>
+  <data name="BatchImport_BtnRetryFailed" xml:space="preserve"><value>重试失败项</value></data>
+  <data name="BatchImport_ProgressLabel" xml:space="preserve"><value>进度：</value></data>
+  <data name="BatchImport_Cancelled" xml:space="preserve"><value>导入已取消：共 {1} 个文件，已处理 {0} 个。</value></data>
   <data name="Bulk_BtnDeselectAll" xml:space="preserve"><value>取消全选</value></data>
   <data name="BulkDelete_ColDateAdded" xml:space="preserve"><value>添加日期</value></data>
   <data name="Menu_ChangeLanguage" xml:space="preserve"><value>更改语言</value></data>

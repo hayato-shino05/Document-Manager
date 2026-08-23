@@ -728,8 +728,13 @@
   <data name="BatchImport_BtnScan" xml:space="preserve"><value>スキャン</value></data>
   <data name="BatchImport_ColPath" xml:space="preserve"><value>パス</value></data>
   <data name="BatchImport_ColSize" xml:space="preserve"><value>サイズ</value></data>
+  <data name="BatchImport_ColFailure" xml:space="preserve"><value>失敗理由</value></data>
+  <data name="BatchImport_ItemFailed" xml:space="preserve"><value>インポートに失敗しました</value></data>
   <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>デフォルト科目</value></data>
   <data name="BatchImport_LblFolder" xml:space="preserve"><value>フォルダ</value></data>
+  <data name="BatchImport_BtnRetryFailed" xml:space="preserve"><value>失敗を再試行</value></data>
+  <data name="BatchImport_ProgressLabel" xml:space="preserve"><value>進捗:</value></data>
+  <data name="BatchImport_Cancelled" xml:space="preserve"><value>{1}件中{0}件を処理した時点でインポートをキャンセルしました。</value></data>
   <data name="Bulk_BtnDeselectAll" xml:space="preserve"><value>すべて解除</value></data>
   <data name="BulkDelete_ColDateAdded" xml:space="preserve"><value>追加日</value></data>
   <data name="Menu_ChangeLanguage" xml:space="preserve"><value>言語を変更</value></data>
