@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using StudyDocumentManager.Core.Interfaces;
+using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Views;
 
@@ -11,10 +12,13 @@ public partial class AffectedItemsPreviewDialog : Window
     private readonly int _totalCount;
     private readonly string _titleSource = string.Empty;
     private readonly string _noteSource = string.Empty;
+    private readonly PreviewTextSource? _titleTextSource;
+    private readonly PreviewTextSource? _noteTextSource;
 
     public AffectedItemsPreviewDialog() { } // XAML loader
 
-    public AffectedItemsPreviewDialog(string title, int totalCount, IReadOnlyList<string> itemNames, string reversibilityNote, ILocalizationService? loc = null)
+    public AffectedItemsPreviewDialog(string title, int totalCount, IReadOnlyList<string> itemNames, string reversibilityNote, ILocalizationService? loc = null,
+        PreviewTextSource? titleSource = null, PreviewTextSource? noteSource = null)
     {
         InitializeComponent();
 
@@ -22,9 +26,10 @@ public partial class AffectedItemsPreviewDialog : Window
         _totalCount = totalCount;
         _titleSource = title;
         _noteSource = reversibilityNote;
-        Title = Resolve(_titleSource);
-        this.FindControl<TextBlock>("TitleText")!.Text = Title;
-        this.FindControl<TextBlock>("ReversibilityNote")!.Text = Resolve(_noteSource);
+        _titleTextSource = titleSource;
+        _noteTextSource = noteSource;
+
+        ApplyComposedTexts();
         UpdateAffectedNote();
         if (_loc != null)
         {
@@ -42,17 +47,32 @@ public partial class AffectedItemsPreviewDialog : Window
 
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
-        Title = Resolve(_titleSource);
+        ApplyComposedTexts();
+        UpdateAffectedNote();
+        var confirmButton = this.FindControl<Button>("ConfirmButton");
+        if (confirmButton != null && _loc != null)
+            confirmButton.Content = _loc["Action_Delete"];
+    }
+
+    private void ApplyComposedTexts()
+    {
+        Title = ResolveTitle();
         var titleText = this.FindControl<TextBlock>("TitleText");
         if (titleText != null)
             titleText.Text = Title;
         var reversibilityNote = this.FindControl<TextBlock>("ReversibilityNote");
         if (reversibilityNote != null)
-            reversibilityNote.Text = Resolve(_noteSource);
-        UpdateAffectedNote();
-        var confirmButton = this.FindControl<Button>("ConfirmButton");
-        if (confirmButton != null && _loc != null)
-            confirmButton.Content = _loc["Action_Delete"];
+            reversibilityNote.Text = ResolveNote();
+    }
+
+    private string ResolveTitle() => _titleTextSource != null ? Format(_titleTextSource) : Resolve(_titleSource);
+
+    private string ResolveNote() => _noteTextSource != null ? Format(_noteTextSource) : Resolve(_noteSource);
+
+    private string Format(PreviewTextSource source)
+    {
+        var format = _loc == null ? source.KeyOrText : _loc[source.KeyOrText];
+        return string.Format(format, source.FormatArgs.ToArray());
     }
 
     private string Resolve(string source)

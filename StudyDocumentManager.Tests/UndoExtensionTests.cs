@@ -235,6 +235,27 @@ public class UndoApplierRoutingTests
         Assert.True(undo.CanUndo);
     }
 
+    [Fact]
+    public void ApplyLast_CollectionEntry_NonSqliteAddFailure_CompensatesAndKeepsEntry()
+    {
+        var undo = new UndoService();
+        var entry = new UndoEntry
+        {
+            DescriptionKey = "UN_CollectionRestorable",
+            Collection = new CollectionSnapshot("Study", null, [1, 2])
+        };
+        undo.Push(entry);
+
+        var collections = new RecordingCollections { NextId = 7, NonSqliteFailOnDocIds = [2] };
+        var applier = new UndoApplier(undo, new RecordingDocuments(), new RecordingRecycleBin(), collections);
+
+        Assert.Throws<InvalidOperationException>(applier.ApplyLast);
+
+        Assert.Equal([7], collections.DeletedIds);
+        Assert.Same(entry, undo.Peek());
+        Assert.True(undo.CanUndo);
+    }
+
     private sealed class RecordingRecycleBin : IRecycleBinRepository
     {
         public List<IReadOnlyList<int>> RestoreCalls { get; } = [];
@@ -263,6 +284,7 @@ public class UndoApplierRoutingTests
         public bool RemoveResult { get; init; } = true;
         public int? TransientFailureCode { get; init; }
         public IReadOnlyList<int>? ForeignKeyFailOnDocIds { get; init; }
+        public IReadOnlyList<int>? NonSqliteFailOnDocIds { get; init; }
 
         public List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetAll() => [];
 
@@ -291,6 +313,9 @@ public class UndoApplierRoutingTests
 
             if (ForeignKeyFailOnDocIds?.Contains(documentId) == true)
                 throw new SqliteException("Simulated foreign key constraint failed.", 19, 787);
+
+            if (NonSqliteFailOnDocIds?.Contains(documentId) == true)
+                throw new InvalidOperationException("Simulated non-sqlite storage failure.");
 
             return true;
         }
@@ -713,6 +738,9 @@ public class UndoCategoryCascadeTests : DatabaseTestBase
         public Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "") => Task.FromResult<string?>(null);
 
         public Task<bool> ShowAffectedItemsPreviewAsync(string title, int totalCount, IReadOnlyList<string> itemNames, string reversibilityNote)
+            => Task.FromResult(true);
+
+        public Task<bool> ShowAffectedItemsPreviewAsync(int totalCount, IReadOnlyList<string> itemNames, PreviewTextSource title, PreviewTextSource reversibilityNote)
             => Task.FromResult(true);
 
         public Task<string?> ShowChangeCategoryAsync(string documentName, IList<string> existingCategories, string currentCategory)

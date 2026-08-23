@@ -21,4 +21,12 @@ public interface ICustomDialogService
 
     Task<bool> ShowAffectedItemsPreviewAsync(string title, int totalCount, IReadOnlyList<string> itemNames, string reversibilityNote)
         => throw new NotSupportedException($"{nameof(ShowAffectedItemsPreviewAsync)} is not implemented by this dialog service.");
+
+    Task<bool> ShowAffectedItemsPreviewAsync(int totalCount, IReadOnlyList<string> itemNames, PreviewTextSource title, PreviewTextSource reversibilityNote)
+        => throw new NotSupportedException($"{nameof(ShowAffectedItemsPreviewAsync)} is not implemented by this dialog service.");
+}
+
+public sealed record PreviewTextSource(string KeyOrText, IReadOnlyList<string> FormatArgs)
+{
+    public static PreviewTextSource Key(string key, params string[] args) => new(key, args);
 }

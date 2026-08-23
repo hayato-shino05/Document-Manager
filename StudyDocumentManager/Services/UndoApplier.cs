@@ -65,7 +65,7 @@ public sealed class UndoApplier : IUndoApplier
                     }
                 }
             }
-            catch (SqliteException)
+            catch
             {
                 _collections.Delete(collectionId);
                 throw;

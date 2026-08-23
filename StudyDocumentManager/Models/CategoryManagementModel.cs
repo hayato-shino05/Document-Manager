@@ -140,10 +140,10 @@ public partial class CategoryManagementModel : ModelBase
         if (_customDialogs != null)
         {
             confirmed = await _customDialogs.ShowAffectedItemsPreviewAsync(
-                string.Format(_loc["PV_CascadeTitle"], BuildTargetNames(targets)),
                 affectedDocs.Count,
                 affectedDocs.Select(d => d.Name).ToList(),
-                _loc["PV_RecycleBinNote"]);
+                PreviewTextSource.Key("PV_CascadeTitle", BuildTargetNames(targets)),
+                PreviewTextSource.Key("PV_RecycleBinNote"));
         }
         else
         {
@@ -201,10 +201,10 @@ public partial class CategoryManagementModel : ModelBase
         if (_customDialogs != null)
         {
             confirmed = await _customDialogs.ShowAffectedItemsPreviewAsync(
-                string.Format(_loc["PV_CascadeTitle"], BuildTargetNames(targets)),
                 affectedDocs.Count,
                 affectedDocs.Select(d => d.Name).ToList(),
-                _loc["PV_RecycleBinNote"]);
+                PreviewTextSource.Key("PV_CascadeTitle", BuildTargetNames(targets)),
+                PreviewTextSource.Key("PV_RecycleBinNote"));
         }
         else
         {
