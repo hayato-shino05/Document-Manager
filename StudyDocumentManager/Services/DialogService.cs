@@ -284,6 +284,16 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         return dialog.Result == true;
     }
 
+    public async Task<bool> ShowAffectedItemsPreviewAsync(int totalCount, IReadOnlyList<string> itemNames, PreviewTextSource title, PreviewTextSource reversibilityNote)
+    {
+        var owner = GetMainWindow();
+        if (owner == null) return false;
+
+        var dialog = new AffectedItemsPreviewDialog(string.Empty, totalCount, itemNames, string.Empty, _loc, title, reversibilityNote);
+        await dialog.ShowDialog(owner);
+        return dialog.Result == true;
+    }
+
     private static List<FilePickerFileType>? BuildFileFilter(string? filter)
     {
         if (string.IsNullOrEmpty(filter)) return null;

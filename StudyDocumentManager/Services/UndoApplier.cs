@@ -1,3 +1,4 @@
+using Microsoft.Data.Sqlite;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 
@@ -5,6 +6,9 @@ namespace StudyDocumentManager.Services;
 
 public sealed class UndoApplier : IUndoApplier
 {
+    private const int SqliteConstraintError = 19;
+    private const int SqliteConstraintForeignKey = 787;
+
     private readonly IUndoService _undo;
     private readonly IDocumentRepository _documents;
     private readonly IRecycleBinRepository _recycleBin;
@@ -44,18 +48,35 @@ public sealed class UndoApplier : IUndoApplier
             if (collectionId <= 0)
                 throw new InvalidOperationException("Undo collection recreation failed.");
 
+            var requested = snapshot.MemberDocumentIds.Count;
+            var linked = 0;
             try
             {
                 foreach (var documentId in snapshot.MemberDocumentIds)
                 {
-                    if (!_collections.AddDocument(collectionId, documentId))
-                        throw new InvalidOperationException("Undo collection membership restoration failed.");
+                    try
+                    {
+                        if (_collections.AddDocument(collectionId, documentId))
+                            linked++;
+                    }
+                    catch (SqliteException ex) when (IsForeignKeyViolation(ex))
+                    {
+                        if (!_collections.GetAll().Any(collection => collection.Id == collectionId))
+                            throw new InvalidOperationException("Undo collection recreation lost mid-restore; entry kept for retry.", ex);
+                        continue;
+                    }
                 }
             }
             catch
             {
                 _collections.Delete(collectionId);
                 throw;
+            }
+
+            if (linked != requested)
+            {
+                _undo.Pop();
+                throw new UndoPartialRestoreException(linked, requested);
             }
         }
         else
@@ -131,4 +152,7 @@ public sealed class UndoApplier : IUndoApplier
 
         _undo.Pop();
     }
+
+    private static bool IsForeignKeyViolation(SqliteException ex)
+        => ex.SqliteErrorCode == SqliteConstraintError && ex.SqliteExtendedErrorCode == SqliteConstraintForeignKey;
 }

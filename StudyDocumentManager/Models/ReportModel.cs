@@ -21,6 +21,8 @@ public partial class ReportModel : ModelBase
     private readonly IReportRepository _reportRepo;
     private readonly IDocumentRepository? _documentRepo;
     private readonly ILocalizationService? _loc;
+    private Dictionary<string, int>? _lastStatusCounts;
+    private bool _localizationSubscribed;
 
     public ReportModel(IReportRepository reportRepo, IDocumentRepository? documentRepo = null, ILocalizationService? localizationService = null)
     {
@@ -28,6 +30,35 @@ public partial class ReportModel : ModelBase
         _documentRepo = documentRepo;
         _loc = localizationService;
         LoadAllData();
+    }
+
+    public void AttachLocalization()
+    {
+        if (_localizationSubscribed || _loc == null)
+            return;
+
+        _loc.LanguageChanged += OnLanguageChanged;
+        _localizationSubscribed = true;
+        RefreshStatusLabels();
+    }
+
+    public void DetachLocalization()
+    {
+        if (!_localizationSubscribed || _loc == null)
+            return;
+
+        _loc.LanguageChanged -= OnLanguageChanged;
+        _localizationSubscribed = false;
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e) => RefreshStatusLabels();
+
+    private void RefreshStatusLabels()
+    {
+        if (_lastStatusCounts == null)
+            return;
+
+        ByStatusData = BuildStatusItems(_lastStatusCounts);
     }
 
     [RelayCommand]
@@ -53,6 +84,12 @@ public partial class ReportModel : ModelBase
     private ObservableCollection<StatusCountItem> CreateStatusCounts()
     {
         var counts = _documentRepo?.GetStatusCounts() ?? [];
+        _lastStatusCounts = counts;
+        return BuildStatusItems(counts);
+    }
+
+    private ObservableCollection<StatusCountItem> BuildStatusItems(Dictionary<string, int> counts)
+    {
         var items = DocumentStatus.All
             .Select(kind => new StatusCountItem
             {

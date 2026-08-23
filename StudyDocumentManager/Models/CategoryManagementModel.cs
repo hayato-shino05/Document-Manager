@@ -46,6 +46,11 @@ public partial class CategoryManagementModel : ModelBase
 
     private void LoadData()
     {
+        var selectedSubjectName = SelectedSubject?.Name;
+        var selectedTypeName = SelectedType?.Name;
+        var selectedSubjectNames = SelectedSubjects.OfType<CategoryItem>().Select(item => item.Name).ToList();
+        var selectedTypeNames = SelectedTypes.OfType<CategoryItem>().Select(item => item.Name).ToList();
+
         var subjectsData = _categoryRepo.GetSubjectsWithCount();
         Subjects = new ObservableCollection<CategoryItem>(
             subjectsData.Select(s => new CategoryItem(s.Name, s.Count)));
@@ -55,8 +60,25 @@ public partial class CategoryManagementModel : ModelBase
             typesData.Select(t => new CategoryItem(t.Name, t.Count)));
 
         TotalDocumentCount = _categoryRepo.GetTotalDocumentCount();
+        SelectedSubject = ResolveSelection(selectedSubjectName, Subjects);
+        SelectedType = ResolveSelection(selectedTypeName, Types);
+        SelectedSubjects = ResolveSelections(selectedSubjectNames, Subjects);
+        SelectedTypes = ResolveSelections(selectedTypeNames, Types);
         OnPropertyChanged(nameof(StatusText));
     }
+
+    private static CategoryItem? ResolveSelection(string? currentName, ObservableCollection<CategoryItem> items)
+        => currentName != null
+            ? items.FirstOrDefault(i => i.Name.Equals(currentName, StringComparison.Ordinal))
+                ?? items.FirstOrDefault(i => i.Name.Equals(currentName, StringComparison.OrdinalIgnoreCase))
+            : null;
+
+    private static IList ResolveSelections(IEnumerable<string> currentNames, ObservableCollection<CategoryItem> items)
+        => currentNames
+            .Select(name => ResolveSelection(name, items))
+            .OfType<CategoryItem>()
+            .Distinct()
+            .ToList();
 
     [RelayCommand]
     private async Task RenameSubjectAsync()
@@ -132,11 +154,10 @@ public partial class CategoryManagementModel : ModelBase
         bool confirmed;
         if (_customDialogs != null)
         {
-            confirmed = await _customDialogs.ShowAffectedItemsPreviewAsync(
-                string.Format(_loc["PV_CascadeTitle"], BuildTargetNames(targets)),
+            confirmed = await ShowAffectedItemsPreviewAsync(
                 affectedDocs.Count,
                 affectedDocs.Select(d => d.Name).ToList(),
-                _loc["PV_RecycleBinNote"]);
+                targets);
         }
         else
         {
@@ -193,11 +214,10 @@ public partial class CategoryManagementModel : ModelBase
         bool confirmed;
         if (_customDialogs != null)
         {
-            confirmed = await _customDialogs.ShowAffectedItemsPreviewAsync(
-                string.Format(_loc["PV_CascadeTitle"], BuildTargetNames(targets)),
+            confirmed = await ShowAffectedItemsPreviewAsync(
                 affectedDocs.Count,
                 affectedDocs.Select(d => d.Name).ToList(),
-                _loc["PV_RecycleBinNote"]);
+                targets);
         }
         else
         {
@@ -235,6 +255,34 @@ public partial class CategoryManagementModel : ModelBase
         catch
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+        }
+    }
+
+    private async Task<bool> ShowAffectedItemsPreviewAsync(
+        int totalCount,
+        IReadOnlyList<string> itemNames,
+        List<CategoryItem> targets)
+    {
+        var customDialogs = _customDialogs!;
+        var targetNames = BuildTargetNames(targets);
+        try
+        {
+            return await customDialogs.ShowAffectedItemsPreviewAsync(
+                totalCount,
+                itemNames,
+                PreviewTextSource.Key("PV_CascadeTitle", targetNames) with
+                {
+                    FormatArgsFactory = () => [BuildTargetNames(targets)]
+                },
+                PreviewTextSource.Key("PV_RecycleBinNote"));
+        }
+        catch (NotSupportedException)
+        {
+            return await customDialogs.ShowAffectedItemsPreviewAsync(
+                string.Format(_loc["PV_CascadeTitle"], targetNames),
+                totalCount,
+                itemNames,
+                _loc["PV_RecycleBinNote"]);
         }
     }
 

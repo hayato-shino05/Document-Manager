@@ -5,6 +5,8 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using Microsoft.Data.Sqlite;
+using StudyDocumentManager.Core;
+using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Models;
@@ -87,6 +89,59 @@ public class ReportFlowTests : IDisposable
         }
     }
 
+    [Fact]
+    public void ReportModel_LanguageChanged_RebuildsStatusLabelsWithoutRequeryingRepositories()
+    {
+        var reportRepo = new CountingReportRepository();
+        var docRepo = new CountingDocumentRepository();
+        var loc = new SwitchableLocalizationService();
+        var model = new ReportModel(reportRepo, docRepo, loc);
+        model.AttachLocalization();
+
+        var countsBefore = model.ByStatusData.ToDictionary(i => i.Kind, i => i.Value);
+        var queriesBefore = reportRepo.TotalCalls + docRepo.StatusCalls;
+
+        loc.SwitchTo("JA");
+
+        Assert.Equal(6, model.ByStatusData.Count);
+        Assert.All(model.ByStatusData, item => Assert.StartsWith("JA:", item.Label));
+        Assert.DoesNotContain(model.ByStatusData, item => item.Label.StartsWith("EN:", StringComparison.Ordinal));
+        Assert.Equal(countsBefore, model.ByStatusData.ToDictionary(i => i.Kind, i => i.Value));
+        Assert.Equal(queriesBefore, reportRepo.TotalCalls + docRepo.StatusCalls);
+    }
+
+    [Fact]
+    public void ReportModel_DetachLocalization_FreezesLabelsOnLanguageChangeWithoutThrowing()
+    {
+        var loc = new SwitchableLocalizationService();
+        var model = new ReportModel(new CountingReportRepository(), new CountingDocumentRepository(), loc);
+
+        model.DetachLocalization();
+        model.AttachLocalization();
+        model.DetachLocalization();
+
+        loc.SwitchTo("JA");
+
+        Assert.Equal(6, model.ByStatusData.Count);
+        Assert.All(model.ByStatusData, item => Assert.StartsWith("EN:", item.Label));
+    }
+
+    [Fact]
+    public void ReportModel_DoubleAttachLocalization_RebuildsOnceWithSingleSetOfSixItems()
+    {
+        var loc = new SwitchableLocalizationService();
+        var model = new ReportModel(new CountingReportRepository(), new CountingDocumentRepository(), loc);
+
+        model.AttachLocalization();
+        model.AttachLocalization();
+
+        loc.SwitchTo("JA");
+
+        Assert.Equal(6, model.ByStatusData.Count);
+        Assert.All(model.ByStatusData, item => Assert.StartsWith("JA:", item.Label));
+        Assert.All(model.ByStatusData, item => Assert.DoesNotContain("EN:", item.Label, StringComparison.Ordinal));
+    }
+
     public void Dispose()
     {
         _db.CloseAllConnections();
@@ -115,5 +170,63 @@ public class ReportFlowTests : IDisposable
             => Enumerable.Range(0, days).Select(index => ($"D{index}", 0)).ToList();
         public List<(string Label, int Count)> GetByMonth(int months)
             => Enumerable.Range(0, months).Select(index => ($"M{index}", 0)).ToList();
+    }
+
+    private sealed class CountingReportRepository : IReportRepository
+    {
+        public int TotalCalls { get; private set; }
+
+        public List<(string Label, int Count)> GetBySubject() { TotalCalls++; return []; }
+        public List<(string Label, int Count)> GetByType() { TotalCalls++; return []; }
+        public List<(string Label, int Count)> GetByDay(int days) { TotalCalls++; return []; }
+        public List<(string Label, int Count)> GetByMonth(int months) { TotalCalls++; return []; }
+    }
+
+    private sealed class CountingDocumentRepository : IDocumentRepository
+    {
+        public int StatusCalls { get; private set; }
+
+        public Dictionary<string, int> GetStatusCounts()
+        {
+            StatusCalls++;
+            return new Dictionary<string, int> { [DocumentStatus.Unread] = 3 };
+        }
+
+        public List<StudyDocument> GetAll() => [];
+        public StudyDocument? GetById(int id) => null;
+        public List<StudyDocument> Search(string keyword) => [];
+        public List<StudyDocument> Filter(string subject, string type) => [];
+        public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type,
+            DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => [];
+        public bool Add(StudyDocument document) => true;
+        public bool AddWithCatalogs(StudyDocument document) => true;
+        public bool Update(StudyDocument document) => true;
+        public bool Delete(int id) => true;
+        public List<string> GetDistinctSubjects() => [];
+        public List<string> GetDistinctTypes() => [];
+        public List<string> GetDistinctTags() => [];
+        public List<StudyDocument> GetUpcomingDeadlines(int days) => [];
+        public List<StudyDocument> GetOverdueDocuments() => [];
+        public void EnsureSubjectExists(string subject) { }
+        public void EnsureTypeExists(string type) { }
+    }
+
+    private sealed class SwitchableLocalizationService : ILocalizationService
+    {
+        private string _prefix = "EN";
+
+        public string this[string key] => $"{_prefix}:{key}";
+        public SupportedLanguage CurrentLanguage => SupportedLanguage.Japanese;
+        public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = [];
+
+        public event EventHandler? LanguageChanged;
+
+        public void SetLanguage(SupportedLanguage language) { }
+
+        public void SwitchTo(string prefix)
+        {
+            _prefix = prefix;
+            LanguageChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

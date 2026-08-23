@@ -191,6 +191,35 @@ public class SavedSearchRepositoryTests : DatabaseTestBase
         }
     }
 
+    [Fact]
+    public void Add_GetById_PreservesUnvalidatedCriteriaVerbatim()
+    {
+        var original = new SavedSearchCriteria
+        {
+            Kind = "time-travel",
+            RecentDays = -5,
+            DeadlineDays = -5,
+            FromDate = new DateTime(2026, 12, 31),
+            ToDate = new DateTime(2026, 1, 1)
+        };
+        var json = original.ToJson();
+
+        var id = SearchRepo.Add(new SavedSearch { Name = "Raw criteria", CriteriaJson = json });
+
+        var loaded = SearchRepo.GetById(id);
+
+        Assert.NotNull(loaded);
+        Assert.Equal(json, loaded!.CriteriaJson);
+        var restored = SavedSearchCriteria.FromJson(loaded.CriteriaJson);
+        Assert.NotNull(restored);
+        Assert.Equal("time-travel", restored!.Kind);
+        Assert.Equal(-5, restored.RecentDays);
+        Assert.Equal(-5, restored.DeadlineDays);
+        Assert.Equal(new DateTime(2026, 12, 31), restored.FromDate);
+        Assert.Equal(new DateTime(2026, 1, 1), restored.ToDate);
+        Assert.True(restored.FromDate > restored.ToDate);
+    }
+
     private static string CreateTemporaryPath(string suffix)
         => Path.Combine(Path.GetTempPath(), $"sdm_{Guid.NewGuid():N}_{suffix}");
 
@@ -242,5 +271,89 @@ public class SavedSearchCriteriaTests
         Assert.Equal(SavedSearchKinds.Standard, criteria.Kind);
         Assert.Equal(7, criteria.RecentDays);
         Assert.Equal(7, criteria.DeadlineDays);
+    }
+}
+
+public class SavedSearchCriteriaCharacterizationTests
+{
+    [Fact]
+    public void FromJson_NullInput_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => SavedSearchCriteria.FromJson(null!));
+    }
+
+    [Fact]
+    public void FromJson_EmptyObject_ReturnsDefaults()
+    {
+        var restored = SavedSearchCriteria.FromJson("{}");
+
+        Assert.NotNull(restored);
+        Assert.Equal(SavedSearchKinds.Standard, restored!.Kind);
+        Assert.Null(restored.Keyword);
+        Assert.Null(restored.Subject);
+        Assert.Null(restored.Type);
+        Assert.Null(restored.FromDate);
+        Assert.Null(restored.ToDate);
+        Assert.Null(restored.MinSize);
+        Assert.Null(restored.MaxSize);
+        Assert.Null(restored.IsImportant);
+        Assert.Equal(7, restored.RecentDays);
+        Assert.Equal(7, restored.DeadlineDays);
+    }
+
+    [Fact]
+    public void Roundtrip_UnsupportedKind_PreservedVerbatim()
+    {
+        var original = new SavedSearchCriteria { Kind = "time-travel" };
+
+        var restored = SavedSearchCriteria.FromJson(original.ToJson());
+
+        Assert.NotNull(restored);
+        Assert.Equal("time-travel", restored!.Kind);
+
+        var fromRaw = SavedSearchCriteria.FromJson("{\"Kind\":\"time-travel\"}");
+        Assert.NotNull(fromRaw);
+        Assert.Equal("time-travel", fromRaw!.Kind);
+        Assert.Contains("\"Kind\":\"time-travel\"", fromRaw.ToJson());
+    }
+
+    [Fact]
+    public void Roundtrip_NegativeDayWindows_NotClamped()
+    {
+        var original = new SavedSearchCriteria { RecentDays = -5, DeadlineDays = -5 };
+
+        var restored = SavedSearchCriteria.FromJson(original.ToJson());
+
+        Assert.NotNull(restored);
+        Assert.Equal(-5, restored!.RecentDays);
+        Assert.Equal(-5, restored.DeadlineDays);
+        Assert.Contains("\"RecentDays\":-5", original.ToJson());
+    }
+
+    [Fact]
+    public void Roundtrip_ReversedDates_PreservedAsIs()
+    {
+        var original = new SavedSearchCriteria
+        {
+            FromDate = new DateTime(2026, 12, 31),
+            ToDate = new DateTime(2026, 1, 1)
+        };
+
+        var restored = SavedSearchCriteria.FromJson(original.ToJson());
+
+        Assert.NotNull(restored);
+        Assert.Equal(new DateTime(2026, 12, 31), restored!.FromDate);
+        Assert.Equal(new DateTime(2026, 1, 1), restored.ToDate);
+        Assert.True(restored.FromDate > restored.ToDate);
+    }
+
+    [Fact]
+    public void FromJson_UnknownProperties_Ignored()
+    {
+        var restored = SavedSearchCriteria.FromJson("{\"Kind\":\"standard\",\"hackerField\":1}");
+
+        Assert.NotNull(restored);
+        Assert.Equal(SavedSearchKinds.Standard, restored!.Kind);
+        Assert.Null(restored.Keyword);
     }
 }

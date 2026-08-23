@@ -294,6 +294,7 @@
                             Spacing="{StaticResource Space1}"
                             HorizontalAlignment="Right">
                     <Button x:Name="btnSave"
+                        IsDefault="True"
                         TabIndex="11"
                         Classes="primary"
                         Command="{Binding SaveCommand}"
@@ -312,6 +313,7 @@
                     </StackPanel>
                 </Button>
                 <Button x:Name="btnCancel"
+                        IsCancel="True"
                         TabIndex="12"
                         Classes="secondary"
                         Command="{Binding CancelCommand}"
