@@ -46,6 +46,11 @@ public partial class CategoryManagementModel : ModelBase
 
     private void LoadData()
     {
+        var selectedSubjectName = SelectedSubject?.Name;
+        var selectedTypeName = SelectedType?.Name;
+        var selectedSubjectNames = SelectedSubjects.OfType<CategoryItem>().Select(item => item.Name).ToList();
+        var selectedTypeNames = SelectedTypes.OfType<CategoryItem>().Select(item => item.Name).ToList();
+
         var subjectsData = _categoryRepo.GetSubjectsWithCount();
         Subjects = new ObservableCollection<CategoryItem>(
             subjectsData.Select(s => new CategoryItem(s.Name, s.Count)));
@@ -55,22 +60,22 @@ public partial class CategoryManagementModel : ModelBase
             typesData.Select(t => new CategoryItem(t.Name, t.Count)));
 
         TotalDocumentCount = _categoryRepo.GetTotalDocumentCount();
-        SelectedSubject = ResolveSelection(SelectedSubject, Subjects);
-        SelectedType = ResolveSelection(SelectedType, Types);
-        SelectedSubjects = ResolveSelections(SelectedSubjects, Subjects);
-        SelectedTypes = ResolveSelections(SelectedTypes, Types);
+        SelectedSubject = ResolveSelection(selectedSubjectName, Subjects);
+        SelectedType = ResolveSelection(selectedTypeName, Types);
+        SelectedSubjects = ResolveSelections(selectedSubjectNames, Subjects);
+        SelectedTypes = ResolveSelections(selectedTypeNames, Types);
         OnPropertyChanged(nameof(StatusText));
     }
 
-    private static CategoryItem? ResolveSelection(CategoryItem? current, ObservableCollection<CategoryItem> items)
-        => current != null
-            ? items.FirstOrDefault(i => i.Name.Equals(current.Name, StringComparison.OrdinalIgnoreCase))
+    private static CategoryItem? ResolveSelection(string? currentName, ObservableCollection<CategoryItem> items)
+        => currentName != null
+            ? items.FirstOrDefault(i => i.Name.Equals(currentName, StringComparison.Ordinal))
+                ?? items.FirstOrDefault(i => i.Name.Equals(currentName, StringComparison.OrdinalIgnoreCase))
             : null;
 
-    private static IList ResolveSelections(IList current, ObservableCollection<CategoryItem> items)
-        => current
-            .OfType<CategoryItem>()
-            .Select(item => ResolveSelection(item, items))
+    private static IList ResolveSelections(IEnumerable<string> currentNames, ObservableCollection<CategoryItem> items)
+        => currentNames
+            .Select(name => ResolveSelection(name, items))
             .OfType<CategoryItem>()
             .Distinct()
             .ToList();
@@ -152,7 +157,7 @@ public partial class CategoryManagementModel : ModelBase
             confirmed = await ShowAffectedItemsPreviewAsync(
                 affectedDocs.Count,
                 affectedDocs.Select(d => d.Name).ToList(),
-                BuildTargetNames(targets));
+                targets);
         }
         else
         {
@@ -212,7 +217,7 @@ public partial class CategoryManagementModel : ModelBase
             confirmed = await ShowAffectedItemsPreviewAsync(
                 affectedDocs.Count,
                 affectedDocs.Select(d => d.Name).ToList(),
-                BuildTargetNames(targets));
+                targets);
         }
         else
         {
@@ -256,15 +261,19 @@ public partial class CategoryManagementModel : ModelBase
     private async Task<bool> ShowAffectedItemsPreviewAsync(
         int totalCount,
         IReadOnlyList<string> itemNames,
-        string targetNames)
+        List<CategoryItem> targets)
     {
         var customDialogs = _customDialogs!;
+        var targetNames = BuildTargetNames(targets);
         try
         {
             return await customDialogs.ShowAffectedItemsPreviewAsync(
                 totalCount,
                 itemNames,
-                PreviewTextSource.Key("PV_CascadeTitle", targetNames),
+                PreviewTextSource.Key("PV_CascadeTitle", targetNames) with
+                {
+                    FormatArgsFactory = () => [BuildTargetNames(targets)]
+                },
                 PreviewTextSource.Key("PV_RecycleBinNote"));
         }
         catch (NotSupportedException)

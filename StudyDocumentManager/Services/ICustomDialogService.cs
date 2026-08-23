@@ -34,7 +34,12 @@ public enum PreviewTextKind
 
 public sealed record PreviewTextSource(PreviewTextKind Kind, string KeyOrText, IReadOnlyList<string> FormatArgs)
 {
+    public Func<IReadOnlyList<string>>? FormatArgsFactory { get; init; }
+
     public static PreviewTextSource Key(string key, params string[] args) => new(PreviewTextKind.Key, key, args);
+
+    public static PreviewTextSource Key(string key, Func<IReadOnlyList<string>> argsFactory)
+        => new(PreviewTextKind.Key, key, []) { FormatArgsFactory = argsFactory };
 
     public static PreviewTextSource Text(string text, params string[] args) => new(PreviewTextKind.Text, text, args);
 }

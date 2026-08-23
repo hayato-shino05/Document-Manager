@@ -215,6 +215,36 @@ public class AffectedItemsPreviewDialogLocalizationTests
     }
 
     [AvaloniaFact]
+    public void LocalizedFormatArgument_ReformatsWithTemplateOnLanguageChange()
+    {
+        var loc = new MutableLocalizationStub();
+        loc.Strings["PV_CascadeTitle"] = "Selected: {0}";
+        loc.Strings["Category_SelectedCount"] = "2 items";
+        var dialog = new AffectedItemsPreviewDialog(
+            string.Empty, 2, new List<string> { "A", "B" }, string.Empty, loc,
+            PreviewTextSource.Key("PV_CascadeTitle", () => [loc["Category_SelectedCount"]]),
+            PreviewTextSource.Key("PV_RecycleBinNote"));
+
+        try
+        {
+            dialog.Show();
+            Flush();
+            Assert.Equal("Selected: 2 items", dialog.Title);
+
+            loc.Strings["PV_CascadeTitle"] = "選択: {0}";
+            loc.Strings["Category_SelectedCount"] = "2件選択済み";
+            loc.SwitchTo(SupportedLanguage.Japanese);
+            Flush();
+
+            Assert.Equal("選択: 2件選択済み", dialog.Title);
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public async Task CallerPath_CategoryDelete_PassesCascadeKeySource_AndDialogReformatsLive()
     {
         var capturedTitles = new List<PreviewTextSource>();

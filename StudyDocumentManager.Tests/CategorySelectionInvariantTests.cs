@@ -57,6 +57,19 @@ public sealed class CategorySelectionInvariantTests : DatabaseTestBase
     }
 
     [Fact]
+    public void Refresh_PrefersExactCaseMatch_WhenCategoriesDifferOnlyByCase()
+    {
+        Repo.Add(new StudyDocument { Name = "A1", Subject = "Math" });
+        Repo.Add(new StudyDocument { Name = "A2", Subject = "math" });
+        var model = CreateModel(new CategorySelectionDialogStub());
+        model.SelectedSubject = new CategoryItem("math", 1);
+
+        model.RefreshCommand.Execute(null);
+
+        Assert.Same(model.Subjects.Single(subject => subject.Name == "math"), model.SelectedSubject);
+    }
+
+    [Fact]
     public async Task Delete_ClearsSelection_WhenSubjectGone()
     {
         Repo.Add(new StudyDocument { Name = "A1", Subject = "A" });

@@ -73,8 +73,10 @@ public partial class AffectedItemsPreviewDialog : Window
     {
         if (source.Kind == PreviewTextKind.Text)
             return string.Format(source.KeyOrText, source.FormatArgs.ToArray());
+
         var format = _loc == null ? source.KeyOrText : _loc[source.KeyOrText];
-        return string.Format(format, source.FormatArgs.ToArray());
+        var args = source.FormatArgsFactory?.Invoke() ?? source.FormatArgs;
+        return string.Format(format, args.ToArray());
     }
 
     private string Resolve(string source)
