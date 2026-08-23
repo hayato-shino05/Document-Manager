@@ -26,7 +26,15 @@ public interface ICustomDialogService
         => throw new NotSupportedException($"{nameof(ShowAffectedItemsPreviewAsync)} is not implemented by this dialog service.");
 }
 
-public sealed record PreviewTextSource(string KeyOrText, IReadOnlyList<string> FormatArgs)
+public enum PreviewTextKind
 {
-    public static PreviewTextSource Key(string key, params string[] args) => new(key, args);
+    Key,
+    Text
+}
+
+public sealed record PreviewTextSource(PreviewTextKind Kind, string KeyOrText, IReadOnlyList<string> FormatArgs)
+{
+    public static PreviewTextSource Key(string key, params string[] args) => new(PreviewTextKind.Key, key, args);
+
+    public static PreviewTextSource Text(string text, params string[] args) => new(PreviewTextKind.Text, text, args);
 }

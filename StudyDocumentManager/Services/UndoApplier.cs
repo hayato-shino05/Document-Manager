@@ -61,6 +61,8 @@ public sealed class UndoApplier : IUndoApplier
                     }
                     catch (SqliteException ex) when (IsForeignKeyViolation(ex))
                     {
+                        if (!_collections.GetAll().Any(collection => collection.Id == collectionId))
+                            throw new InvalidOperationException("Undo collection recreation lost mid-restore; entry kept for retry.", ex);
                         continue;
                     }
                 }

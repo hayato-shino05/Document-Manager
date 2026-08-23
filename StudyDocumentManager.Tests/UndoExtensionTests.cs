@@ -216,6 +216,28 @@ public class UndoApplierRoutingTests
     }
 
     [Fact]
+    public void ApplyLast_CollectionEntry_CollectionVanishedMidRestore_ThrowsAndKeepsEntry()
+    {
+        var undo = new UndoService();
+        var entry = new UndoEntry
+        {
+            DescriptionKey = "UN_CollectionRestorable",
+            Collection = new CollectionSnapshot("Study", null, [1])
+        };
+        undo.Push(entry);
+
+        var collections = new RecordingCollections { NextId = 7, ForeignKeyFailOnDocIds = [1], CollectionLostMidRestore = true };
+        var applier = new UndoApplier(undo, new RecordingDocuments(), new RecordingRecycleBin(), collections);
+
+        var failure = Record.Exception(applier.ApplyLast);
+
+        Assert.IsType<InvalidOperationException>(failure);
+        Assert.Equal([7], collections.DeletedIds);
+        Assert.Same(entry, undo.Peek());
+        Assert.True(applier.CanUndo);
+    }
+
+    [Fact]
     public void ApplyLast_CollectionEntry_TransientSqliteFailure_CompensatesAndKeepsEntry()
     {
         var undo = new UndoService();
@@ -276,21 +298,28 @@ public class UndoApplierRoutingTests
 
     private sealed class RecordingCollections : ICollectionRepository
     {
+        private readonly List<int> _createdIds = [];
+
         public int NextId { get; set; } = 42;
         public List<(string Name, string? Description)> Created { get; } = [];
         public List<(int CollectionId, int DocumentId)> AddedDocs { get; } = [];
         public List<(int CollectionId, int DocumentId)> RemovedDocs { get; } = [];
         public List<int> DeletedIds { get; } = [];
         public bool RemoveResult { get; init; } = true;
+        public bool CollectionLostMidRestore { get; init; }
         public int? TransientFailureCode { get; init; }
         public IReadOnlyList<int>? ForeignKeyFailOnDocIds { get; init; }
         public IReadOnlyList<int>? NonSqliteFailOnDocIds { get; init; }
 
-        public List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetAll() => [];
+        public List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetAll()
+            => CollectionLostMidRestore
+                ? []
+                : _createdIds.Select(id => (id, "Recreated", (string?)null, default(DateTime), 0)).ToList();
 
         public int Create(string name, string? description = null)
         {
             Created.Add((name, description));
+            _createdIds.Add(NextId);
             return NextId;
         }
 

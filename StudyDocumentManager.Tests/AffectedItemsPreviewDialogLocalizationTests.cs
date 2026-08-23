@@ -142,6 +142,37 @@ public class AffectedItemsPreviewDialogLocalizationTests
         }
     }
 
+    [AvaloniaFact]
+    public void LiteralTextSource_BypassesLocalizationAndStaysStableAcrossLanguageChanges()
+    {
+        var loc = new MutableLocalizationStub();
+        var dialog = new AffectedItemsPreviewDialog(
+            string.Empty, 2, new List<string> { "Guide.pdf" }, string.Empty, loc,
+            PreviewTextSource.Text("Custom {0}", "X"),
+            PreviewTextSource.Text("Literal note {0}", "Y"));
+
+        try
+        {
+            dialog.Show();
+            Flush();
+
+            Assert.Equal("Custom X", dialog.Title);
+            Assert.Equal("Custom X", dialog.FindControl<TextBlock>("TitleText")!.Text);
+            Assert.Equal("Literal note Y", dialog.FindControl<TextBlock>("ReversibilityNote")!.Text);
+
+            loc.SwitchTo(SupportedLanguage.Japanese);
+            Flush();
+
+            Assert.Equal("Custom X", dialog.Title);
+            Assert.Equal("Custom X", dialog.FindControl<TextBlock>("TitleText")!.Text);
+            Assert.Equal("Literal note Y", dialog.FindControl<TextBlock>("ReversibilityNote")!.Text);
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
     private static void Flush()
     {
         Avalonia.Threading.Dispatcher.UIThread.RunJobs();

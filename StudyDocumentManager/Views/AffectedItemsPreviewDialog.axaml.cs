@@ -71,6 +71,8 @@ public partial class AffectedItemsPreviewDialog : Window
 
     private string Format(PreviewTextSource source)
     {
+        if (source.Kind == PreviewTextKind.Text)
+            return string.Format(source.KeyOrText, source.FormatArgs.ToArray());
         var format = _loc == null ? source.KeyOrText : _loc[source.KeyOrText];
         return string.Format(format, source.FormatArgs.ToArray());
     }
