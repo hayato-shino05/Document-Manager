@@ -74,13 +74,39 @@ public sealed class UndoApplier : IUndoApplier
                     removedMemberships.Add(membership);
                 }
             }
-            catch
+            catch (Exception undoFailure)
             {
+                Exception? compensationFailure = null;
+
                 foreach (var item in currentDocuments.Where(item => item.Current != null && updatedDocuments.Contains(item.Original)))
-                    _documents.Update(item.Current!);
+                {
+                    try
+                    {
+                        if (!_documents.Update(item.Current!))
+                            compensationFailure ??= new InvalidOperationException("Undo document compensation failed.");
+                    }
+                    catch (Exception exception)
+                    {
+                        compensationFailure ??= exception;
+                    }
+                }
 
                 foreach (var membership in removedMemberships)
-                    _collections.AddDocument(membership.CollectionId, membership.DocumentId);
+                {
+                    try
+                    {
+                        if (!_collections.AddDocument(membership.CollectionId, membership.DocumentId))
+                            compensationFailure ??= new InvalidOperationException("Undo collection membership compensation failed.");
+                    }
+                    catch (Exception exception)
+                    {
+                        compensationFailure ??= exception;
+                    }
+                }
+
+                if (compensationFailure != null)
+                    throw new InvalidOperationException("Undo compensation did not complete.", new AggregateException(undoFailure, compensationFailure));
+
                 throw;
             }
         }
