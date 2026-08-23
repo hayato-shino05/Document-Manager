@@ -148,7 +148,7 @@ public class UndoApplierRoutingTests
     }
 
     [Fact]
-    public void ApplyLast_WhenRestoreCountIsPartial_ThrowsAndKeepsUndoEntry()
+    public void ApplyLast_WhenRestoreCountIsPartial_ConsumesEntryAndThrowsPartial()
     {
         var undo = new UndoService();
         undo.Push(new UndoEntry { DescriptionKey = "UN_DeletedDocuments", DeletedIds = [7, 8] });
@@ -156,9 +156,11 @@ public class UndoApplierRoutingTests
         var recycleBin = new RecordingRecycleBin { RestoreCount = 1 };
         var applier = new UndoApplier(undo, new RecordingDocuments(), recycleBin, new RecordingCollections());
 
-        Assert.Throws<InvalidOperationException>(applier.ApplyLast);
+        var exception = Assert.Throws<UndoPartialRestoreException>(applier.ApplyLast);
+        Assert.Equal(1, exception.RestoredCount);
+        Assert.Equal(2, exception.RequestedCount);
         Assert.Single(recycleBin.RestoreCalls);
-        Assert.True(undo.CanUndo);
+        Assert.False(undo.CanUndo);
     }
 
     [Fact]
@@ -327,36 +329,82 @@ public class UndoApplierResilienceTests : DatabaseTestBase
     }
 
     [Fact]
-    public void ApplyLast_DeletedIdsEntryWithPermanentlyDeletedId_ThrowsKeepsEntryForRetryAndSurvivorRestored()
+    public void ApplyLast_PartialDeleteRestore_ConsumesNewestEntryAndUnclogsStack()
     {
-        var docA = new StudyDocument { Name = "A", Subject = "S1", Type = "PDF" };
+        var docA = new StudyDocument { Name = "A", Subject = "OldSubject", Type = "PDF" };
         var doomed = new StudyDocument { Name = "C", Subject = "S3", Type = "PDF" };
         Assert.True(Repo.Add(docA));
         Assert.True(Repo.Add(doomed));
-        Assert.Equal(2, Db.BulkSoftDelete([docA.Id, doomed.Id]));
-        Assert.True(Repo.PermanentDeleteDocument(doomed.Id));
 
-        var undo = new UndoService();
-        var entry = new UndoEntry
+        var olderMetadata = new UndoEntry
+        {
+            DescriptionKey = "BE_UndoDescription",
+            DescriptionArgs = [1],
+            Originals =
+            [
+                new StudyDocument { Id = docA.Id, Name = "A", Subject = "OldSubject", Type = "PDF" }
+            ],
+            CreatedAt = DateTime.Now
+        };
+        var newerDelete = new UndoEntry
         {
             DescriptionKey = "UN_DeletedDocuments",
             DescriptionArgs = [2],
             DeletedIds = [docA.Id, doomed.Id],
             CreatedAt = DateTime.Now
         };
-        undo.Push(entry);
+
+        var undo = new UndoService();
+        undo.Push(olderMetadata);
+        undo.Push(newerDelete);
+        Assert.Equal(1, Repo.BulkUpdateSubject([docA.Id], "ChangedSubject"));
+        Assert.Equal(2, Db.BulkSoftDelete([docA.Id, doomed.Id]));
+        Assert.True(Repo.PermanentDeleteDocument(doomed.Id));
 
         var applier = new UndoApplier(undo, Repo, Repo, new CollectionRepository(Db));
 
-        Assert.Throws<InvalidOperationException>(applier.ApplyLast);
+        var partial = Assert.Throws<UndoPartialRestoreException>(applier.ApplyLast);
+
+        Assert.Equal(1, partial.RestoredCount);
+        Assert.Equal(2, partial.RequestedCount);
         Assert.NotNull(Repo.GetById(docA.Id));
         Assert.Null(Repo.GetById(doomed.Id));
+        Assert.Same(olderMetadata, undo.Peek());
+        Assert.True(applier.CanUndo);
+
+        applier.ApplyLast();
+
+        Assert.Equal("OldSubject", Repo.GetById(docA.Id)!.Subject);
+        Assert.False(undo.CanUndo);
+    }
+
+    [Fact]
+    public void ApplyLast_AllDeletedIdsPermanentlyGone_KeepsEntryForRetry()
+    {
+        var doomed = new StudyDocument { Name = "Gone", Subject = "S3", Type = "PDF" };
+        Assert.True(Repo.Add(doomed));
+        Assert.Equal(1, Db.BulkSoftDelete([doomed.Id]));
+        Assert.True(Repo.PermanentDeleteDocument(doomed.Id));
+
+        var undo = new UndoService();
+        var entry = new UndoEntry
+        {
+            DescriptionKey = "UN_DeletedDocuments",
+            DescriptionArgs = [1],
+            DeletedIds = [doomed.Id],
+            CreatedAt = DateTime.Now
+        };
+        undo.Push(entry);
+        var applier = new UndoApplier(undo, Repo, Repo, new CollectionRepository(Db));
+
+        var failure = Record.Exception(applier.ApplyLast);
+
+        Assert.IsType<InvalidOperationException>(failure);
         Assert.Same(entry, undo.Peek());
         Assert.True(applier.CanUndo);
 
         Assert.Throws<InvalidOperationException>(applier.ApplyLast);
-        Assert.Null(Repo.GetById(doomed.Id));
-        Assert.NotNull(Repo.GetById(docA.Id));
+        Assert.Same(entry, undo.Peek());
     }
 
     [Fact]
@@ -785,6 +833,76 @@ public class BulkDeleteFallbackUndoTests : DatabaseTestBase
         public Task<bool> ShowConfirmAsync(string title, string message) => Task.FromResult(true);
         public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false) => Task.FromResult(true);
         public Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "") => Task.FromResult<string?>(null);
+    }
+}
+
+public class BulkDeleteModelPartialUndoTests : DatabaseTestBase
+{
+    [Fact]
+    public async Task UndoLast_ApplierPartialRestore_ReportsPartialWithoutErrorDialog()
+    {
+        var survivor = new StudyDocument { Name = "Keep", Subject = "Math", Type = "PDF" };
+        Assert.True(Repo.Add(survivor));
+        Assert.Equal(1, Db.BulkSoftDelete([survivor.Id]));
+
+        var undo = new UndoService();
+        undo.Push(new UndoEntry
+        {
+            DescriptionKey = "UN_DeletedDocuments",
+            DescriptionArgs = [2],
+            DeletedIds = [survivor.Id],
+            CreatedAt = DateTime.Now
+        });
+
+        var dialogs = new RecordingDialogs();
+        var applier = new PartialThrowingApplier(Repo, undo, [survivor.Id]);
+        var model = new BulkDeleteModel(Repo, Repo, new CategoryRepository(Db), dialogs, new StubNavigation(), new FormatLocalization(),
+            null, null, undo, applier, Repo);
+        model.Initialize();
+
+        await model.UndoLastCommand.ExecuteAsync(null);
+
+        Assert.Empty(dialogs.Errors);
+        Assert.Contains("BE_Result_Partial", model.StatusText);
+        Assert.DoesNotContain("UN_DeletedDocuments", model.StatusText);
+        Assert.Equal([survivor.Id], model.Documents.Select(d => d.Document.Id).ToList());
+        Assert.False(model.UndoLastCommand.CanExecute(null));
+    }
+
+    private sealed class PartialThrowingApplier(IRecycleBinRepository recycleBin, IUndoService undo, IReadOnlyList<int> restoreIds) : IUndoApplier
+    {
+        public bool CanUndo => undo.CanUndo;
+
+        public void ApplyLast()
+        {
+            recycleBin.RestoreDocuments(restoreIds);
+            undo.Pop();
+            throw new UndoPartialRestoreException(1, 2);
+        }
+    }
+
+    private sealed class RecordingDialogs : IDialogService
+    {
+        public List<string> Errors { get; } = [];
+
+        public Task ShowMessageAsync(string title, string message) => Task.CompletedTask;
+        public Task ShowErrorAsync(string title, string message)
+        {
+            Errors.Add(message);
+            return Task.CompletedTask;
+        }
+        public Task<bool> ShowConfirmAsync(string title, string message) => Task.FromResult(true);
+        public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false) => Task.FromResult(true);
+        public Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "") => Task.FromResult<string?>(null);
+    }
+
+    private sealed class FormatLocalization : ILocalizationService
+    {
+        public string this[string key] => $"{key}:{{0}}";
+        public SupportedLanguage CurrentLanguage => SupportedLanguage.Japanese;
+        public void SetLanguage(SupportedLanguage language) { }
+        public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = Enum.GetValues<SupportedLanguage>();
+        public event EventHandler? LanguageChanged { add { } remove { } }
     }
 }
 

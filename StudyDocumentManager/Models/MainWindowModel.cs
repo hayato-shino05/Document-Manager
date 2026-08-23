@@ -158,6 +158,12 @@ public partial class MainWindowModel : ModelBase
         {
             _undoApplier.ApplyLast();
         }
+        catch (UndoPartialRestoreException ex)
+        {
+            SetLocalizedStatus("UN_Applied", string.Format(_loc["BE_Result_Partial"], ex.RestoredCount, ex.RequestedCount));
+            RefreshCurrentViewAfterUndo();
+            return;
+        }
         catch (Exception)
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);

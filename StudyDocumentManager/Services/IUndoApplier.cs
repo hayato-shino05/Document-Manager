@@ -8,3 +8,9 @@ public interface IUndoApplier
 
     void ApplyLast();
 }
+
+public sealed class UndoPartialRestoreException(int restoredCount, int requestedCount) : InvalidOperationException($"Undo restored {restoredCount} of {requestedCount} documents; the rest were permanently deleted.")
+{
+    public int RestoredCount { get; } = restoredCount;
+    public int RequestedCount { get; } = requestedCount;
+}

@@ -28,9 +28,15 @@ public sealed class UndoApplier : IUndoApplier
 
         if (entry.DeletedIds.Count > 0)
         {
+            var requested = entry.DeletedIds.Count;
             var restored = _recycleBin.RestoreDocuments(entry.DeletedIds);
-            if (restored != entry.DeletedIds.Count)
-                throw new InvalidOperationException("Undo delete restore incomplete; entry kept for retry.");
+            if (restored == 0)
+                throw new InvalidOperationException("Undo delete restore failed; entry kept for retry.");
+            if (restored < requested)
+            {
+                _undo.Pop();
+                throw new UndoPartialRestoreException(restored, requested);
+            }
         }
         else if (entry.Collection is { } snapshot)
         {
