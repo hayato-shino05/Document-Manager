@@ -1,3 +1,4 @@
+using Microsoft.Data.Sqlite;
 using StudyDocumentManager.Core;
 using StudyDocumentManager.Core.DTOs;
 using StudyDocumentManager.Core.Entities;
@@ -193,6 +194,47 @@ public class UndoApplierRoutingTests
         Assert.Throws<InvalidOperationException>(applier.ApplyLast);
     }
 
+    [Fact]
+    public void ApplyLast_CollectionEntry_MemberForeignKeyViolation_SkipsMemberThrowsPartialWithoutCompensation()
+    {
+        var undo = new UndoService();
+        undo.Push(new UndoEntry
+        {
+            DescriptionKey = "UN_CollectionRestorable",
+            Collection = new CollectionSnapshot("Study", null, [1, 2])
+        });
+
+        var collections = new RecordingCollections { ForeignKeyFailOnDocIds = [2] };
+        var applier = new UndoApplier(undo, new RecordingDocuments(), new RecordingRecycleBin(), collections);
+
+        var partial = Assert.Throws<UndoPartialRestoreException>(applier.ApplyLast);
+
+        Assert.Equal(1, partial.RestoredCount);
+        Assert.Equal(2, partial.RequestedCount);
+        Assert.Empty(collections.DeletedIds);
+        Assert.False(undo.CanUndo);
+    }
+
+    [Fact]
+    public void ApplyLast_CollectionEntry_TransientSqliteFailure_CompensatesAndKeepsEntry()
+    {
+        var undo = new UndoService();
+        undo.Push(new UndoEntry
+        {
+            DescriptionKey = "UN_CollectionRestorable",
+            Collection = new CollectionSnapshot("Study", null, [1])
+        });
+
+        var collections = new RecordingCollections { TransientFailureCode = 17 };
+        var applier = new UndoApplier(undo, new RecordingDocuments(), new RecordingRecycleBin(), collections);
+
+        var failure = Record.Exception(applier.ApplyLast);
+
+        Assert.IsType<SqliteException>(failure);
+        Assert.Single(collections.DeletedIds);
+        Assert.True(undo.CanUndo);
+    }
+
     private sealed class RecordingRecycleBin : IRecycleBinRepository
     {
         public List<IReadOnlyList<int>> RestoreCalls { get; } = [];
@@ -217,7 +259,10 @@ public class UndoApplierRoutingTests
         public List<(string Name, string? Description)> Created { get; } = [];
         public List<(int CollectionId, int DocumentId)> AddedDocs { get; } = [];
         public List<(int CollectionId, int DocumentId)> RemovedDocs { get; } = [];
+        public List<int> DeletedIds { get; } = [];
         public bool RemoveResult { get; init; } = true;
+        public int? TransientFailureCode { get; init; }
+        public IReadOnlyList<int>? ForeignKeyFailOnDocIds { get; init; }
 
         public List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetAll() => [];
 
@@ -228,12 +273,25 @@ public class UndoApplierRoutingTests
         }
 
         public bool Update(int id, string name, string? description = null) => true;
-        public bool Delete(int id) => true;
+
+        public bool Delete(int id)
+        {
+            DeletedIds.Add(id);
+            return true;
+        }
+
         public List<StudyDocument> GetDocuments(int collectionId) => [];
 
         public bool AddDocument(int collectionId, int documentId)
         {
             AddedDocs.Add((collectionId, documentId));
+
+            if (TransientFailureCode is int code)
+                throw new SqliteException("Simulated transient sqlite failure.", code);
+
+            if (ForeignKeyFailOnDocIds?.Contains(documentId) == true)
+                throw new SqliteException("Simulated foreign key constraint failed.", 19, 787);
+
             return true;
         }
 
@@ -482,6 +540,130 @@ public class UndoCollectionIntegrationTests : DatabaseTestBase
 
         var restoredMemberIds = collections.GetDocuments(all[0].Id).Select(d => d.Id).OrderBy(x => x).ToList();
         Assert.Equal(memberIds.OrderBy(x => x), restoredMemberIds);
+    }
+
+    [Fact]
+    public void ApplyLast_CollectionDelete_AllMembersLive_RestoresBothPopsAndUnclogsStack()
+    {
+        var collections = new CollectionRepository(Db);
+        var docA = new StudyDocument { Name = "A", Subject = "S", Type = "T" };
+        var docB = new StudyDocument { Name = "B", Subject = "S", Type = "T" };
+        Assert.True(Repo.Add(docA));
+        Assert.True(Repo.Add(docB));
+
+        var olderMetadata = new UndoEntry
+        {
+            DescriptionKey = "BE_UndoDescription",
+            DescriptionArgs = [1],
+            Originals = [new StudyDocument { Id = docA.Id, Name = "A", Subject = "S", Type = "T" }],
+            CreatedAt = DateTime.Now
+        };
+        var undo = new UndoService();
+        undo.Push(olderMetadata);
+        undo.Push(new UndoEntry
+        {
+            DescriptionKey = "UN_CollectionRestorable",
+            DescriptionArgs = ["Study"],
+            Collection = new CollectionSnapshot("Study", "focus", [docA.Id, docB.Id]),
+            CreatedAt = DateTime.Now
+        });
+        Assert.Equal(1, Repo.BulkUpdateSubject([docA.Id], "Changed"));
+
+        new UndoApplier(undo, Repo, Repo, collections).ApplyLast();
+
+        var recreated = collections.GetAll().Single(c => c.Name == "Study");
+        Assert.Equal(new[] { docA.Id, docB.Id }.OrderBy(x => x).ToList(), collections.GetDocuments(recreated.Id).Select(d => d.Id).OrderBy(x => x).ToList());
+        Assert.Same(olderMetadata, undo.Peek());
+        Assert.True(undo.CanUndo);
+
+        new UndoApplier(undo, Repo, Repo, collections).ApplyLast();
+
+        Assert.Equal("S", Repo.GetById(docA.Id)!.Subject);
+        Assert.False(undo.CanUndo);
+    }
+
+    [Fact]
+    public void ApplyLast_CollectionDelete_PermanentMemberGone_LinksSurvivorConsumesEntryUnclogsStack()
+    {
+        var collections = new CollectionRepository(Db);
+        int originalId = collections.Create("Study", "focus");
+        var survivor = new StudyDocument { Name = "Keep", Subject = "S", Type = "T" };
+        var doomed = new StudyDocument { Name = "Gone", Subject = "S", Type = "T" };
+        Assert.True(Repo.Add(survivor));
+        Assert.True(Repo.Add(doomed));
+        Assert.True(collections.AddDocument(originalId, survivor.Id));
+        Assert.True(collections.AddDocument(originalId, doomed.Id));
+
+        var olderMetadata = new UndoEntry
+        {
+            DescriptionKey = "BE_UndoDescription",
+            DescriptionArgs = [1],
+            Originals = [new StudyDocument { Id = survivor.Id, Name = "Keep", Subject = "S", Type = "T" }],
+            CreatedAt = DateTime.Now
+        };
+        var undo = new UndoService();
+        undo.Push(olderMetadata);
+        undo.Push(new UndoEntry
+        {
+            DescriptionKey = "UN_CollectionRestorable",
+            DescriptionArgs = ["Study"],
+            Collection = new CollectionSnapshot("Study", "focus", [survivor.Id, doomed.Id]),
+            CreatedAt = DateTime.Now
+        });
+
+        Assert.True(collections.Delete(originalId));
+        Assert.Equal(1, Db.BulkSoftDelete([doomed.Id]));
+        Assert.True(Repo.PermanentDeleteDocument(doomed.Id));
+        Assert.Equal(1, Repo.BulkUpdateSubject([survivor.Id], "Changed"));
+
+        var applier = new UndoApplier(undo, Repo, Repo, collections);
+
+        var partial = Assert.Throws<UndoPartialRestoreException>(applier.ApplyLast);
+
+        Assert.Equal(1, partial.RestoredCount);
+        Assert.Equal(2, partial.RequestedCount);
+        var recreated = collections.GetAll().Single(c => c.Name == "Study");
+        Assert.Equal([survivor.Id], collections.GetDocuments(recreated.Id).Select(d => d.Id).ToList());
+        Assert.Same(olderMetadata, undo.Peek());
+        Assert.True(applier.CanUndo);
+
+        applier.ApplyLast();
+
+        Assert.Equal("S", Repo.GetById(survivor.Id)!.Subject);
+        Assert.False(undo.CanUndo);
+    }
+
+    [Fact]
+    public void ApplyLast_CollectionDelete_AllMembersPermanentGone_KeepsEmptyCollectionConsumesEntry()
+    {
+        var collections = new CollectionRepository(Db);
+        int originalId = collections.Create("Study", "focus");
+        var doomed = new StudyDocument { Name = "Gone", Subject = "S", Type = "T" };
+        Assert.True(Repo.Add(doomed));
+        Assert.True(collections.AddDocument(originalId, doomed.Id));
+
+        var undo = new UndoService();
+        undo.Push(new UndoEntry
+        {
+            DescriptionKey = "UN_CollectionRestorable",
+            DescriptionArgs = ["Study"],
+            Collection = new CollectionSnapshot("Study", "focus", [doomed.Id]),
+            CreatedAt = DateTime.Now
+        });
+
+        Assert.True(collections.Delete(originalId));
+        Assert.Equal(1, Db.BulkSoftDelete([doomed.Id]));
+        Assert.True(Repo.PermanentDeleteDocument(doomed.Id));
+
+        var applier = new UndoApplier(undo, Repo, Repo, collections);
+
+        var partial = Assert.Throws<UndoPartialRestoreException>(applier.ApplyLast);
+
+        Assert.Equal(0, partial.RestoredCount);
+        Assert.Equal(1, partial.RequestedCount);
+        var recreated = collections.GetAll().Single(c => c.Name == "Study");
+        Assert.Empty(collections.GetDocuments(recreated.Id));
+        Assert.False(applier.CanUndo);
     }
 }
 
