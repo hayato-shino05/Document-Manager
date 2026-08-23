@@ -9,13 +9,15 @@ public sealed class UndoApplier : IUndoApplier
     private readonly IDocumentRepository _documents;
     private readonly IRecycleBinRepository _recycleBin;
     private readonly ICollectionRepository _collections;
+    private readonly IUndoRepository? _undoRepository;
 
-    public UndoApplier(IUndoService undo, IDocumentRepository documents, IRecycleBinRepository recycleBin, ICollectionRepository collections)
+    public UndoApplier(IUndoService undo, IDocumentRepository documents, IRecycleBinRepository recycleBin, ICollectionRepository collections, IUndoRepository? undoRepository = null)
     {
         _undo = undo;
         _documents = documents;
         _recycleBin = recycleBin;
         _collections = collections;
+        _undoRepository = undoRepository;
     }
 
     public bool CanUndo => _undo.CanUndo;
@@ -52,6 +54,15 @@ public sealed class UndoApplier : IUndoApplier
         }
         else
         {
+            if (_undoRepository != null)
+            {
+                _undoRepository.ApplyMetadataUndo(
+                    entry.Originals,
+                    entry.AddedCollectionMemberships.Select(membership => (membership.CollectionId, membership.DocumentId)).ToList());
+                _undo.Pop();
+                return;
+            }
+
             var currentDocuments = entry.Originals
                 .Select(original => (Original: original, Current: _documents.GetById(original.Id)))
                 .ToList();

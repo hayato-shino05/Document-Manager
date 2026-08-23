@@ -102,6 +102,7 @@ public partial class App : Application
         services.AddSingleton<IRecycleBinRepository>(sp => sp.GetRequiredService<DocumentRepository>());
         services.AddSingleton<IBulkOperationRepository>(sp => sp.GetRequiredService<DocumentRepository>());
         services.AddSingleton<IFileIntegrityRepository>(sp => sp.GetRequiredService<DocumentRepository>());
+        services.AddSingleton<IUndoRepository>(sp => sp.GetRequiredService<DocumentRepository>());
         services.AddSingleton<ICategoryRepository, CategoryRepository>();
         services.AddSingleton<ICollectionRepository, CollectionRepository>();
         services.AddSingleton<IPersonalNoteRepository, PersonalNoteRepository>();

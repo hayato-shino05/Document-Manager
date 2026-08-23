@@ -7,7 +7,7 @@ namespace StudyDocumentManager.Data.Repositories;
 /// <summary>
 /// Implements all document-related repository interfaces using DatabaseHelper.
 /// </summary>
-public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IBulkOperationRepository, IFileIntegrityRepository
+public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IBulkOperationRepository, IFileIntegrityRepository, IUndoRepository
 {
     private readonly DatabaseHelper _db;
 
@@ -41,6 +41,11 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
     public bool AddWithCatalogs(StudyDocument document) => _db.InsertDocumentWithCatalogs(document);
 
     public bool Update(StudyDocument document) => _db.UpdateDocument(document);
+
+    public void ApplyMetadataUndo(
+        IReadOnlyList<StudyDocument> originals,
+        IReadOnlyList<(int CollectionId, int DocumentId)> addedCollectionMemberships)
+        => _db.ApplyMetadataUndo(originals, addedCollectionMemberships);
 
     public bool Delete(int id) => _db.DeleteDocument(id);
 

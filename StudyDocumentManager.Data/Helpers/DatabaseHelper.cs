@@ -316,34 +316,13 @@ public class DatabaseHelper
 
     public bool UpdateDocument(StudyDocument doc)
     {
-        const string query = """
-            UPDATE documents SET
-                name = @name, subject = @subject, type = @type, file_path = @file_path,
-                notes = @notes, file_size = @file_size, author = @author,
-                is_important = @is_important, tags = @tags, deadline = @deadline,
-                status = @status
-            WHERE id = @id
-            """;
-
         using var connection = OpenConnection();
         using var transaction = connection.BeginTransaction();
 
         try
         {
-            if (!string.IsNullOrWhiteSpace(doc.Subject))
-                InsertCatalogValue(connection, transaction, "categories", doc.Subject);
-
-            if (!string.IsNullOrWhiteSpace(doc.Type))
-                InsertCatalogValue(connection, transaction, "document_types", doc.Type);
-
-            using var command = connection.CreateCommand();
-            command.Transaction = transaction;
-            command.CommandText = query;
-            foreach (var parameter in BuildDocumentParameters(doc))
-                command.Parameters.Add(parameter);
-            command.Parameters.Add(new SqliteParameter("@id", doc.Id));
-
-            if (command.ExecuteNonQuery() == 0)
+            var updated = UpdateDocumentCore(connection, transaction, doc);
+            if (!updated)
             {
                 transaction.Rollback();
                 return false;
@@ -351,6 +330,65 @@ public class DatabaseHelper
 
             transaction.Commit();
             return true;
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+    private bool UpdateDocumentCore(SqliteConnection connection, SqliteTransaction transaction, StudyDocument doc)
+    {
+        if (!string.IsNullOrWhiteSpace(doc.Subject))
+            InsertCatalogValue(connection, transaction, "categories", doc.Subject);
+
+        if (!string.IsNullOrWhiteSpace(doc.Type))
+            InsertCatalogValue(connection, transaction, "document_types", doc.Type);
+
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = """
+            UPDATE documents SET
+                name = @name, subject = @subject, type = @type, file_path = @file_path,
+                notes = @notes, file_size = @file_size, author = @author,
+                is_important = @is_important, tags = @tags, deadline = @deadline,
+                status = @status
+            WHERE id = @id
+            """;
+        foreach (var parameter in BuildDocumentParameters(doc))
+            command.Parameters.Add(parameter);
+        command.Parameters.Add(new SqliteParameter("@id", doc.Id));
+        return command.ExecuteNonQuery() > 0;
+    }
+
+    public void ApplyMetadataUndo(
+        IReadOnlyList<StudyDocument> originals,
+        IReadOnlyList<(int CollectionId, int DocumentId)> addedCollectionMemberships)
+    {
+        using var connection = OpenConnection();
+        using var transaction = connection.BeginTransaction();
+
+        try
+        {
+            foreach (var original in originals)
+            {
+                if (!UpdateDocumentCore(connection, transaction, original))
+                    throw new InvalidOperationException("Undo document restoration failed.");
+            }
+
+            foreach (var membership in addedCollectionMemberships)
+            {
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "DELETE FROM collection_items WHERE collection_id = @collectionId AND document_id = @documentId";
+                command.Parameters.AddWithValue("@collectionId", membership.CollectionId);
+                command.Parameters.AddWithValue("@documentId", membership.DocumentId);
+                if (command.ExecuteNonQuery() == 0)
+                    throw new InvalidOperationException("Undo collection membership removal failed.");
+            }
+
+            transaction.Commit();
         }
         catch
         {
