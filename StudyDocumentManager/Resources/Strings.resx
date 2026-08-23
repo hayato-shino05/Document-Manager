@@ -657,6 +657,9 @@
   <data name="FileIntegrity_StatValid" xml:space="preserve"><value>正常</value></data>
   <data name="FileIntegrity_StatMissing" xml:space="preserve"><value>欠損</value></data>
   <data name="FileIntegrity_StatCorrupted" xml:space="preserve"><value>破損</value></data>
+  <data name="FileIntegrity_BtnCancel" xml:space="preserve"><value>スキャンをキャンセル</value></data>
+  <data name="FileIntegrity_BtnRetryMissing" xml:space="preserve"><value>欠損を再確認</value></data>
+  <data name="FileIntegrity_Cancelled" xml:space="preserve"><value>{1}件中{0}件を処理した時点でスキャンをキャンセルしました。</value></data>
 
   <!-- AddEdit View (additional) -->
   <data name="AddEdit_LblDocName" xml:space="preserve"><value>文書名 *</value></data>

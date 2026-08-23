@@ -916,7 +916,8 @@ public class AvaloniaBindingRegressionTests
         {
             window.Show();
 
-            var scanButton = Assert.Single(view.GetVisualDescendants().OfType<Button>());
+            var scanButton = view.GetVisualDescendants().OfType<Button>()
+                .Single(button => AutomationProperties.GetAutomationId(button) == "FileIntegrity_Scan");
             Assert.Same(model.CheckIntegrityCommand, scanButton.Command);
 
             model.CheckIntegrityCommand.Execute(null);
