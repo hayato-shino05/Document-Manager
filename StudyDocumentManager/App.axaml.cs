@@ -108,6 +108,7 @@ public partial class App : Application
         services.AddSingleton<IRelatedDocumentRepository, RelatedDocumentRepository>();
         services.AddSingleton<IRecentFileRepository, RecentFileRepository>();
         services.AddSingleton<IReportRepository, ReportRepository>();
+        services.AddSingleton<ISavedSearchRepository, SavedSearchRepository>();
         services.AddSingleton<ISettingsService, SettingsRepository>();
 
         // Services
@@ -145,6 +146,9 @@ public partial class App : Application
         services.AddSingleton<ILocalizationService>(sp => sp.GetRequiredService<LocalizationService>());
         services.AddSingleton<IUpdateService, Services.UpdateService>();
         services.AddSingleton<IToastService, Services.ToastService>();
+        services.AddSingleton<UndoService>();
+        services.AddSingleton<IUndoService>(sp => sp.GetRequiredService<UndoService>());
+        services.AddSingleton<IUndoApplier, UndoApplier>();
 
         // モデル — メイン
         services.AddSingleton<MainWindowModel>();
@@ -163,6 +167,7 @@ public partial class App : Application
         services.AddTransient<CollectionManagementModel>();
         services.AddTransient<RecycleBinModel>();
         services.AddTransient<FileIntegrityCheckModel>();
+        services.AddTransient<SmartViewsModel>();
 
         // モデル — レポート
         services.AddTransient<ReportModel>();

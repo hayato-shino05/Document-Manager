@@ -32,9 +32,13 @@ public partial class AddEditModel : ModelBase
     [ObservableProperty] private bool _isEditing;
     [ObservableProperty] private bool _hasNameValidationError;
     [ObservableProperty] private string _nameValidationMessage = string.Empty;
+    [ObservableProperty] private string _selectedStatus = DocumentStatus.Unread;
+    [ObservableProperty] private bool _hasStatusValidationError;
+    [ObservableProperty] private string _statusValidationMessage = string.Empty;
 
     [ObservableProperty] private ObservableCollection<string> _subjects = new();
     [ObservableProperty] private ObservableCollection<string> _types = new();
+    [ObservableProperty] private List<StatusOption> _statusOptions = [];
 
     public AddEditModel(IDocumentRepository repository, ICategoryRepository categoryRepo, IDialogService dialogService, IFileDialogService fileDialogService, INavigationService navigationService, ILocalizationService loc)
     {
@@ -50,6 +54,7 @@ public partial class AddEditModel : ModelBase
         PageTitle = _loc["AddEdit_PageTitleAdd"];
         Subjects = new ObservableCollection<string>(_categoryRepo.GetAllSubjects());
         Types = new ObservableCollection<string>(_categoryRepo.GetAllTypes());
+        BuildStatusOptions();
     }
 
     public void AttachLocalization()
@@ -74,9 +79,26 @@ public partial class AddEditModel : ModelBase
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
         PageTitle = _loc[IsEditing ? "AddEdit_PageTitleEdit" : "AddEdit_PageTitleAdd"];
+        BuildStatusOptions();
         if (HasNameValidationError)
             NameValidationMessage = _loc["AddEdit_NameRequired"];
+        if (HasStatusValidationError)
+            StatusValidationMessage = _loc["DS_Error_InvalidStatus"];
     }
+
+    private void BuildStatusOptions()
+        => StatusOptions = [..DocumentStatus.All.Select(s => new StatusOption(s, GetStatusLabel(s)))];
+
+    private string GetStatusLabel(string status) => status switch
+    {
+        DocumentStatus.Unread => _loc["DS_Kind_Unread"],
+        DocumentStatus.InProgress => _loc["DS_Kind_InProgress"],
+        DocumentStatus.Read => _loc["DS_Kind_Read"],
+        DocumentStatus.NeedsAction => _loc["DS_Kind_NeedsAction"],
+        DocumentStatus.Completed => _loc["DS_Kind_Completed"],
+        DocumentStatus.Archived => _loc["DS_Kind_Archived"],
+        _ => status
+    };
 
     public void LoadDocument(int documentId)
     {
@@ -96,6 +118,7 @@ public partial class AddEditModel : ModelBase
         Tags = doc.Tags;
         IsImportant = doc.IsImportant;
         Deadline = doc.Deadline.HasValue ? new DateTimeOffset(doc.Deadline.Value) : null;
+        SelectedStatus = DocumentStatus.IsValid(doc.Status) ? doc.Status : DocumentStatus.Unread;
     }
 
     partial void OnNameChanged(string value)
@@ -105,6 +128,29 @@ public partial class AddEditModel : ModelBase
             HasNameValidationError = false;
             NameValidationMessage = string.Empty;
         }
+    }
+
+    partial void OnSelectedStatusChanged(string value)
+    {
+        if (DocumentStatus.IsValid(value) && HasStatusValidationError)
+        {
+            HasStatusValidationError = false;
+            StatusValidationMessage = string.Empty;
+        }
+    }
+
+    private bool ValidateStatus()
+    {
+        if (DocumentStatus.IsValid(SelectedStatus))
+        {
+            HasStatusValidationError = false;
+            StatusValidationMessage = string.Empty;
+            return true;
+        }
+
+        HasStatusValidationError = true;
+        StatusValidationMessage = _loc["DS_Error_InvalidStatus"];
+        return false;
     }
 
     private bool ValidateName()
@@ -161,6 +207,11 @@ public partial class AddEditModel : ModelBase
             return;
         }
 
+        if (!ValidateStatus())
+        {
+            return;
+        }
+
         var filePath = FilePath.Trim();
         var doc = new StudyDocument
         {
@@ -173,7 +224,8 @@ public partial class AddEditModel : ModelBase
             Tags = Tags.Trim(),
             IsImportant = IsImportant,
             Deadline = Deadline?.DateTime,
-            FileSize = GetFileSize(filePath)
+            FileSize = GetFileSize(filePath),
+            Status = SelectedStatus
         };
 
         try

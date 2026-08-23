@@ -753,6 +753,89 @@
   <data name="FileType_Archive" xml:space="preserve"><value>アーカイブ</value></data>
   <data name="FileType_Design" xml:space="preserve"><value>デザイン</value></data>
   <data name="FileType_Other" xml:space="preserve"><value>その他</value></data>
+
+  <!-- SmartViews View -->
+  <data name="Menu_SmartViews" xml:space="preserve"><value>スマートビュー</value></data>
+  <data name="SV_Title" xml:space="preserve"><value>スマートビュー</value></data>
+  <data name="SV_ListHeader" xml:space="preserve"><value>スマートビュー一覧</value></data>
+  <data name="SV_EmptyState" xml:space="preserve"><value>保存された検索条件がありません。「新規作成」で追加できます</value></data>
+  <data name="SV_New" xml:space="preserve"><value>新規作成</value></data>
+  <data name="SV_Open" xml:space="preserve"><value>実行</value></data>
+  <data name="SV_Edit" xml:space="preserve"><value>編集</value></data>
+  <data name="SV_Duplicate" xml:space="preserve"><value>複製</value></data>
+  <data name="SV_Delete" xml:space="preserve"><value>削除</value></data>
+  <data name="SV_DeleteConfirm" xml:space="preserve"><value>「{0}」を削除しますか？</value></data>
+  <data name="SV_NameRequired" xml:space="preserve"><value>名前を入力してください</value></data>
+  <data name="SV_NameExists" xml:space="preserve"><value>同じ名前のスマートビューが既に存在します</value></data>
+  <data name="SV_Saved" xml:space="preserve"><value>スマートビューを保存しました</value></data>
+  <data name="SV_Deleted" xml:space="preserve"><value>スマートビューを削除しました</value></data>
+  <data name="SV_LoadError" xml:space="preserve"><value>スマートビューの読み込みに失敗しました</value></data>
+  <data name="SV_Kind_Label" xml:space="preserve"><value>条件の種類</value></data>
+  <data name="SV_Kind_Standard" xml:space="preserve"><value>標準条件</value></data>
+  <data name="SV_Kind_Uncategorized" xml:space="preserve"><value>カテゴリ未設定</value></data>
+  <data name="SV_Kind_MissingMetadata" xml:space="preserve"><value>メタデータ欠損</value></data>
+  <data name="SV_Kind_MissingFile" xml:space="preserve"><value>ファイル欠損</value></data>
+  <data name="SV_Kind_RecentlyAdded" xml:space="preserve"><value>最近追加</value></data>
+  <data name="SV_Kind_Important" xml:space="preserve"><value>重要</value></data>
+  <data name="SV_Kind_DueSoon" xml:space="preserve"><value>期限間近</value></data>
+  <data name="SV_Field_Name" xml:space="preserve"><value>名前</value></data>
+  <data name="SV_Field_Keyword" xml:space="preserve"><value>キーワード</value></data>
+  <data name="SV_Field_Subject" xml:space="preserve"><value>科目</value></data>
+  <data name="SV_Field_Type" xml:space="preserve"><value>種類</value></data>
+  <data name="SV_Field_FromDate" xml:space="preserve"><value>追加日（開始）</value></data>
+  <data name="SV_Field_ToDate" xml:space="preserve"><value>追加日（終了）</value></data>
+  <data name="SV_Field_MinSize" xml:space="preserve"><value>最小サイズ (MB)</value></data>
+  <data name="SV_Field_MaxSize" xml:space="preserve"><value>最大サイズ (MB)</value></data>
+  <data name="SV_Field_Important" xml:space="preserve"><value>重要のみ表示</value></data>
+  <data name="SV_Field_RecentDays" xml:space="preserve"><value>対象期間（日）</value></data>
+  <data name="SV_Field_DeadlineDays" xml:space="preserve"><value>期限対象日数（日）</value></data>
+  <data name="SV_Status_Applied" xml:space="preserve"><value>スマートビュー「{0}」を実行しました</value></data>
+
+  <!-- Document Status -->
+  <data name="DS_FilterAll" xml:space="preserve"><value>すべてのステータス</value></data>
+  <data name="DS_Label_Status" xml:space="preserve"><value>ステータス</value></data>
+  <data name="DS_Kind_Unread" xml:space="preserve"><value>未読</value></data>
+  <data name="DS_Kind_InProgress" xml:space="preserve"><value>学習中</value></data>
+  <data name="DS_Kind_Read" xml:space="preserve"><value>既読</value></data>
+  <data name="DS_Kind_NeedsAction" xml:space="preserve"><value>要対応</value></data>
+  <data name="DS_Kind_Completed" xml:space="preserve"><value>完了</value></data>
+  <data name="DS_Kind_Archived" xml:space="preserve"><value>アーカイブ済み</value></data>
+  <data name="DS_Error_InvalidStatus" xml:space="preserve"><value>有効なステータスを選択してください</value></data>
+  <data name="RS_StatusCounts_Title" xml:space="preserve"><value>ステータス別レポート</value></data>
+
+  <!-- Bulk Edit -->
+  <data name="BE_SectionTitle" xml:space="preserve"><value>一括編集</value></data>
+  <data name="BE_Field_Subject" xml:space="preserve"><value>科目</value></data>
+  <data name="BE_Field_Type" xml:space="preserve"><value>種類</value></data>
+  <data name="BE_Field_Tags" xml:space="preserve"><value>タグ</value></data>
+  <data name="BE_Field_Important" xml:space="preserve"><value>重要</value></data>
+  <data name="BE_Field_Deadline" xml:space="preserve"><value>期限</value></data>
+  <data name="BE_Field_Status" xml:space="preserve"><value>ステータス</value></data>
+  <data name="BE_Field_CollectionAdd" xml:space="preserve"><value>コレクションに追加</value></data>
+  <data name="BE_PreviewTitle" xml:space="preserve"><value>一括編集の確認</value></data>
+  <data name="BE_PreviewAffected" xml:space="preserve"><value>{0}件の文書に適用します</value></data>
+  <data name="BE_ConfirmApply" xml:space="preserve"><value>適用</value></data>
+  <data name="BE_Cancel" xml:space="preserve"><value>キャンセル</value></data>
+  <data name="BE_Result_AllSuccess" xml:space="preserve"><value>{0}/{1}件の文書を更新しました</value></data>
+  <data name="BE_Result_Partial" xml:space="preserve"><value>{0}/{1}件のみ更新されました。失敗した文書があります</value></data>
+  <data name="BE_FailedItemsHeader" xml:space="preserve"><value>失敗した文書:</value></data>
+  <data name="BE_Undo" xml:space="preserve"><value>元に戻す</value></data>
+  <data name="BE_UndoDescription" xml:space="preserve"><value>{0}件の文書を一括編集</value></data>
+  <data name="BE_Undone" xml:space="preserve"><value>一括編集を元に戻しました</value></data>
+  <data name="BE_NoSelectionHint" xml:space="preserve"><value>文書を選択してください</value></data>
+  <data name="BE_NoFieldsEnabledHint" xml:space="preserve"><value>編集するフィールドを有効にして値を入力してください</value></data>
+  <data name="BE_CollectionNone" xml:space="preserve"><value>（コレクションなし）</value></data>
+
+  <!-- Undo / Affected preview -->
+  <data name="Menu_Undo" xml:space="preserve"><value>元に戻す</value></data>
+  <data name="UN_Applied" xml:space="preserve"><value>元に戻しました：{0}</value></data>
+  <data name="UN_DeletedDocuments" xml:space="preserve"><value>{0}件の文書を削除</value></data>
+  <data name="UN_CollectionRestorable" xml:space="preserve"><value>コレクション「{0}」を削除（復元可能）</value></data>
+  <data name="UN_Renamed" xml:space="preserve"><value>「{0}」を「{1}」に変更</value></data>
+  <data name="PV_DeleteCollection" xml:space="preserve"><value>このコレクションを削除しますか？</value></data>
+  <data name="PV_CascadeTitle" xml:space="preserve"><value>{0}を削除しますか？</value></data>
+  <data name="PV_MembershipNote" xml:space="preserve"><value>削除後も「元に戻す」でコレクションとメンバー構成を復元できます。文書自体は削除されません。</value></data>
+  <data name="PV_RecycleBinNote" xml:space="preserve"><value>削除された文書はごみ箱から復元できます。「元に戻す」でも復元できます。</value></data>
 </root>
 
 

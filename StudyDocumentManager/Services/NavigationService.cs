@@ -1,4 +1,5 @@
-﻿using StudyDocumentManager.Core.Interfaces;
+﻿using StudyDocumentManager.Core.Entities;
+using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Models;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -44,6 +45,8 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             "treemap" => serviceProvider.GetRequiredService<TreeMapModel>(),
             "personal-note" => CreatePersonalNoteModel(parameter),
             "related-docs" => CreateRelatedDocsModel(parameter),
+            "smartviews" or "smart-views" or "savedsearches" => serviceProvider.GetRequiredService<SmartViewsModel>(),
+            "run-smartview" => CreateDashboardWithSavedSearch(parameter),
             _ => serviceProvider.GetRequiredService<DashboardModel>(),
         };
 
@@ -86,6 +89,21 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
         if (parameter is (int docId, string docName))
         {
             vm.Load(docId, docName);
+        }
+        return vm;
+    }
+
+    private DashboardModel CreateDashboardWithSavedSearch(object? parameter)
+    {
+        var vm = serviceProvider.GetRequiredService<DashboardModel>();
+        if (parameter is int savedSearchId)
+        {
+            var savedSearch = serviceProvider.GetRequiredService<ISavedSearchRepository>().GetById(savedSearchId);
+            var criteria = savedSearch == null ? null : SavedSearchCriteria.FromJson(savedSearch.CriteriaJson);
+            if (criteria != null)
+            {
+                vm.ApplySavedSearch(criteria);
+            }
         }
         return vm;
     }

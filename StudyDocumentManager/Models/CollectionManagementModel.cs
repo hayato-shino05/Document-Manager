@@ -15,6 +15,7 @@ public partial class CollectionManagementModel : ModelBase
     private readonly IDialogService _dialogService;
     private readonly ICustomDialogService _customDialogService;
     private readonly ILocalizationService _loc;
+    private readonly IUndoService? _undo;
 
     [ObservableProperty] private ObservableCollection<CollectionItem> _collections = [];
     [ObservableProperty] private CollectionItem? _selectedCollection;
@@ -23,13 +24,14 @@ public partial class CollectionManagementModel : ModelBase
     [ObservableProperty] private ObservableCollection<StudyDocument> _allDocuments = [];
     [ObservableProperty] private IList _selectedDocumentsInCollection = new List<StudyDocument>();
 
-    public CollectionManagementModel(IDocumentRepository repository, ICollectionRepository collectionRepo, IDialogService dialogService, ICustomDialogService customDialogService, ILocalizationService loc)
+    public CollectionManagementModel(IDocumentRepository repository, ICollectionRepository collectionRepo, IDialogService dialogService, ICustomDialogService customDialogService, ILocalizationService loc, IUndoService? undoService = null)
     {
         _repository = repository;
         _collectionRepo = collectionRepo;
         _dialogService = dialogService;
         _customDialogService = customDialogService;
         _loc = loc;
+        _undo = undoService;
         LoadCollections();
     }
 
@@ -129,9 +131,22 @@ public partial class CollectionManagementModel : ModelBase
         if (SelectedCollection == null) return;
 
         var collectionId = SelectedCollection.Id;
-        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
-            string.Format(_loc["Collection_ConfirmDelete"], SelectedCollection.Name),
-            _loc["Action_Delete"], isDanger: true);
+        var collectionName = SelectedCollection.Name;
+        var collectionDescription = SelectedCollection.Description;
+
+        List<StudyDocument> memberDocuments;
+        try
+        {
+            memberDocuments = _collectionRepo.GetDocuments(collectionId);
+        }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"],
+                string.Format(_loc["Collection_LoadError"], ex.Message));
+            return;
+        }
+
+        var confirmed = await ConfirmDeletePreviewAsync(collectionName, memberDocuments);
         if (!confirmed) return;
 
         try
@@ -141,6 +156,14 @@ public partial class CollectionManagementModel : ModelBase
                 await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
                 return;
             }
+
+            _undo?.Push(new UndoEntry
+            {
+                DescriptionKey = "UN_CollectionRestorable",
+                DescriptionArgs = [collectionName],
+                Collection = new CollectionSnapshot(collectionName, collectionDescription, [.. memberDocuments.Select(d => d.Id)]),
+                CreatedAt = DateTime.Now
+            });
 
             SelectedCollection = null;
             LoadCollections();
@@ -283,6 +306,24 @@ public partial class CollectionManagementModel : ModelBase
 
     [RelayCommand]
     private void Refresh() => LoadCollections();
+
+    private async Task<bool> ConfirmDeletePreviewAsync(string collectionName, List<StudyDocument> memberDocuments)
+    {
+        try
+        {
+            return await _customDialogService.ShowAffectedItemsPreviewAsync(
+                _loc["PV_DeleteCollection"],
+                memberDocuments.Count,
+                memberDocuments.Select(d => d.Name).ToList(),
+                _loc["PV_MembershipNote"]);
+        }
+        catch (NotSupportedException)
+        {
+            return await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"],
+                string.Format(_loc["Collection_ConfirmDelete"], collectionName),
+                _loc["Action_Delete"], isDanger: true);
+        }
+    }
 }
 
 public class CollectionItem

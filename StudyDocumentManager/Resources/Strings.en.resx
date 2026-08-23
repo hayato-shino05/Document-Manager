@@ -645,4 +645,87 @@ Please check your network connection.</value></data>
   <data name="FileType_Archive" xml:space="preserve"><value>Archive</value></data>
   <data name="FileType_Design" xml:space="preserve"><value>Design</value></data>
   <data name="FileType_Other" xml:space="preserve"><value>Other</value></data>
+
+  <!-- SmartViews View -->
+  <data name="Menu_SmartViews" xml:space="preserve"><value>Smart Views</value></data>
+  <data name="SV_Title" xml:space="preserve"><value>Smart Views</value></data>
+  <data name="SV_ListHeader" xml:space="preserve"><value>Saved Views</value></data>
+  <data name="SV_EmptyState" xml:space="preserve"><value>No saved searches yet. Create one with "New"</value></data>
+  <data name="SV_New" xml:space="preserve"><value>New</value></data>
+  <data name="SV_Open" xml:space="preserve"><value>Run</value></data>
+  <data name="SV_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="SV_Duplicate" xml:space="preserve"><value>Duplicate</value></data>
+  <data name="SV_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="SV_DeleteConfirm" xml:space="preserve"><value>Delete "{0}"?</value></data>
+  <data name="SV_NameRequired" xml:space="preserve"><value>Please enter a name</value></data>
+  <data name="SV_NameExists" xml:space="preserve"><value>A smart view with the same name already exists</value></data>
+  <data name="SV_Saved" xml:space="preserve"><value>Smart view saved</value></data>
+  <data name="SV_Deleted" xml:space="preserve"><value>Smart view deleted</value></data>
+  <data name="SV_LoadError" xml:space="preserve"><value>Failed to load smart views</value></data>
+  <data name="SV_Kind_Label" xml:space="preserve"><value>Criteria Kind</value></data>
+  <data name="SV_Kind_Standard" xml:space="preserve"><value>Standard criteria</value></data>
+  <data name="SV_Kind_Uncategorized" xml:space="preserve"><value>Uncategorized</value></data>
+  <data name="SV_Kind_MissingMetadata" xml:space="preserve"><value>Missing metadata</value></data>
+  <data name="SV_Kind_MissingFile" xml:space="preserve"><value>Missing file</value></data>
+  <data name="SV_Kind_RecentlyAdded" xml:space="preserve"><value>Recently added</value></data>
+  <data name="SV_Kind_Important" xml:space="preserve"><value>Important</value></data>
+  <data name="SV_Kind_DueSoon" xml:space="preserve"><value>Due soon</value></data>
+  <data name="SV_Field_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="SV_Field_Keyword" xml:space="preserve"><value>Keyword</value></data>
+  <data name="SV_Field_Subject" xml:space="preserve"><value>Subject</value></data>
+  <data name="SV_Field_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="SV_Field_FromDate" xml:space="preserve"><value>Added from</value></data>
+  <data name="SV_Field_ToDate" xml:space="preserve"><value>Added to</value></data>
+  <data name="SV_Field_MinSize" xml:space="preserve"><value>Min size (MB)</value></data>
+  <data name="SV_Field_MaxSize" xml:space="preserve"><value>Max size (MB)</value></data>
+  <data name="SV_Field_Important" xml:space="preserve"><value>Important only</value></data>
+  <data name="SV_Field_RecentDays" xml:space="preserve"><value>Period (days)</value></data>
+  <data name="SV_Field_DeadlineDays" xml:space="preserve"><value>Deadline window (days)</value></data>
+  <data name="SV_Status_Applied" xml:space="preserve"><value>Smart view "{0}" applied</value></data>
+
+  <!-- Document Status -->
+  <data name="DS_FilterAll" xml:space="preserve"><value>All Statuses</value></data>
+  <data name="DS_Label_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="DS_Kind_Unread" xml:space="preserve"><value>Unread</value></data>
+  <data name="DS_Kind_InProgress" xml:space="preserve"><value>In Progress</value></data>
+  <data name="DS_Kind_Read" xml:space="preserve"><value>Read</value></data>
+  <data name="DS_Kind_NeedsAction" xml:space="preserve"><value>Needs Action</value></data>
+  <data name="DS_Kind_Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="DS_Kind_Archived" xml:space="preserve"><value>Archived</value></data>
+  <data name="DS_Error_InvalidStatus" xml:space="preserve"><value>Please select a valid status</value></data>
+  <data name="RS_StatusCounts_Title" xml:space="preserve"><value>Reports by Status</value></data>
+
+  <!-- Bulk Edit -->
+  <data name="BE_SectionTitle" xml:space="preserve"><value>Bulk Edit</value></data>
+  <data name="BE_Field_Subject" xml:space="preserve"><value>Subject</value></data>
+  <data name="BE_Field_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="BE_Field_Tags" xml:space="preserve"><value>Tags</value></data>
+  <data name="BE_Field_Important" xml:space="preserve"><value>Important</value></data>
+  <data name="BE_Field_Deadline" xml:space="preserve"><value>Deadline</value></data>
+  <data name="BE_Field_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="BE_Field_CollectionAdd" xml:space="preserve"><value>Add to Collection</value></data>
+  <data name="BE_PreviewTitle" xml:space="preserve"><value>Confirm Bulk Edit</value></data>
+  <data name="BE_PreviewAffected" xml:space="preserve"><value>This will update {0} documents</value></data>
+  <data name="BE_ConfirmApply" xml:space="preserve"><value>Apply</value></data>
+  <data name="BE_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="BE_Result_AllSuccess" xml:space="preserve"><value>Updated {0}/{1} documents</value></data>
+  <data name="BE_Result_Partial" xml:space="preserve"><value>Only {0}/{1} documents were updated. Some failed</value></data>
+  <data name="BE_FailedItemsHeader" xml:space="preserve"><value>Failed documents:</value></data>
+  <data name="BE_Undo" xml:space="preserve"><value>Undo</value></data>
+  <data name="BE_UndoDescription" xml:space="preserve"><value>Bulk edit of {0} documents</value></data>
+  <data name="BE_Undone" xml:space="preserve"><value>Bulk edit undone</value></data>
+  <data name="BE_NoSelectionHint" xml:space="preserve"><value>Select at least one document</value></data>
+  <data name="BE_NoFieldsEnabledHint" xml:space="preserve"><value>Enable at least one field and enter a value</value></data>
+  <data name="BE_CollectionNone" xml:space="preserve"><value>(No collection)</value></data>
+
+  <!-- Undo / Affected preview -->
+  <data name="Menu_Undo" xml:space="preserve"><value>Undo</value></data>
+  <data name="UN_Applied" xml:space="preserve"><value>Undone: {0}</value></data>
+  <data name="UN_DeletedDocuments" xml:space="preserve"><value>Deleted {0} documents</value></data>
+  <data name="UN_CollectionRestorable" xml:space="preserve"><value>Deleted collection '{0}' (restorable)</value></data>
+  <data name="UN_Renamed" xml:space="preserve"><value>Renamed '{0}' to '{1}'</value></data>
+  <data name="PV_DeleteCollection" xml:space="preserve"><value>Delete this collection?</value></data>
+  <data name="PV_CascadeTitle" xml:space="preserve"><value>Delete {0}?</value></data>
+  <data name="PV_MembershipNote" xml:space="preserve"><value>The collection and its members can be restored afterwards with Undo. The documents themselves are not deleted.</value></data>
+  <data name="PV_RecycleBinNote" xml:space="preserve"><value>Deleted documents can be restored from the Recycle Bin or with Undo.</value></data>
 </root>

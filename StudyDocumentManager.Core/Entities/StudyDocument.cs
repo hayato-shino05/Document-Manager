@@ -18,6 +18,7 @@ public class StudyDocument
     public bool IsImportant { get; set; }
     public string Tags { get; set; } = string.Empty;
     public DateTime? Deadline { get; set; }
+    public string Status { get; set; } = DocumentStatus.Unread;
 
     public StudyDocument()
     {

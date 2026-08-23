@@ -1,0 +1,286 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             x:Class="StudyDocumentManager.Views.SmartViews"
+             x:DataType="vm:SmartViewsModel"
+             AutomationProperties.AutomationId="Screen_SmartViews">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="{StaticResource IconFilter}" Width="20" Height="20"/>
+                    <TextBlock AutomationProperties.AutomationId="Title_SmartViews"
+                               Text="{loc:Localize SV_Title}" FontSize="{StaticResource FontSizeXl}"
+                               FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+            </DockPanel>
+
+            <Grid ColumnDefinitions="300,16,*">
+
+                <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
+                                CornerRadius="6,6,0,0" Padding="{StaticResource PaddingMd}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Image Source="{StaticResource IconCollection}" Width="14" Height="14"/>
+                                <TextBlock Text="{loc:Localize SV_ListHeader}" FontSize="{StaticResource FontSizeLg}"
+                                           FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6"
+                                    Margin="{StaticResource PaddingMd}">
+                            <Button Classes="primary" x:Name="btnNew"
+                                    AutomationProperties.AutomationId="SmartViews_New"
+                                    Command="{Binding NewCommand}">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="{StaticResource IconAddWhite}" Width="14" Height="14"/>
+                                    <TextBlock Text="{loc:Localize SV_New}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="secondary" x:Name="btnRefresh"
+                                    AutomationProperties.AutomationId="SmartViews_Refresh"
+                                    Command="{Binding RefreshCommand}">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="{StaticResource IconRefresh}" Width="14" Height="14"/>
+                                    <TextBlock Text="{loc:Localize Action_Refresh}" FontSize="{StaticResource FontSizeSm}"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                        <Panel>
+                            <ListBox x:Name="lstViews"
+                                     ItemsSource="{Binding SavedViews}"
+                                     SelectedItem="{Binding SelectedSavedSearch}"
+                                     Padding="{StaticResource PaddingIcon}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="6,6">
+                                            <Image Source="{StaticResource IconFilter}" Width="14" Height="14"/>
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMd}"
+                                                           FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
+                                                <TextBlock Text="{Binding KindLabel}" FontSize="{StaticResource FontSizeXs}"
+                                                           Foreground="{StaticResource TextSecondary}" TextTrimming="CharacterEllipsis"
+                                                           MaxWidth="220"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <StackPanel Classes="empty-state" IsVisible="{Binding IsLoading}">
+                                <ProgressBar IsIndeterminate="True" Width="180" Height="4"/>
+                                <TextBlock Classes="empty-state-text" Text="{loc:Localize Status_Loading}"/>
+                            </StackPanel>
+
+                            <StackPanel Classes="empty-state" IsVisible="{Binding HasLoadError}">
+                                <Image Classes="empty-state-icon" Source="{StaticResource IconWarning}"/>
+                                <TextBlock Classes="empty-state-text" Text="{loc:Localize SV_LoadError}"/>
+                            </StackPanel>
+
+                            <StackPanel Classes="empty-state" IsVisible="{Binding IsEmptyState}">
+                                <Image Classes="empty-state-icon" Source="{StaticResource IconDocPage}"/>
+                                <TextBlock Classes="empty-state-text" Text="{loc:Localize SV_EmptyState}"/>
+                            </StackPanel>
+                        </Panel>
+                    </DockPanel>
+                </Border>
+
+                <Border Grid.Column="2" Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="{StaticResource PaddingCardLg}" Spacing="12">
+
+                            <StackPanel Orientation="Horizontal" Spacing="6"
+                                        IsVisible="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                <Button Classes="secondary" x:Name="btnOpen"
+                                        AutomationProperties.AutomationId="SmartViews_Open"
+                                        Command="{Binding OpenCommand}"
+                                        IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <Image Source="{StaticResource IconOpenFile}" Width="13" Height="13"/>
+                                        <TextBlock Text="{loc:Localize SV_Open}" FontSize="{StaticResource FontSizeSm}"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="secondary" x:Name="btnEdit"
+                                        AutomationProperties.AutomationId="SmartViews_Edit"
+                                        Command="{Binding EditCommand}"
+                                        IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <Image Source="{StaticResource IconEdit}" Width="13" Height="13"/>
+                                        <TextBlock Text="{loc:Localize SV_Edit}" FontSize="{StaticResource FontSizeSm}"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="secondary" x:Name="btnDuplicate"
+                                        AutomationProperties.AutomationId="SmartViews_Duplicate"
+                                        Command="{Binding DuplicateCommand}"
+                                        IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <TextBlock Text="{loc:Localize SV_Duplicate}" FontSize="{StaticResource FontSizeSm}"/>
+                                </Button>
+                                <Button Classes="danger" x:Name="btnDelete"
+                                        AutomationProperties.AutomationId="SmartViews_Delete"
+                                        Command="{Binding DeleteCommand}"
+                                        IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <Image Source="{StaticResource IconDeleteWhite}" Width="13" Height="13"/>
+                                        <TextBlock Text="{loc:Localize SV_Delete}" FontSize="{StaticResource FontSizeSm}"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+
+                            <StackPanel IsVisible="{Binding ShowNoSelectionHint}"
+                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8"
+                                        Margin="0,40,0,0">
+                                <Image Source="{StaticResource IconFilter}" Width="36" Height="36" Opacity="0.4"/>
+                                <TextBlock Text="{loc:Localize SV_EmptyState}"
+                                           FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+
+                            <Border IsVisible="{Binding IsEditing}"
+                                    Background="{StaticResource SidebarBackground}"
+                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                                    CornerRadius="{StaticResource RadiusMd}"
+                                    Padding="{StaticResource PaddingCardLg}">
+                                <StackPanel Spacing="10">
+
+                                    <StackPanel Spacing="{StaticResource Space1}">
+                                        <TextBlock Text="{loc:Localize SV_Field_Name}" Classes="field-label"/>
+                                        <TextBox x:Name="txtEditorName"
+                                                 Watermark="{loc:Localize SV_Field_Name}"
+                                                 Text="{Binding EditorName, Mode=TwoWay}"
+                                                 AutomationProperties.Name="{loc:Localize SV_Field_Name}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="{StaticResource Space1}">
+                                        <TextBlock Text="{loc:Localize SV_Kind_Label}" Classes="field-label"/>
+                                        <ComboBox x:Name="cmbKind"
+                                                  ItemsSource="{Binding KindOptions}"
+                                                  SelectedItem="{Binding SelectedKindOption, Mode=TwoWay}"
+                                                  HorizontalAlignment="Stretch"
+                                                  AutomationProperties.Name="{loc:Localize SV_Kind_Label}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Label}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="{StaticResource Space1}">
+                                        <TextBlock Text="{loc:Localize SV_Field_Keyword}" Classes="field-label"/>
+                                        <TextBox x:Name="txtEditorKeyword"
+                                                 Watermark="{loc:Localize SV_Field_Keyword}"
+                                                 Text="{Binding EditorKeyword, Mode=TwoWay}"
+                                                 AutomationProperties.Name="{loc:Localize SV_Field_Keyword}"/>
+                                    </StackPanel>
+
+                                    <Grid ColumnDefinitions="*,12,*">
+                                        <StackPanel Grid.Column="0" Spacing="{StaticResource Space1}">
+                                            <TextBlock Text="{loc:Localize SV_Field_Subject}" Classes="field-label"/>
+                                            <ComboBox x:Name="cmbEditorSubject"
+                                                      ItemsSource="{Binding Subjects}"
+                                                      SelectedItem="{Binding EditorSubject, Mode=TwoWay}"
+                                                      HorizontalAlignment="Stretch"
+                                                      PlaceholderText="{loc:Localize Filter_AllSubjects}"
+                                                      AutomationProperties.Name="{loc:Localize SV_Field_Subject}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Spacing="{StaticResource Space1}">
+                                            <TextBlock Text="{loc:Localize SV_Field_Type}" Classes="field-label"/>
+                                            <ComboBox x:Name="cmbEditorType"
+                                                      ItemsSource="{Binding Types}"
+                                                      SelectedItem="{Binding EditorType, Mode=TwoWay}"
+                                                      HorizontalAlignment="Stretch"
+                                                      PlaceholderText="{loc:Localize Filter_AllTypes}"
+                                                      AutomationProperties.Name="{loc:Localize SV_Field_Type}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <StackPanel Spacing="{StaticResource Space1}"
+                                                IsVisible="{Binding IsStandardFieldsVisible}">
+                                        <TextBlock Text="{loc:Localize SV_Field_FromDate}" Classes="field-label"/>
+                                        <DatePicker x:Name="dpEditorFromDate"
+                                                    SelectedDate="{Binding EditorFromDate}"
+                                                    HorizontalAlignment="Stretch"
+                                                    AutomationProperties.Name="{loc:Localize SV_Field_FromDate}"/>
+                                        <TextBlock Text="{loc:Localize SV_Field_ToDate}" Classes="field-label"/>
+                                        <DatePicker x:Name="dpEditorToDate"
+                                                    SelectedDate="{Binding EditorToDate}"
+                                                    HorizontalAlignment="Stretch"
+                                                    AutomationProperties.Name="{loc:Localize SV_Field_ToDate}"/>
+                                    </StackPanel>
+
+                                    <Grid ColumnDefinitions="*,12,*" IsVisible="{Binding IsStandardFieldsVisible}">
+                                        <StackPanel Grid.Column="0" Spacing="{StaticResource Space1}">
+                                            <TextBlock Text="{loc:Localize SV_Field_MinSize}" Classes="field-label"/>
+                                            <NumericUpDown x:Name="numEditorMinSize"
+                                                           Value="{Binding EditorMinSize}"
+                                                           Minimum="0" FormatString="F1"
+                                                           HorizontalAlignment="Stretch"
+                                                           AutomationProperties.Name="{loc:Localize SV_Field_MinSize}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Spacing="{StaticResource Space1}">
+                                            <TextBlock Text="{loc:Localize SV_Field_MaxSize}" Classes="field-label"/>
+                                            <NumericUpDown x:Name="numEditorMaxSize"
+                                                           Value="{Binding EditorMaxSize}"
+                                                           Minimum="0" FormatString="F1"
+                                                           HorizontalAlignment="Stretch"
+                                                           AutomationProperties.Name="{loc:Localize SV_Field_MaxSize}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <CheckBox x:Name="chkEditorImportant"
+                                              IsChecked="{Binding EditorIsImportantOnly}"
+                                              IsVisible="{Binding IsStandardFieldsVisible}"
+                                              Content="{loc:Localize SV_Field_Important}"/>
+
+                                    <StackPanel Spacing="{StaticResource Space1}"
+                                                IsVisible="{Binding IsRecentDaysVisible}">
+                                        <TextBlock Text="{loc:Localize SV_Field_RecentDays}" Classes="field-label"/>
+                                        <NumericUpDown x:Name="numEditorRecentDays"
+                                                       Value="{Binding EditorRecentDays}"
+                                                       Minimum="1" Maximum="365" Increment="1"
+                                                       HorizontalAlignment="Stretch"
+                                                       AutomationProperties.Name="{loc:Localize SV_Field_RecentDays}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="{StaticResource Space1}"
+                                                IsVisible="{Binding IsDeadlineDaysVisible}">
+                                        <TextBlock Text="{loc:Localize SV_Field_DeadlineDays}" Classes="field-label"/>
+                                        <NumericUpDown x:Name="numEditorDeadlineDays"
+                                                       Value="{Binding EditorDeadlineDays}"
+                                                       Minimum="1" Maximum="365" Increment="1"
+                                                       HorizontalAlignment="Stretch"
+                                                       AutomationProperties.Name="{loc:Localize SV_Field_DeadlineDays}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Button Classes="primary" x:Name="btnSave"
+                                                AutomationProperties.AutomationId="SmartViews_Save"
+                                                Command="{Binding SaveCommand}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <Image Source="{StaticResource IconCheck}" Width="13" Height="13"/>
+                                                <TextBlock Text="{loc:Localize Action_Save}" FontSize="{StaticResource FontSizeSm}"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Classes="secondary" x:Name="btnCancelEdit"
+                                                Command="{Binding CancelEditCommand}"
+                                                Content="{loc:Localize Action_Cancel}"/>
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+
+            </Grid>
+        </DockPanel>
+    </Border>
+
+</UserControl>

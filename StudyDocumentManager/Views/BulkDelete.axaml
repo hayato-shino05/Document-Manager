@@ -38,6 +38,15 @@
 
                     <Border Width="1" Height="20" Background="{StaticResource CardBorder}" Margin="4,0"/>
 
+                    <Button Classes="secondary" Command="{Binding UndoLastCommand}"
+                            AutomationProperties.AutomationId="BulkDelete_Undo"
+                            AutomationProperties.Name="{loc:Localize BE_Undo}"
+                            Padding="12,5">
+                        <TextBlock Text="{loc:Localize BE_Undo}" FontSize="{StaticResource FontSizeSm}"/>
+                    </Button>
+
+                    <Border Width="1" Height="20" Background="{StaticResource CardBorder}" Margin="4,0"/>
+
                     <TextBlock Text="{loc:Localize AddEdit_LblSubject}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
                                Foreground="{StaticResource TextSecondary}"/>
                     <ComboBox Name="cboSubject" Width="130" FontSize="{StaticResource FontSizeSm}" Height="28" VerticalAlignment="Center"/>
@@ -47,6 +56,97 @@
                     <ComboBox Name="cboType" Width="110" FontSize="{StaticResource FontSizeSm}" Height="28" VerticalAlignment="Center"/>
                     </StackPanel>
                 </ScrollViewer>
+            </Border>
+
+            <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                    Padding="{StaticResource PaddingMd}" Margin="0,0,0,12">
+                <Expander Header="{loc:Localize BE_SectionTitle}" IsExpanded="False"
+                          HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <UniformGrid Columns="2" Margin="0,8,0,0">
+                        <StackPanel Spacing="{StaticResource Space1}" Margin="0,0,12,8">
+                            <CheckBox AutomationProperties.AutomationId="BulkEdit_EnableSubject"
+                                      Content="{loc:Localize BE_Field_Subject}"
+                                      IsChecked="{Binding EnableSubject}"/>
+                            <TextBox Height="28" Text="{Binding NewSubject, Mode=TwoWay}"
+                                     IsEnabled="{Binding EnableSubject}"
+                                     AutomationProperties.AutomationId="BulkEdit_NewSubject"
+                                     AutomationProperties.Name="{loc:Localize BE_Field_Subject}"/>
+                        </StackPanel>
+                        <StackPanel Spacing="{StaticResource Space1}" Margin="0,0,0,8">
+                            <CheckBox AutomationProperties.AutomationId="BulkEdit_EnableType"
+                                      Content="{loc:Localize BE_Field_Type}"
+                                      IsChecked="{Binding EnableType}"/>
+                            <TextBox Height="28" Text="{Binding NewType, Mode=TwoWay}"
+                                     IsEnabled="{Binding EnableType}"
+                                     AutomationProperties.AutomationId="BulkEdit_NewType"
+                                     AutomationProperties.Name="{loc:Localize BE_Field_Type}"/>
+                        </StackPanel>
+                        <StackPanel Spacing="{StaticResource Space1}" Margin="0,0,12,8">
+                            <CheckBox AutomationProperties.AutomationId="BulkEdit_EnableTags"
+                                      Content="{loc:Localize BE_Field_Tags}"
+                                      IsChecked="{Binding EnableTags}"/>
+                            <TextBox Height="28" Text="{Binding NewTags, Mode=TwoWay}"
+                                     IsEnabled="{Binding EnableTags}"
+                                     AutomationProperties.AutomationId="BulkEdit_NewTags"
+                                     AutomationProperties.Name="{loc:Localize BE_Field_Tags}"/>
+                        </StackPanel>
+                        <StackPanel Spacing="{StaticResource Space1}" Margin="0,0,0,8">
+                            <CheckBox AutomationProperties.AutomationId="BulkEdit_EnableImportant"
+                                      Content="{loc:Localize BE_Field_Important}"
+                                      IsChecked="{Binding EnableImportant}"/>
+                            <CheckBox AutomationProperties.AutomationId="BulkEdit_NewImportant"
+                                      Content="{loc:Localize Dashboard_CsvYes}"
+                                      IsChecked="{Binding NewImportant, Mode=TwoWay}"
+                                      IsEnabled="{Binding EnableImportant}"
+                                      Margin="16,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel Spacing="{StaticResource Space1}" Margin="0,0,12,8">
+                            <CheckBox AutomationProperties.AutomationId="BulkEdit_EnableDeadline"
+                                      Content="{loc:Localize BE_Field_Deadline}"
+                                      IsChecked="{Binding EnableDeadline}"/>
+                            <DatePicker SelectedDate="{Binding NewDeadline}"
+                                        IsEnabled="{Binding EnableDeadline}"
+                                        HorizontalAlignment="Stretch"
+                                        AutomationProperties.AutomationId="BulkEdit_NewDeadline"
+                                        AutomationProperties.Name="{loc:Localize BE_Field_Deadline}"/>
+                        </StackPanel>
+                        <StackPanel Spacing="{StaticResource Space1}" Margin="0,0,0,8">
+                            <CheckBox AutomationProperties.AutomationId="BulkEdit_EnableStatus"
+                                      Content="{loc:Localize BE_Field_Status}"
+                                      IsChecked="{Binding EnableStatus}"/>
+                            <ComboBox ItemsSource="{Binding StatusOptions}"
+                                      SelectedItem="{Binding SelectedStatusOption}"
+                                      IsEnabled="{Binding EnableStatus}"
+                                      HorizontalAlignment="Stretch"
+                                      AutomationProperties.AutomationId="BulkEdit_NewStatus"
+                                      AutomationProperties.Name="{loc:Localize BE_Field_Status}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Display}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Spacing="{StaticResource Space1}" Margin="0,0,12,0">
+                            <CheckBox AutomationProperties.AutomationId="BulkEdit_EnableCollectionAdd"
+                                      Content="{loc:Localize BE_Field_CollectionAdd}"
+                                      IsChecked="{Binding EnableCollectionAdd}"/>
+                            <ComboBox ItemsSource="{Binding CollectionOptions}"
+                                      SelectedItem="{Binding SelectedCollectionOption}"
+                                      IsEnabled="{Binding EnableCollectionAdd}"
+                                      HorizontalAlignment="Stretch"
+                                      AutomationProperties.AutomationId="BulkEdit_NewCollection"
+                                      AutomationProperties.Name="{loc:Localize BE_Field_CollectionAdd}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Label}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                    </UniformGrid>
+                </Expander>
             </Border>
 
             <Border DockPanel.Dock="Bottom" Background="{StaticResource SidebarBackground}"

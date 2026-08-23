@@ -22,6 +22,9 @@ public partial class MainWindowModel : ModelBase
     [ObservableProperty]
     private SupportedLanguage _selectedLanguage;
 
+    [ObservableProperty]
+    private bool _canUndo;
+
     public IReadOnlyList<SupportedLanguage> AvailableLanguages => _loc.AvailableLanguages;
 
     public bool CanGoBack => _navigationService.CanGoBack;
@@ -35,6 +38,8 @@ public partial class MainWindowModel : ModelBase
     private readonly ILocalizationService _loc;
     private readonly ISettingsService _settingsService;
     private readonly IUpdateService _updateService;
+    private readonly IUndoApplier? _undoApplier;
+    private readonly IUndoService? _undoService;
     private string? _statusKey = "Status_TotalDocs";
     private object[] _statusArguments = [0];
 
@@ -47,7 +52,9 @@ public partial class MainWindowModel : ModelBase
         IApplicationLifecycleService lifecycleService,
         ILocalizationService loc,
         ISettingsService settingsService,
-        IUpdateService updateService)
+        IUpdateService updateService,
+        IUndoApplier? undoApplier = null,
+        IUndoService? undoService = null)
     {
         _navigationService = navigationService;
         _dialogService = dialogService;
@@ -57,8 +64,15 @@ public partial class MainWindowModel : ModelBase
         _loc = loc;
         _settingsService = settingsService;
         _updateService = updateService;
+        _undoApplier = undoApplier;
+        _undoService = undoService;
         _currentView = dashboardModel;
         _statusText = FormatLocalizedStatus();
+        if (_undoService != null)
+        {
+            CanUndo = _undoApplier != null && _undoService.CanUndo;
+            _undoService.StackChanged += () => CanUndo = _undoApplier != null && _undoApplier.CanUndo;
+        }
         _loc.LanguageChanged += (_, _) =>
         {
             if (_statusKey != null)
@@ -131,6 +145,47 @@ public partial class MainWindowModel : ModelBase
         {
             _navigationService.GoBack();
             OnPropertyChanged(nameof(CanGoBack));
+        }
+    }
+
+    [RelayCommand]
+    private async Task UndoLastAsync()
+    {
+        if (!CanUndo || _undoApplier == null) return;
+
+        var entry = _undoService?.Peek();
+        try
+        {
+            _undoApplier.ApplyLast();
+        }
+        catch (Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+            return;
+        }
+
+        if (entry != null)
+        {
+            var detail = string.Format(_loc[entry.DescriptionKey], entry.DescriptionArgs ?? []);
+            SetLocalizedStatus("UN_Applied", detail);
+        }
+
+        RefreshCurrentViewAfterUndo();
+    }
+
+    private void RefreshCurrentViewAfterUndo()
+    {
+        switch (CurrentView)
+        {
+            case DashboardModel dashboard:
+                dashboard.RefreshCommand.Execute(null);
+                break;
+            case CategoryManagementModel categoryManagement:
+                categoryManagement.RefreshCommand.Execute(null);
+                break;
+            case CollectionManagementModel collectionManagement:
+                collectionManagement.RefreshCommand.Execute(null);
+                break;
         }
     }
 
@@ -214,6 +269,9 @@ public partial class MainWindowModel : ModelBase
                 break;
             case CategoryManagementModel catMgmt:
                 SetExternalStatus(catMgmt.StatusText);
+                break;
+            case SmartViewsModel smartViews:
+                SetExternalStatus(smartViews.StatusText);
                 break;
             default:
                 SetExternalStatus(string.Empty);

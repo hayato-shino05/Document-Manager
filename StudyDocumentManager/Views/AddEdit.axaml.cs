@@ -8,6 +8,7 @@ public partial class AddEdit : UserControl
 {
     private AddEditModel? _model;
     private bool _propertyChangedSubscribed;
+    private bool _syncingStatus;
 
     public AddEdit()
     {
@@ -16,6 +17,12 @@ public partial class AddEdit : UserControl
         AttachedToVisualTree += OnAttachedToVisualTree;
         DetachedFromVisualTree += OnDetachedFromVisualTree;
         SizeChanged += OnSizeChanged;
+        cmbStatus.SelectionChanged += (_, _) =>
+        {
+            if (_syncingStatus || cmbStatus.SelectedItem is not StatusOption option) return;
+            if (_model != null)
+                _model.SelectedStatus = option.Value;
+        };
     }
 
     private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
@@ -85,6 +92,7 @@ public partial class AddEdit : UserControl
 
         _model.PropertyChanged += OnModelPropertyChanged;
         _propertyChangedSubscribed = true;
+        SyncStatusCombo(_model);
     }
 
     private void DetachModelHandlers()
@@ -106,6 +114,27 @@ public partial class AddEdit : UserControl
             && sender is AddEditModel { HasNameValidationError: true })
         {
             this.FindControl<TextBox>("txtName")?.Focus();
+        }
+        else if (e.PropertyName is nameof(AddEditModel.StatusOptions) or nameof(AddEditModel.SelectedStatus))
+        {
+            SyncStatusCombo(sender as AddEditModel);
+        }
+    }
+
+    private void SyncStatusCombo(AddEditModel? model)
+    {
+        if (model is null)
+            return;
+
+        _syncingStatus = true;
+        try
+        {
+            cmbStatus.ItemsSource = model.StatusOptions;
+            cmbStatus.SelectedItem = model.StatusOptions.FirstOrDefault(o => o.Value == model.SelectedStatus);
+        }
+        finally
+        {
+            _syncingStatus = false;
         }
     }
 }

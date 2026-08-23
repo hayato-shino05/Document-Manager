@@ -29,7 +29,8 @@ public static class DatabaseMigrator
                 tags TEXT,
                 deadline DATETIME,
                 is_deleted INTEGER DEFAULT 0,
-                deleted_at DATETIME
+                deleted_at DATETIME,
+                status TEXT NOT NULL DEFAULT 'unread'
             );
 
             CREATE TABLE IF NOT EXISTS collections (
@@ -93,6 +94,13 @@ public static class DatabaseMigrator
                 value TEXT
             );
 
+            CREATE TABLE IF NOT EXISTS saved_searches (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+                criteria_json TEXT NOT NULL,
+                created_at DATETIME DEFAULT (datetime('now', 'localtime'))
+            );
+
             CREATE INDEX IF NOT EXISTS idx_documents_subject ON documents(subject);
             CREATE INDEX IF NOT EXISTS idx_documents_type ON documents(type);
             CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at);
@@ -116,6 +124,7 @@ public static class DatabaseMigrator
             ExecuteSql(conn, transaction, createTablesQuery);
             MigrateAddColumn(conn, transaction, "documents", "is_deleted", "INTEGER DEFAULT 0");
             MigrateAddColumn(conn, transaction, "documents", "deleted_at", "DATETIME");
+            MigrateAddColumn(conn, transaction, "documents", "status", "TEXT NOT NULL DEFAULT 'unread'");
             ExecuteSql(conn, transaction, "PRAGMA defer_foreign_keys = ON");
 
             if (preflight.RebuildDocuments)
@@ -136,6 +145,7 @@ public static class DatabaseMigrator
         MigrateSeedCategories(conn);
         MigrateNormalizeFileTypes(conn);
         MigrateNeutralizeLabels(conn);
+        MigrateWriteSchemaVersion4(conn);
     }
 
     private sealed record MigrationPreflight(IReadOnlyList<string> TablesToRebuild, bool RebuildDocuments);
@@ -147,7 +157,7 @@ public static class DatabaseMigrator
     {
         if (TableExists(connection, "documents"))
         {
-            RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at"], ["is_deleted", "deleted_at"]);
+            RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["is_deleted", "deleted_at", "status"]);
             EnsureNoUnsupportedIndexesOrTriggers(connection, "documents");
         }
 
@@ -155,6 +165,7 @@ public static class DatabaseMigrator
         ValidateKnownTable(connection, "categories", ["id", "name", "created_at"]);
         ValidateKnownTable(connection, "document_types", ["id", "name", "created_at"]);
         ValidateKnownTable(connection, "app_settings", ["key", "value"]);
+        ValidateKnownTable(connection, "saved_searches", ["id", "name", "criteria_json", "created_at"]);
     }
 
     private static void MigrateLegacyVietnameseSchema(SqliteConnection connection, string createTablesQuery)
@@ -197,6 +208,7 @@ public static class DatabaseMigrator
         {
             "documents", "collections", "collection_items", "personal_notes", "recent_files",
             "document_relations", "categories", "document_types", "app_settings",
+            "saved_searches",
             "tai_lieu", "danh_muc", "loai_tai_lieu"
         };
         var unsupportedTables = tables.Where(table => !supportedTables.Contains(table)).ToList();
@@ -353,18 +365,19 @@ public static class DatabaseMigrator
         var supportedTables = new HashSet<string>(StringComparer.Ordinal)
         {
             "documents", "collections", "collection_items", "personal_notes", "recent_files",
-            "document_relations", "categories", "document_types", "app_settings"
+            "document_relations", "categories", "document_types", "app_settings", "saved_searches"
         };
         var unsupportedTables = tables.Where(table => !supportedTables.Contains(table)).ToList();
         if (unsupportedTables.Count > 0)
             throw new InvalidOperationException($"Unsupported database tables: {string.Join(", ", unsupportedTables)}.");
 
-        RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at"], ["is_deleted", "deleted_at"]);
+        RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["is_deleted", "deleted_at", "status"]);
         var rebuildDocuments = ValidateDocumentIndexesAndTriggers(connection);
         ValidateKnownTable(connection, "collections", ["id", "name", "description", "created_at"]);
         ValidateKnownTable(connection, "categories", ["id", "name", "created_at"]);
         ValidateKnownTable(connection, "document_types", ["id", "name", "created_at"]);
         ValidateKnownTable(connection, "app_settings", ["key", "value"]);
+        ValidateKnownTable(connection, "saved_searches", ["id", "name", "criteria_json", "created_at"]);
 
         var tablesToRebuild = new List<string>();
         ValidateChildTable(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"],
@@ -571,8 +584,8 @@ public static class DatabaseMigrator
 
     private static void RebuildDocumentsTable(SqliteConnection connection, SqliteTransaction transaction)
     {
-        ExecuteSql(connection, transaction, "CREATE TABLE documents_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, subject TEXT, type TEXT, file_path TEXT, notes TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), file_size REAL, author TEXT, is_important INTEGER DEFAULT 0, tags TEXT, deadline DATETIME, is_deleted INTEGER DEFAULT 0, deleted_at DATETIME)");
-        ExecuteSql(connection, transaction, "INSERT INTO documents_rebuild (id, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at) SELECT id, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at FROM documents");
+        ExecuteSql(connection, transaction, "CREATE TABLE documents_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, subject TEXT, type TEXT, file_path TEXT, notes TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), file_size REAL, author TEXT, is_important INTEGER DEFAULT 0, tags TEXT, deadline DATETIME, is_deleted INTEGER DEFAULT 0, deleted_at DATETIME, status TEXT NOT NULL DEFAULT 'unread')");
+        ExecuteSql(connection, transaction, "INSERT INTO documents_rebuild (id, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status) SELECT id, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status FROM documents");
         ExecuteSql(connection, transaction, "DROP TABLE documents");
         ExecuteSql(connection, transaction, "ALTER TABLE documents_rebuild RENAME TO documents");
     }
@@ -937,5 +950,17 @@ public static class DatabaseMigrator
             tx.Rollback();
             throw;
         }
+    }
+
+    private static void MigrateWriteSchemaVersion4(SqliteConnection conn)
+    {
+        using var checkCmd = conn.CreateCommand();
+        checkCmd.CommandText = "SELECT value FROM app_settings WHERE key = 'schema_version'";
+        var currentVersion = checkCmd.ExecuteScalar()?.ToString();
+        if (int.TryParse(currentVersion, out var ver) && ver >= 4)
+            return;
+
+        using var cmd = new SqliteCommand("INSERT OR REPLACE INTO app_settings (key, value) VALUES ('schema_version', '4')", conn);
+        cmd.ExecuteNonQuery();
     }
 }

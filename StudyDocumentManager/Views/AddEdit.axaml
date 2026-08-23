@@ -119,9 +119,9 @@
                                        FontSize="{StaticResource FontSizeMd}"
                                        FontWeight="SemiBold"
                                        Foreground="{StaticResource TextPrimary}"/>
-                            <TextBox x:Name="txtNotes"
-                                     Text="{Binding Notes, Mode=TwoWay}"
-                                     TabIndex="10"
+                             <TextBox x:Name="txtNotes"
+                                      Text="{Binding Notes, Mode=TwoWay}"
+                                      TabIndex="10"
                                      AutomationProperties.Name="{loc:Localize AddEdit_LblNotes}"
                                      FontSize="{StaticResource FontSizeMd}"
                                      Watermark="{loc:Localize AddEdit_PlaceholderNotes}"
@@ -214,38 +214,75 @@
                         <Grid x:Name="deadlineImportantFields"
                               Grid.Column="1"
                               Grid.Row="2"
-                              ColumnDefinitions="*,Auto,Auto"
+                              RowDefinitions="Auto,Auto"
                               Margin="12,4,0,0">
-                            <Border Grid.Column="1"
-                                    Width="{StaticResource Space5}"/>
-                            <StackPanel Grid.Column="0"
-                                        Spacing="{StaticResource Space1}">
-                                <TextBlock Text="{loc:Localize AddEdit_LblDeadline}"
-                                           FontSize="{StaticResource FontSizeMd}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}"/>
-                                <DatePicker x:Name="dateDeadline"
-                                            SelectedDate="{Binding Deadline, Mode=TwoWay}"
-                                            TabIndex="8"
-                                            IsTabStop="True"
-                                            Focusable="True"
-                                            AutomationProperties.Name="{loc:Localize AddEdit_LblDeadline}"
-                                            FontSize="{StaticResource FontSizeMd}"
-                                            YearFormat="{loc:Localize AddEdit_DateYearFormat}"
-                                            MonthFormat="{loc:Localize AddEdit_DateMonthFormat}"
-                                            DayFormat="{loc:Localize AddEdit_DateDayFormat}"
-                                            HorizontalAlignment="Stretch"/>
-                            </StackPanel>
-                            <StackPanel Grid.Column="2"
-                                        VerticalAlignment="Bottom">
-                                <CheckBox x:Name="chkImportant"
-                                          Content="{loc:Localize AddEdit_ChkImportant}"
-                                          TabIndex="9"
-                                          AutomationProperties.Name="{loc:Localize AddEdit_ChkImportant}"
-                                          FontSize="{StaticResource FontSizeMd}"
-                                          IsChecked="{Binding IsImportant, Mode=TwoWay}"/>
-                                <Border Height="{StaticResource Space1}"/>
-                            </StackPanel>
+                            <Grid Grid.Row="0"
+                                  ColumnDefinitions="*,Auto,Auto">
+                                <Border Grid.Column="1"
+                                        Width="{StaticResource Space5}"/>
+                                <StackPanel Grid.Column="0"
+                                            Spacing="{StaticResource Space1}">
+                                    <TextBlock Text="{loc:Localize AddEdit_LblDeadline}"
+                                               FontSize="{StaticResource FontSizeMd}"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimary}"/>
+                                    <DatePicker x:Name="dateDeadline"
+                                                SelectedDate="{Binding Deadline, Mode=TwoWay}"
+                                                TabIndex="8"
+                                                IsTabStop="True"
+                                                Focusable="True"
+                                                AutomationProperties.Name="{loc:Localize AddEdit_LblDeadline}"
+                                                FontSize="{StaticResource FontSizeMd}"
+                                                YearFormat="{loc:Localize AddEdit_DateYearFormat}"
+                                                MonthFormat="{loc:Localize AddEdit_DateMonthFormat}"
+                                                DayFormat="{loc:Localize AddEdit_DateDayFormat}"
+                                                HorizontalAlignment="Stretch"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2"
+                                            VerticalAlignment="Bottom">
+                                    <CheckBox x:Name="chkImportant"
+                                              Content="{loc:Localize AddEdit_ChkImportant}"
+                                              TabIndex="9"
+                                              AutomationProperties.Name="{loc:Localize AddEdit_ChkImportant}"
+                                              FontSize="{StaticResource FontSizeMd}"
+                                              IsChecked="{Binding IsImportant, Mode=TwoWay}"/>
+                                    <Border Height="{StaticResource Space1}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid x:Name="statusFields"
+                                  Grid.Row="1"
+                                  ColumnDefinitions="*,Auto,*"
+                                  Margin="0,4,0,0">
+                                <Border Grid.Column="1"
+                                        Width="{StaticResource Space5}"/>
+                                <StackPanel Grid.Column="0"
+                                            Spacing="{StaticResource Space1}">
+                                    <TextBlock Text="{loc:Localize DS_Label_Status}"
+                                               FontSize="{StaticResource FontSizeMd}"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimary}"/>
+                                    <ComboBox x:Name="cmbStatus"
+                                              TabIndex="13"
+                                              AutomationProperties.Name="{loc:Localize DS_Label_Status}"
+                                              FontSize="{StaticResource FontSizeMd}"
+                                              Height="32"
+                                              HorizontalAlignment="Stretch">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Display}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                    <TextBlock x:Name="txtStatusError"
+                                               Text="{Binding StatusValidationMessage}"
+                                               IsVisible="{Binding HasStatusValidationError}"
+                                               AutomationProperties.Name="{Binding StatusValidationMessage}"
+                                               AutomationProperties.LiveSetting="Polite"
+                                               Foreground="{StaticResource DangerBrush}"
+                                               FontSize="{StaticResource FontSizeSm}"/>
+                                </StackPanel>
+                            </Grid>
                         </Grid>
                     </Grid>
                 </Border>
