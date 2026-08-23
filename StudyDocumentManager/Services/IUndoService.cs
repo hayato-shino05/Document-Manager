@@ -23,8 +23,11 @@ public sealed class UndoEntry
     public object[]? DescriptionArgs { get; set; }
     public IReadOnlyList<StudyDocument> Originals { get; init; } = Array.Empty<StudyDocument>();
     public IReadOnlyList<int> DeletedIds { get; init; } = Array.Empty<int>();
+    public IReadOnlyList<CollectionMembership> AddedCollectionMemberships { get; init; } = Array.Empty<CollectionMembership>();
     public CollectionSnapshot? Collection { get; init; }
     public DateTime CreatedAt { get; init; }
 }
+
+public sealed record CollectionMembership(int CollectionId, int DocumentId);
 
 public sealed record CollectionSnapshot(string Name, string? Description, IReadOnlyList<int> MemberDocumentIds);

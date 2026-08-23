@@ -93,6 +93,54 @@ public class UndoApplierRoutingTests
     }
 
     [Fact]
+    public void ApplyLast_MetadataEntry_RemovesAddedCollectionMemberships()
+    {
+        var undo = new UndoService();
+        undo.Push(new UndoEntry
+        {
+            DescriptionKey = "BE_UndoDescription",
+            Originals = [new StudyDocument { Id = 5 }],
+            AddedCollectionMemberships = [new CollectionMembership(42, 5)]
+        });
+
+        var collections = new RecordingCollections();
+        new UndoApplier(undo, new RecordingDocuments(), new RecordingRecycleBin(), collections).ApplyLast();
+
+        Assert.Equal([(42, 5)], collections.RemovedDocs);
+        Assert.False(undo.CanUndo);
+    }
+
+    [Fact]
+    public void ApplyLast_WhenDocumentRestoreFails_KeepsUndoEntry()
+    {
+        var undo = new UndoService();
+        undo.Push(new UndoEntry
+        {
+            DescriptionKey = "BE_UndoDescription",
+            Originals = [new StudyDocument { Id = 5 }]
+        });
+
+        var documents = new RecordingDocuments { UpdateResult = false };
+        var applier = new UndoApplier(undo, documents, new RecordingRecycleBin(), new RecordingCollections());
+
+        Assert.Throws<InvalidOperationException>(applier.ApplyLast);
+        Assert.True(undo.CanUndo);
+    }
+
+    [Fact]
+    public void ApplyLast_WhenRestoreCountIsPartial_KeepsUndoEntry()
+    {
+        var undo = new UndoService();
+        undo.Push(new UndoEntry { DescriptionKey = "UN_DeletedDocuments", DeletedIds = [7, 8] });
+
+        var recycleBin = new RecordingRecycleBin { RestoreCount = 1 };
+        var applier = new UndoApplier(undo, new RecordingDocuments(), recycleBin, new RecordingCollections());
+
+        Assert.Throws<InvalidOperationException>(applier.ApplyLast);
+        Assert.True(undo.CanUndo);
+    }
+
+    [Fact]
     public void ApplyLast_EmptyStack_Throws()
     {
         var applier = new UndoApplier(new UndoService(), new RecordingDocuments(), new RecordingRecycleBin(), new RecordingCollections());
@@ -103,11 +151,12 @@ public class UndoApplierRoutingTests
     private sealed class RecordingRecycleBin : IRecycleBinRepository
     {
         public List<IReadOnlyList<int>> RestoreCalls { get; } = [];
+        public int? RestoreCount { get; init; }
 
         public int RestoreDocuments(IReadOnlyList<int> ids)
         {
             RestoreCalls.Add(ids);
-            return ids.Count;
+            return RestoreCount ?? ids.Count;
         }
 
         public List<StudyDocument> GetDeletedDocuments() => [];
@@ -122,6 +171,7 @@ public class UndoApplierRoutingTests
         public int NextId { get; set; } = 42;
         public List<(string Name, string? Description)> Created { get; } = [];
         public List<(int CollectionId, int DocumentId)> AddedDocs { get; } = [];
+        public List<(int CollectionId, int DocumentId)> RemovedDocs { get; } = [];
 
         public List<(int Id, string Name, string? Description, DateTime CreatedAt, int ItemCount)> GetAll() => [];
 
@@ -141,12 +191,17 @@ public class UndoApplierRoutingTests
             return true;
         }
 
-        public bool RemoveDocument(int collectionId, int documentId) => true;
+        public bool RemoveDocument(int collectionId, int documentId)
+        {
+            RemovedDocs.Add((collectionId, documentId));
+            return true;
+        }
     }
 
     private sealed class RecordingDocuments : IDocumentRepository
     {
         public List<StudyDocument> Updated { get; } = [];
+        public bool UpdateResult { get; init; } = true;
 
         public List<StudyDocument> GetAll() => [];
         public StudyDocument? GetById(int id) => null;
@@ -159,7 +214,7 @@ public class UndoApplierRoutingTests
         public bool Update(StudyDocument document)
         {
             Updated.Add(document);
-            return true;
+            return UpdateResult;
         }
 
         public bool Delete(int id) => true;

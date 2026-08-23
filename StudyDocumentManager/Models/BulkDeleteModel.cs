@@ -238,6 +238,10 @@ public partial class BulkDeleteModel : ModelBase
             if (originals.Count == 0)
                 return;
 
+            HashSet<int> existingCollectionMembers = changes.AddToCollectionId is int collectionId && _collectionRepo != null
+                ? _collectionRepo.GetDocuments(collectionId).Select(document => document.Id).ToHashSet()
+                : [];
+
             var confirmed = await ConfirmPreviewAsync(originals.Count, BuildPreviewPairs(changes));
             if (!confirmed) return;
 
@@ -245,11 +249,19 @@ public partial class BulkDeleteModel : ModelBase
 
             if (outcome.Succeeded > 0)
             {
+                var addedMemberships = changes.AddToCollectionId is int addedCollectionId
+                    ? outcome.Items
+                        .Where(item => item.Success && !existingCollectionMembers.Contains(item.DocumentId))
+                        .Select(item => new CollectionMembership(addedCollectionId, item.DocumentId))
+                        .ToList()
+                    : [];
+
                 _undo.Push(new UndoEntry
                 {
                     DescriptionKey = "BE_UndoDescription",
                     DescriptionArgs = [outcome.Succeeded],
                     Originals = originals,
+                    AddedCollectionMemberships = addedMemberships,
                     CreatedAt = DateTime.Now
                 });
                 UndoLastCommand.NotifyCanExecuteChanged();
