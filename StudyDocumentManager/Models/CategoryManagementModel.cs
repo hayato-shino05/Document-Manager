@@ -55,8 +55,15 @@ public partial class CategoryManagementModel : ModelBase
             typesData.Select(t => new CategoryItem(t.Name, t.Count)));
 
         TotalDocumentCount = _categoryRepo.GetTotalDocumentCount();
+        SelectedSubject = ResolveSelection(SelectedSubject, Subjects);
+        SelectedType = ResolveSelection(SelectedType, Types);
         OnPropertyChanged(nameof(StatusText));
     }
+
+    private static CategoryItem? ResolveSelection(CategoryItem? current, ObservableCollection<CategoryItem> items)
+        => current != null
+            ? items.FirstOrDefault(i => i.Name.Equals(current.Name, StringComparison.OrdinalIgnoreCase))
+            : null;
 
     [RelayCommand]
     private async Task RenameSubjectAsync()
