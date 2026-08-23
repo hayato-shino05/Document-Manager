@@ -9,6 +9,8 @@ public partial class AffectedItemsPreviewDialog : Window
 
     private readonly ILocalizationService? _loc;
     private readonly int _totalCount;
+    private readonly string _titleSource = string.Empty;
+    private readonly string _noteSource = string.Empty;
 
     public AffectedItemsPreviewDialog() { } // XAML loader
 
@@ -18,9 +20,11 @@ public partial class AffectedItemsPreviewDialog : Window
 
         _loc = loc;
         _totalCount = totalCount;
-        Title = title;
-        this.FindControl<TextBlock>("TitleText")!.Text = title;
-        this.FindControl<TextBlock>("ReversibilityNote")!.Text = reversibilityNote;
+        _titleSource = title;
+        _noteSource = reversibilityNote;
+        Title = Resolve(_titleSource);
+        this.FindControl<TextBlock>("TitleText")!.Text = Title;
+        this.FindControl<TextBlock>("ReversibilityNote")!.Text = Resolve(_noteSource);
         UpdateAffectedNote();
         if (_loc != null)
         {
@@ -38,10 +42,24 @@ public partial class AffectedItemsPreviewDialog : Window
 
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
+        Title = Resolve(_titleSource);
+        var titleText = this.FindControl<TextBlock>("TitleText");
+        if (titleText != null)
+            titleText.Text = Title;
+        var reversibilityNote = this.FindControl<TextBlock>("ReversibilityNote");
+        if (reversibilityNote != null)
+            reversibilityNote.Text = Resolve(_noteSource);
         UpdateAffectedNote();
         var confirmButton = this.FindControl<Button>("ConfirmButton");
         if (confirmButton != null && _loc != null)
             confirmButton.Content = _loc["Action_Delete"];
+    }
+
+    private string Resolve(string source)
+    {
+        if (_loc == null)
+            return source;
+        return _loc[source] == $"[{source}]" ? source : _loc[source];
     }
 
     private void UpdateAffectedNote()
