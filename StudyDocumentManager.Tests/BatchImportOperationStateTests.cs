@@ -49,6 +49,27 @@ public sealed class BatchImportOperationStateTests
         Assert.Equal(["dashboard"], navigation.Routes);
     }
 
+    [Theory]
+    [InlineData("C:\\Users\\private\\study.db; SELECT * FROM documents; user@example.com")]
+    [InlineData("")]
+    public async Task Import_WhenSaveThrows_UsesLocalizedFailureFallback(string failureMessage)
+    {
+        var importer = new ControlledImportService { FailureMessage = failureMessage };
+        var model = CreateModel(importer, new RecordingNavigationService());
+        model.Files = new ObservableCollection<FileImportItem>
+        {
+            new() { FileName = "A", FilePath = "A.pdf", FileType = "PDF" }
+        };
+
+        await model.ImportCommand.ExecuteAsync(null);
+
+        Assert.True(model.Files[0].IsFailed);
+        Assert.Equal("BatchImport_ItemFailed", model.Files[0].FailureReason);
+        Assert.DoesNotContain("study.db", model.Files[0].FailureReason);
+        Assert.DoesNotContain("documents", model.Files[0].FailureReason);
+        Assert.DoesNotContain("user@example.com", model.Files[0].FailureReason);
+    }
+
     [Fact]
     public async Task CancelDuringImport_DoesNotMarkUnprocessedItemsAsFailed()
     {
@@ -189,6 +210,7 @@ public sealed class BatchImportOperationStateTests
 
         public bool FailFirstA { get; init; }
         public bool AlwaysFailA { get; init; }
+        public string? FailureMessage { get; init; }
         public List<string> AttemptedPaths { get; } = [];
         public Action? OnFirstSave { get; set; }
 
@@ -201,6 +223,8 @@ public sealed class BatchImportOperationStateTests
             AttemptedPaths.Add(document.FilePath);
             if (AttemptedPaths.Count == 1)
                 OnFirstSave?.Invoke();
+            if (FailureMessage is not null && document.FilePath == "A.pdf")
+                throw new IOException(FailureMessage);
             if (AlwaysFailA && document.FilePath == "A.pdf")
                 return DocumentImportOutcome.Failed;
 

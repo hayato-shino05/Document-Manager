@@ -220,6 +220,7 @@ public partial class BatchImportModel : ModelBase
                 };
 
                 DocumentImportOutcome outcome;
+                var itemFailureReason = failureReason;
                 try
                 {
                     outcome = await Task.Run(
@@ -235,6 +236,7 @@ public partial class BatchImportModel : ModelBase
                 catch (Exception)
                 {
                     outcome = DocumentImportOutcome.Failed;
+                    itemFailureReason = _loc["BatchImport_ItemFailed"];
                 }
 
                 switch (outcome)
@@ -255,7 +257,7 @@ public partial class BatchImportModel : ModelBase
                         break;
                     case DocumentImportOutcome.Failed:
                         item.IsFailed = true;
-                        item.FailureReason = failureReason;
+                        item.FailureReason = itemFailureReason;
                         _operationProgress.RecordFailure(item.FilePath);
                         break;
                 }
