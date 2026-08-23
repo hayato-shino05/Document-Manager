@@ -148,16 +148,17 @@ public class UndoApplierRoutingTests
     }
 
     [Fact]
-    public void ApplyLast_WhenRestoreCountIsPartial_RestoresWhatExistsAndPopsEntry()
+    public void ApplyLast_WhenRestoreCountIsPartial_ThrowsAndKeepsUndoEntry()
     {
         var undo = new UndoService();
         undo.Push(new UndoEntry { DescriptionKey = "UN_DeletedDocuments", DeletedIds = [7, 8] });
 
         var recycleBin = new RecordingRecycleBin { RestoreCount = 1 };
-        new UndoApplier(undo, new RecordingDocuments(), recycleBin, new RecordingCollections()).ApplyLast();
+        var applier = new UndoApplier(undo, new RecordingDocuments(), recycleBin, new RecordingCollections());
 
+        Assert.Throws<InvalidOperationException>(applier.ApplyLast);
         Assert.Single(recycleBin.RestoreCalls);
-        Assert.False(undo.CanUndo);
+        Assert.True(undo.CanUndo);
     }
 
     [Fact]
@@ -326,32 +327,36 @@ public class UndoApplierResilienceTests : DatabaseTestBase
     }
 
     [Fact]
-    public void ApplyLast_DeletedIdsEntryWithPermanentlyDeletedId_RestoresRecoverableOnes()
+    public void ApplyLast_DeletedIdsEntryWithPermanentlyDeletedId_ThrowsKeepsEntryForRetryAndSurvivorRestored()
     {
         var docA = new StudyDocument { Name = "A", Subject = "S1", Type = "PDF" };
-        var docB = new StudyDocument { Name = "B", Subject = "S2", Type = "DOCX" };
         var doomed = new StudyDocument { Name = "C", Subject = "S3", Type = "PDF" };
         Assert.True(Repo.Add(docA));
-        Assert.True(Repo.Add(docB));
         Assert.True(Repo.Add(doomed));
-        Assert.Equal(3, Db.BulkSoftDelete([docA.Id, docB.Id, doomed.Id]));
+        Assert.Equal(2, Db.BulkSoftDelete([docA.Id, doomed.Id]));
         Assert.True(Repo.PermanentDeleteDocument(doomed.Id));
 
         var undo = new UndoService();
-        undo.Push(new UndoEntry
+        var entry = new UndoEntry
         {
             DescriptionKey = "UN_DeletedDocuments",
-            DescriptionArgs = [3],
-            DeletedIds = [docA.Id, doomed.Id, docB.Id],
+            DescriptionArgs = [2],
+            DeletedIds = [docA.Id, doomed.Id],
             CreatedAt = DateTime.Now
-        });
+        };
+        undo.Push(entry);
 
-        new UndoApplier(undo, Repo, Repo, new CollectionRepository(Db)).ApplyLast();
+        var applier = new UndoApplier(undo, Repo, Repo, new CollectionRepository(Db));
 
+        Assert.Throws<InvalidOperationException>(applier.ApplyLast);
+        Assert.NotNull(Repo.GetById(docA.Id));
+        Assert.Null(Repo.GetById(doomed.Id));
+        Assert.Same(entry, undo.Peek());
+        Assert.True(applier.CanUndo);
+
+        Assert.Throws<InvalidOperationException>(applier.ApplyLast);
         Assert.Null(Repo.GetById(doomed.Id));
         Assert.NotNull(Repo.GetById(docA.Id));
-        Assert.NotNull(Repo.GetById(docB.Id));
-        Assert.False(undo.CanUndo);
     }
 
     [Fact]
@@ -692,6 +697,70 @@ public class BulkDeleteFallbackUndoTests : DatabaseTestBase
 
         await model.UndoLastCommand.ExecuteAsync(null);
         Assert.Equal(2, dialogs.Errors.Count);
+    }
+
+    [Fact]
+    public async Task UndoLast_MetadataFallbackWithMemberships_RemovesMembershipsRestoresOriginalsAndPops()
+    {
+        var collections = new CollectionRepository(Db);
+        var collectionId = collections.Create("Study", "focus");
+        var doc = new StudyDocument { Name = "Alpha", Subject = "Math", Type = "PDF" };
+        Assert.True(Repo.Add(doc));
+        Assert.True(collections.AddDocument(collectionId, doc.Id));
+        Assert.Single(collections.GetDocuments(collectionId));
+
+        var preEdit = Clone(Repo.GetById(doc.Id)!);
+        Assert.True(Repo.Update(new StudyDocument { Id = doc.Id, Name = "Alpha", Subject = "Physics", Type = "PDF" }));
+
+        var undo = new UndoService();
+        undo.Push(new UndoEntry
+        {
+            DescriptionKey = "BE_UndoDescription",
+            DescriptionArgs = [1],
+            Originals = [preEdit],
+            AddedCollectionMemberships = [new CollectionMembership(collectionId, doc.Id)],
+            CreatedAt = DateTime.Now
+        });
+
+        var dialogs = new RecordingErrorDialogs();
+        var model = new BulkDeleteModel(Repo, Repo, new CategoryRepository(Db), dialogs, new StubNavigation(), new FormatKeyLocalization(),
+            null, collections, undo);
+
+        await model.UndoLastCommand.ExecuteAsync(null);
+
+        Assert.Equal("Math", Repo.GetById(doc.Id)!.Subject);
+        Assert.Empty(collections.GetDocuments(collectionId));
+        Assert.False(model.UndoLastCommand.CanExecute(null));
+        Assert.Empty(dialogs.Errors);
+    }
+
+    [Fact]
+    public async Task UndoLast_MetadataFallbackWithMembershipsAndNullCollectionRepo_SkipsMembershipRemovalSilently()
+    {
+        var doc = new StudyDocument { Name = "Beta", Subject = "Math", Type = "DOCX" };
+        Assert.True(Repo.Add(doc));
+
+        var preEdit = Clone(Repo.GetById(doc.Id)!);
+        Assert.True(Repo.Update(new StudyDocument { Id = doc.Id, Name = "Beta", Subject = "Physics", Type = "DOCX" }));
+
+        var undo = new UndoService();
+        undo.Push(new UndoEntry
+        {
+            DescriptionKey = "BE_UndoDescription",
+            DescriptionArgs = [1],
+            Originals = [preEdit],
+            AddedCollectionMemberships = [new CollectionMembership(999, doc.Id)],
+            CreatedAt = DateTime.Now
+        });
+
+        var dialogs = new RecordingErrorDialogs();
+        var model = CreateModel(undo, dialogs, null);
+
+        await model.UndoLastCommand.ExecuteAsync(null);
+
+        Assert.Equal("Math", Repo.GetById(doc.Id)!.Subject);
+        Assert.False(model.UndoLastCommand.CanExecute(null));
+        Assert.Empty(dialogs.Errors);
     }
 
     private sealed class FormatKeyLocalization : ILocalizationService

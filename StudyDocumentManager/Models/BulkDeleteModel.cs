@@ -326,6 +326,10 @@ public partial class BulkDeleteModel : ModelBase
             {
                 foreach (var original in entry.Originals)
                     _repository.Update(original);
+
+                foreach (var membership in entry.AddedCollectionMemberships)
+                    _ = _collectionRepo?.RemoveDocument(membership.CollectionId, membership.DocumentId);
+
                 LoadData([.. entry.Originals.Select(o => o.Id)]);
                 _undo.Pop();
                 detail = string.Format(_loc[entry.DescriptionKey], entry.DescriptionArgs ?? []);
