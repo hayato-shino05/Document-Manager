@@ -92,6 +92,87 @@ public sealed class BatchImportOperationStateTests
         Assert.True(model.Files[0].IsFailed);
     }
 
+    [Fact]
+    public async Task CancelDuringLastSave_PreservesOutcomeWithoutNavigating()
+    {
+        var importer = new ControlledImportService();
+        var navigation = new RecordingNavigationService();
+        var model = CreateModel(importer, navigation);
+        importer.OnFirstSave = () => model.CancelCommand.Execute(null);
+        model.Files = new ObservableCollection<FileImportItem>
+        {
+            new() { FileName = "A", FilePath = "A.pdf", FileType = "PDF" }
+        };
+
+        await model.ImportCommand.ExecuteAsync(null);
+
+        Assert.True(model.IsImportCancelled);
+        Assert.Equal(1, model.ImportedCount);
+        Assert.Equal(1, model.ProcessedCount);
+        Assert.Empty(navigation.Routes);
+    }
+
+    [Fact]
+    public async Task FreshImport_WhenPreviouslyFailedItemFailsAgain_KeepsFailureVisible()
+    {
+        var importer = new ControlledImportService { AlwaysFailA = true };
+        var navigation = new RecordingNavigationService();
+        var model = CreateModel(importer, navigation);
+        model.Files = new ObservableCollection<FileImportItem>
+        {
+            new() { FileName = "A", FilePath = "A.pdf", FileType = "PDF" }
+        };
+
+        await model.ImportCommand.ExecuteAsync(null);
+        await model.ImportCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, model.FailedCount);
+        Assert.Single(model.FailedItems);
+        Assert.True(model.Files[0].IsFailed);
+        Assert.Empty(navigation.Routes);
+    }
+
+    [Fact]
+    public void ScanFolder_ClearsPreviousOperationStateAndFailureMarkers()
+    {
+        var model = CreateModel(new ControlledImportService(), new RecordingNavigationService());
+        var folder = Path.Combine(Path.GetTempPath(), $"sdm_batch_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(folder);
+
+        try
+        {
+            model.Files = new ObservableCollection<FileImportItem>
+            {
+                new() { FileName = "Failed", FilePath = "Failed.pdf", IsFailed = true }
+            };
+            model.IsImportCancelled = true;
+            model.ImportedCount = 2;
+            model.SkippedDuplicateCount = 1;
+            model.FailedCount = 1;
+            model.ProcessedCount = 4;
+            model.TotalCount = 5;
+            model.ImportStatusMessage = "stale";
+            model.FolderPath = folder;
+
+            model.ScanFolderCommand.Execute(null);
+
+            Assert.Empty(model.Files);
+            Assert.False(model.IsImportCancelled);
+            Assert.Equal(0, model.ImportedCount);
+            Assert.Equal(0, model.SkippedDuplicateCount);
+            Assert.Equal(0, model.FailedCount);
+            Assert.Equal(0, model.ProcessedCount);
+            Assert.Equal(0, model.TotalCount);
+            Assert.Empty(model.ImportStatusMessage);
+            Assert.Empty(model.FailedItems);
+            Assert.False(model.HasFailedItems);
+        }
+        finally
+        {
+            Directory.Delete(folder, recursive: true);
+        }
+    }
+
     private static BatchImportModel CreateModel(
         ControlledImportService importer,
         RecordingNavigationService navigation)

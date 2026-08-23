@@ -34,7 +34,10 @@ public partial class BatchImportModel : ModelBase
 
     public bool HasFiles => Files.Count > 0;
     public bool HasFailedItems => Files.Any(file => file.IsFailed);
-    public IReadOnlyList<string> FailedItems => _operationProgress.FailedItems;
+    public IReadOnlyList<string> FailedItems => Files
+        .Where(file => file.IsFailed)
+        .Select(file => file.FilePath)
+        .ToList();
     public int SucceededCount => _operationProgress.Succeeded;
     public int SkippedCount => _operationProgress.Skipped;
 
@@ -72,7 +75,17 @@ public partial class BatchImportModel : ModelBase
             return;
 
         Files.Clear();
+        ImportedCount = 0;
+        SkippedDuplicateCount = 0;
+        FailedCount = 0;
+        IsImportCancelled = false;
+        ProcessedCount = 0;
+        TotalCount = 0;
+        ImportStatusMessage = string.Empty;
         ImportErrorMessage = string.Empty;
+        _operationProgress.Start(0);
+        _operationProgress.Stop();
+        NotifyOperationStateChanged();
 
         try
         {
@@ -162,23 +175,26 @@ public partial class BatchImportModel : ModelBase
         IsImportCancelled = false;
         if (!preserveCounters)
         {
+            foreach (var item in selected)
+            {
+                item.IsFailed = false;
+                item.FailureReason = string.Empty;
+            }
+
+            NotifyFailureStateChanged();
             ImportedCount = 0;
             SkippedDuplicateCount = 0;
-            FailedCount = 0;
-            _operationProgress.Start(selected.Count);
-        }
-        else
-        {
-            _operationProgress.Start(selected.Count);
         }
 
+        FailedCount = Files.Count(file => file.IsFailed);
+        _operationProgress.Start(selected.Count);
+        NotifyOperationStateChanged();
         ProcessedCount = 0;
         TotalCount = selected.Count;
         ImportErrorMessage = string.Empty;
         ImportStatusMessage = _loc["BatchImport_StatusImporting"];
-        _importCancellation = new CancellationTokenSource();
-
-        var cancellation = _importCancellation;
+        var cancellation = new CancellationTokenSource();
+        _importCancellation = cancellation;
         var failureReason = _loc["BatchImport_ItemFailed"];
 
         try
@@ -225,8 +241,6 @@ public partial class BatchImportModel : ModelBase
                 {
                     case DocumentImportOutcome.Imported:
                         ImportedCount++;
-                        if (preserveCounters && item.IsFailed)
-                            FailedCount--;
                         item.IsSelected = false;
                         item.IsFailed = false;
                         item.FailureReason = string.Empty;
@@ -234,35 +248,36 @@ public partial class BatchImportModel : ModelBase
                         break;
                     case DocumentImportOutcome.SkippedDuplicate:
                         SkippedDuplicateCount++;
-                        if (preserveCounters && item.IsFailed)
-                            FailedCount--;
                         item.IsSelected = false;
                         item.IsFailed = false;
                         item.FailureReason = string.Empty;
                         _operationProgress.RecordSkipped(item.FilePath);
                         break;
                     case DocumentImportOutcome.Failed:
-                        if (!item.IsFailed)
-                            FailedCount++;
                         item.IsFailed = true;
                         item.FailureReason = failureReason;
                         _operationProgress.RecordFailure(item.FilePath);
                         break;
                 }
 
+                FailedCount = Files.Count(file => file.IsFailed);
                 ProcessedCount = _operationProgress.Processed;
-                OnPropertyChanged(nameof(FailedItems));
-                OnPropertyChanged(nameof(SucceededCount));
-                OnPropertyChanged(nameof(SkippedCount));
-                OnPropertyChanged(nameof(HasFailedItems));
+                NotifyOperationStateChanged();
+            }
+
+            if (cancellation.IsCancellationRequested)
+            {
+                _operationProgress.Cancel();
+                IsImportCancelled = true;
             }
         }
         finally
         {
             _operationProgress.Stop();
             IsImporting = false;
-            _importCancellation.Dispose();
-            _importCancellation = null;
+            cancellation.Dispose();
+            if (ReferenceEquals(_importCancellation, cancellation))
+                _importCancellation = null;
         }
 
         if (IsImportCancelled)
@@ -292,6 +307,19 @@ public partial class BatchImportModel : ModelBase
 
         await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"], ImportStatusMessage);
         _navigationService.NavigateTo("dashboard");
+    }
+
+    private void NotifyFailureStateChanged()
+    {
+        OnPropertyChanged(nameof(FailedItems));
+        OnPropertyChanged(nameof(HasFailedItems));
+    }
+
+    private void NotifyOperationStateChanged()
+    {
+        NotifyFailureStateChanged();
+        OnPropertyChanged(nameof(SucceededCount));
+        OnPropertyChanged(nameof(SkippedCount));
     }
 
     [RelayCommand]
