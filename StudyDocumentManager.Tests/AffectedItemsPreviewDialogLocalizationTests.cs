@@ -263,6 +263,27 @@ public class AffectedItemsPreviewDialogLocalizationTests
         }
     }
 
+    [Fact]
+    public async Task CallerPath_CategoryDelete_FallsBackToLegacyPreviewImplementation()
+    {
+        var dialogs = new LegacyOnlyCustomDialogs();
+        var documents = new CallerPathDocuments(
+        [
+            new StudyDocument { Id = 1, Name = "Guide.pdf", Subject = "Math101" }
+        ]);
+        var loc = new MutableLocalizationStub();
+        loc.Strings["PV_CascadeTitle"] = "Delete targets: {0}";
+        loc.Strings["PV_RecycleBinNote"] = "Recycle bin note";
+        var model = new CategoryManagementModel(documents, new CallerPathCategories(), new NoOpDialogs(), loc, dialogs);
+
+        model.SelectedSubjects = new List<CategoryItem> { model.Subjects.Single() };
+
+        await model.DeleteSubjectCommand.ExecuteAsync(null);
+
+        Assert.Equal("Delete targets: 'Math101'", dialogs.Title);
+        Assert.Equal("Recycle bin note", dialogs.ReversibilityNote);
+    }
+
     private sealed class MutableLocalizationStub : ILocalizationService
     {
         private SupportedLanguage _current = SupportedLanguage.English;
@@ -288,6 +309,31 @@ public class AffectedItemsPreviewDialogLocalizationTests
             LanguageChanged?.Invoke(this, EventArgs.Empty);
         }
     }
+}
+
+file sealed class LegacyOnlyCustomDialogs : ICustomDialogService
+{
+    public string? Title { get; private set; }
+    public string? ReversibilityNote { get; private set; }
+
+    public Task<bool> ShowAffectedItemsPreviewAsync(string title, int totalCount, IReadOnlyList<string> itemNames, string reversibilityNote)
+    {
+        Title = title;
+        ReversibilityNote = reversibilityNote;
+        return Task.FromResult(false);
+    }
+
+    public Task<string?> ShowChangeCategoryAsync(string documentName, IList<string> existingCategories, string currentCategory)
+        => Task.FromResult<string?>(null);
+
+    public Task<int> ShowSelectCollectionAsync(string documentName, IList<(int Id, string Name, int DocCount)> collections)
+        => Task.FromResult(-1);
+
+    public Task<List<StudyDocument>?> ShowDocumentPickerAsync(string collectionName, IEnumerable<StudyDocument> allDocuments, IEnumerable<int> alreadyInCollection)
+        => Task.FromResult<List<StudyDocument>?>(null);
+
+    public Task<AddDocumentDraft?> ShowAddDocumentAsync(string filePath, IList<string> subjects, IList<string> types)
+        => Task.FromResult<AddDocumentDraft?>(null);
 }
 
 file sealed class PreviewCapturingCustomDialogs(List<PreviewTextSource> capturedTitles) : ICustomDialogService

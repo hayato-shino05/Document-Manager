@@ -139,11 +139,10 @@ public partial class CategoryManagementModel : ModelBase
         bool confirmed;
         if (_customDialogs != null)
         {
-            confirmed = await _customDialogs.ShowAffectedItemsPreviewAsync(
+            confirmed = await ShowAffectedItemsPreviewAsync(
                 affectedDocs.Count,
                 affectedDocs.Select(d => d.Name).ToList(),
-                PreviewTextSource.Key("PV_CascadeTitle", BuildTargetNames(targets)),
-                PreviewTextSource.Key("PV_RecycleBinNote"));
+                BuildTargetNames(targets));
         }
         else
         {
@@ -200,11 +199,10 @@ public partial class CategoryManagementModel : ModelBase
         bool confirmed;
         if (_customDialogs != null)
         {
-            confirmed = await _customDialogs.ShowAffectedItemsPreviewAsync(
+            confirmed = await ShowAffectedItemsPreviewAsync(
                 affectedDocs.Count,
                 affectedDocs.Select(d => d.Name).ToList(),
-                PreviewTextSource.Key("PV_CascadeTitle", BuildTargetNames(targets)),
-                PreviewTextSource.Key("PV_RecycleBinNote"));
+                BuildTargetNames(targets));
         }
         else
         {
@@ -242,6 +240,30 @@ public partial class CategoryManagementModel : ModelBase
         catch
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+        }
+    }
+
+    private async Task<bool> ShowAffectedItemsPreviewAsync(
+        int totalCount,
+        IReadOnlyList<string> itemNames,
+        string targetNames)
+    {
+        var customDialogs = _customDialogs!;
+        try
+        {
+            return await customDialogs.ShowAffectedItemsPreviewAsync(
+                totalCount,
+                itemNames,
+                PreviewTextSource.Key("PV_CascadeTitle", targetNames),
+                PreviewTextSource.Key("PV_RecycleBinNote"));
+        }
+        catch (NotSupportedException)
+        {
+            return await customDialogs.ShowAffectedItemsPreviewAsync(
+                string.Format(_loc["PV_CascadeTitle"], targetNames),
+                totalCount,
+                itemNames,
+                _loc["PV_RecycleBinNote"]);
         }
     }
 
