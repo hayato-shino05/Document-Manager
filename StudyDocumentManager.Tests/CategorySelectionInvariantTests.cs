@@ -25,6 +25,38 @@ public sealed class CategorySelectionInvariantTests : DatabaseTestBase
     }
 
     [Fact]
+    public void Refresh_ReconcilesMultiSelections_WithCurrentSubjectAndTypeItems()
+    {
+        Repo.Add(new StudyDocument { Name = "A1", Subject = "A", Type = "T" });
+        var model = CreateModel(new CategorySelectionDialogStub());
+        model.SelectedSubjects = new List<CategoryItem> { model.Subjects.Single(s => s.Name == "A") };
+        model.SelectedTypes = new List<CategoryItem> { model.Types.Single(t => t.Name == "T") };
+
+        model.RefreshCommand.Execute(null);
+
+        var refreshedSubject = model.Subjects.Single(s => s.Name == "A");
+        var refreshedType = model.Types.Single(t => t.Name == "T");
+        Assert.Same(refreshedSubject, model.SelectedSubjects[0]);
+        Assert.Same(refreshedType, model.SelectedTypes[0]);
+    }
+
+    [Fact]
+    public void Refresh_RemovesMultiSelections_WhenCategoryNoLongerExists()
+    {
+        Repo.Add(new StudyDocument { Name = "A1", Subject = "A", Type = "T" });
+        var model = CreateModel(new CategorySelectionDialogStub());
+        model.SelectedSubjects = new List<CategoryItem> { model.Subjects.Single(s => s.Name == "A") };
+        model.SelectedTypes = new List<CategoryItem> { model.Types.Single(t => t.Name == "T") };
+        var documentId = Repo.GetAll().Single(document => document.Name == "A1").Id;
+        Repo.Delete(documentId);
+
+        model.RefreshCommand.Execute(null);
+
+        Assert.Empty(model.SelectedSubjects);
+        Assert.Empty(model.SelectedTypes);
+    }
+
+    [Fact]
     public async Task Delete_ClearsSelection_WhenSubjectGone()
     {
         Repo.Add(new StudyDocument { Name = "A1", Subject = "A" });
