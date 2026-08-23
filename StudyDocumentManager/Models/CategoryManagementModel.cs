@@ -72,6 +72,7 @@ public partial class CategoryManagementModel : ModelBase
             .OfType<CategoryItem>()
             .Select(item => ResolveSelection(item, items))
             .OfType<CategoryItem>()
+            .Distinct()
             .ToList();
 
     [RelayCommand]

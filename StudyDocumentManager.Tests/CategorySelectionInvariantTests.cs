@@ -103,6 +103,64 @@ public sealed class CategorySelectionInvariantTests : DatabaseTestBase
         Assert.Same(model.Types.First(t => t.Name == "T1"), model.SelectedType);
     }
 
+    [Fact]
+    public void Refresh_ReconcilesMultiSelection_ByNameCaseInsensitively()
+    {
+        Repo.Add(new StudyDocument { Name = "A1", Subject = "Math101" });
+        var model = CreateModel(new CategorySelectionDialogStub());
+        var stale = new CategoryItem("math101", 999);
+        model.SelectedSubjects = new List<CategoryItem> { stale };
+
+        model.RefreshCommand.Execute(null);
+
+        var selected = Assert.Single(model.SelectedSubjects.Cast<CategoryItem>());
+        Assert.Same(model.Subjects.Single(s => s.Name == "Math101"), selected);
+    }
+
+    [Fact]
+    public async Task Rename_ReconcilesMultiSelection_AndDropsRenamedOldName()
+    {
+        Repo.Add(new StudyDocument { Name = "A1", Subject = "Math101" });
+        Repo.Add(new StudyDocument { Name = "B1", Subject = "Physics101" });
+        var dialog = new CategorySelectionDialogStub { InputResult = "Math102" };
+        var model = CreateModel(dialog);
+        model.SelectedSubject = model.Subjects.Single(s => s.Name == "Math101");
+        model.SelectedSubjects = new List<CategoryItem>
+        {
+            model.Subjects.Single(s => s.Name == "Math101"),
+            model.Subjects.Single(s => s.Name == "Physics101")
+        };
+
+        await model.RenameSubjectCommand.ExecuteAsync(null);
+
+        var selected = Assert.Single(model.SelectedSubjects.Cast<CategoryItem>());
+        Assert.Equal("Physics101", selected.Name);
+        Assert.Same(model.Subjects.Single(s => s.Name == "Physics101"), selected);
+    }
+
+    [Fact]
+    public async Task Delete_ReconcilesMultiSelection_BeforeChoosingTargets()
+    {
+        Repo.Add(new StudyDocument { Name = "A1", Subject = "A" });
+        Repo.Add(new StudyDocument { Name = "B1", Subject = "B" });
+        var dialog = new CategorySelectionDialogStub { ConfirmResult = true };
+        var model = CreateModel(dialog);
+        model.SelectedSubjects = new List<CategoryItem>
+        {
+            model.Subjects.Single(s => s.Name == "A"),
+            model.Subjects.Single(s => s.Name == "B")
+        };
+        var categoryRepo = new CategoryRepository(Db);
+        Assert.True(categoryRepo.UpdateSubjectName("A", "C"));
+
+        model.RefreshCommand.Execute(null);
+        await model.DeleteSubjectCommand.ExecuteAsync(null);
+
+        Assert.Contains(Repo.GetAll(), d => d.Subject == "C");
+        Assert.DoesNotContain(Repo.GetAll(), d => d.Subject == "B");
+        Assert.Empty(model.SelectedSubjects);
+    }
+
     private CategoryManagementModel CreateModel(CategorySelectionDialogStub dialog)
         => new(Repo, new CategoryRepository(Db), dialog, new CategorySelectionLocalizationStub());
 }
