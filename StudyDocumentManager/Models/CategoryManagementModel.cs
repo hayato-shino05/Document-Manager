@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 
 using StudyDocumentManager.Services;
@@ -14,6 +15,8 @@ public partial class CategoryManagementModel : ModelBase
     private readonly ICategoryRepository _categoryRepo;
     private readonly IDialogService _dialogService;
     private readonly ILocalizationService _loc;
+    private readonly ICustomDialogService? _customDialogs;
+    private readonly IUndoService? _undo;
 
     [ObservableProperty] private ObservableCollection<CategoryItem> _subjects = new();
     [ObservableProperty] private ObservableCollection<CategoryItem> _types = new();
@@ -29,12 +32,15 @@ public partial class CategoryManagementModel : ModelBase
 
     public string StatusText => string.Format(_loc["Status_CategorySummary"], TotalDocumentCount, Subjects.Count, Types.Count);
 
-    public CategoryManagementModel(IDocumentRepository repository, ICategoryRepository categoryRepo, IDialogService dialogService, ILocalizationService loc)
+    public CategoryManagementModel(IDocumentRepository repository, ICategoryRepository categoryRepo, IDialogService dialogService, ILocalizationService loc,
+        ICustomDialogService? customDialogService = null, IUndoService? undoService = null)
     {
         _repository = repository;
         _categoryRepo = categoryRepo;
         _dialogService = dialogService;
         _loc = loc;
+        _customDialogs = customDialogService;
+        _undo = undoService;
         LoadData();
     }
 
@@ -63,12 +69,14 @@ public partial class CategoryManagementModel : ModelBase
 
         try
         {
+            var originals = CaptureOriginalsBySubject(subject.Name);
             if (!_categoryRepo.UpdateSubjectName(subject.Name, newName.Trim()))
             {
                 await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
                 return;
             }
 
+            PushRenameUndo(originals, subject.Name, newName.Trim());
             LoadData();
             await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
                 string.Format(_loc["Category_RenameSubjectDone"], newName.Trim()));
@@ -90,12 +98,14 @@ public partial class CategoryManagementModel : ModelBase
 
         try
         {
+            var originals = CaptureOriginalsByType(type.Name);
             if (!_categoryRepo.UpdateTypeName(type.Name, newName.Trim()))
             {
                 await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
                 return;
             }
 
+            PushRenameUndo(originals, type.Name, newName.Trim());
             LoadData();
             await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
                 string.Format(_loc["Category_RenameTypeDone"], newName.Trim()));
@@ -116,18 +126,29 @@ public partial class CategoryManagementModel : ModelBase
             targets = [SelectedSubject];
         }
 
-        int totalDocs = targets.Sum(t => t.Count);
-        string namesStr = targets.Count == 1
-            ? $"'{targets[0].Name}'"
-            : string.Format(_loc["Category_SelectedCount"], targets.Count);
+        var allDocs = _repository.GetAll();
+        var affectedDocs = allDocs.Where(d => targets.Any(t => t.Name == d.Subject)).ToList();
 
-        string confirmMsg = totalDocs == 0
-            ? string.Format(_loc["Category_DeleteConfirmMsg"], namesStr)
-            : string.Format(_loc["Category_DeleteWithDocsMsg"], namesStr, totalDocs);
-
-        bool confirm = await _dialogService.ShowConfirmAsync(_loc["Category_ConfirmDeleteSubject"], confirmMsg,
-            _loc["Action_Delete"], isDanger: true);
-        if (!confirm) return;
+        bool confirmed;
+        if (_customDialogs != null)
+        {
+            confirmed = await _customDialogs.ShowAffectedItemsPreviewAsync(
+                string.Format(_loc["PV_CascadeTitle"], BuildTargetNames(targets)),
+                affectedDocs.Count,
+                affectedDocs.Select(d => d.Name).ToList(),
+                _loc["PV_RecycleBinNote"]);
+        }
+        else
+        {
+            int totalDocs = targets.Sum(t => t.Count);
+            string namesStr = BuildTargetNames(targets);
+            string confirmMsg = totalDocs == 0
+                ? string.Format(_loc["Category_DeleteConfirmMsg"], namesStr)
+                : string.Format(_loc["Category_DeleteWithDocsMsg"], namesStr, totalDocs);
+            confirmed = await _dialogService.ShowConfirmAsync(_loc["Category_ConfirmDeleteSubject"], confirmMsg,
+                _loc["Action_Delete"], isDanger: true);
+        }
+        if (!confirmed) return;
 
         try
         {
@@ -139,6 +160,8 @@ public partial class CategoryManagementModel : ModelBase
                     return;
                 }
             }
+
+            PushCascadeUndo(affectedDocs);
 
             LoadData();
             SelectedSubjects = new List<CategoryItem>();
@@ -164,18 +187,29 @@ public partial class CategoryManagementModel : ModelBase
             targets = [SelectedType];
         }
 
-        int totalDocs = targets.Sum(t => t.Count);
-        string namesStr = targets.Count == 1
-            ? $"'{targets[0].Name}'"
-            : string.Format(_loc["Category_SelectedCount"], targets.Count);
+        var allDocs = _repository.GetAll();
+        var affectedDocs = allDocs.Where(d => targets.Any(t => t.Name == d.Type)).ToList();
 
-        string confirmMsg = totalDocs == 0
-            ? string.Format(_loc["Category_DeleteConfirmMsg"], namesStr)
-            : string.Format(_loc["Category_DeleteWithDocsMsg"], namesStr, totalDocs);
-
-        bool confirm = await _dialogService.ShowConfirmAsync(_loc["Category_ConfirmDeleteType"], confirmMsg,
-            _loc["Action_Delete"], isDanger: true);
-        if (!confirm) return;
+        bool confirmed;
+        if (_customDialogs != null)
+        {
+            confirmed = await _customDialogs.ShowAffectedItemsPreviewAsync(
+                string.Format(_loc["PV_CascadeTitle"], BuildTargetNames(targets)),
+                affectedDocs.Count,
+                affectedDocs.Select(d => d.Name).ToList(),
+                _loc["PV_RecycleBinNote"]);
+        }
+        else
+        {
+            int totalDocs = targets.Sum(t => t.Count);
+            string namesStr = BuildTargetNames(targets);
+            string confirmMsg = totalDocs == 0
+                ? string.Format(_loc["Category_DeleteConfirmMsg"], namesStr)
+                : string.Format(_loc["Category_DeleteWithDocsMsg"], namesStr, totalDocs);
+            confirmed = await _dialogService.ShowConfirmAsync(_loc["Category_ConfirmDeleteType"], confirmMsg,
+                _loc["Action_Delete"], isDanger: true);
+        }
+        if (!confirmed) return;
 
         try
         {
@@ -187,6 +221,8 @@ public partial class CategoryManagementModel : ModelBase
                     return;
                 }
             }
+
+            PushCascadeUndo(affectedDocs);
 
             LoadData();
             SelectedTypes = new List<CategoryItem>();
@@ -270,6 +306,41 @@ public partial class CategoryManagementModel : ModelBase
     private void Refresh()
     {
         LoadData();
+    }
+
+    private string BuildTargetNames(List<CategoryItem> targets)
+        => targets.Count == 1
+            ? $"'{targets[0].Name}'"
+            : string.Format(_loc["Category_SelectedCount"], targets.Count);
+
+    private List<StudyDocument> CaptureOriginalsBySubject(string subject)
+        => _repository.GetAll().Where(d => d.Subject == subject).ToList();
+
+    private List<StudyDocument> CaptureOriginalsByType(string type)
+        => _repository.GetAll().Where(d => d.Type == type).ToList();
+
+    private void PushRenameUndo(List<StudyDocument> originals, string oldName, string newName)
+    {
+        if (originals.Count == 0) return;
+        _undo?.Push(new UndoEntry
+        {
+            DescriptionKey = "UN_Renamed",
+            DescriptionArgs = [oldName, newName],
+            Originals = originals,
+            CreatedAt = DateTime.Now
+        });
+    }
+
+    private void PushCascadeUndo(List<StudyDocument> affectedDocs)
+    {
+        if (affectedDocs.Count == 0) return;
+        _undo?.Push(new UndoEntry
+        {
+            DescriptionKey = "UN_DeletedDocuments",
+            DescriptionArgs = [affectedDocs.Count],
+            DeletedIds = [.. affectedDocs.Select(d => d.Id)],
+            CreatedAt = DateTime.Now
+        });
     }
 }
 

@@ -68,6 +68,18 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
+
+                    <TextBlock Text="{loc:Localize DS_Label_Status}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondary}"/>
+                    <ComboBox Name="cboStatus" Width="130" FontSize="{StaticResource FontSizeMd}"
+                              Height="{StaticResource HeightControl}" VerticalAlignment="Center"
+                              AutomationProperties.Name="{loc:Localize DS_Label_Status}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Display}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                     </StackPanel>
                 </ScrollViewer>
 

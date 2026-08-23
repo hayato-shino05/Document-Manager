@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
@@ -14,6 +15,7 @@ public partial class DashboardModel : ModelBase
 {
     private const string FILTER_ALL_SUBJECTS_KEY = "Filter_AllSubjects";
     private const string FILTER_ALL_TYPES_KEY = "Filter_AllTypes";
+    public const string FILTER_ALL_STATUS_KEY = "Filter_AllStatuses";
 
     private readonly IDocumentRepository _repository;
     private readonly IRecycleBinRepository _recycleBinRepo;
@@ -77,6 +79,10 @@ public partial class DashboardModel : ModelBase
     [ObservableProperty] private bool _isEmptyState;
     [ObservableProperty] private bool _hasLoadError;
     [ObservableProperty] private string _stateMessage = string.Empty;
+    [ObservableProperty] private string _lastBackupDisplay = string.Empty;
+    [ObservableProperty] private bool _isBackupStale;
+    [ObservableProperty] private string _lastBackupWarning = string.Empty;
+    [ObservableProperty] private string _backupDirectoryInfo = string.Empty;
 
     // ——— Search & Filter ——— 
     [ObservableProperty] private string _searchKeyword = string.Empty;
@@ -84,6 +90,8 @@ public partial class DashboardModel : ModelBase
     [ObservableProperty] private List<string> _types = new();
     [ObservableProperty] private string _selectedSubject = FILTER_ALL_SUBJECTS_KEY;
     [ObservableProperty] private string _selectedType = FILTER_ALL_TYPES_KEY;
+    [ObservableProperty] private string _selectedStatus = FILTER_ALL_STATUS_KEY;
+    [ObservableProperty] private List<StatusOption> _statusOptions = [];
 
     // ——— Advanced Filter ——— 
     [ObservableProperty] private bool _isAdvancedFilterVisible;
@@ -103,6 +111,7 @@ public partial class DashboardModel : ModelBase
             if (IsDateFilterEnabled && (FilterFromDate.HasValue || FilterToDate.HasValue)) count++;
             if (IsSizeFilterEnabled) count++;
             if (IsImportantOnly) count++;
+            if (SelectedStatus != FILTER_ALL_STATUS_KEY) count++;
             return count;
         }
     }
@@ -155,11 +164,13 @@ public partial class DashboardModel : ModelBase
         _exportService = exportService;
         _backupService = backupService;
         _loc = localizationService;
+        BuildStatusOptions();
         _statusText = _loc[_statusKey];
         _loc.LanguageChanged += (_, _) =>
         {
             Subjects = [FILTER_ALL_SUBJECTS_KEY, .._availableSubjects];
             Types = [FILTER_ALL_TYPES_KEY, .._availableTypes];
+            BuildStatusOptions();
 
             if (_allDocuments.Count > 0 || Documents.Count > 0 || IsEmptyState || HasLoadError)
                 BuildCategoryTree(_allDocuments, _availableSubjects, _availableTypes);
@@ -214,6 +225,7 @@ public partial class DashboardModel : ModelBase
             Types = [FILTER_ALL_TYPES_KEY, ..types];
             SelectedSubject = FILTER_ALL_SUBJECTS_KEY;
             SelectedType = FILTER_ALL_TYPES_KEY;
+            SelectedStatus = FILTER_ALL_STATUS_KEY;
             Documents = docs.ToList();
             BuildCategoryTree(docs, subjects, types);
 
@@ -236,6 +248,13 @@ public partial class DashboardModel : ModelBase
         {
             _isLoadingData = false;
             IsLoading = false;
+        }
+
+        if (_pendingSavedSearch != null)
+        {
+            var pending = _pendingSavedSearch;
+            _pendingSavedSearch = null;
+            ApplySavedSearch(pending);
         }
     }
 
@@ -298,6 +317,24 @@ public partial class DashboardModel : ModelBase
 
         return key is null ? canonicalType : _loc[key];
     }
+
+    private void BuildStatusOptions()
+        => StatusOptions =
+        [
+            new(FILTER_ALL_STATUS_KEY, _loc["DS_FilterAll"]),
+            ..DocumentStatus.All.Select(s => new StatusOption(s, GetStatusLabel(s)))
+        ];
+
+    private string GetStatusLabel(string status) => status switch
+    {
+        DocumentStatus.Unread => _loc["DS_Kind_Unread"],
+        DocumentStatus.InProgress => _loc["DS_Kind_InProgress"],
+        DocumentStatus.Read => _loc["DS_Kind_Read"],
+        DocumentStatus.NeedsAction => _loc["DS_Kind_NeedsAction"],
+        DocumentStatus.Completed => _loc["DS_Kind_Completed"],
+        DocumentStatus.Archived => _loc["DS_Kind_Archived"],
+        _ => status
+    };
 
     private void BuildCategoryTree(IList<StudyDocument> docs, List<string> subjects, List<string> types)
     {
@@ -511,28 +548,38 @@ public partial class DashboardModel : ModelBase
 
         try
         {
-            string keyword = SearchKeyword?.Trim() ?? "";
-            string subject = SelectedSubject == FILTER_ALL_SUBJECTS_KEY ? "" : SelectedSubject;
-            string type = SelectedType == FILTER_ALL_TYPES_KEY ? "" : SelectedType;
-            DateTime? fromDate = IsDateFilterEnabled && FilterFromDate.HasValue ? FilterFromDate.Value.DateTime : null;
-            DateTime? toDate = IsDateFilterEnabled && FilterToDate.HasValue ? FilterToDate.Value.DateTime : null;
-            double? minSize = IsSizeFilterEnabled ? FilterMinSize : null;
-            double? maxSize = IsSizeFilterEnabled ? FilterMaxSize : null;
-            bool? isImportant = IsImportantOnly ? true : null;
-            bool hasFilter = !string.IsNullOrEmpty(subject) || !string.IsNullOrEmpty(type)
-                || fromDate.HasValue || toDate.HasValue || minSize.HasValue || maxSize.HasValue
-                || isImportant.HasValue || !string.IsNullOrEmpty(keyword);
-
-            var results = hasFilter
-                ? _repository.SearchAdvanced(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant)
-                : _repository.GetAll();
-
-            UpdateVisibleState(results);
+            ApplyFiltersCore();
         }
         finally
         {
             _isApplyingFilters = false;
         }
+    }
+
+    private void ApplyFiltersCore()
+    {
+        string keyword = SearchKeyword?.Trim() ?? "";
+        string subject = SelectedSubject == FILTER_ALL_SUBJECTS_KEY ? "" : SelectedSubject;
+        string type = SelectedType == FILTER_ALL_TYPES_KEY ? "" : SelectedType;
+        DateTime? fromDate = IsDateFilterEnabled && FilterFromDate.HasValue ? FilterFromDate.Value.DateTime : null;
+        DateTime? toDate = IsDateFilterEnabled && FilterToDate.HasValue ? FilterToDate.Value.DateTime : null;
+        double? minSize = IsSizeFilterEnabled ? FilterMinSize : null;
+        double? maxSize = IsSizeFilterEnabled ? FilterMaxSize : null;
+        bool? isImportant = IsImportantOnly ? true : null;
+        string? status = SelectedStatus == FILTER_ALL_STATUS_KEY ? null : SelectedStatus;
+        bool hasFilter = !string.IsNullOrEmpty(subject) || !string.IsNullOrEmpty(type)
+            || fromDate.HasValue || toDate.HasValue || minSize.HasValue || maxSize.HasValue
+            || isImportant.HasValue || !string.IsNullOrEmpty(keyword)
+            || status != null;
+
+        var results = !hasFilter
+            ? _repository.GetAll()
+            : status != null
+                ? _repository.SearchAdvancedWithStatus(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant, status)
+                : _repository.SearchAdvanced(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant);
+
+        OnPropertyChanged(nameof(ActiveFilterCount));
+        UpdateVisibleState(results);
     }
 
     // ——— Document actions ——— 
@@ -668,6 +715,7 @@ public partial class DashboardModel : ModelBase
         SearchKeyword = string.Empty;
         SelectedSubject = FILTER_ALL_SUBJECTS_KEY;
         SelectedType = FILTER_ALL_TYPES_KEY;
+        SelectedStatus = FILTER_ALL_STATUS_KEY;
         IsAdvancedFilterVisible = false;
         IsDateFilterEnabled = false;
         FilterFromDate = null;
@@ -858,6 +906,79 @@ public partial class DashboardModel : ModelBase
         SetLocalizedStatus("Status_Overdue", docs.Count);
     }
 
+    // スマートビュー実行（NavigationService "run-smartview" 経由）
+    public void ApplySavedSearch(SavedSearchCriteria? criteria)
+    {
+        if (criteria == null || _isApplyingFilters) return;
+
+        // View の遅延初期化前に呼ばれた場合は保留し、LoadData 完了後に適用する
+        if (_isLoadingData || IsLoading)
+        {
+            _pendingSavedSearch = criteria;
+            return;
+        }
+
+        ApplySavedSearchCore(criteria);
+    }
+
+    private SavedSearchCriteria? _pendingSavedSearch;
+
+    private void ApplySavedSearchCore(SavedSearchCriteria criteria)
+    {
+        _isApplyingFilters = true;
+        try
+        {
+            SearchKeyword = criteria.Keyword ?? string.Empty;
+            SelectedSubject = string.IsNullOrEmpty(criteria.Subject) ? FILTER_ALL_SUBJECTS_KEY : criteria.Subject;
+            SelectedType = string.IsNullOrEmpty(criteria.Type) ? FILTER_ALL_TYPES_KEY : criteria.Type;
+            SelectedStatus = FILTER_ALL_STATUS_KEY;
+            FilterFromDate = criteria.FromDate.HasValue ? new DateTimeOffset(criteria.FromDate.Value) : null;
+            FilterToDate = criteria.ToDate.HasValue ? new DateTimeOffset(criteria.ToDate.Value) : null;
+            FilterMinSize = criteria.MinSize ?? 0;
+            FilterMaxSize = criteria.MaxSize ?? 100;
+            IsDateFilterEnabled = criteria.FromDate.HasValue || criteria.ToDate.HasValue;
+            IsSizeFilterEnabled = criteria.MinSize.HasValue || criteria.MaxSize.HasValue;
+            IsImportantOnly = criteria.IsImportant ?? false;
+            IsAdvancedFilterVisible = IsDateFilterEnabled || IsSizeFilterEnabled || (criteria.IsImportant ?? false);
+
+            switch (criteria.Kind)
+            {
+                case SavedSearchKinds.Uncategorized:
+                    UpdateVisibleState(_repository.GetUncategorizedDocuments());
+                    break;
+                case SavedSearchKinds.MissingMetadata:
+                    UpdateVisibleState(_repository.GetDocumentsWithMissingMetadata());
+                    break;
+                case SavedSearchKinds.MissingFile:
+                    UpdateVisibleState(_repository.GetAll()
+                        .Where(d => !string.IsNullOrEmpty(d.FilePath) && !File.Exists(d.FilePath))
+                        .ToList());
+                    break;
+                case SavedSearchKinds.RecentlyAdded:
+                    FilterFromDate = DateTimeOffset.Now.AddDays(-criteria.RecentDays);
+                    IsDateFilterEnabled = true;
+                    ApplyFiltersCore();
+                    break;
+                case SavedSearchKinds.Important:
+                    IsImportantOnly = true;
+                    ApplyFiltersCore();
+                    break;
+                case SavedSearchKinds.DueSoon:
+                    var upcoming = _repository.GetUpcomingDeadlines(criteria.DeadlineDays);
+                    Documents = upcoming.ToList();
+                    SetLocalizedStatus("Status_UpcomingDeadlines", upcoming.Count);
+                    break;
+                default:
+                    ApplyFiltersCore();
+                    break;
+            }
+        }
+        finally
+        {
+            _isApplyingFilters = false;
+        }
+    }
+
     // ——— About dialog ——— 
     [RelayCommand]
     private async Task ShowAboutAsync()
@@ -876,4 +997,11 @@ public partial class DashboardModel : ModelBase
     {
         if (!_isLoadingData) ApplyFilters();
     }
+
+    partial void OnSelectedStatusChanged(string value)
+    {
+        if (!_isLoadingData) ApplyFilters();
+    }
 }
+
+public sealed record StatusOption(string Value, string Display);

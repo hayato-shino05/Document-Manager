@@ -17,6 +17,7 @@ public partial class Dashboard : UserControl
         var dgv = this.FindControl<DataGrid>("dgvDocuments");
         var cboSubject = this.FindControl<ComboBox>("cboSubject");
         var cboType = this.FindControl<ComboBox>("cboType");
+        var cboStatus = this.FindControl<ComboBox>("cboStatus");
 
         // Double-click to open file
         if (dgv != null)
@@ -55,6 +56,16 @@ public partial class Dashboard : UserControl
             };
         }
 
+        if (cboStatus != null)
+        {
+            cboStatus.SelectionChanged += (s, e) =>
+            {
+                if (_syncing) return;
+                if (DataContext is DashboardModel vm && cboStatus.SelectedItem is StatusOption option)
+                    vm.SelectedStatus = option.Value;
+            };
+        }
+
         // Use AttachedToVisualTree — fires AFTER the control is added to visual tree
         // but BEFORE layout. We then post with Loaded priority to run after layout.
         AttachedToVisualTree += (s, e) =>
@@ -69,29 +80,29 @@ public partial class Dashboard : UserControl
             {
                 Dispatcher.UIThread.InvokeAsync(() =>
                 {
-                    InitializeData(dgv, cboSubject, cboType);
+                    InitializeData(dgv, cboSubject, cboType, cboStatus);
                 });
             };
             timer.Start();
         };
     }
 
-    private void InitializeData(DataGrid? dgv, ComboBox? cboSubject, ComboBox? cboType)
+    private void InitializeData(DataGrid? dgv, ComboBox? cboSubject, ComboBox? cboType, ComboBox? cboStatus)
     {
         if (DataContext is not DashboardModel vm) return;
 
         // Subscribe to ViewModel property changes
-        vm.PropertyChanged += (sender, args) => OnVmPropertyChanged(sender, args, dgv, cboSubject, cboType);
+        vm.PropertyChanged += (sender, args) => OnVmPropertyChanged(sender, args, dgv, cboSubject, cboType, cboStatus);
 
         // Initialize data (populates vm.Documents, vm.Subjects, vm.Types)
         vm.Initialize();
 
         // Sync UI controls
-        SyncAll(vm, dgv, cboSubject, cboType);
+        SyncAll(vm, dgv, cboSubject, cboType, cboStatus);
     }
 
     private void OnVmPropertyChanged(object? sender, PropertyChangedEventArgs args,
-        DataGrid? dgv, ComboBox? cboSubject, ComboBox? cboType)
+        DataGrid? dgv, ComboBox? cboSubject, ComboBox? cboType, ComboBox? cboStatus)
     {
         if (sender is not DashboardModel vm) return;
         if (_syncing) return;
@@ -123,12 +134,19 @@ public partial class Dashboard : UserControl
                 case nameof(DashboardModel.SelectedType):
                     if (cboType != null) cboType.SelectedItem = vm.SelectedType;
                     break;
+                case nameof(DashboardModel.StatusOptions):
+                    SyncStatusComboBox(cboStatus, vm.StatusOptions, vm.SelectedStatus);
+                    break;
+                case nameof(DashboardModel.SelectedStatus):
+                    if (cboStatus != null)
+                        cboStatus.SelectedItem = FindStatusOption(vm.StatusOptions, vm.SelectedStatus);
+                    break;
             }
         }
         finally { _syncing = false; }
     }
 
-    private void SyncAll(DashboardModel vm, DataGrid? dgv, ComboBox? cboSubject, ComboBox? cboType)
+    private void SyncAll(DashboardModel vm, DataGrid? dgv, ComboBox? cboSubject, ComboBox? cboType, ComboBox? cboStatus)
     {
         _syncing = true;
         try
@@ -136,6 +154,7 @@ public partial class Dashboard : UserControl
             if (dgv != null) dgv.ItemsSource = vm.Documents;
             SyncComboBox(cboSubject, vm.Subjects, vm.SelectedSubject);
             SyncComboBox(cboType, vm.Types, vm.SelectedType);
+            SyncStatusComboBox(cboStatus, vm.StatusOptions, vm.SelectedStatus);
         }
         finally { _syncing = false; }
     }
@@ -146,4 +165,14 @@ public partial class Dashboard : UserControl
         cbo.ItemsSource = items;
         cbo.SelectedItem = selectedItem;
     }
+
+    private static void SyncStatusComboBox(ComboBox? cbo, List<StatusOption> options, string selectedValue)
+    {
+        if (cbo == null) return;
+        cbo.ItemsSource = options;
+        cbo.SelectedItem = FindStatusOption(options, selectedValue);
+    }
+
+    private static StatusOption? FindStatusOption(List<StatusOption> options, string value)
+        => options.FirstOrDefault(o => o.Value == value);
 }

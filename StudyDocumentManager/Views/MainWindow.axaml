@@ -82,6 +82,7 @@
                               AutomationProperties.AutomationId="Menu_Organize">
                         <MenuItem Header="{loc:Localize Menu_ManageCategories}" Command="{Binding NavigateCommand}" CommandParameter="categories" InputGesture="Ctrl+M"/>
                         <MenuItem Header="{loc:Localize Menu_Collections}" Command="{Binding NavigateCommand}" CommandParameter="collections"/>
+                        <MenuItem Header="{loc:Localize Menu_SmartViews}" Command="{Binding NavigateCommand}" CommandParameter="smartviews"/>
                     </MenuItem>
                     <MenuItem Header="{loc:Localize Menu_Import}"
                               AutomationProperties.AutomationId="Menu_Import">
@@ -183,6 +184,14 @@
                 <!-- Right side -->
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
                             HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button Classes="secondary toolbar-btn" Command="{Binding UndoLastCommand}"
+                            AutomationProperties.AutomationId="Toolbar_Undo"
+                            IsVisible="{Binding CanUndo}">
+                        <StackPanel Classes="toolbar-btn-stack">
+                            <Image Source="{StaticResource IconBack}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="{loc:Localize Menu_Undo}" Classes="toolbar-btn-label"/>
+                        </StackPanel>
+                    </Button>
                     <Button Classes="secondary toolbar-btn" Command="{Binding GoBackCommand}"
                             AutomationProperties.AutomationId="Toolbar_Back"
                             IsVisible="{Binding CanGoBack}">
@@ -260,6 +269,9 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:TreeMapModel}">
                     <v:TreeMap />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:SmartViewsModel}">
+                    <v:SmartViews />
                 </DataTemplate>
             </ContentControl.DataTemplates>
         </ContentControl>

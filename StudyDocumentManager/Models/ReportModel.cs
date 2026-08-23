@@ -13,15 +13,20 @@ public partial class ReportModel : ModelBase
     [ObservableProperty] private ObservableCollection<ChartDataItem> _byTypeData = new();
     [ObservableProperty] private ObservableCollection<ChartDataItem> _byDayData = new();
     [ObservableProperty] private ObservableCollection<ChartDataItem> _byMonthData = new();
+    [ObservableProperty] private ObservableCollection<StatusCountItem> _byStatusData = new();
     [ObservableProperty] private bool _hasDayData;
     [ObservableProperty] private bool _hasMonthData;
 
 
     private readonly IReportRepository _reportRepo;
+    private readonly IDocumentRepository? _documentRepo;
+    private readonly ILocalizationService? _loc;
 
-    public ReportModel(IReportRepository reportRepo)
+    public ReportModel(IReportRepository reportRepo, IDocumentRepository? documentRepo = null, ILocalizationService? localizationService = null)
     {
         _reportRepo = reportRepo;
+        _documentRepo = documentRepo;
+        _loc = localizationService;
         LoadAllData();
     }
 
@@ -42,7 +47,38 @@ public partial class ReportModel : ModelBase
 
         HasDayData = ByDayData.Any(item => item.Value > 0);
         HasMonthData = ByMonthData.Any(item => item.Value > 0);
+        ByStatusData = CreateStatusCounts();
     }
+
+    private ObservableCollection<StatusCountItem> CreateStatusCounts()
+    {
+        var counts = _documentRepo?.GetStatusCounts() ?? [];
+        var items = DocumentStatus.All
+            .Select(kind => new StatusCountItem
+            {
+                Kind = kind,
+                Label = GetStatusLabel(kind),
+                Value = counts.TryGetValue(kind, out int count) ? count : 0
+            })
+            .ToList();
+        var max = items.Count > 0 ? items.Max(x => x.Value) : 1;
+        if (max == 0) max = 1;
+        foreach (var item in items) item.MaxValue = max;
+        return new ObservableCollection<StatusCountItem>(items);
+    }
+
+    private string GetStatusLabel(string status) => status switch
+    {
+        DocumentStatus.Unread => Loc("DS_Kind_Unread"),
+        DocumentStatus.InProgress => Loc("DS_Kind_InProgress"),
+        DocumentStatus.Read => Loc("DS_Kind_Read"),
+        DocumentStatus.NeedsAction => Loc("DS_Kind_NeedsAction"),
+        DocumentStatus.Completed => Loc("DS_Kind_Completed"),
+        DocumentStatus.Archived => Loc("DS_Kind_Archived"),
+        _ => status
+    };
+
+    private string Loc(string key) => _loc?[key] ?? key;
 
     private static ObservableCollection<ChartDataItem> CreateChartData(IEnumerable<ChartDataItem> items)
     {
@@ -63,5 +99,15 @@ public class ChartDataItem
     public int MaxValue { get; set; } = 1;
 
     // For bar chart visualization (proportional width, max ~300px)
+    public double BarWidth => MaxValue > 0 ? (double)Value / MaxValue * 300.0 : 0;
+}
+
+public class StatusCountItem
+{
+    public string Kind { get; set; } = string.Empty;
+    public string Label { get; set; } = string.Empty;
+    public int Value { get; set; }
+    public int MaxValue { get; set; } = 1;
+
     public double BarWidth => MaxValue > 0 ? (double)Value / MaxValue * 300.0 : 0;
 }

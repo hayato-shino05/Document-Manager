@@ -9,4 +9,7 @@ public interface IRecycleBinRepository
     bool PermanentDeleteDocument(int id);
     int EmptyRecycleBin();
     int GetDeletedDocumentCount();
+
+    int RestoreDocuments(IReadOnlyList<int> ids)
+        => throw new NotSupportedException($"{nameof(RestoreDocuments)} is not implemented by this repository.");
 }

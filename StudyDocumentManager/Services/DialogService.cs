@@ -264,6 +264,26 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         return dialog.Result;
     }
 
+    public async Task<bool> ShowBulkEditPreviewAsync(int affectedCount, IReadOnlyList<(string FieldLabel, string NewValue)> changes)
+    {
+        var owner = GetMainWindow();
+        if (owner == null) return false;
+
+        var dialog = new BulkEditPreviewDialog(affectedCount, changes, _loc);
+        await dialog.ShowDialog(owner);
+        return dialog.Result == true;
+    }
+
+    public async Task<bool> ShowAffectedItemsPreviewAsync(string title, int totalCount, IReadOnlyList<string> itemNames, string reversibilityNote)
+    {
+        var owner = GetMainWindow();
+        if (owner == null) return false;
+
+        var dialog = new AffectedItemsPreviewDialog(title, totalCount, itemNames, reversibilityNote, _loc);
+        await dialog.ShowDialog(owner);
+        return dialog.Result == true;
+    }
+
     private static List<FilePickerFileType>? BuildFileFilter(string? filter)
     {
         if (string.IsNullOrEmpty(filter)) return null;

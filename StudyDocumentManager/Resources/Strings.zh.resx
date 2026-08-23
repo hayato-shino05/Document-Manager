@@ -850,4 +850,87 @@
   <data name="FileType_Archive" xml:space="preserve"><value>压缩包</value></data>
   <data name="FileType_Design" xml:space="preserve"><value>设计</value></data>
   <data name="FileType_Other" xml:space="preserve"><value>其他</value></data>
+
+  <!-- SmartViews View -->
+  <data name="Menu_SmartViews" xml:space="preserve"><value>智能视图</value></data>
+  <data name="SV_Title" xml:space="preserve"><value>智能视图</value></data>
+  <data name="SV_ListHeader" xml:space="preserve"><value>已保存视图列表</value></data>
+  <data name="SV_EmptyState" xml:space="preserve"><value>尚无已保存的搜索条件。点击“新建”添加</value></data>
+  <data name="SV_New" xml:space="preserve"><value>新建</value></data>
+  <data name="SV_Open" xml:space="preserve"><value>运行</value></data>
+  <data name="SV_Edit" xml:space="preserve"><value>编辑</value></data>
+  <data name="SV_Duplicate" xml:space="preserve"><value>复制</value></data>
+  <data name="SV_Delete" xml:space="preserve"><value>删除</value></data>
+  <data name="SV_DeleteConfirm" xml:space="preserve"><value>确定删除“{0}”吗？</value></data>
+  <data name="SV_NameRequired" xml:space="preserve"><value>请输入名称</value></data>
+  <data name="SV_NameExists" xml:space="preserve"><value>已存在同名的智能视图</value></data>
+  <data name="SV_Saved" xml:space="preserve"><value>智能视图已保存</value></data>
+  <data name="SV_Deleted" xml:space="preserve"><value>智能视图已删除</value></data>
+  <data name="SV_LoadError" xml:space="preserve"><value>加载智能视图失败</value></data>
+  <data name="SV_Kind_Label" xml:space="preserve"><value>条件类型</value></data>
+  <data name="SV_Kind_Standard" xml:space="preserve"><value>标准条件</value></data>
+  <data name="SV_Kind_Uncategorized" xml:space="preserve"><value>未分类</value></data>
+  <data name="SV_Kind_MissingMetadata" xml:space="preserve"><value>缺少元数据</value></data>
+  <data name="SV_Kind_MissingFile" xml:space="preserve"><value>文件缺失</value></data>
+  <data name="SV_Kind_RecentlyAdded" xml:space="preserve"><value>最近添加</value></data>
+  <data name="SV_Kind_Important" xml:space="preserve"><value>重要</value></data>
+  <data name="SV_Kind_DueSoon" xml:space="preserve"><value>即将到期</value></data>
+  <data name="SV_Field_Name" xml:space="preserve"><value>名称</value></data>
+  <data name="SV_Field_Keyword" xml:space="preserve"><value>关键词</value></data>
+  <data name="SV_Field_Subject" xml:space="preserve"><value>科目</value></data>
+  <data name="SV_Field_Type" xml:space="preserve"><value>类型</value></data>
+  <data name="SV_Field_FromDate" xml:space="preserve"><value>添加日期起</value></data>
+  <data name="SV_Field_ToDate" xml:space="preserve"><value>添加日期止</value></data>
+  <data name="SV_Field_MinSize" xml:space="preserve"><value>最小大小 (MB)</value></data>
+  <data name="SV_Field_MaxSize" xml:space="preserve"><value>最大大小 (MB)</value></data>
+  <data name="SV_Field_Important" xml:space="preserve"><value>仅显示重要</value></data>
+  <data name="SV_Field_RecentDays" xml:space="preserve"><value>时间范围（天）</value></data>
+  <data name="SV_Field_DeadlineDays" xml:space="preserve"><value>截止期限天数</value></data>
+  <data name="SV_Status_Applied" xml:space="preserve"><value>已运行智能视图“{0}”</value></data>
+
+  <!-- Document Status -->
+  <data name="DS_FilterAll" xml:space="preserve"><value>所有状态</value></data>
+  <data name="DS_Label_Status" xml:space="preserve"><value>状态</value></data>
+  <data name="DS_Kind_Unread" xml:space="preserve"><value>未读</value></data>
+  <data name="DS_Kind_InProgress" xml:space="preserve"><value>进行中</value></data>
+  <data name="DS_Kind_Read" xml:space="preserve"><value>已读</value></data>
+  <data name="DS_Kind_NeedsAction" xml:space="preserve"><value>待处理</value></data>
+  <data name="DS_Kind_Completed" xml:space="preserve"><value>已完成</value></data>
+  <data name="DS_Kind_Archived" xml:space="preserve"><value>已归档</value></data>
+  <data name="DS_Error_InvalidStatus" xml:space="preserve"><value>请选择有效的状态</value></data>
+  <data name="RS_StatusCounts_Title" xml:space="preserve"><value>按状态统计报表</value></data>
+
+  <!-- Bulk Edit -->
+  <data name="BE_SectionTitle" xml:space="preserve"><value>批量编辑</value></data>
+  <data name="BE_Field_Subject" xml:space="preserve"><value>科目</value></data>
+  <data name="BE_Field_Type" xml:space="preserve"><value>类型</value></data>
+  <data name="BE_Field_Tags" xml:space="preserve"><value>标签</value></data>
+  <data name="BE_Field_Important" xml:space="preserve"><value>重要</value></data>
+  <data name="BE_Field_Deadline" xml:space="preserve"><value>截止日期</value></data>
+  <data name="BE_Field_Status" xml:space="preserve"><value>状态</value></data>
+  <data name="BE_Field_CollectionAdd" xml:space="preserve"><value>添加到收藏集</value></data>
+  <data name="BE_PreviewTitle" xml:space="preserve"><value>确认批量编辑</value></data>
+  <data name="BE_PreviewAffected" xml:space="preserve"><value>将更新 {0} 个文档</value></data>
+  <data name="BE_ConfirmApply" xml:space="preserve"><value>应用</value></data>
+  <data name="BE_Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="BE_Result_AllSuccess" xml:space="preserve"><value>已更新 {0}/{1} 个文档</value></data>
+  <data name="BE_Result_Partial" xml:space="preserve"><value>仅更新了 {0}/{1} 个文档，部分失败</value></data>
+  <data name="BE_FailedItemsHeader" xml:space="preserve"><value>失败的文档：</value></data>
+  <data name="BE_Undo" xml:space="preserve"><value>撤销</value></data>
+  <data name="BE_UndoDescription" xml:space="preserve"><value>批量编辑了 {0} 个文档</value></data>
+  <data name="BE_Undone" xml:space="preserve"><value>已撤销批量编辑</value></data>
+  <data name="BE_NoSelectionHint" xml:space="preserve"><value>请至少选择一个文档</value></data>
+  <data name="BE_NoFieldsEnabledHint" xml:space="preserve"><value>请启用至少一个字段并填写值</value></data>
+  <data name="BE_CollectionNone" xml:space="preserve"><value>（无收藏集）</value></data>
+
+  <!-- Undo / Affected preview -->
+  <data name="Menu_Undo" xml:space="preserve"><value>撤销</value></data>
+  <data name="UN_Applied" xml:space="preserve"><value>已撤销：{0}</value></data>
+  <data name="UN_DeletedDocuments" xml:space="preserve"><value>删除了 {0} 个文档</value></data>
+  <data name="UN_CollectionRestorable" xml:space="preserve"><value>删除了收藏集“{0}”（可恢复）</value></data>
+  <data name="UN_Renamed" xml:space="preserve"><value>将“{0}”重命名为“{1}”</value></data>
+  <data name="PV_DeleteCollection" xml:space="preserve"><value>要删除此收藏集吗？</value></data>
+  <data name="PV_CascadeTitle" xml:space="preserve"><value>要删除{0}吗？</value></data>
+  <data name="PV_MembershipNote" xml:space="preserve"><value>删除后可通过“撤销”恢复收藏集及其成员。文档本身不会被删除。</value></data>
+  <data name="PV_RecycleBinNote" xml:space="preserve"><value>被删除的文档可从回收站或通过“撤销”恢复。</value></data>
 </root>

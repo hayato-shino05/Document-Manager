@@ -850,4 +850,87 @@
   <data name="FileType_Archive" xml:space="preserve"><value>Lưu trữ</value></data>
   <data name="FileType_Design" xml:space="preserve"><value>Thiết kế</value></data>
   <data name="FileType_Other" xml:space="preserve"><value>Khác</value></data>
+
+  <!-- SmartViews View -->
+  <data name="Menu_SmartViews" xml:space="preserve"><value>Chế độ xem thông minh</value></data>
+  <data name="SV_Title" xml:space="preserve"><value>Chế độ xem thông minh</value></data>
+  <data name="SV_ListHeader" xml:space="preserve"><value>Danh sách chế độ xem</value></data>
+  <data name="SV_EmptyState" xml:space="preserve"><value>Chưa có điều kiện tìm kiếm nào được lưu. Tạo mới bằng "Tạo mới"</value></data>
+  <data name="SV_New" xml:space="preserve"><value>Tạo mới</value></data>
+  <data name="SV_Open" xml:space="preserve"><value>Chạy</value></data>
+  <data name="SV_Edit" xml:space="preserve"><value>Sửa</value></data>
+  <data name="SV_Duplicate" xml:space="preserve"><value>Nhân bản</value></data>
+  <data name="SV_Delete" xml:space="preserve"><value>Xóa</value></data>
+  <data name="SV_DeleteConfirm" xml:space="preserve"><value>Xóa "{0}"?</value></data>
+  <data name="SV_NameRequired" xml:space="preserve"><value>Vui lòng nhập tên</value></data>
+  <data name="SV_NameExists" xml:space="preserve"><value>Đã tồn tại chế độ xem cùng tên</value></data>
+  <data name="SV_Saved" xml:space="preserve"><value>Đã lưu chế độ xem thông minh</value></data>
+  <data name="SV_Deleted" xml:space="preserve"><value>Đã xóa chế độ xem thông minh</value></data>
+  <data name="SV_LoadError" xml:space="preserve"><value>Không thể tải chế độ xem thông minh</value></data>
+  <data name="SV_Kind_Label" xml:space="preserve"><value>Loại điều kiện</value></data>
+  <data name="SV_Kind_Standard" xml:space="preserve"><value>Điều kiện tiêu chuẩn</value></data>
+  <data name="SV_Kind_Uncategorized" xml:space="preserve"><value>Chưa phân loại</value></data>
+  <data name="SV_Kind_MissingMetadata" xml:space="preserve"><value>Thiếu siêu dữ liệu</value></data>
+  <data name="SV_Kind_MissingFile" xml:space="preserve"><value>Thiếu tệp</value></data>
+  <data name="SV_Kind_RecentlyAdded" xml:space="preserve"><value>Thêm gần đây</value></data>
+  <data name="SV_Kind_Important" xml:space="preserve"><value>Quan trọng</value></data>
+  <data name="SV_Kind_DueSoon" xml:space="preserve"><value>Sắp đến hạn</value></data>
+  <data name="SV_Field_Name" xml:space="preserve"><value>Tên</value></data>
+  <data name="SV_Field_Keyword" xml:space="preserve"><value>Từ khóa</value></data>
+  <data name="SV_Field_Subject" xml:space="preserve"><value>Danh mục</value></data>
+  <data name="SV_Field_Type" xml:space="preserve"><value>Loại</value></data>
+  <data name="SV_Field_FromDate" xml:space="preserve"><value>Ngày thêm từ</value></data>
+  <data name="SV_Field_ToDate" xml:space="preserve"><value>Ngày thêm đến</value></data>
+  <data name="SV_Field_MinSize" xml:space="preserve"><value>Kích thước tối thiểu (MB)</value></data>
+  <data name="SV_Field_MaxSize" xml:space="preserve"><value>Kích thước tối đa (MB)</value></data>
+  <data name="SV_Field_Important" xml:space="preserve"><value>Chỉ hiển thị quan trọng</value></data>
+  <data name="SV_Field_RecentDays" xml:space="preserve"><value>Khoảng thời gian (ngày)</value></data>
+  <data name="SV_Field_DeadlineDays" xml:space="preserve"><value>Số ngày hạn chót</value></data>
+  <data name="SV_Status_Applied" xml:space="preserve"><value>Đã chạy chế độ xem "{0}"</value></data>
+
+  <!-- Document Status -->
+  <data name="DS_FilterAll" xml:space="preserve"><value>Tất cả trạng thái</value></data>
+  <data name="DS_Label_Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="DS_Kind_Unread" xml:space="preserve"><value>Chưa đọc</value></data>
+  <data name="DS_Kind_InProgress" xml:space="preserve"><value>Đang xử lý</value></data>
+  <data name="DS_Kind_Read" xml:space="preserve"><value>Đã đọc</value></data>
+  <data name="DS_Kind_NeedsAction" xml:space="preserve"><value>Cần xử lý</value></data>
+  <data name="DS_Kind_Completed" xml:space="preserve"><value>Đã hoàn tất</value></data>
+  <data name="DS_Kind_Archived" xml:space="preserve"><value>Đã lưu trữ</value></data>
+  <data name="DS_Error_InvalidStatus" xml:space="preserve"><value>Vui lòng chọn trạng thái hợp lệ</value></data>
+  <data name="RS_StatusCounts_Title" xml:space="preserve"><value>Báo cáo theo trạng thái</value></data>
+
+  <!-- Bulk Edit -->
+  <data name="BE_SectionTitle" xml:space="preserve"><value>Chỉnh sửa hàng loạt</value></data>
+  <data name="BE_Field_Subject" xml:space="preserve"><value>Môn học</value></data>
+  <data name="BE_Field_Type" xml:space="preserve"><value>Loại</value></data>
+  <data name="BE_Field_Tags" xml:space="preserve"><value>Thẻ</value></data>
+  <data name="BE_Field_Important" xml:space="preserve"><value>Quan trọng</value></data>
+  <data name="BE_Field_Deadline" xml:space="preserve"><value>Hạn chót</value></data>
+  <data name="BE_Field_Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="BE_Field_CollectionAdd" xml:space="preserve"><value>Thêm vào bộ sưu tập</value></data>
+  <data name="BE_PreviewTitle" xml:space="preserve"><value>Xác nhận chỉnh sửa hàng loạt</value></data>
+  <data name="BE_PreviewAffected" xml:space="preserve"><value>Sẽ cập nhật {0} tài liệu</value></data>
+  <data name="BE_ConfirmApply" xml:space="preserve"><value>Áp dụng</value></data>
+  <data name="BE_Cancel" xml:space="preserve"><value>Hủy</value></data>
+  <data name="BE_Result_AllSuccess" xml:space="preserve"><value>Đã cập nhật {0}/{1} tài liệu</value></data>
+  <data name="BE_Result_Partial" xml:space="preserve"><value>Chỉ cập nhật được {0}/{1} tài liệu. Một số tài liệu thất bại</value></data>
+  <data name="BE_FailedItemsHeader" xml:space="preserve"><value>Tài liệu thất bại:</value></data>
+  <data name="BE_Undo" xml:space="preserve"><value>Hoàn tác</value></data>
+  <data name="BE_UndoDescription" xml:space="preserve"><value>Chỉnh sửa hàng loạt {0} tài liệu</value></data>
+  <data name="BE_Undone" xml:space="preserve"><value>Đã hoàn tác chỉnh sửa hàng loạt</value></data>
+  <data name="BE_NoSelectionHint" xml:space="preserve"><value>Vui lòng chọn ít nhất một tài liệu</value></data>
+  <data name="BE_NoFieldsEnabledHint" xml:space="preserve"><value>Bật ít nhất một trường và nhập giá trị</value></data>
+  <data name="BE_CollectionNone" xml:space="preserve"><value>(Không có bộ sưu tập)</value></data>
+
+  <!-- Undo / Affected preview -->
+  <data name="Menu_Undo" xml:space="preserve"><value>Hoàn tác</value></data>
+  <data name="UN_Applied" xml:space="preserve"><value>Đã hoàn tác: {0}</value></data>
+  <data name="UN_DeletedDocuments" xml:space="preserve"><value>Đã xóa {0} tài liệu</value></data>
+  <data name="UN_CollectionRestorable" xml:space="preserve"><value>Đã xóa bộ sưu tập '{0}' (có thể khôi phục)</value></data>
+  <data name="UN_Renamed" xml:space="preserve"><value>Đã đổi '{0}' thành '{1}'</value></data>
+  <data name="PV_DeleteCollection" xml:space="preserve"><value>Xóa bộ sưu tập này?</value></data>
+  <data name="PV_CascadeTitle" xml:space="preserve"><value>Xóa {0}?</value></data>
+  <data name="PV_MembershipNote" xml:space="preserve"><value>Sau khi xóa, có thể khôi phục bộ sưu tập và thành viên bằng Hoàn tác. Bản thân tài liệu không bị xóa.</value></data>
+  <data name="PV_RecycleBinNote" xml:space="preserve"><value>Tài liệu đã xóa có thể được khôi phục từ Thùng rác hoặc bằng Hoàn tác.</value></data>
 </root>

@@ -15,4 +15,10 @@ public interface ICustomDialogService
         IEnumerable<int> alreadyInCollection);
 
     Task<AddDocumentDraft?> ShowAddDocumentAsync(string filePath, IList<string> subjects, IList<string> types);
+
+    Task<bool> ShowBulkEditPreviewAsync(int affectedCount, IReadOnlyList<(string FieldLabel, string NewValue)> changes)
+        => throw new NotSupportedException($"{nameof(ShowBulkEditPreviewAsync)} is not implemented by this dialog service.");
+
+    Task<bool> ShowAffectedItemsPreviewAsync(string title, int totalCount, IReadOnlyList<string> itemNames, string reversibilityNote)
+        => throw new NotSupportedException($"{nameof(ShowAffectedItemsPreviewAsync)} is not implemented by this dialog service.");
 }

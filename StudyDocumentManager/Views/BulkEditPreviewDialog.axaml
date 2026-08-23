@@ -1,0 +1,64 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+        x:Class="StudyDocumentManager.Views.BulkEditPreviewDialog"
+        AutomationProperties.AutomationId="Dialog_BulkEditPreview"
+        Title="{loc:Localize BE_PreviewTitle}"
+        Width="420" MaxHeight="520" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="{StaticResource ContentBackground}">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24" Spacing="12">
+
+            <Border Background="{StaticResource SidebarBackground}" CornerRadius="{StaticResource RadiusSm}"
+                    Padding="10,8">
+                <TextBlock x:Name="AffectedNote"
+                           AutomationProperties.AutomationId="BulkEditPreview_Affected"
+                           FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
+                           Foreground="{StaticResource TextPrimary}"
+                           TextWrapping="Wrap"/>
+            </Border>
+
+            <ItemsControl x:Name="ChangesList" AutomationProperties.AutomationId="BulkEditPreview_Changes">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
+                                Padding="4,6" Margin="0,0,0,2">
+                            <Grid ColumnDefinitions="Auto,12,*">
+                                <TextBlock Grid.Column="0" Text="{Binding FieldLabel}"
+                                           FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextPrimary}"/>
+                                <TextBlock Grid.Column="2" Text="{Binding NewValue}"
+                                           FontSize="{StaticResource FontSizeSm}"
+                                           Foreground="{StaticResource TextSecondary}"
+                                           TextWrapping="Wrap"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8" Margin="0,8,0,0">
+                <Button x:Name="ConfirmButton"
+                        AutomationProperties.AutomationId="BulkEditPreview_Confirm"
+                        AutomationProperties.Name="{loc:Localize BE_ConfirmApply}"
+                        Content="{loc:Localize BE_ConfirmApply}"
+                        Classes="danger"
+                        MinWidth="110"
+                        HorizontalContentAlignment="Center"/>
+                <Button x:Name="CancelButton"
+                        AutomationProperties.AutomationId="BulkEditPreview_Cancel"
+                        AutomationProperties.Name="{loc:Localize BE_Cancel}"
+                        Content="{loc:Localize BE_Cancel}"
+                        Classes="secondary"
+                        IsCancel="True"
+                        MinWidth="80"
+                        HorizontalContentAlignment="Center"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

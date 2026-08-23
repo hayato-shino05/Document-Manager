@@ -170,6 +170,12 @@ public class DatabaseHelper
         string? keyword, string? subject, string? type,
         DateTime? fromDate, DateTime? toDate,
         double? minSize, double? maxSize, bool? isImportant)
+        => SearchDocumentsAdvanced(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant, null);
+
+    public List<StudyDocument> SearchDocumentsAdvanced(
+        string? keyword, string? subject, string? type,
+        DateTime? fromDate, DateTime? toDate,
+        double? minSize, double? maxSize, bool? isImportant, string? status)
     {
         var query = "SELECT * FROM documents WHERE (is_deleted IS NULL OR is_deleted = 0)";
         var parameters = new List<SqliteParameter>();
@@ -221,25 +227,58 @@ public class DatabaseHelper
             query += " AND is_important = 1";
         }
 
+        if (!string.IsNullOrEmpty(status))
+        {
+            query += " AND (status = @status)";
+            parameters.Add(new SqliteParameter("@status", status));
+        }
+
         query += " ORDER BY created_at DESC";
         return ExecuteReader(query, parameters.ToArray());
+    }
+
+    public Dictionary<string, int> GetStatusCounts()
+    {
+        const string query = "SELECT status, COUNT(*) FROM documents WHERE (is_deleted IS NULL OR is_deleted = 0) AND status IS NOT NULL GROUP BY status";
+        var counts = new Dictionary<string, int>();
+        using var conn = OpenConnection();
+        using var cmd = new SqliteCommand(query, conn);
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+            counts[reader.GetString(0)] = Convert.ToInt32(reader.GetValue(1));
+
+        return counts;
     }
 
     public bool InsertDocument(StudyDocument doc)
     {
         const string query = """
-            INSERT INTO documents (name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline)
-            VALUES (@name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline)
+            INSERT INTO documents (name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline, status)
+            VALUES (@name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline, @status);
+            SELECT last_insert_rowid();
             """;
-        return ExecuteNonQuery(query, BuildDocumentParameters(doc)) > 0;
+
+        using var conn = OpenConnection();
+        using var cmd = new SqliteCommand(query, conn);
+
+        foreach (var parameter in BuildDocumentParameters(doc))
+            cmd.Parameters.Add(parameter);
+
+        var result = cmd.ExecuteScalar();
+        if (result == null)
+            return false;
+
+        doc.Id = Convert.ToInt32(result);
+        return true;
     }
 
 
     public bool InsertDocumentWithCatalogs(StudyDocument document)
     {
         const string query = """
-            INSERT INTO documents (name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline)
-            VALUES (@name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline)
+            INSERT INTO documents (name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline, status)
+            VALUES (@name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline, @status)
             """;
 
         using var connection = OpenConnection();
@@ -277,33 +316,13 @@ public class DatabaseHelper
 
     public bool UpdateDocument(StudyDocument doc)
     {
-        const string query = """
-            UPDATE documents SET
-                name = @name, subject = @subject, type = @type, file_path = @file_path,
-                notes = @notes, file_size = @file_size, author = @author,
-                is_important = @is_important, tags = @tags, deadline = @deadline
-            WHERE id = @id
-            """;
-
         using var connection = OpenConnection();
         using var transaction = connection.BeginTransaction();
 
         try
         {
-            if (!string.IsNullOrWhiteSpace(doc.Subject))
-                InsertCatalogValue(connection, transaction, "categories", doc.Subject);
-
-            if (!string.IsNullOrWhiteSpace(doc.Type))
-                InsertCatalogValue(connection, transaction, "document_types", doc.Type);
-
-            using var command = connection.CreateCommand();
-            command.Transaction = transaction;
-            command.CommandText = query;
-            foreach (var parameter in BuildDocumentParameters(doc))
-                command.Parameters.Add(parameter);
-            command.Parameters.Add(new SqliteParameter("@id", doc.Id));
-
-            if (command.ExecuteNonQuery() == 0)
+            var updated = UpdateDocumentCore(connection, transaction, doc);
+            if (!updated)
             {
                 transaction.Rollback();
                 return false;
@@ -317,6 +336,75 @@ public class DatabaseHelper
             transaction.Rollback();
             throw;
         }
+    }
+
+    private bool UpdateDocumentCore(SqliteConnection connection, SqliteTransaction transaction, StudyDocument doc)
+    {
+        if (!string.IsNullOrWhiteSpace(doc.Subject))
+            InsertCatalogValue(connection, transaction, "categories", doc.Subject);
+
+        if (!string.IsNullOrWhiteSpace(doc.Type))
+            InsertCatalogValue(connection, transaction, "document_types", doc.Type);
+
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = """
+            UPDATE documents SET
+                name = @name, subject = @subject, type = @type, file_path = @file_path,
+                notes = @notes, file_size = @file_size, author = @author,
+                is_important = @is_important, tags = @tags, deadline = @deadline,
+                status = @status
+            WHERE id = @id
+            """;
+        foreach (var parameter in BuildDocumentParameters(doc))
+            command.Parameters.Add(parameter);
+        command.Parameters.Add(new SqliteParameter("@id", doc.Id));
+        return command.ExecuteNonQuery() > 0;
+    }
+
+    public void ApplyMetadataUndo(
+        IReadOnlyList<StudyDocument> originals,
+        IReadOnlyList<(int CollectionId, int DocumentId)> addedCollectionMemberships)
+    {
+        using var connection = OpenConnection();
+        using var transaction = connection.BeginTransaction();
+
+        try
+        {
+            foreach (var original in originals)
+            {
+                if (!DocumentRowExists(connection, transaction, original.Id))
+                    continue;
+                if (!UpdateDocumentCore(connection, transaction, original))
+                    throw new InvalidOperationException("Undo document restoration failed.");
+            }
+
+            foreach (var membership in addedCollectionMemberships)
+            {
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "DELETE FROM collection_items WHERE collection_id = @collectionId AND document_id = @documentId";
+                command.Parameters.AddWithValue("@collectionId", membership.CollectionId);
+                command.Parameters.AddWithValue("@documentId", membership.DocumentId);
+                command.ExecuteNonQuery();
+            }
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+    private static bool DocumentRowExists(SqliteConnection connection, SqliteTransaction transaction, int id)
+    {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = "SELECT COUNT(*) FROM documents WHERE id = @id";
+        command.Parameters.AddWithValue("@id", id);
+        return Convert.ToInt32(command.ExecuteScalar()) > 0;
     }
 
     public bool DeleteDocument(int id)
@@ -389,6 +477,28 @@ public class DatabaseHelper
         return ExecuteReader(query);
     }
 
+    public List<StudyDocument> GetUncategorizedDocuments()
+    {
+        const string query = """
+            SELECT * FROM documents
+            WHERE (is_deleted IS NULL OR is_deleted = 0)
+            AND (subject IS NULL OR subject = '')
+            ORDER BY created_at DESC
+            """;
+        return ExecuteReader(query);
+    }
+
+    public List<StudyDocument> GetDocumentsWithMissingMetadata()
+    {
+        const string query = """
+            SELECT * FROM documents
+            WHERE (is_deleted IS NULL OR is_deleted = 0)
+            AND ((subject IS NULL OR subject = '') OR (type IS NULL OR type = '') OR (tags IS NULL OR tags = ''))
+            ORDER BY created_at DESC
+            """;
+        return ExecuteReader(query);
+    }
+
     public DashboardStats GetDashboardStatistics()
     {
         var stats = new DashboardStats();
@@ -419,7 +529,39 @@ public class DatabaseHelper
         using var conn = OpenConnection();
         using var transaction = conn.BeginTransaction();
 
-        using var documentCommand = conn.CreateCommand();
+        if (!RestoreDocumentCore(conn, transaction, id))
+        {
+            transaction.Rollback();
+            return false;
+        }
+
+        transaction.Commit();
+        return true;
+    }
+
+    public int RestoreDocuments(IReadOnlyList<int> ids)
+    {
+        if (ids is null || ids.Count == 0)
+            return 0;
+
+        var distinctIds = ids.Distinct().ToList();
+        using var conn = OpenConnection();
+        using var transaction = conn.BeginTransaction();
+
+        var restored = 0;
+        foreach (var id in distinctIds)
+        {
+            if (RestoreDocumentCore(conn, transaction, id))
+                restored++;
+        }
+
+        transaction.Commit();
+        return restored;
+    }
+
+    private static bool RestoreDocumentCore(SqliteConnection connection, SqliteTransaction transaction, int id)
+    {
+        using var documentCommand = connection.CreateCommand();
         documentCommand.Transaction = transaction;
         documentCommand.CommandText = "SELECT subject, type FROM documents WHERE id = @id AND is_deleted = 1";
         documentCommand.Parameters.AddWithValue("@id", id);
@@ -433,25 +575,16 @@ public class DatabaseHelper
         reader.Close();
 
         if (!string.IsNullOrWhiteSpace(subject))
-            InsertCatalogValue(conn, transaction, "categories", subject);
+            InsertCatalogValue(connection, transaction, "categories", subject);
 
         if (!string.IsNullOrWhiteSpace(type))
-            InsertCatalogValue(conn, transaction, "document_types", type);
+            InsertCatalogValue(connection, transaction, "document_types", type);
 
-        using var restoreCommand = conn.CreateCommand();
+        using var restoreCommand = connection.CreateCommand();
         restoreCommand.Transaction = transaction;
         restoreCommand.CommandText = "UPDATE documents SET is_deleted = 0, deleted_at = NULL WHERE id = @id AND is_deleted = 1";
         restoreCommand.Parameters.AddWithValue("@id", id);
-        var restored = restoreCommand.ExecuteNonQuery() > 0;
-
-        if (!restored)
-        {
-            transaction.Rollback();
-            return false;
-        }
-
-        transaction.Commit();
-        return true;
+        return restoreCommand.ExecuteNonQuery() > 0;
     }
 
     public bool PermanentDeleteDocument(int id)
@@ -720,10 +853,13 @@ public class DatabaseHelper
         while (tableReader.Read())
             actualTables.Add(tableReader.GetString(0));
 
-        if (!actualTables.SetEquals(requiredTables))
+        var hasSavedSearches = actualTables.Contains("saved_searches");
+        var expectedTables = hasSavedSearches ? [.. requiredTables, "saved_searches"] : requiredTables;
+
+        if (!actualTables.SetEquals(expectedTables))
             throw new InvalidOperationException("Backup database tables are not supported.");
 
-        ValidateRequiredColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at"]);
+        ValidateRequiredColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["status"]);
         ValidateRequiredColumns(connection, "collections", ["id", "name", "description", "created_at"]);
         ValidateRequiredColumns(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"]);
         ValidateRequiredColumns(connection, "personal_notes", ["id", "document_id", "content", "created_at", "updated_at"]);
@@ -732,6 +868,8 @@ public class DatabaseHelper
         ValidateRequiredColumns(connection, "categories", ["id", "name", "created_at"]);
         ValidateRequiredColumns(connection, "document_types", ["id", "name", "created_at"]);
         ValidateRequiredColumns(connection, "app_settings", ["key", "value"]);
+        if (hasSavedSearches)
+            ValidateRequiredColumns(connection, "saved_searches", ["id", "name", "criteria_json", "created_at"]);
 
         ValidateCascadeForeignKeys(connection, "collection_items", [("collection_id", "collections", "id"), ("document_id", "documents", "id")]);
         ValidateCascadeForeignKeys(connection, "personal_notes", [("document_id", "documents", "id")]);
@@ -742,12 +880,13 @@ public class DatabaseHelper
         ValidateUniqueConstraint(connection, "document_relations", ["doc_id_1", "doc_id_2"]);
         ValidateDocumentPathIndex(connection, requireDocumentPathIndex);
 
-        foreach (var tableName in requiredTables)
+        foreach (var tableName in expectedTables)
             ValidateIndexesAndTriggers(connection, tableName, allowLegacyDocumentPathIndexes: !requireDocumentPathIndex);
 
         using var schemaVersionCommand = connection.CreateCommand();
         schemaVersionCommand.CommandText = "SELECT value FROM app_settings WHERE key = 'schema_version'";
-        if (!string.Equals(schemaVersionCommand.ExecuteScalar()?.ToString(), "3", StringComparison.Ordinal))
+        var schemaVersion = schemaVersionCommand.ExecuteScalar()?.ToString();
+        if (!string.Equals(schemaVersion, "3", StringComparison.Ordinal) && !string.Equals(schemaVersion, "4", StringComparison.Ordinal))
             throw new InvalidOperationException("Backup database schema version is not supported.");
 
         using (var documentCommand = connection.CreateCommand())
@@ -787,6 +926,9 @@ public class DatabaseHelper
     }
 
     private static void ValidateRequiredColumns(SqliteConnection connection, string tableName, IReadOnlyCollection<string> requiredColumns)
+        => ValidateRequiredColumns(connection, tableName, requiredColumns, []);
+
+    private static void ValidateRequiredColumns(SqliteConnection connection, string tableName, IReadOnlyCollection<string> requiredColumns, IReadOnlyCollection<string> optionalColumns)
     {
         using var command = connection.CreateCommand();
         command.CommandText = $"PRAGMA table_info({tableName})";
@@ -795,7 +937,12 @@ public class DatabaseHelper
         while (reader.Read())
             actualColumns.Add(reader.GetString(1));
 
-        if (!actualColumns.SetEquals(requiredColumns))
+        var unsupportedColumns = actualColumns.Where(column => !requiredColumns.Contains(column, StringComparer.Ordinal)).ToList();
+        if (unsupportedColumns.Count > 0)
+            throw new InvalidOperationException($"Backup database table '{tableName}' is not supported.");
+
+        var missingRequiredColumns = requiredColumns.Except(optionalColumns, StringComparer.Ordinal).Except(actualColumns, StringComparer.Ordinal).ToList();
+        if (missingRequiredColumns.Count > 0)
             throw new InvalidOperationException($"Backup database table '{tableName}' is not supported.");
     }
 
@@ -981,8 +1128,21 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
             Author = reader["author"]?.ToString() ?? string.Empty,
             IsImportant = reader["is_important"] is not DBNull && Convert.ToInt32(reader["is_important"]) == 1,
             Tags = reader["tags"]?.ToString() ?? string.Empty,
-            Deadline = reader["deadline"] is DBNull ? null : DateTime.Parse(reader["deadline"].ToString()!)
+            Deadline = reader["deadline"] is DBNull ? null : DateTime.Parse(reader["deadline"].ToString()!),
+            Status = ReadStatus(reader)
         };
+    }
+
+    private static string ReadStatus(SqliteDataReader reader)
+    {
+        for (var i = 0; i < reader.FieldCount; i++)
+        {
+            if (!string.Equals(reader.GetName(i), "status", StringComparison.Ordinal))
+                continue;
+            return reader.IsDBNull(i) ? DocumentStatus.Unread : reader.GetString(i);
+        }
+
+        return DocumentStatus.Unread;
     }
 
     private SqliteParameter[] BuildDocumentParameters(StudyDocument doc)
@@ -998,7 +1158,8 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
             new SqliteParameter("@author", string.IsNullOrEmpty(doc.Author) ? DBNull.Value : doc.Author),
             new SqliteParameter("@is_important", doc.IsImportant ? 1 : 0),
             new SqliteParameter("@tags", string.IsNullOrEmpty(doc.Tags) ? DBNull.Value : doc.Tags),
-            new SqliteParameter("@deadline", doc.Deadline.HasValue ? doc.Deadline.Value.ToString("yyyy-MM-dd HH:mm:ss") : DBNull.Value)
+            new SqliteParameter("@deadline", doc.Deadline.HasValue ? doc.Deadline.Value.ToString("yyyy-MM-dd HH:mm:ss") : DBNull.Value),
+            new SqliteParameter("@status", DocumentStatus.IsValid(doc.Status) ? doc.Status : DocumentStatus.Unread)
         ];
     }
 
@@ -1555,6 +1716,174 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         return cmd.ExecuteNonQuery();
     }
 
+    public int BulkUpdateStatus(List<int> ids, string status)
+    {
+        if (ids == null || ids.Count == 0) return 0;
+        if (!DocumentStatus.IsValid(status)) return 0;
+        using var conn = OpenConnection();
+        var paramNames = new List<string>();
+        using var cmd = conn.CreateCommand();
+        for (int i = 0; i < ids.Count; i++)
+        {
+            paramNames.Add($"@id{i}");
+            cmd.Parameters.AddWithValue($"@id{i}", ids[i]);
+        }
+        cmd.Parameters.AddWithValue("@status", status);
+        cmd.CommandText = $"UPDATE documents SET status = @status WHERE id IN ({string.Join(",", paramNames)}) AND (is_deleted IS NULL OR is_deleted = 0)";
+        return cmd.ExecuteNonQuery();
+    }
+
+    public BulkEditOutcome BulkEditMetadata(IReadOnlyList<int> documentIds, BulkEditChanges changes)
+    {
+        var ids = documentIds ?? Array.Empty<int>();
+        var requested = ids.Count;
+        if (requested == 0 || changes is null || !changes.HasAnyChange)
+            return new BulkEditOutcome { Requested = requested };
+
+        var results = new List<BulkItemResult>(requested);
+        using var conn = OpenConnection();
+        using var transaction = conn.BeginTransaction();
+
+        try
+        {
+            var targetCollectionMissing = false;
+            if (changes.AddToCollectionId is int requestedCollectionId)
+            {
+                using var collectionCheck = conn.CreateCommand();
+                collectionCheck.Transaction = transaction;
+                collectionCheck.CommandText = "SELECT COUNT(*) FROM collections WHERE id = @collectionId";
+                collectionCheck.Parameters.AddWithValue("@collectionId", requestedCollectionId);
+                targetCollectionMissing = Convert.ToInt32(collectionCheck.ExecuteScalar()) == 0;
+            }
+
+            foreach (var id in ids)
+            {
+                var succeeded = false;
+                var statusAllowed = changes.Status is null || DocumentStatus.IsValid(changes.Status);
+                if (!targetCollectionMissing && statusAllowed)
+                {
+                    try
+                    {
+                        transaction.Save(BulkEditItemSavepoint);
+                        try
+                        {
+                            // whitelist check must precede the UPDATE so a rejected field-set never partially applies
+                            succeeded = ExecuteBulkEditMetadataUpdate(conn, transaction, id, changes);
+                            if (succeeded && changes.AddToCollectionId is int collectionId)
+                                InsertBulkEditCollectionLink(conn, transaction, collectionId, id);
+                            transaction.Release(BulkEditItemSavepoint);
+                        }
+                        catch
+                        {
+                            transaction.Rollback(BulkEditItemSavepoint);
+                            transaction.Release(BulkEditItemSavepoint);
+                            throw;
+                        }
+                    }
+                    catch (SqliteException)
+                    {
+                        succeeded = false;
+                    }
+                }
+                results.Add(new BulkItemResult(id, succeeded));
+            }
+
+            SeedBulkEditCatalogValues(conn, transaction, changes, results);
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+
+        return new BulkEditOutcome
+        {
+            Requested = requested,
+            Succeeded = results.Count(r => r.Success),
+            Items = results
+        };
+    }
+
+    private const string BulkEditItemSavepoint = "bulk_edit_item";
+
+    private static bool ExecuteBulkEditMetadataUpdate(
+        SqliteConnection conn, SqliteTransaction transaction, int id, BulkEditChanges changes)
+    {
+        var sets = new List<string>();
+        using var cmd = conn.CreateCommand();
+        cmd.Transaction = transaction;
+
+        if (changes.Subject is not null)
+        {
+            sets.Add("subject = @subject");
+            cmd.Parameters.AddWithValue("@subject", string.IsNullOrEmpty(changes.Subject) ? DBNull.Value : changes.Subject);
+        }
+        if (changes.Type is not null)
+        {
+            sets.Add("type = @type");
+            cmd.Parameters.AddWithValue("@type", string.IsNullOrEmpty(changes.Type) ? DBNull.Value : changes.Type);
+        }
+        if (changes.Tags is not null)
+        {
+            sets.Add("tags = @tags");
+            cmd.Parameters.AddWithValue("@tags", string.IsNullOrEmpty(changes.Tags) ? DBNull.Value : changes.Tags);
+        }
+        if (changes.IsImportant is not null)
+        {
+            sets.Add("is_important = @is_important");
+            cmd.Parameters.AddWithValue("@is_important", changes.IsImportant.Value ? 1 : 0);
+        }
+        if (changes.Deadline is not null)
+        {
+            sets.Add("deadline = @deadline");
+            cmd.Parameters.AddWithValue("@deadline", changes.Deadline.Value.ToString("yyyy-MM-dd HH:mm:ss"));
+        }
+        if (changes.Status is not null)
+        {
+            sets.Add("status = @status");
+            cmd.Parameters.AddWithValue("@status", changes.Status);
+        }
+
+        if (sets.Count == 0)
+        {
+            using var existsCommand = conn.CreateCommand();
+            existsCommand.Transaction = transaction;
+            existsCommand.CommandText = "SELECT COUNT(*) FROM documents WHERE id = @id AND (is_deleted IS NULL OR is_deleted = 0)";
+            existsCommand.Parameters.AddWithValue("@id", id);
+            return Convert.ToInt32(existsCommand.ExecuteScalar()) == 1;
+        }
+
+        cmd.CommandText = $"UPDATE documents SET {string.Join(", ", sets)} WHERE id = @id AND (is_deleted IS NULL OR is_deleted = 0)";
+        cmd.Parameters.AddWithValue("@id", id);
+        return cmd.ExecuteNonQuery() == 1;
+    }
+
+    private static void InsertBulkEditCollectionLink(
+        SqliteConnection conn, SqliteTransaction transaction, int collectionId, int documentId)
+    {
+        using var cmd = conn.CreateCommand();
+        cmd.Transaction = transaction;
+        cmd.CommandText = "INSERT OR IGNORE INTO collection_items (collection_id, document_id) VALUES (@collectionId, @documentId)";
+        cmd.Parameters.AddWithValue("@collectionId", collectionId);
+        cmd.Parameters.AddWithValue("@documentId", documentId);
+        cmd.ExecuteNonQuery();
+    }
+
+    private static void SeedBulkEditCatalogValues(
+        SqliteConnection conn, SqliteTransaction transaction, BulkEditChanges changes, IReadOnlyList<BulkItemResult> results)
+    {
+        if (!results.Any(r => r.Success))
+            return;
+
+        if (!string.IsNullOrWhiteSpace(changes.Subject))
+            InsertCatalogValue(conn, transaction, "categories", changes.Subject);
+
+        if (!string.IsNullOrWhiteSpace(changes.Type))
+            InsertCatalogValue(conn, transaction, "document_types", changes.Type);
+    }
+
 
 
     public int EmptyRecycleBin()
@@ -1716,6 +2045,86 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         cmd.Parameters.AddWithValue("@key", key);
         cmd.Parameters.AddWithValue("@value", value);
         cmd.ExecuteNonQuery();
+    }
+
+    public List<SavedSearch> GetSavedSearches()
+    {
+        const string query = "SELECT * FROM saved_searches ORDER BY name COLLATE NOCASE";
+        var results = new List<SavedSearch>();
+        using var conn = OpenConnection();
+        using var cmd = new SqliteCommand(query, conn);
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+            results.Add(MapToSavedSearch(reader));
+        return results;
+    }
+
+    public SavedSearch? GetSavedSearchById(int id)
+    {
+        const string query = "SELECT * FROM saved_searches WHERE id = @id";
+        using var conn = OpenConnection();
+        using var cmd = new SqliteCommand(query, conn);
+        cmd.Parameters.AddWithValue("@id", id);
+        using var reader = cmd.ExecuteReader();
+        return reader.Read() ? MapToSavedSearch(reader) : null;
+    }
+
+    public bool SavedSearchNameExists(string name)
+    {
+        const string query = "SELECT COUNT(*) FROM saved_searches WHERE name = @name COLLATE NOCASE";
+        using var conn = OpenConnection();
+        using var cmd = new SqliteCommand(query, conn);
+        cmd.Parameters.AddWithValue("@name", name);
+        return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+    }
+
+    public int InsertSavedSearch(SavedSearch savedSearch)
+    {
+        const string query = """
+            INSERT INTO saved_searches (name, criteria_json)
+            VALUES (@name, @criteria_json);
+            SELECT last_insert_rowid();
+            """;
+        using var conn = OpenConnection();
+        using var cmd = new SqliteCommand(query, conn);
+        cmd.Parameters.AddWithValue("@name", savedSearch.Name);
+        cmd.Parameters.AddWithValue("@criteria_json", savedSearch.CriteriaJson);
+        var result = cmd.ExecuteScalar();
+        return result != null ? Convert.ToInt32(result) : 0;
+    }
+
+    public bool UpdateSavedSearch(SavedSearch savedSearch)
+    {
+        const string query = """
+            UPDATE saved_searches SET name = @name, criteria_json = @criteria_json
+            WHERE id = @id
+            """;
+        using var conn = OpenConnection();
+        using var cmd = new SqliteCommand(query, conn);
+        cmd.Parameters.AddWithValue("@id", savedSearch.Id);
+        cmd.Parameters.AddWithValue("@name", savedSearch.Name);
+        cmd.Parameters.AddWithValue("@criteria_json", savedSearch.CriteriaJson);
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public bool DeleteSavedSearch(int id)
+    {
+        const string query = "DELETE FROM saved_searches WHERE id = @id";
+        using var conn = OpenConnection();
+        using var cmd = new SqliteCommand(query, conn);
+        cmd.Parameters.AddWithValue("@id", id);
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    private static SavedSearch MapToSavedSearch(SqliteDataReader reader)
+    {
+        return new SavedSearch
+        {
+            Id = reader.GetInt32(reader.GetOrdinal("id")),
+            Name = reader["name"]?.ToString() ?? string.Empty,
+            CriteriaJson = reader["criteria_json"]?.ToString() ?? string.Empty,
+            CreatedAt = reader["created_at"] is DBNull ? DateTime.Now : DateTime.Parse(reader["created_at"].ToString()!)
+        };
     }
 
 }
