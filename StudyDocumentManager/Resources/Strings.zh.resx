@@ -794,7 +794,7 @@
   <data name="FileIntegrity_StatCorrupted" xml:space="preserve"><value>损坏</value></data>
   <data name="FileIntegrity_BtnCancel" xml:space="preserve"><value>取消扫描</value></data>
   <data name="FileIntegrity_BtnRetryMissing" xml:space="preserve"><value>重新检查缺失文件</value></data>
-  <data name="FileIntegrity_Cancelled" xml:space="preserve"><value>扫描已取消，已处理 {1}/{0} 个文件。</value></data>
+  <data name="FileIntegrity_Cancelled" xml:space="preserve"><value>扫描已取消，已处理 {0}/{1} 个文件。</value></data>
   <data name="AddEdit_LblDocName" xml:space="preserve"><value>文档名称 *</value></data>
   <data name="AddEdit_PlaceholderDocName" xml:space="preserve"><value>输入文档名称...</value></data>
   <data name="AddEdit_LblCategory" xml:space="preserve"><value>分类（科目）</value></data>

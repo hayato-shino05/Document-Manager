@@ -557,7 +557,7 @@ Please check your network connection.</value></data>
   <data name="FileIntegrity_StatCorrupted" xml:space="preserve"><value>Corrupted</value></data>
   <data name="FileIntegrity_BtnCancel" xml:space="preserve"><value>Cancel scan</value></data>
   <data name="FileIntegrity_BtnRetryMissing" xml:space="preserve"><value>Recheck missing</value></data>
-  <data name="FileIntegrity_Cancelled" xml:space="preserve"><value>Scan cancelled after {1} of {0} files.</value></data>
+  <data name="FileIntegrity_Cancelled" xml:space="preserve"><value>Scan cancelled after {0} of {1} files.</value></data>
   <data name="AddEdit_LblDocName" xml:space="preserve"><value>Document Name *</value></data>
   <data name="AddEdit_PlaceholderDocName" xml:space="preserve"><value>Enter document name...</value></data>
   <data name="AddEdit_LblCategory" xml:space="preserve"><value>Category (Subject)</value></data>

@@ -794,7 +794,7 @@
   <data name="FileIntegrity_StatCorrupted" xml:space="preserve"><value>Bị hỏng</value></data>
   <data name="FileIntegrity_BtnCancel" xml:space="preserve"><value>Hủy quét</value></data>
   <data name="FileIntegrity_BtnRetryMissing" xml:space="preserve"><value>Kiểm tra lại tệp thiếu</value></data>
-  <data name="FileIntegrity_Cancelled" xml:space="preserve"><value>Đã hủy quét sau khi xử lý {1}/{0} tệp.</value></data>
+  <data name="FileIntegrity_Cancelled" xml:space="preserve"><value>Đã hủy quét sau khi xử lý {0}/{1} tệp.</value></data>
   <data name="AddEdit_LblDocName" xml:space="preserve"><value>Tên tài liệu *</value></data>
   <data name="AddEdit_PlaceholderDocName" xml:space="preserve"><value>Nhập tên tài liệu...</value></data>
   <data name="AddEdit_LblCategory" xml:space="preserve"><value>Danh mục (môn học)</value></data>

@@ -22,6 +22,18 @@ public class LocalizationResourceIntegrityTests
     }
 
     [Theory]
+    [InlineData("Strings.resx", "{1}件中{0}件を処理した時点でスキャンをキャンセルしました。")]
+    [InlineData("Strings.en.resx", "Scan cancelled after {0} of {1} files.")]
+    [InlineData("Strings.vi.resx", "Đã hủy quét sau khi xử lý {0}/{1} tệp.")]
+    [InlineData("Strings.zh.resx", "扫描已取消，已处理 {0}/{1} 个文件。")]
+    public void LocalizedFileIntegrityCancellationMessages_UseLocaleSpecificPlaceholderOrder(string fileName, string expected)
+    {
+        var resources = LoadResources(fileName);
+
+        Assert.Equal(expected, resources["FileIntegrity_Cancelled"]);
+    }
+
+    [Theory]
     [InlineData("Strings.resx")]
     [InlineData("Strings.en.resx")]
     public void DefaultAndEnglishResources_ContainSlice4BDialogKeys(string fileName)
@@ -74,7 +86,8 @@ public class LocalizationResourceIntegrityTests
         {
             var value = localized[key];
             Assert.False(string.IsNullOrWhiteSpace(value), $"{fileName} has an empty value for {key}");
-            Assert.Equal(GetFormatItems(canonicalValue), GetFormatItems(value));
+            if (key != "FileIntegrity_Cancelled")
+                Assert.Equal(GetFormatItems(canonicalValue), GetFormatItems(value));
         }
     }
 
