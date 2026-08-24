@@ -32,6 +32,7 @@ public sealed class BatchImportOperationStateTests
         Assert.Equal(1, model.FailedCount);
         Assert.Equal(["A.pdf"], model.FailedItems);
         Assert.True(model.Files[0].IsFailed);
+        Assert.Equal(BatchImportFailureCode.ImportFailed, model.Files[0].FailureCode);
         Assert.Equal("BatchImport_ItemFailed", model.Files[0].FailureReason);
         Assert.Empty(navigation.Routes);
 
@@ -45,6 +46,7 @@ public sealed class BatchImportOperationStateTests
         Assert.Equal(0, model.FailedCount);
         Assert.Empty(model.FailedItems);
         Assert.False(model.Files[0].IsFailed);
+        Assert.Equal(BatchImportFailureCode.None, model.Files[0].FailureCode);
         Assert.Empty(model.Files[0].FailureReason);
         Assert.Equal(["dashboard"], navigation.Routes);
     }
@@ -64,6 +66,7 @@ public sealed class BatchImportOperationStateTests
         await model.ImportCommand.ExecuteAsync(null);
 
         Assert.True(model.Files[0].IsFailed);
+        Assert.Equal(BatchImportFailureCode.ImportFailed, model.Files[0].FailureCode);
         Assert.Equal("BatchImport_ItemFailed", model.Files[0].FailureReason);
         Assert.DoesNotContain("study.db", model.Files[0].FailureReason);
         Assert.DoesNotContain("documents", model.Files[0].FailureReason);
@@ -151,6 +154,75 @@ public sealed class BatchImportOperationStateTests
         Assert.Single(model.FailedItems);
         Assert.True(model.Files[0].IsFailed);
         Assert.Empty(navigation.Routes);
+    }
+
+    [Fact]
+    public void LanguageChange_RefreshesFailureDisplayFromMachineCode()
+    {
+        var localization = new SwitchableLocalizationService();
+        var model = new BatchImportModel(
+            new RecordingDialogService(),
+            new FakeFileDialogService(),
+            new RecordingNavigationService(),
+            localization,
+            new ControlledImportService());
+        var item = new FileImportItem
+        {
+            IsFailed = true,
+            FailureCode = BatchImportFailureCode.ImportFailed,
+            FailureReason = localization["BatchImport_ItemFailed"]
+        };
+        model.Files = new ObservableCollection<FileImportItem> { item };
+
+        localization.SwitchToEnglish();
+
+        Assert.Equal("Import failed (en)", item.FailureReason);
+        Assert.Equal(BatchImportFailureCode.ImportFailed, item.FailureCode);
+    }
+
+    [Fact]
+    public async Task Dispose_DuringImport_CancelsOperationWithoutNavigating()
+    {
+        var importer = new ControlledImportService();
+        var navigation = new RecordingNavigationService();
+        var model = CreateModel(importer, navigation);
+        importer.OnFirstSave = model.Dispose;
+        model.Files = new ObservableCollection<FileImportItem>
+        {
+            new() { FileName = "A", FilePath = "A.pdf", FileType = "PDF" },
+            new() { FileName = "B", FilePath = "B.pdf", FileType = "PDF" }
+        };
+
+        await model.ImportCommand.ExecuteAsync(null);
+
+        Assert.True(model.IsImportCancelled);
+        Assert.Equal(1, model.ProcessedCount);
+        Assert.Empty(navigation.Routes);
+    }
+
+    [Fact]
+    public void Dispose_UnsubscribesFromLanguageChanges()
+    {
+        var localization = new SwitchableLocalizationService();
+        var model = new BatchImportModel(
+            new RecordingDialogService(),
+            new FakeFileDialogService(),
+            new RecordingNavigationService(),
+            localization,
+            new ControlledImportService());
+        var item = new FileImportItem
+        {
+            IsFailed = true,
+            FailureCode = BatchImportFailureCode.ImportFailed,
+            FailureReason = localization["BatchImport_ItemFailed"]
+        };
+        model.Files = new ObservableCollection<FileImportItem> { item };
+
+        model.Dispose();
+        localization.SwitchToEnglish();
+
+        Assert.Equal("BatchImport_ItemFailed", item.FailureReason);
+        Assert.Equal(BatchImportFailureCode.ImportFailed, item.FailureCode);
     }
 
     [Fact]
@@ -272,5 +344,29 @@ public sealed class BatchImportOperationStateTests
         public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = [];
         public event EventHandler? LanguageChanged { add { } remove { } }
         public void SetLanguage(SupportedLanguage language) { }
+    }
+
+    private sealed class SwitchableLocalizationService : ILocalizationService
+    {
+        private bool _english;
+
+        public string this[string key]
+            => _english && key == "BatchImport_ItemFailed"
+                ? "Import failed (en)"
+                : key;
+
+        public SupportedLanguage CurrentLanguage
+            => _english ? SupportedLanguage.English : SupportedLanguage.Japanese;
+
+        public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = [];
+        public event EventHandler? LanguageChanged;
+
+        public void SetLanguage(SupportedLanguage language)
+        {
+            _english = language == SupportedLanguage.English;
+            LanguageChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void SwitchToEnglish() => SetLanguage(SupportedLanguage.English);
     }
 }

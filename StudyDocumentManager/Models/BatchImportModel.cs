@@ -8,7 +8,13 @@ using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
 
-public partial class BatchImportModel : ModelBase
+public enum BatchImportFailureCode
+{
+    None,
+    ImportFailed
+}
+
+public partial class BatchImportModel : ModelBase, IDisposable
 {
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
@@ -55,6 +61,26 @@ public partial class BatchImportModel : ModelBase
         _loc = loc;
         _droppedFileImportService = droppedFileImportService;
         _analytics = analytics;
+        _loc.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        foreach (var item in Files.Where(file => file.FailureCode != BatchImportFailureCode.None))
+            item.FailureReason = GetFailureReason(item.FailureCode);
+    }
+
+    private string GetFailureReason(BatchImportFailureCode code)
+        => code switch
+        {
+            BatchImportFailureCode.ImportFailed => _loc["BatchImport_ItemFailed"],
+            _ => string.Empty
+        };
+
+    public void Dispose()
+    {
+        _importCancellation?.Cancel();
+        _loc.LanguageChanged -= OnLanguageChanged;
     }
 
     [RelayCommand]
@@ -178,6 +204,7 @@ public partial class BatchImportModel : ModelBase
             foreach (var item in selected)
             {
                 item.IsFailed = false;
+                item.FailureCode = BatchImportFailureCode.None;
                 item.FailureReason = string.Empty;
             }
 
@@ -195,8 +222,6 @@ public partial class BatchImportModel : ModelBase
         ImportStatusMessage = _loc["BatchImport_StatusImporting"];
         var cancellation = new CancellationTokenSource();
         _importCancellation = cancellation;
-        var failureReason = _loc["BatchImport_ItemFailed"];
-
         try
         {
             var defaultSubject = DefaultSubject.Trim();
@@ -220,7 +245,6 @@ public partial class BatchImportModel : ModelBase
                 };
 
                 DocumentImportOutcome outcome;
-                var itemFailureReason = failureReason;
                 try
                 {
                     outcome = await Task.Run(
@@ -236,7 +260,6 @@ public partial class BatchImportModel : ModelBase
                 catch (Exception)
                 {
                     outcome = DocumentImportOutcome.Failed;
-                    itemFailureReason = _loc["BatchImport_ItemFailed"];
                 }
 
                 switch (outcome)
@@ -245,6 +268,7 @@ public partial class BatchImportModel : ModelBase
                         ImportedCount++;
                         item.IsSelected = false;
                         item.IsFailed = false;
+                        item.FailureCode = BatchImportFailureCode.None;
                         item.FailureReason = string.Empty;
                         _operationProgress.RecordSuccess(item.FilePath);
                         break;
@@ -252,12 +276,14 @@ public partial class BatchImportModel : ModelBase
                         SkippedDuplicateCount++;
                         item.IsSelected = false;
                         item.IsFailed = false;
+                        item.FailureCode = BatchImportFailureCode.None;
                         item.FailureReason = string.Empty;
                         _operationProgress.RecordSkipped(item.FilePath);
                         break;
                     case DocumentImportOutcome.Failed:
                         item.IsFailed = true;
-                        item.FailureReason = itemFailureReason;
+                        item.FailureCode = BatchImportFailureCode.ImportFailed;
+                        item.FailureReason = GetFailureReason(item.FailureCode);
                         _operationProgress.RecordFailure(item.FilePath);
                         break;
                 }
@@ -359,5 +385,6 @@ public partial class FileImportItem : ObservableObject
     [ObservableProperty] private double _fileSizeMB;
     [ObservableProperty] private bool _isSelected = true;
     [ObservableProperty] private bool _isFailed;
+    [ObservableProperty] private BatchImportFailureCode _failureCode;
     [ObservableProperty] private string _failureReason = string.Empty;
 }

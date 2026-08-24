@@ -52,7 +52,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
 
         if (viewModel != null)
         {
-            _mainModel.CurrentView = viewModel;
+            SetCurrentView(viewModel);
         }
     }
 
@@ -60,7 +60,18 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
     public void GoBack()
     {
         if (_mainModel == null) return;
-        _mainModel.CurrentView = serviceProvider.GetRequiredService<DashboardModel>();
+        SetCurrentView(serviceProvider.GetRequiredService<DashboardModel>());
+    }
+
+    private void SetCurrentView(ModelBase viewModel)
+    {
+        if (_mainModel is null || ReferenceEquals(_mainModel.CurrentView, viewModel))
+            return;
+
+        if (_mainModel.CurrentView is IDisposable disposable)
+            disposable.Dispose();
+
+        _mainModel.CurrentView = viewModel;
     }
 
     private AddEditModel CreateAddEditModel(int? documentId)
