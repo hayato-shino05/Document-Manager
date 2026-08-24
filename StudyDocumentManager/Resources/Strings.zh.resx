@@ -213,6 +213,9 @@
   <data name="Dashboard_BackupFailed" xml:space="preserve">
     <value>无法创建备份文件</value>
   </data>
+  <data name="Dashboard_BackupCancelled" xml:space="preserve">
+    <value>已取消备份</value>
+  </data>
   <data name="Dashboard_ConfirmOverwriteBackup" xml:space="preserve">
     <value>覆盖备份</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Dashboard_RestoreFailed" xml:space="preserve">
     <value>无法验证或恢复备份文件</value>
+  </data>
+  <data name="Dashboard_RestoreCancelled" xml:space="preserve">
+    <value>已取消恢复</value>
   </data>
   <data name="Dashboard_RestoreRestartRequired" xml:space="preserve">
     <value>数据库已恢复。请重新打开应用程序。</value>

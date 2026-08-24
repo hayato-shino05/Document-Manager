@@ -217,6 +217,58 @@
             </StackPanel>
         </Border>
 
+        <Border DockPanel.Dock="Top"
+                IsVisible="{Binding IsBackupOperationVisible}"
+                Background="{StaticResource SidebarBackground}"
+                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
+                Padding="{StaticResource PaddingRow}"
+                AutomationProperties.AutomationId="Dashboard_BackupOperation">
+            <StackPanel Spacing="{StaticResource Space1}">
+                <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsBackingUp}">
+                    <StackPanel Spacing="{StaticResource Space1}">
+                        <TextBlock Text="{loc:Localize Dashboard_BackupTitle}"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   FontWeight="SemiBold"/>
+                        <ProgressBar Value="{Binding BackupProgress}" Minimum="0" Maximum="100" Height="4"
+                                     AutomationProperties.Name="{loc:Localize Dashboard_BackupTitle}"/>
+                        <TextBlock Text="{Binding BackupError}" IsVisible="{Binding BackupError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                   Foreground="{StaticResource DangerBrush}"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Classes="secondary" Command="{Binding CancelBackupCommand}"
+                            Content="{loc:Localize Action_Cancel}"
+                            AutomationProperties.AutomationId="Dashboard_CancelBackup"
+                            Margin="{StaticResource Space2},0,0,0"/>
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsRestoring}">
+                    <StackPanel Spacing="{StaticResource Space1}">
+                        <TextBlock Text="{loc:Localize Dashboard_SelectBackup}"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   FontWeight="SemiBold"/>
+                        <ProgressBar Value="{Binding RestoreProgress}" Minimum="0" Maximum="100" Height="4"
+                                     AutomationProperties.Name="{loc:Localize Dashboard_SelectBackup}"/>
+                        <TextBlock Text="{Binding RestoreError}" IsVisible="{Binding RestoreError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                   Foreground="{StaticResource DangerBrush}"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Classes="secondary" Command="{Binding CancelRestoreCommand}"
+                            Content="{loc:Localize Action_Cancel}"
+                            AutomationProperties.AutomationId="Dashboard_CancelRestore"
+                            Margin="{StaticResource Space2},0,0,0"/>
+                </Grid>
+                <TextBlock Text="{loc:Localize Dashboard_BackupCancelled}"
+                           IsVisible="{Binding BackupCancelled}"
+                           Foreground="{StaticResource TextSecondary}"/>
+                <TextBlock Text="{loc:Localize Dashboard_RestoreCancelled}"
+                           IsVisible="{Binding RestoreCancelled}"
+                           Foreground="{StaticResource TextSecondary}"/>
+                <TextBlock Text="{Binding BackupError}"
+                           IsVisible="{Binding BackupError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           Foreground="{StaticResource DangerBrush}"/>
+                <TextBlock Text="{Binding RestoreError}"
+                           IsVisible="{Binding RestoreError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           Foreground="{StaticResource DangerBrush}"/>
+            </StackPanel>
+        </Border>
+
         <!-- ═══ MAIN: TreeView (left) + DataGrid (right) ═══ -->
         <Grid ColumnDefinitions="190,Auto,*">
 
@@ -623,7 +675,7 @@
                     <Border Grid.Row="3" Background="{StaticResource CardBackground}"
                             BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
                             Padding="{StaticResource PaddingMd}">
-                        <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto">
+                        <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                             <TextBlock Text="{Binding StatusText}" FontSize="{StaticResource FontSizeSm}"
                                        Foreground="{StaticResource TextSecondary}"
                                        VerticalAlignment="Center"/>

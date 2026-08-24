@@ -226,6 +226,7 @@
   <data name="Dashboard_BackupDone" xml:space="preserve"><value>データベースをバックアップしました：&#xA;{0}</value></data>
   <data name="Dashboard_BackupError" xml:space="preserve"><value>バックアップできません: {0}</value></data>
   <data name="Dashboard_BackupFailed" xml:space="preserve"><value>バックアップファイルを作成できませんでした</value></data>
+  <data name="Dashboard_BackupCancelled" xml:space="preserve"><value>バックアップをキャンセルしました</value></data>
   <data name="Dashboard_ConfirmOverwriteBackup" xml:space="preserve"><value>バックアップの上書き</value></data>
   <data name="Dashboard_OverwriteBackupWarning" xml:space="preserve"><value>既存のバックアップファイルを上書きします。よろしいですか？</value></data>
   <data name="Dashboard_OverwriteBackup" xml:space="preserve"><value>上書き</value></data>
@@ -241,6 +242,7 @@
   <data name="Dashboard_RestoreDone" xml:space="preserve"><value>データベースの復元が完了しました</value></data>
   <data name="Dashboard_RestoreError" xml:space="preserve"><value>復元できません: {0}</value></data>
   <data name="Dashboard_RestoreFailed" xml:space="preserve"><value>バックアップファイルを検証または復元できませんでした</value></data>
+  <data name="Dashboard_RestoreCancelled" xml:space="preserve"><value>復元をキャンセルしました</value></data>
   <data name="Dashboard_RestoreRestartRequired" xml:space="preserve"><value>データベースを復元しました。アプリケーションを再度開いてください。</value></data>
   <data name="Dashboard_ExportWriteFailed" xml:space="preserve"><value>CSVファイルを書き込めませんでした</value></data>
   <data name="Dashboard_NoCollections" xml:space="preserve"><value>コレクションがありません。先に「コレクション」メニューからコレクションを作成してください。</value></data>

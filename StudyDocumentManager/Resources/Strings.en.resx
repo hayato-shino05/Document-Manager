@@ -599,10 +599,12 @@ Please check your network connection.</value></data>
   <data name="Collection_DeselectAll" xml:space="preserve"><value>Deselect All</value></data>
   <data name="Collection_AddToTitle" xml:space="preserve"><value>Add documents to "{0}"</value></data>
   <data name="Dashboard_BackupFailed" xml:space="preserve"><value>Could not create the backup file</value></data>
+  <data name="Dashboard_BackupCancelled" xml:space="preserve"><value>Backup cancelled</value></data>
   <data name="Dashboard_ConfirmOverwriteBackup" xml:space="preserve"><value>Overwrite backup</value></data>
   <data name="Dashboard_OverwriteBackupWarning" xml:space="preserve"><value>The existing backup file will be overwritten. Continue?</value></data>
   <data name="Dashboard_OverwriteBackup" xml:space="preserve"><value>Overwrite</value></data>
   <data name="Dashboard_RestoreFailed" xml:space="preserve"><value>Could not validate or restore the backup file</value></data>
+  <data name="Dashboard_RestoreCancelled" xml:space="preserve"><value>Restore cancelled</value></data>
   <data name="Dashboard_RestoreRestartRequired" xml:space="preserve"><value>The database was restored. Please reopen the application.</value></data>
   <data name="Dashboard_ExportWriteFailed" xml:space="preserve"><value>Could not write the CSV file</value></data>
   <data name="BatchImport_InvalidDrop" xml:space="preserve"><value>Files cannot be dropped on this screen</value></data>

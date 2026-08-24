@@ -33,6 +33,8 @@ public partial class DashboardModel : ModelBase
     private readonly ILocalizationService _loc;
     private bool _isLoadingData;
     private bool _isApplyingFilters;
+    private CancellationTokenSource? _backupCancellation;
+    private CancellationTokenSource? _restoreCancellation;
 
     // ═══ 文書一覧 ═══
     [ObservableProperty]
@@ -83,8 +85,27 @@ public partial class DashboardModel : ModelBase
     [ObservableProperty] private bool _isBackupStale;
     [ObservableProperty] private string _lastBackupWarning = string.Empty;
     [ObservableProperty] private string _backupDirectoryInfo = string.Empty;
+    [ObservableProperty] private bool _isBackingUp;
+    [ObservableProperty] private bool _isRestoring;
+    [ObservableProperty] private int _backupProgress;
+    [ObservableProperty] private int _restoreProgress;
+    [ObservableProperty] private string _backupError = string.Empty;
+    [ObservableProperty] private string _restoreError = string.Empty;
+    [ObservableProperty] private bool _backupCancelled;
+    [ObservableProperty] private bool _restoreCancelled;
 
-    // ——— Search & Filter ——— 
+    public bool IsBackupOperationVisible => IsBackingUp || IsRestoring
+        || BackupCancelled || RestoreCancelled
+        || !string.IsNullOrEmpty(BackupError) || !string.IsNullOrEmpty(RestoreError);
+
+    partial void OnIsBackingUpChanged(bool value) => OnPropertyChanged(nameof(IsBackupOperationVisible));
+    partial void OnIsRestoringChanged(bool value) => OnPropertyChanged(nameof(IsBackupOperationVisible));
+    partial void OnBackupErrorChanged(string value) => OnPropertyChanged(nameof(IsBackupOperationVisible));
+    partial void OnRestoreErrorChanged(string value) => OnPropertyChanged(nameof(IsBackupOperationVisible));
+    partial void OnBackupCancelledChanged(bool value) => OnPropertyChanged(nameof(IsBackupOperationVisible));
+    partial void OnRestoreCancelledChanged(bool value) => OnPropertyChanged(nameof(IsBackupOperationVisible));
+
+    // ——— Search & Filter ———
     [ObservableProperty] private string _searchKeyword = string.Empty;
     [ObservableProperty] private List<string> _subjects = new();
     [ObservableProperty] private List<string> _types = new();
@@ -681,12 +702,56 @@ public partial class DashboardModel : ModelBase
     [RelayCommand]
     private async Task BackupDatabaseAsync()
     {
-        var (success, path, error) = await _backupService.BackupAsync();
-        if (success)
-            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], string.Format(_loc["Dashboard_BackupDone"], path));
-        else if (error != null)
-            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_BackupError"], error));
+        if (IsBackingUp || IsRestoring) return;
+
+        _backupCancellation?.Dispose();
+        _backupCancellation = new CancellationTokenSource();
+        var cancellationToken = _backupCancellation.Token;
+        IsBackingUp = true;
+        BackupProgress = 0;
+        BackupError = string.Empty;
+        BackupCancelled = false;
+
+        try
+        {
+            var (success, path, error) = await _backupService.BackupAsync(cancellationToken);
+            if (success)
+            {
+                BackupProgress = 100;
+                await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], string.Format(_loc["Dashboard_BackupDone"], path));
+            }
+            else if (cancellationToken.IsCancellationRequested)
+            {
+                BackupCancelled = true;
+                BackupProgress = 0;
+                return;
+            }
+            else if (error != null)
+            {
+                BackupError = _loc["Dashboard_BackupFailed"];
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_BackupError"], BackupError));
+            }
+        }
+        catch (Exception)
+        {
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                BackupError = _loc["Dashboard_BackupFailed"];
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_BackupError"], BackupError));
+            }
+            else
+                BackupCancelled = true;
+        }
+        finally
+        {
+            IsBackingUp = false;
+            _backupCancellation?.Dispose();
+            _backupCancellation = null;
+        }
     }
+
+    [RelayCommand]
+    private void CancelBackup() => _backupCancellation?.Cancel();
 
     [RelayCommand]
     private async Task ExportCsvAsync()
@@ -702,10 +767,54 @@ public partial class DashboardModel : ModelBase
     [RelayCommand]
     private async Task RestoreDatabaseAsync()
     {
-        var (success, error) = await _backupService.RestoreAsync();
-        if (!success && error is not null)
-            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_RestoreError"], error));
+        if (IsBackingUp || IsRestoring) return;
+
+        _restoreCancellation?.Dispose();
+        _restoreCancellation = new CancellationTokenSource();
+        var cancellationToken = _restoreCancellation.Token;
+        IsRestoring = true;
+        RestoreProgress = 0;
+        RestoreError = string.Empty;
+        RestoreCancelled = false;
+
+        try
+        {
+            var (success, error) = await _backupService.RestoreAsync(cancellationToken);
+            if (success)
+                RestoreProgress = 100;
+            else if (cancellationToken.IsCancellationRequested)
+            {
+                RestoreCancelled = true;
+                return;
+            }
+            else if (error is not null)
+            {
+                RestoreError = _loc["Dashboard_RestoreFailed"];
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], string.Format(_loc["Dashboard_RestoreError"], RestoreError));
+            }
+        }
+        catch (Exception)
+        {
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                RestoreError = _loc["Dashboard_RestoreFailed"];
+                await _dialogService.ShowErrorAsync(
+                    _loc["Dialog_Error"],
+                    string.Format(_loc["Dashboard_RestoreError"], RestoreError));
+            }
+            else
+                RestoreCancelled = true;
+        }
+        finally
+        {
+            IsRestoring = false;
+            _restoreCancellation?.Dispose();
+            _restoreCancellation = null;
+        }
     }
+
+    [RelayCommand]
+    private void CancelRestore() => _restoreCancellation?.Cancel();
 
     [RelayCommand]
     private void Refresh()
