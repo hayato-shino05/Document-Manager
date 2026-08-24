@@ -237,7 +237,7 @@
                     <Button Grid.Column="1" Classes="secondary" Command="{Binding CancelBackupCommand}"
                             Content="{loc:Localize Action_Cancel}"
                             AutomationProperties.AutomationId="Dashboard_CancelBackup"
-                            Margin="{StaticResource Space2},0,0,0"/>
+                            Margin="{StaticResource MarginSpace2}"/>
                 </Grid>
                 <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsRestoring}">
                     <StackPanel Spacing="{StaticResource Space1}">
@@ -252,7 +252,7 @@
                     <Button Grid.Column="1" Classes="secondary" Command="{Binding CancelRestoreCommand}"
                             Content="{loc:Localize Action_Cancel}"
                             AutomationProperties.AutomationId="Dashboard_CancelRestore"
-                            Margin="{StaticResource Space2},0,0,0"/>
+                            Margin="{StaticResource MarginSpace2}"/>
                 </Grid>
                 <TextBlock Text="{loc:Localize Dashboard_BackupCancelled}"
                            IsVisible="{Binding BackupCancelled}"

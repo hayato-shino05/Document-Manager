@@ -267,7 +267,7 @@ public partial class BatchImportModel : ModelBase
                 NotifyOperationStateChanged();
             }
 
-            if (cancellation.IsCancellationRequested)
+            if (cancellation?.IsCancellationRequested == true)
             {
                 _operationProgress.Cancel();
                 IsImportCancelled = true;
