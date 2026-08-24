@@ -50,6 +50,24 @@ public class ProcessLauncherService : IProcessLauncherService
         }
     }
 
+    public void OpenFolder(string folderPath)
+    {
+        if (_platformInfo.IsLinux)
+        {
+            StartLinuxTarget(folderPath);
+            return;
+        }
+
+        if (Directory.Exists(folderPath))
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = folderPath,
+                UseShellExecute = true
+            });
+        }
+    }
+
     public void OpenUrl(string url)
     {
         if (_platformInfo.IsLinux)

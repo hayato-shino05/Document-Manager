@@ -36,6 +36,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             "categories" => serviceProvider.GetRequiredService<CategoryManagementModel>(),
             "collections" => serviceProvider.GetRequiredService<CollectionManagementModel>(),
             "recyclebin" or "recycle" => serviceProvider.GetRequiredService<RecycleBinModel>(),
+            "recovery" or "recoverycenter" or "recovery-center" => serviceProvider.GetRequiredService<RecoveryCenterModel>(),
             "batchimport" or "batch-import" => serviceProvider.GetRequiredService<BatchImportModel>(),
             "bulkdelete" or "bulk-delete" => serviceProvider.GetRequiredService<BulkDeleteModel>(),
             "duplicates" => serviceProvider.GetRequiredService<DuplicateDetectionModel>(),

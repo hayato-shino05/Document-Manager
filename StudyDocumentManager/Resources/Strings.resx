@@ -846,6 +846,33 @@
   <data name="PV_CascadeTitle" xml:space="preserve"><value>{0}を削除しますか？</value></data>
   <data name="PV_MembershipNote" xml:space="preserve"><value>削除後も「元に戻す」でコレクションとメンバー構成を復元できます。文書自体は削除されません。</value></data>
   <data name="PV_RecycleBinNote" xml:space="preserve"><value>削除された文書はごみ箱から復元できます。「元に戻す」でも復元できます。</value></data>
+  <data name="RC_Title" xml:space="preserve"><value>リカバリーセンター</value></data>
+  <data name="RC_LatestBackup" xml:space="preserve"><value>最新バックアップ:</value></data>
+  <data name="RC_LatestNone" xml:space="preserve"><value>バックアップはまだありません</value></data>
+  <data name="RC_StatusNone" xml:space="preserve"><value>—</value></data>
+  <data name="RC_StatusValid" xml:space="preserve"><value>正常</value></data>
+  <data name="RC_StatusInvalid" xml:space="preserve"><value>無効</value></data>
+  <data name="RC_Location" xml:space="preserve"><value>保存先:</value></data>
+  <data name="RC_Retention" xml:space="preserve"><value>保持する世代数:</value></data>
+  <data name="RC_SaveRetention" xml:space="preserve"><value>保持設定を保存</value></data>
+  <data name="RC_CreateBackup" xml:space="preserve"><value>バックアップを作成</value></data>
+  <data name="RC_Restore" xml:space="preserve"><value>復元</value></data>
+  <data name="RC_OpenFolder" xml:space="preserve"><value>フォルダーを開く</value></data>
+  <data name="RC_RestoreFromFile" xml:space="preserve"><value>ファイルから復元…</value></data>
+  <data name="RC_ColName" xml:space="preserve"><value>バックアップファイル</value></data>
+  <data name="RC_ColCreated" xml:space="preserve"><value>作成日時</value></data>
+  <data name="RC_ColSize" xml:space="preserve"><value>サイズ</value></data>
+  <data name="RC_ColStatus" xml:space="preserve"><value>状態</value></data>
+  <data name="RC_EmptyState" xml:space="preserve"><value>バックアップ世代はまだありません。最初のバックアップを作成しましょう。</value></data>
+  <data name="RC_ConfirmRestoreTitle" xml:space="preserve"><value>復元の確認</value></data>
+  <data name="RC_ConfirmRestoreMessage" xml:space="preserve"><value>{0} に作成されたバックアップを復元しますか？&#10;&#10;現在のデータベース（{2}、ドキュメント {1} 件）は置き換えられます。この操作は取り消せません。</value></data>
+  <data name="RC_RestoreRestartMessage" xml:space="preserve"><value>復元が完了しました。&#10;&#10;復元を完了するにはアプリケーションの再起動が必要です。&#10;手順:&#10;1. 作業中のデータを保存し、自動的に閉じない場合はこのウィンドウを閉じてください。&#10;2. Study Document Manager を再度起動します。&#10;3. ダッシュボードでドキュメントを確認してください。</value></data>
+  <data name="RC_BackupCreated" xml:space="preserve"><value>バックアップを作成しました。</value></data>
+  <data name="RC_BackupFailed" xml:space="preserve"><value>バックアップに失敗しました。</value></data>
+  <data name="RC_RetentionSaved" xml:space="preserve"><value>保持設定を保存しました。</value></data>
+  <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>このファイルは有効なバックアップ世代ではありません。</value></data>
+  <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>復元に失敗しました。現在のデータベースは変更されていません。</value></data>
+  <data name="RC_RecoveryPaths" xml:space="preserve"><value>関連する復旧ツール:</value></data>
 </root>
 
 

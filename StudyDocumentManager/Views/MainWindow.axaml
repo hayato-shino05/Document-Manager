@@ -88,9 +88,10 @@
                               AutomationProperties.AutomationId="Menu_Import">
                         <MenuItem Header="{loc:Localize Menu_BatchImport}" Command="{Binding NavigateCommand}" CommandParameter="batch-import"/>
                     </MenuItem>
-                    <MenuItem Header="{loc:Localize Menu_Maintenance}"
-                              AutomationProperties.AutomationId="Menu_Maintenance">
-                        <MenuItem Header="{loc:Localize Menu_BulkDelete}" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
+            <MenuItem Header="{loc:Localize Menu_Maintenance}"
+                      AutomationProperties.AutomationId="Menu_Maintenance">
+                <MenuItem Header="{loc:Localize RC_Title}" Command="{Binding NavigateCommand}" CommandParameter="recovery"/>
+                <MenuItem Header="{loc:Localize Menu_BulkDelete}" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
                         <MenuItem Header="{loc:Localize Menu_FindDuplicates}" Command="{Binding NavigateCommand}" CommandParameter="duplicates"/>
                         <MenuItem Header="{loc:Localize Menu_FileCheck}" Command="{Binding NavigateCommand}" CommandParameter="integrity"/>
                         <MenuItem Header="{loc:Localize Menu_RecycleBin}" Command="{Binding NavigateCommand}" CommandParameter="recycle"/>
@@ -272,6 +273,9 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:SmartViewsModel}">
                     <v:SmartViews />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:RecoveryCenterModel}">
+                    <v:RecoveryCenterView />
                 </DataTemplate>
             </ContentControl.DataTemplates>
         </ContentControl>

@@ -1,0 +1,147 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             xmlns:conv="using:StudyDocumentManager.Converters"
+             xmlns:core="using:StudyDocumentManager.Core.Interfaces"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             x:Class="StudyDocumentManager.Views.RecoveryCenterView"
+             x:DataType="vm:RecoveryCenterModel"
+             AutomationProperties.AutomationId="Screen_RecoveryCenter">
+
+    <Border Classes="page-wrapper">
+        <DockPanel>
+            <!-- Header: Title + Primary actions -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+                <StackPanel Classes="page-header-stack" Margin="0">
+                    <Image Source="{StaticResource IconRestore}" Width="18" Height="18"/>
+                    <TextBlock Classes="page-title"
+                               AutomationProperties.AutomationId="Title_RecoveryCenter"
+                               Text="{loc:Localize RC_Title}"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
+                            HorizontalAlignment="Right">
+                    <Button Classes="primary" AutomationProperties.AutomationId="Recovery_CreateBackup"
+                            AutomationProperties.Name="{loc:Localize RC_CreateBackup}"
+                            Command="{Binding CreateBackupCommand}" Padding="{StaticResource PaddingMd}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconSave}" Width="16" Height="16"/>
+                            <TextBlock Text="{loc:Localize RC_CreateBackup}" FontSize="{StaticResource FontSizeMd}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="danger" AutomationProperties.AutomationId="Recovery_RestoreSelected"
+                            AutomationProperties.Name="{loc:Localize RC_Restore}"
+                            Command="{Binding RestoreSelectedCommand}" IsEnabled="{Binding CanRestoreSelected}" Padding="{StaticResource PaddingMd}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconRestore}" Width="16" Height="16"/>
+                            <TextBlock Text="{loc:Localize RC_Restore}" FontSize="{StaticResource FontSizeMd}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" AutomationProperties.AutomationId="Recovery_OpenFolder"
+                            AutomationProperties.Name="{loc:Localize RC_OpenFolder}"
+                            Command="{Binding OpenBackupFolderCommand}" Padding="{StaticResource PaddingMd}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconHDD}" Width="16" Height="16"/>
+                            <TextBlock Text="{loc:Localize RC_OpenFolder}" FontSize="{StaticResource FontSizeMd}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" AutomationProperties.AutomationId="Recovery_RestoreFromFile"
+                            AutomationProperties.Name="{loc:Localize RC_RestoreFromFile}"
+                            Command="{Binding RestoreFromFileCommand}" Padding="{StaticResource PaddingMd}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconOpenFile}" Width="16" Height="16"/>
+                            <TextBlock Text="{loc:Localize RC_RestoreFromFile}" FontSize="{StaticResource FontSizeMd}"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+
+            <ScrollViewer>
+                <StackPanel Spacing="12">
+
+                    <!-- Latest backup summary -->
+                    <Border Classes="card" AutomationProperties.AutomationId="Recovery_LatestCard">
+                        <StackPanel Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Image Source="{StaticResource IconClock}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <TextBlock Classes="caption" Text="{loc:Localize RC_LatestBackup}" VerticalAlignment="Center"/>
+                                <TextBlock FontWeight="SemiBold"
+                                           AutomationProperties.AutomationId="Recovery_LatestTime"
+                                           Text="{Binding LatestBackupText}" VerticalAlignment="Center"/>
+                                <TextBlock FontWeight="SemiBold"
+                                           AutomationProperties.AutomationId="Recovery_LatestStatus"
+                                           Text="{Binding LatestStatusText}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Image Source="{StaticResource IconFolderBase}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <TextBlock Classes="caption" Text="{loc:Localize RC_Location}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding BackupLocationText}"
+                                           AutomationProperties.AutomationId="Recovery_Location"
+                                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+                                <TextBlock Classes="caption" Text="{loc:Localize RC_Retention}" VerticalAlignment="Center"/>
+                                <NumericUpDown Minimum="1" Maximum="100" Increment="1" Width="110"
+                                               AutomationProperties.AutomationId="Recovery_RetentionCount"
+                                               Value="{Binding RetentionCount}"/>
+                                <Button Classes="secondary" AutomationProperties.AutomationId="Recovery_SaveRetention"
+                                        AutomationProperties.Name="{loc:Localize RC_SaveRetention}"
+                                        Command="{Binding SaveRetentionCommand}"
+                                        Content="{loc:Localize RC_SaveRetention}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Versions -->
+                    <Border Classes="card" ClipToBounds="True">
+                        <Panel>
+                            <DataGrid Classes="std"
+                                      AutomationProperties.AutomationId="Recovery_VersionsGrid"
+                                      AutomationProperties.Name="{loc:Localize RC_Title}"
+                                      ItemsSource="{Binding Versions}"
+                                      SelectedItem="{Binding SelectedVersion}"
+                                      IsReadOnly="True"
+                                      MinHeight="220">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="{loc:Localize RC_ColName}" Binding="{Binding FilePath}" Width="*" MinWidth="260"/>
+                                    <DataGridTextColumn Header="{loc:Localize RC_ColCreated}" Binding="{Binding CreatedAtLocal, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" Width="170"/>
+                                    <DataGridTextColumn Header="{loc:Localize RC_ColSize}" Binding="{Binding SizeBytes, Converter={x:Static conv:FileSizeConverter.Instance}}" Width="90"/>
+                                    <DataGridTemplateColumn Header="{loc:Localize RC_ColStatus}" Width="110">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate x:DataType="core:BackupVersionInfo">
+                                                <TextBlock Text="{Binding IsValid, Converter={x:Static conv:BackupStatusConverter.Instance}}"
+                                                           VerticalAlignment="Center" Margin="8,0"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <StackPanel Classes="empty-state" IsVisible="{Binding !HasVersions}">
+                                <Image Classes="empty-state-icon" Source="{StaticResource IconRestore}"/>
+                                <TextBlock Classes="empty-state-text"
+                                           AutomationProperties.AutomationId="Recovery_EmptyState"
+                                           AutomationProperties.LiveSetting="Polite"
+                                           Text="{loc:Localize RC_EmptyState}"/>
+                            </StackPanel>
+                        </Panel>
+                    </Border>
+
+                    <!-- Recovery paths -->
+                    <Border Classes="card" AutomationProperties.AutomationId="Recovery_LinksCard">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Classes="caption" Text="{loc:Localize RC_RecoveryPaths}" VerticalAlignment="Center"/>
+                            <Button Classes="secondary" AutomationProperties.AutomationId="Recovery_GoRecycleBin"
+                                    Command="{Binding GoToRecycleBinCommand}"
+                                    Content="{loc:Localize Menu_RecycleBin}"/>
+                            <Button Classes="secondary" AutomationProperties.AutomationId="Recovery_GoIntegrity"
+                                    Command="{Binding GoToFileIntegrityCommand}"
+                                    Content="{loc:Localize Menu_FileCheck}"/>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
+
+</UserControl>

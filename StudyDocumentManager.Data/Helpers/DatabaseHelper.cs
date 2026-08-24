@@ -518,6 +518,12 @@ public class DatabaseHelper
 
 
 
+    public int GetDocumentCount()
+    {
+        using var conn = OpenConnection();
+        return GetScalarInt(conn, "SELECT COUNT(*) FROM documents WHERE (is_deleted IS NULL OR is_deleted = 0)");
+    }
+
     public List<StudyDocument> GetDeletedDocuments()
     {
         const string query = "SELECT * FROM documents WHERE is_deleted = 1 ORDER BY deleted_at DESC";

@@ -947,4 +947,31 @@
   <data name="PV_CascadeTitle" xml:space="preserve"><value>要删除{0}吗？</value></data>
   <data name="PV_MembershipNote" xml:space="preserve"><value>删除后可通过“撤销”恢复收藏集及其成员。文档本身不会被删除。</value></data>
   <data name="PV_RecycleBinNote" xml:space="preserve"><value>被删除的文档可从回收站或通过“撤销”恢复。</value></data>
+  <data name="RC_Title" xml:space="preserve"><value>恢复中心</value></data>
+  <data name="RC_LatestBackup" xml:space="preserve"><value>最新备份：</value></data>
+  <data name="RC_LatestNone" xml:space="preserve"><value>尚无备份</value></data>
+  <data name="RC_StatusNone" xml:space="preserve"><value>—</value></data>
+  <data name="RC_StatusValid" xml:space="preserve"><value>有效</value></data>
+  <data name="RC_StatusInvalid" xml:space="preserve"><value>无效</value></data>
+  <data name="RC_Location" xml:space="preserve"><value>保存位置：</value></data>
+  <data name="RC_Retention" xml:space="preserve"><value>保留版本数：</value></data>
+  <data name="RC_SaveRetention" xml:space="preserve"><value>保存保留设置</value></data>
+  <data name="RC_CreateBackup" xml:space="preserve"><value>创建备份</value></data>
+  <data name="RC_Restore" xml:space="preserve"><value>恢复</value></data>
+  <data name="RC_OpenFolder" xml:space="preserve"><value>打开文件夹</value></data>
+  <data name="RC_RestoreFromFile" xml:space="preserve"><value>从文件恢复…</value></data>
+  <data name="RC_ColName" xml:space="preserve"><value>备份文件</value></data>
+  <data name="RC_ColCreated" xml:space="preserve"><value>创建时间</value></data>
+  <data name="RC_ColSize" xml:space="preserve"><value>大小</value></data>
+  <data name="RC_ColStatus" xml:space="preserve"><value>状态</value></data>
+  <data name="RC_EmptyState" xml:space="preserve"><value>尚无备份版本，请创建第一个备份。</value></data>
+  <data name="RC_ConfirmRestoreTitle" xml:space="preserve"><value>确认恢复</value></data>
+  <data name="RC_ConfirmRestoreMessage" xml:space="preserve"><value>要恢复 {0} 创建的备份吗？&#10;&#10;当前数据库（{2}，共 {1} 个文档）将被替换。此操作无法撤销。</value></data>
+  <data name="RC_RestoreRestartMessage" xml:space="preserve"><value>恢复完成。&#10;&#10;需要重新启动应用程序以完成恢复。&#10;步骤：&#10;1. 保存当前工作；如果窗口未自动关闭，请手动关闭。&#10;2. 重新启动 Study Document Manager。&#10;3. 在仪表板上核对文档。</value></data>
+  <data name="RC_BackupCreated" xml:space="preserve"><value>备份已创建。</value></data>
+  <data name="RC_BackupFailed" xml:space="preserve"><value>备份失败。</value></data>
+  <data name="RC_RetentionSaved" xml:space="preserve"><value>保留设置已保存。</value></data>
+  <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>该文件不是有效的备份版本。</value></data>
+  <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>恢复失败。当前数据库未被更改。</value></data>
+  <data name="RC_RecoveryPaths" xml:space="preserve"><value>相关恢复工具：</value></data>
 </root>

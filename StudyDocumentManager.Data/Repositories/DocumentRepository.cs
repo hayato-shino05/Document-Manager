@@ -111,5 +111,7 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
 
     public bool RestoreDatabase(string sourcePath) => _db.RestoreDatabase(sourcePath);
 
+    public int GetDocumentCount() => _db.GetDocumentCount();
+
     public string DatabasePath => _db.DatabasePath;
 }

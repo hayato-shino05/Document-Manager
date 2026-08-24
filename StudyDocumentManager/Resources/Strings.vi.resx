@@ -947,4 +947,31 @@
   <data name="PV_CascadeTitle" xml:space="preserve"><value>Xóa {0}?</value></data>
   <data name="PV_MembershipNote" xml:space="preserve"><value>Sau khi xóa, có thể khôi phục bộ sưu tập và thành viên bằng Hoàn tác. Bản thân tài liệu không bị xóa.</value></data>
   <data name="PV_RecycleBinNote" xml:space="preserve"><value>Tài liệu đã xóa có thể được khôi phục từ Thùng rác hoặc bằng Hoàn tác.</value></data>
+  <data name="RC_Title" xml:space="preserve"><value>Trung tâm Khôi phục</value></data>
+  <data name="RC_LatestBackup" xml:space="preserve"><value>Bản sao lưu mới nhất:</value></data>
+  <data name="RC_LatestNone" xml:space="preserve"><value>Chưa có bản sao lưu</value></data>
+  <data name="RC_StatusNone" xml:space="preserve"><value>—</value></data>
+  <data name="RC_StatusValid" xml:space="preserve"><value>Hợp lệ</value></data>
+  <data name="RC_StatusInvalid" xml:space="preserve"><value>Không hợp lệ</value></data>
+  <data name="RC_Location" xml:space="preserve"><value>Vị trí lưu:</value></data>
+  <data name="RC_Retention" xml:space="preserve"><value>Số phiên bản giữ lại:</value></data>
+  <data name="RC_SaveRetention" xml:space="preserve"><value>Lưu cài đặt giữ lại</value></data>
+  <data name="RC_CreateBackup" xml:space="preserve"><value>Tạo bản sao lưu</value></data>
+  <data name="RC_Restore" xml:space="preserve"><value>Khôi phục</value></data>
+  <data name="RC_OpenFolder" xml:space="preserve"><value>Mở thư mục</value></data>
+  <data name="RC_RestoreFromFile" xml:space="preserve"><value>Khôi phục từ tệp…</value></data>
+  <data name="RC_ColName" xml:space="preserve"><value>Tệp sao lưu</value></data>
+  <data name="RC_ColCreated" xml:space="preserve"><value>Ngày tạo</value></data>
+  <data name="RC_ColSize" xml:space="preserve"><value>Kích thước</value></data>
+  <data name="RC_ColStatus" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="RC_EmptyState" xml:space="preserve"><value>Chưa có phiên bản sao lưu. Hãy tạo bản sao lưu đầu tiên.</value></data>
+  <data name="RC_ConfirmRestoreTitle" xml:space="preserve"><value>Xác nhận khôi phục</value></data>
+  <data name="RC_ConfirmRestoreMessage" xml:space="preserve"><value>Khôi phục bản sao lưu tạo lúc {0}?&#10;&#10;Cơ sở dữ liệu hiện tại ({2}) với {1} tài liệu sẽ bị thay thế. Thao tác này không thể hoàn tác.</value></data>
+  <data name="RC_RestoreRestartMessage" xml:space="preserve"><value>Khôi phục hoàn tất.&#10;&#10;Ứng dụng cần khởi động lại để hoàn tất việc khôi phục.&#10;Các bước:&#10;1. Lưu công việc đang làm; nếu cửa sổ không tự đóng, hãy đóng nó.&#10;2. Khởi động lại Study Document Manager.&#10;3. Kiểm tra tài liệu trên Dashboard.</value></data>
+  <data name="RC_BackupCreated" xml:space="preserve"><value>Đã tạo bản sao lưu.</value></data>
+  <data name="RC_BackupFailed" xml:space="preserve"><value>Tạo bản sao lưu thất bại.</value></data>
+  <data name="RC_RetentionSaved" xml:space="preserve"><value>Đã lưu cài đặt giữ lại.</value></data>
+  <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>Tệp này không phải bản sao lưu hợp lệ.</value></data>
+  <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>Khôi phục thất bại. Cơ sở dữ liệu hiện tại không bị thay đổi.</value></data>
+  <data name="RC_RecoveryPaths" xml:space="preserve"><value>Công cụ khôi phục liên quan:</value></data>
 </root>

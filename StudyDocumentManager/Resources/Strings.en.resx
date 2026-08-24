@@ -738,4 +738,31 @@ Please check your network connection.</value></data>
   <data name="PV_CascadeTitle" xml:space="preserve"><value>Delete {0}?</value></data>
   <data name="PV_MembershipNote" xml:space="preserve"><value>The collection and its members can be restored afterwards with Undo. The documents themselves are not deleted.</value></data>
   <data name="PV_RecycleBinNote" xml:space="preserve"><value>Deleted documents can be restored from the Recycle Bin or with Undo.</value></data>
+  <data name="RC_Title" xml:space="preserve"><value>Recovery Center</value></data>
+  <data name="RC_LatestBackup" xml:space="preserve"><value>Latest backup:</value></data>
+  <data name="RC_LatestNone" xml:space="preserve"><value>No backup yet</value></data>
+  <data name="RC_StatusNone" xml:space="preserve"><value>—</value></data>
+  <data name="RC_StatusValid" xml:space="preserve"><value>Valid</value></data>
+  <data name="RC_StatusInvalid" xml:space="preserve"><value>Invalid</value></data>
+  <data name="RC_Location" xml:space="preserve"><value>Location:</value></data>
+  <data name="RC_Retention" xml:space="preserve"><value>Versions to keep:</value></data>
+  <data name="RC_SaveRetention" xml:space="preserve"><value>Save retention</value></data>
+  <data name="RC_CreateBackup" xml:space="preserve"><value>Create backup</value></data>
+  <data name="RC_Restore" xml:space="preserve"><value>Restore</value></data>
+  <data name="RC_OpenFolder" xml:space="preserve"><value>Open folder</value></data>
+  <data name="RC_RestoreFromFile" xml:space="preserve"><value>Restore from file…</value></data>
+  <data name="RC_ColName" xml:space="preserve"><value>Backup file</value></data>
+  <data name="RC_ColCreated" xml:space="preserve"><value>Created</value></data>
+  <data name="RC_ColSize" xml:space="preserve"><value>Size</value></data>
+  <data name="RC_ColStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="RC_EmptyState" xml:space="preserve"><value>No backup versions yet. Create your first backup.</value></data>
+  <data name="RC_ConfirmRestoreTitle" xml:space="preserve"><value>Confirm restore</value></data>
+  <data name="RC_ConfirmRestoreMessage" xml:space="preserve"><value>Restore the backup created at {0}?&#10;&#10;The current database ({2}) with {1} documents will be replaced. This cannot be undone.</value></data>
+  <data name="RC_RestoreRestartMessage" xml:space="preserve"><value>Restore completed.&#10;&#10;The application must restart to finish the restore.&#10;Steps:&#10;1. Save your work and close this window if it does not close automatically.&#10;2. Start Study Document Manager again.&#10;3. Verify your documents on the Dashboard.</value></data>
+  <data name="RC_BackupCreated" xml:space="preserve"><value>Backup created successfully.</value></data>
+  <data name="RC_BackupFailed" xml:space="preserve"><value>Backup failed.</value></data>
+  <data name="RC_RetentionSaved" xml:space="preserve"><value>Retention setting saved.</value></data>
+  <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>This file is not a valid backup version.</value></data>
+  <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>Restore failed. The current database was not changed.</value></data>
+  <data name="RC_RecoveryPaths" xml:space="preserve"><value>Related recovery tools:</value></data>
 </root>

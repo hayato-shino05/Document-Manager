@@ -34,6 +34,19 @@ public partial class App : Application
         var db = Services.GetRequiredService<DatabaseHelper>();
         db.InitializeDatabase();
 
+        // Versioned backup housekeeping: keep a fresh restore point without blocking startup.
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                Services.GetRequiredService<IVersionedBackupService>().EnsureFreshBackup(TimeSpan.FromHours(24));
+            }
+            catch (Exception)
+            {
+                Console.Error.WriteLine("Versioned backup skipped.");
+            }
+        });
+
         var localization = Services.GetRequiredService<LocalizationService>();
         var settings = Services.GetRequiredService<ISettingsService>();
         InitializeLanguage(localization, settings, osCulture);
@@ -143,6 +156,7 @@ public partial class App : Application
         services.AddSingleton<IProcessLauncherService, ProcessLauncherService>();
         services.AddSingleton<IExportService, CsvExportService>();
         services.AddSingleton<IBackupService, DatabaseBackupService>();
+services.AddSingleton<IVersionedBackupService, VersionedBackupService>();
         services.AddSingleton<LocalizationService>();
         services.AddSingleton<ILocalizationService>(sp => sp.GetRequiredService<LocalizationService>());
         services.AddSingleton<IUpdateService, Services.UpdateService>();
@@ -167,6 +181,7 @@ public partial class App : Application
         services.AddTransient<CategoryManagementModel>();
         services.AddTransient<CollectionManagementModel>();
         services.AddTransient<RecycleBinModel>();
+services.AddTransient<RecoveryCenterModel>();
         services.AddTransient<FileIntegrityCheckModel>();
         services.AddTransient<SmartViewsModel>();
 
