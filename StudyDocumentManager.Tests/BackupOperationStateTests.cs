@@ -125,6 +125,64 @@ public sealed class BackupOperationStateTests
     }
 
     [Fact]
+    public async Task BackupAsync_CancelDuringOperation_ReportsCancelledWithoutError()
+    {
+        var backup = new ControlledBackupService { BackupResult = (true, "backup.db", null), ObserveCancelAfterRelease = true };
+        var model = CreateModel(backup);
+
+        var operation = model.BackupDatabaseCommand.ExecuteAsync(null);
+        await backup.Started.Task;
+
+        model.CancelBackupCommand.Execute(null);
+        backup.Release();
+        await operation;
+
+        Assert.True(backup.ObservedCancelAfterRelease);
+        Assert.False(model.IsBackingUp);
+        Assert.True(model.BackupCancelled);
+        Assert.Equal(0, model.BackupProgress);
+        Assert.Empty(model.BackupError);
+    }
+
+    [Fact]
+    public async Task RestoreAsync_CancelDuringOperation_ReportsCancelledWithoutError()
+    {
+        var backup = new ControlledBackupService { RestoreResult = (true, null), BlockRestore = true, ObserveCancelAfterRelease = true };
+        var model = CreateModel(backup);
+
+        var operation = model.RestoreDatabaseCommand.ExecuteAsync(null);
+        await backup.Started.Task;
+
+        model.CancelRestoreCommand.Execute(null);
+        backup.Release();
+        await operation;
+
+        Assert.True(backup.ObservedCancelAfterRelease);
+        Assert.False(model.IsRestoring);
+        Assert.True(model.RestoreCancelled);
+        Assert.Equal(0, model.RestoreProgress);
+        Assert.Empty(model.RestoreError);
+    }
+
+    [Fact]
+    public async Task BackupService_ObservesTokenBeforeStart_WhenAlreadyCancelled()
+    {
+        var backup = new ControlledBackupService { BackupResult = (true, "backup.db", null) };
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => backup.BackupAsync(new CancellationToken(canceled: true)));
+    }
+
+    [Fact]
+    public async Task RestoreService_ObservesTokenBeforeStart_WhenAlreadyCancelled()
+    {
+        var backup = new ControlledBackupService { RestoreResult = (true, null) };
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => backup.RestoreAsync(new CancellationToken(canceled: true)));
+    }
+
+    [Fact]
     public async Task RestoreAsync_SuccessCompletesWithoutError()
     {
         var backup = new ControlledBackupService { RestoreResult = (true, null) };
@@ -161,6 +219,8 @@ public sealed class BackupOperationStateTests
         public (bool Success, string? Error) RestoreResult { get; set; }
         public Exception? ExceptionToThrow { get; set; }
         public bool BlockRestore { get; set; }
+        public bool ObserveCancelAfterRelease { get; set; }
+        public bool ObservedCancelAfterRelease { get; private set; }
         public TaskCompletionSource<bool> Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private readonly TaskCompletionSource<bool> _release = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -171,8 +231,14 @@ public sealed class BackupOperationStateTests
             CancellationToken cancellationToken,
             (bool Success, string? Path, string? Error) result)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             Started.TrySetResult(true);
             await _release.Task;
+            if (ObserveCancelAfterRelease)
+            {
+                ObservedCancelAfterRelease = true;
+                cancellationToken.ThrowIfCancellationRequested();
+            }
             if (ExceptionToThrow is not null)
                 throw ExceptionToThrow;
             return result;
@@ -194,10 +260,16 @@ public sealed class BackupOperationStateTests
             CancellationToken cancellationToken,
             (bool Success, string? Error) result)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             Started.TrySetResult(true);
             if (!BlockRestore)
                 _release.TrySetResult(true);
             await _release.Task;
+            if (ObserveCancelAfterRelease)
+            {
+                ObservedCancelAfterRelease = true;
+                cancellationToken.ThrowIfCancellationRequested();
+            }
             if (ExceptionToThrow is not null)
                 throw ExceptionToThrow;
             return result;
