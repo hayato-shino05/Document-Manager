@@ -5,6 +5,7 @@ using StudyDocumentManager.Data.Repositories;
 using StudyDocumentManager.Models;
 using StudyDocumentManager.Services;
 using StudyDocumentManager.Tests.TestDoubles;
+using System.Threading;
 using Xunit;
 
 namespace StudyDocumentManager.Tests;
@@ -206,6 +207,282 @@ public sealed class RecoveryCenterTests : IDisposable
     }
 
     [Fact]
+    public void EnsureFreshBackup_TreatsCorruptNewestAsStale_AndReplacesIt()
+    {
+        SeedDocument("corruption target");
+        Assert.Equal(1, _service.EnsureFreshBackup(TimeSpan.FromHours(24)));
+
+        var latest = _service.GetLatest();
+        Assert.NotNull(latest);
+        File.WriteAllText(latest!.FilePath, "corrupted bytes");
+
+        Assert.Equal(1, _service.EnsureFreshBackup(TimeSpan.FromHours(24)));
+        var newest = _service.GetLatest();
+        Assert.NotNull(newest);
+        Assert.True(newest.IsValid);
+        Assert.NotEqual(latest.FilePath, newest.FilePath);
+    }
+
+    [Fact]
+    public async Task CreateBackupAsync_AwaitedReload_ListsNewVersion_AndResetsLoading()
+    {
+        SeedDocument("async reload target");
+        var (model, dialogs, lifecycle, _, _, timeline) = CreateModel();
+        dialogs.ConfirmResult = true;
+
+        await model.CreateBackupCommand.ExecuteAsync(null);
+
+        Assert.False(model.IsLoading);
+        Assert.True(model.HasVersions);
+        Assert.Single(model.Versions);
+        Assert.Contains(timeline, t => t.StartsWith("message|", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task LoadDataAsync_ConcurrentCalls_CompleteWithoutErrorOrDuplication()
+    {
+        SeedDocument("reentry target");
+        Assert.NotNull(_service.CreateVersion());
+        var (model, _, _, _, _, _) = CreateModel();
+
+        while (model.IsLoading)
+            await Task.Delay(10);
+        Assert.True(model.HasVersions);
+
+        var first = model.LoadDataCommand.ExecuteAsync(null);
+        var second = model.LoadDataCommand.ExecuteAsync(null);
+        await Task.WhenAll(first, second);
+
+        // The IsLoading clear runs in a completion continuation that may land after the await.
+        for (var i = 0; i < 500 && model.IsLoading; i++)
+            await Task.Delay(10);
+
+        Assert.False(model.IsLoading);
+        Assert.True(model.HasVersions);
+        Assert.Single(model.Versions);
+    }
+
+    [Fact]
+    public async Task LoadDataAsync_JoinedAfterMutation_ObservesNewVersion()
+    {
+        SeedDocument("mutation target");
+        var (model, _, _, _, _, _) = CreateModel();
+
+        // The constructor's background load may still be in flight; the mutation lands
+        // and the next awaited refresh must include it instead of being dropped.
+        Assert.NotNull(_service.CreateVersion());
+
+        await model.LoadDataCommand.ExecuteAsync(null);
+
+        Assert.False(model.IsLoading);
+        Assert.True(model.HasVersions);
+        Assert.Single(model.Versions);
+    }
+
+    [Fact]
+    public async Task CreateBackupAsync_WhenReloadFails_ShowsErrorInsteadOfSuccess()
+    {
+        var version = new BackupVersionInfo(@"C:\stub\new.db", DateTime.Now, 10, IsValid: true, IsLatest: true);
+        var stub = new StubVersionedBackupService
+        {
+            CreateHandler = () => version,
+            ListHandler = () => throw new IOException("reload failure")
+        };
+        var (model, dialogs, _, _, _, timeline) = CreateModel(service: stub);
+        dialogs.ConfirmResult = true;
+
+        await model.CreateBackupCommand.ExecuteAsync(null);
+
+        Assert.DoesNotContain(timeline, t => t.StartsWith("message|", StringComparison.Ordinal));
+        Assert.Contains(timeline, t => t.StartsWith("error|", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task SaveRetentionAsync_WhenReloadFails_ShowsErrorInsteadOfSuccess()
+    {
+        var stub = new StubVersionedBackupService
+        {
+            ListHandler = () => throw new IOException("reload failure")
+        };
+        var (model, dialogs, _, _, _, timeline) = CreateModel(service: stub);
+        model.RetentionCount = 3;
+
+        await model.SaveRetentionCommand.ExecuteAsync(null);
+
+        Assert.DoesNotContain(timeline, t => t.StartsWith("message|", StringComparison.Ordinal));
+        Assert.Contains(timeline, t => t.StartsWith("error|", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task LoadDataCommand_ConcurrentRequests_SerializeWithoutOverlap()
+    {
+        var firstStarted = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseFirst = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var version = new BackupVersionInfo(@"C:\stub\a.db", DateTime.Now, 10, IsValid: true, IsLatest: true);
+        var callCount = 0;
+        var stub = new StubVersionedBackupService
+        {
+            ListHandler = () =>
+            {
+                if (Interlocked.Increment(ref callCount) == 1)
+                {
+                    firstStarted.TrySetResult(true);
+                    releaseFirst.Task.Wait(5000);
+                    return [version];
+                }
+
+                return [version];
+            }
+        };
+        var (model, _, _, _, _, _) = CreateModel(service: stub);
+
+        while (model.IsLoading)
+            await Task.Delay(10);
+
+        var first = model.LoadDataCommand.ExecuteAsync(null);
+        await firstStarted.Task;
+        var second = model.LoadDataCommand.ExecuteAsync(null);
+        releaseFirst.TrySetResult(true);
+        await Task.WhenAll(first, second);
+
+        for (var i = 0; i < 500 && model.IsLoading; i++)
+            await Task.Delay(10);
+
+        Assert.Equal(1, stub.MaxConcurrentLoads);
+        Assert.False(model.IsLoading);
+        Assert.True(model.HasVersions);
+        Assert.Single(model.Versions);
+    }
+
+    [Fact]
+    public async Task Constructor_StartsLoadWithoutBlocking_AndCompletesIt()
+    {
+        var version = new BackupVersionInfo(@"C:\stub\b.db", DateTime.Now, 10, IsValid: true, IsLatest: true);
+        var stub = new StubVersionedBackupService { ListHandler = () => [version] };
+
+        var model = new RecoveryCenterModel(
+            stub,
+            new RecordingDialogService(),
+            new StubFileDialogService(),
+            new StubNavigationService(),
+            new RecordingLifecycleService(),
+            new StubProcessLauncherService(),
+            new KeyLocalizationService());
+
+        Assert.True(model.IsLoading); // load started synchronously, constructor returned
+        for (var i = 0; i < 500 && model.IsLoading; i++)
+            await Task.Delay(10);
+        Assert.False(model.IsLoading);
+        Assert.Single(model.Versions);
+    }
+
+    [Fact]
+    public async Task ConcurrentCreateAndRetention_EachCallerGetsOwnOutcome()
+    {
+        var version = new BackupVersionInfo(@"C:\stub\c.db", DateTime.Now, 10, IsValid: true, IsLatest: true);
+        var ctorLoadStarted = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseCtorLoad = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var createReloadStarted = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseCreateReload = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var callCount = 0;
+        var stubCreate = new StubVersionedBackupService
+        {
+            CreateHandler = () => version,
+            ListHandler = () =>
+            {
+                var n = Interlocked.Increment(ref callCount);
+                if (n == 1)
+                {
+                    ctorLoadStarted.TrySetResult(true);
+                    releaseCtorLoad.Task.Wait(5000);
+                    return [];
+                }
+
+                if (n == 2)
+                {
+                    createReloadStarted.TrySetResult(true);
+                    releaseCreateReload.Task.Wait(5000);
+                    throw new IOException("create reload fails");
+                }
+
+                return [version];
+            }
+        };
+        var stubRetention = new StubVersionedBackupService { ListHandler = () => [version] };
+        var (createModel, createDialogs, _, _, _, createTimeline) = CreateModel(service: stubCreate);
+        var (retentionModel, retentionDialogs, _, _, _, retentionTimeline) = CreateModel(service: stubRetention);
+
+        await ctorLoadStarted.Task;
+        releaseCtorLoad.TrySetResult(true);
+
+        var create = createModel.CreateBackupCommand.ExecuteAsync(null);
+        await createReloadStarted.Task;
+
+        var retention = retentionModel.SaveRetentionCommand.ExecuteAsync(null);
+        await retention;
+
+        releaseCreateReload.TrySetResult(true);
+        await create;
+
+        // The failing reload must not leak its result into the other caller's outcome.
+        Assert.Contains(createTimeline, t => t.StartsWith("error|", StringComparison.Ordinal));
+        Assert.DoesNotContain(createTimeline, t => t.StartsWith("message|", StringComparison.Ordinal));
+        Assert.Contains(retentionTimeline, t => t.StartsWith("message|", StringComparison.Ordinal));
+        Assert.DoesNotContain(retentionTimeline, t => t.StartsWith("error|", StringComparison.Ordinal));
+        Assert.Equal(1, stubCreate.MaxConcurrentLoads);
+        Assert.Equal(1, stubRetention.MaxConcurrentLoads);
+    }
+
+    private sealed class ImmediateSynchronizationContext : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback d, object? state) => d(state);
+        public override void Send(SendOrPostCallback d, object? state) => d(state);
+    }
+
+    [Fact]
+    public async Task StaleLoadCompletion_DoesNotClearIsLoadingWhileNewerLoadActive()
+    {
+        var version = new BackupVersionInfo(@"C:\stub\s.db", DateTime.Now, 10, IsValid: true, IsLatest: true);
+        var gate = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var callCount = 0;
+        var stub = new StubVersionedBackupService
+        {
+            ListHandler = () =>
+            {
+                if (Interlocked.Increment(ref callCount) == 1)
+                    gate.Task.Wait(5000); // block the constructor load (A) until released
+                return [version];
+            }
+        };
+
+        var previous = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(new ImmediateSynchronizationContext());
+        try
+        {
+            var (model, _, _, _, _, _) = CreateModel(service: stub);
+            Assert.True(model.IsLoading, "constructor load A is in progress");
+
+            // Trigger load B; its QueueLoad replaces _loadChain with runB synchronously.
+            var b = model.LoadDataCommand.ExecuteAsync(null);
+            Assert.True(model.IsLoading, "load B is active after it starts");
+
+            // Release load A. It completes after B started, so its reload must not clear IsLoading.
+            gate.TrySetResult(true);
+            await b;
+
+            // B's completion posts IsLoading=false via the context; observe the final state.
+            for (var i = 0; i < 200 && model.IsLoading; i++)
+                await Task.Delay(10);
+
+            Assert.False(model.IsLoading, "only the latest load (B) clears IsLoading");
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previous);
+        }
+    }
+
+    [Fact]
     public void EnsureFreshBackup_CreatesOnlyWhenStale()
     {
         SeedDocument("freshness target");
@@ -238,7 +515,8 @@ public sealed class RecoveryCenterTests : IDisposable
     // --- Model-level confirmation contract (deterministic, doubles only) ---
 
     private (RecoveryCenterModel Model, RecordingDialogService Dialogs, RecordingLifecycleService Lifecycle, StubFileDialogService FileDialogs, StubProcessLauncherService Launcher, List<string> Timeline) CreateModel(
-        string? openFileResult = null)
+        string? openFileResult = null,
+        IVersionedBackupService? service = null)
     {
         var timeline = new List<string>();
         var dialogs = new RecordingDialogService(timeline);
@@ -246,7 +524,7 @@ public sealed class RecoveryCenterTests : IDisposable
         var fileDialogs = new StubFileDialogService(openFileResult);
         var launcher = new StubProcessLauncherService();
         var model = new RecoveryCenterModel(
-            _service,
+            service ?? _service,
             dialogs,
             fileDialogs,
             new StubNavigationService(),
@@ -367,7 +645,7 @@ public sealed class RecoveryCenterTests : IDisposable
         try
         {
             var documents = reopened.GetAllDocuments();
-            Assert.Equal(1, documents.Count);
+            Assert.Single(documents);
             Assert.Equal("before backup", documents[0].Name);
         }
         finally

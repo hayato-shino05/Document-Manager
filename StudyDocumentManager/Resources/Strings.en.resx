@@ -771,4 +771,5 @@ Please check your network connection.</value></data>
   <data name="Integrity_DatabaseLocation" xml:space="preserve"><value>Database location:</value></data>
   <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>Open containing folder</value></data>
   <data name="Integrity_PathCopied" xml:space="preserve"><value>Path copied to clipboard.</value></data>
+  <data name="RC_Loading" xml:space="preserve"><value>Loading…</value></data>
 </root>

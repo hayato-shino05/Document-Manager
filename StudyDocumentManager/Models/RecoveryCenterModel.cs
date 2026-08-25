@@ -24,6 +24,7 @@ public partial class RecoveryCenterModel : ModelBase, IDisposable
     [ObservableProperty] private int _retentionCount;
     [ObservableProperty] private bool _hasVersions;
     [ObservableProperty] private bool _canRestoreSelected;
+    [ObservableProperty] private bool _isLoading;
 
     public RecoveryCenterModel(
         IVersionedBackupService backupService,
@@ -44,7 +45,8 @@ public partial class RecoveryCenterModel : ModelBase, IDisposable
 
         _loc.LanguageChanged += OnLanguageChanged;
         RetentionCount = _backupService.RetentionCount;
-        LoadData();
+        BackupLocationText = _backupService.BackupDirectory;
+        _ = LoadDataAsync();
     }
 
     public void Dispose() => _loc.LanguageChanged -= OnLanguageChanged;
@@ -55,15 +57,66 @@ public partial class RecoveryCenterModel : ModelBase, IDisposable
         => CanRestoreSelected = value is not null;
 
     [RelayCommand]
-    private void LoadData()
+    private Task LoadDataAsync() => QueueLoad();
+
+    // Invariant: each refresh runs strictly after the previous one, so a caller that
+    // mutates backups then awaits its own load always observes the mutation.
+    private Task _loadChain = Task.CompletedTask;
+
+    private async Task<bool> QueueLoad()
     {
-        SelectedVersion = null;
-        var versions = _backupService.ListVersions();
-        Versions = new ObservableCollection<BackupVersionInfo>(versions);
-        HasVersions = versions.Count > 0;
-        UpdateLatestSummary(versions);
-        BackupLocationText = _backupService.BackupDirectory;
+        var context = SynchronizationContext.Current;
+        var run = RunLoad(_loadChain);
+        _loadChain = run;
+        _ = run.ContinueWith(_ =>
+        {
+            if (!ReferenceEquals(_loadChain, run))
+                return;
+
+            if (context is not null)
+            {
+                context.Post(_ =>
+                {
+                    // Re-check on the target context: a newer load may have started
+                    // after this continuation was queued but before it runs here.
+                    if (ReferenceEquals(_loadChain, run))
+                        IsLoading = false;
+                }, null);
+            }
+            else
+            {
+                IsLoading = false;
+            }
+        }, TaskScheduler.Default);
+        return await run;
     }
+
+    private async Task<bool> RunLoad(Task previous)
+    {
+        IsLoading = true;
+        try
+        {
+            await previous;
+            var versions = await Task.Run(() => _backupService.ListVersions());
+            SelectedVersion = null;
+            Versions = new ObservableCollection<BackupVersionInfo>(versions);
+            HasVersions = versions.Count > 0;
+            UpdateLatestSummary(versions);
+            BackupLocationText = _backupService.BackupDirectory;
+            return true;
+        }
+        catch (Exception)
+        {
+            Console.Error.WriteLine("Recovery Center refresh failed.");
+            return false;
+        }
+    }
+
+    public bool ShowEmptyState => !IsLoading && !HasVersions;
+
+    partial void OnIsLoadingChanged(bool value) => OnPropertyChanged(nameof(ShowEmptyState));
+
+    partial void OnHasVersionsChanged(bool value) => OnPropertyChanged(nameof(ShowEmptyState));
 
     private void UpdateLatestSummary(IReadOnlyList<BackupVersionInfo> versions)
     {
@@ -86,7 +139,12 @@ public partial class RecoveryCenterModel : ModelBase, IDisposable
             return;
         }
 
-        LoadData();
+        if (!await QueueLoad())
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+            return;
+        }
+
         await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["RC_BackupCreated"]);
     }
 
@@ -136,7 +194,11 @@ public partial class RecoveryCenterModel : ModelBase, IDisposable
     {
         _backupService.RetentionCount = RetentionCount;
         RetentionCount = _backupService.RetentionCount;
-        LoadData();
+        if (!await QueueLoad())
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+            return;
+        }
         await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["RC_RetentionSaved"]);
     }
 

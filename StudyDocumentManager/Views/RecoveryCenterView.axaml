@@ -116,7 +116,14 @@
                                 </DataGrid.Columns>
                             </DataGrid>
 
-                            <StackPanel Classes="empty-state" IsVisible="{Binding !HasVersions}">
+                            <StackPanel Classes="empty-state" IsVisible="{Binding IsLoading}">
+                                <TextBlock Classes="empty-state-text"
+                                           AutomationProperties.AutomationId="Recovery_LoadingState"
+                                           AutomationProperties.LiveSetting="Polite"
+                                           Text="{loc:Localize RC_Loading}"/>
+                            </StackPanel>
+
+                            <StackPanel Classes="empty-state" IsVisible="{Binding ShowEmptyState}">
                                 <Image Classes="empty-state-icon" Source="{StaticResource IconRestore}"/>
                                 <TextBlock Classes="empty-state-text"
                                            AutomationProperties.AutomationId="Recovery_EmptyState"

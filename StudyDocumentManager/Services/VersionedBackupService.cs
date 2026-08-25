@@ -177,7 +177,7 @@ public class VersionedBackupService : IVersionedBackupService
         try
         {
             var latest = GetLatest();
-            if (latest is not null && DateTime.Now - latest.CreatedAtLocal < maxAge)
+            if (latest is not null && latest.IsValid && DateTime.Now - latest.CreatedAtLocal < maxAge)
                 return 0;
 
             return CreateVersion() is null ? 0 : 1;

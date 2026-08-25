@@ -5,6 +5,50 @@ using StudyDocumentManager.Services;
 namespace StudyDocumentManager.Tests.TestDoubles;
 
 /// <summary>
+/// Scriptable IVersionedBackupService for Recovery Center model tests; no filesystem access.
+/// </summary>
+public sealed class StubVersionedBackupService : IVersionedBackupService
+{
+    public string BackupDirectory { get; set; } = Path.Combine(Path.GetTempPath(), "sdm_stub_backups");
+
+    public int RetentionCount { get; set; } = 10;
+
+    public Func<IReadOnlyList<BackupVersionInfo>>? ListHandler { get; set; }
+
+    public Func<BackupVersionInfo?>? CreateHandler { get; set; }
+
+    public int ConcurrentLoads { get; private set; }
+
+    public int MaxConcurrentLoads { get; private set; }
+
+    public IReadOnlyList<BackupVersionInfo> ListVersions()
+    {
+        ConcurrentLoads++;
+        MaxConcurrentLoads = Math.Max(MaxConcurrentLoads, ConcurrentLoads);
+        try
+        {
+            return ListHandler?.Invoke() ?? [];
+        }
+        finally
+        {
+            ConcurrentLoads--;
+        }
+    }
+
+    public BackupVersionInfo? GetLatest() => ListVersions().FirstOrDefault();
+
+    public BackupVersionInfo? CreateVersion() => CreateHandler?.Invoke();
+
+    public RestorePlan? PlanRestore(string sourcePath) => null;
+
+    public RestoreOutcome Restore(string sourcePath) => new(false, RestartRequired: false, ErrorKey: null);
+
+    public int PruneRetention() => 0;
+
+    public int EnsureFreshBackup(TimeSpan maxAge) => 0;
+}
+
+/// <summary>
 /// Records every dialog interaction into a shared timeline so tests can assert
 /// message content and ordering against other services (e.g. lifecycle shutdown).
 /// </summary>

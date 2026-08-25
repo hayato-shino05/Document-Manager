@@ -980,4 +980,5 @@
   <data name="Integrity_DatabaseLocation" xml:space="preserve"><value>Vị trí cơ sở dữ liệu:</value></data>
   <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>Mở thư mục chứa</value></data>
   <data name="Integrity_PathCopied" xml:space="preserve"><value>Đã sao chép đường dẫn vào clipboard.</value></data>
+  <data name="RC_Loading" xml:space="preserve"><value>Đang tải…</value></data>
 </root>
