@@ -100,7 +100,7 @@ dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c De
 生成物:
 
 - publish: `artifacts\publish\win-x64\`
-- setup EXE: `artifacts\installer\DocumentManager_v4.0.0_Setup.exe`
+- setup EXE: `artifacts\installer\DocumentManager.exe`
 
 この setup は .NET Framework 4.8 を要求せず、`win-x64` 向け自己完結型の Windows アプリとして配布します。
 
