@@ -162,11 +162,21 @@ public sealed class FileStateClassifierTests
         Assert.Equal(DocumentFileState.DriveDisconnected, state);
     }
 
+    [Theory]
+    [InlineData(32)]
+    [InlineData(33)]
+    public void Classify_SharingOrLockViolation_ReturnsAccessDenied(int win32Error)
+    {
+        var state = FileStateClassifier.Classify(WindowsPath,
+            _ => throw new IOException("sharing violation", HResultFromWin32(win32Error)));
+        Assert.Equal(DocumentFileState.AccessDenied, state);
+    }
+
     [Fact]
     public void Classify_OtherIoFailure_ReturnsMissing()
     {
         var state = FileStateClassifier.Classify(WindowsPath,
-            _ => throw new IOException("unknown io failure", HResultFromWin32(33)));
+            _ => throw new IOException("disk full", HResultFromWin32(112)));
         Assert.Equal(DocumentFileState.Missing, state);
     }
 

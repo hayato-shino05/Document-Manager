@@ -211,6 +211,79 @@ public sealed class IntegrityRelinkTests : DatabaseTestBase
     }
 
     [Fact]
+    public async Task Relink_Model_RejectsTargetOnUnreadyRoot_AsDriveDisconnected()
+    {
+        SeedDocument("relink target", Path.Combine(NewTempDir(), "gone.pdf"));
+        var dialogs = new RecordingDialogService();
+        var unreachableTarget = @"Z:\new\doc.pdf";
+        var fileDialogs = new StubFileDialogService(unreachableTarget);
+        var model = CreateModel(
+            dialogs: dialogs,
+            fileDialogs: fileDialogs,
+            fileProbe: path => path == unreachableTarget
+                ? throw new DirectoryNotFoundException("path not found") { HResult = HResultFromWin32(3) }
+                : FileStateClassifier.ReadableProbe(path),
+            rootReadyProbe: path => path == unreachableTarget ? false : true);
+        await model.CheckIntegrityCommand.ExecuteAsync(null);
+        var item = Assert.Single(model.Results);
+
+        await model.SelectNewFileCommand.ExecuteAsync(item);
+
+        var error = dialogs.Timeline.Single(t => t.StartsWith("error|", StringComparison.Ordinal));
+        Assert.Contains("FileState_DriveDisconnected", error);
+        Assert.DoesNotContain(Repo.GetAll(), d => d.FilePath == unreachableTarget);
+    }
+
+    [Fact]
+    public async Task RetryMissing_CancelKeepsOriginalStatesForUnprocessedItems()
+    {
+        SeedDocument("invalid doc", "relative/nope.pdf");   // InvalidPath state
+        SeedDocument("missing doc", Path.Combine(NewTempDir(), "gone.pdf")); // Missing state
+        var dialogs = new RecordingDialogService();
+
+        var model = CreateModel(dialogs: dialogs);
+        await model.CheckIntegrityCommand.ExecuteAsync(null);
+        Assert.Equal(2, model.Results.Count);
+        Assert.Contains(model.Results, r => r.StatusKey == "FileState_InvalidPath");
+
+        // Block the retry scan on the first probe so the test can cancel mid-operation
+        // and release deterministically.
+        var probeStarted = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseProbe = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var blockingModel = CreateModel(
+            dialogs: dialogs,
+            fileProbe: path =>
+            {
+                probeStarted.TrySetResult(true);
+                releaseProbe.Task.Wait(5000);
+                return path.StartsWith("relative", StringComparison.Ordinal)
+                    ? throw new ArgumentException("invalid")
+                    : false;
+            });
+        blockingModel.Results = model.Results;
+        blockingModel.MissingCount = model.MissingCount;
+
+        var retry = blockingModel.RetryMissingCommand.ExecuteAsync(null);
+        await probeStarted.Task;
+        blockingModel.CancelCheckCommand.Execute(null);
+        releaseProbe.TrySetResult(true);
+        await retry;
+
+        Assert.True(blockingModel.IsCheckCancelled);
+        // The unprocessed invalid item keeps its original state instead of becoming Missing.
+        Assert.Contains(blockingModel.Results, r => r.StatusKey == "FileState_InvalidPath");
+        Assert.Contains(blockingModel.Results, r => r.StatusKey == "Integrity_FileNotExist");
+        Assert.Equal(2, blockingModel.Results.Count);
+    }
+
+    private string NewTempDir()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"sdm_relink_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        return dir;
+    }
+
+    [Fact]
     public async Task OpenContainingFolder_UsesLauncherWithBrokenPath()
     {
         var parent = Path.Combine(Path.GetTempPath(), $"sdm_relink_{Guid.NewGuid():N}");

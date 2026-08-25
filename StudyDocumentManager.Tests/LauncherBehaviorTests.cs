@@ -77,6 +77,17 @@ public sealed class LauncherBehaviorTests : IDisposable
     }
 
     [Fact]
+    public void Linux_OpenFolder_MissingDirectory_StartsNothing()
+    {
+        var started = new List<ProcessStartInfo>();
+        var launcher = new ProcessLauncherService(new StubPlatformInfo(isLinux: true), psi => started.Add(psi));
+
+        launcher.OpenFolder(Path.Combine(_root, "gone"));
+
+        Assert.Empty(started);
+    }
+
+    [Fact]
     public void Windows_RevealInExplorer_ExistingFile_SelectsTheFile()
     {
         var started = new List<ProcessStartInfo>();

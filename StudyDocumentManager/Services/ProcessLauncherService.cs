@@ -62,7 +62,8 @@ public class ProcessLauncherService : IProcessLauncherService
     {
         if (_platformInfo.IsLinux)
         {
-            StartLinuxTarget(folderPath);
+            if (Directory.Exists(folderPath))
+                StartLinuxTarget(folderPath);
             return;
         }
 

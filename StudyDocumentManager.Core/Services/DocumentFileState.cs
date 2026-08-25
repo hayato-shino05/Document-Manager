@@ -61,6 +61,10 @@ public static class FileStateClassifier
         {
             return DocumentFileState.DriveDisconnected;
         }
+        catch (IOException ex) when (IsSharingViolation(ex))
+        {
+            return DocumentFileState.AccessDenied;
+        }
         catch (IOException)
         {
             return DocumentFileState.Missing;
@@ -143,8 +147,8 @@ public static class FileStateClassifier
     }
 
     private static bool IsDriveDisconnected(IOException ex)
-    {
-        // Win32 ERROR_NOT_READY(21), ERROR_BAD_NETPATH(53), ERROR_NETNAME_DELETED(64), ERROR_BAD_NET_NAME(67)
-        return (uint)(ex.HResult & 0xFFFF) is 21u or 53u or 64u or 67u;
-    }
+        => (uint)(ex.HResult & 0xFFFF) is 21u or 53u or 64u or 67u;
+
+    private static bool IsSharingViolation(IOException ex)
+        => (uint)(ex.HResult & 0xFFFF) is 32u or 33u;
 }

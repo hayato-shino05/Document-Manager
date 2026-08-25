@@ -166,6 +166,7 @@ public partial class FileIntegrityCheckModel : ModelBase
             return;
 
         var documents = Results.Select(result => result.Document).ToList();
+        var statesById = Results.ToDictionary(result => result.Document.Id, result => result.State);
         IsChecking = true;
         IsCheckCancelled = false;
         TotalChecked = 0;
@@ -184,7 +185,12 @@ public partial class FileIntegrityCheckModel : ModelBase
             if (scan.IsCancelled)
             {
                 foreach (var document in documents.Skip(scan.Processed))
-                    Results.Add(CreateMissingResult(document, DocumentFileState.Missing));
+                {
+                    var state = statesById.TryGetValue(document.Id, out var originalState)
+                        ? originalState
+                        : DocumentFileState.Missing;
+                    Results.Add(CreateMissingResult(document, state));
+                }
             }
             MissingCount = Results.Count;
 
@@ -235,9 +241,7 @@ public partial class FileIntegrityCheckModel : ModelBase
                 _loc["Integrity_SelectNewFile"], _loc["Integrity_FileFilter"]);
             if (IsChecking || string.IsNullOrWhiteSpace(newPath) || !IsRemovalSnapshotCurrent(snapshot)) return;
 
-            // Relink only points the document at an accessible replacement file.
-            // The document row (identity + metadata) is preserved; the original file is never moved or deleted.
-            var newState = FileStateClassifier.Classify(newPath, _fileProbe);
+            var newState = FileStateClassifier.Classify(newPath, _fileProbe, _rootReadyProbe);
             if (newState != DocumentFileState.Ok)
             {
                 await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc[GetStatusKey(newState)]);
