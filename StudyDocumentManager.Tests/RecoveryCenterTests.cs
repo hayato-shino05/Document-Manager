@@ -73,6 +73,37 @@ public sealed class RecoveryCenterTests : IDisposable
     }
 
     [Fact]
+    public void GetLatest_ReturnsNewestValid_AndSkipsCorruptNewest()
+    {
+        SeedDocument("getlatest target");
+        var older = _service.CreateVersion();
+        Assert.NotNull(older);
+        Thread.Sleep(1100);
+        var newest = _service.CreateVersion();
+        Assert.NotNull(newest);
+
+        File.WriteAllText(newest!.FilePath, "corrupted contents");
+
+        var latest = _service.GetLatest();
+        Assert.NotNull(latest);
+        Assert.Equal(older!.FilePath, latest!.FilePath);
+        Assert.True(latest.IsValid);
+    }
+
+    [Fact]
+    public void GetLatest_ReturnsNull_WhenNoValidVersionExists()
+    {
+        SeedDocument("getlatest none target");
+        var only = _service.CreateVersion();
+        Assert.NotNull(only);
+
+        File.WriteAllText(only!.FilePath, "corrupted contents");
+
+        var latest = _service.GetLatest();
+        Assert.Null(latest);
+    }
+
+    [Fact]
     public void ListVersions_OrdersNewestFirst_AndFlagsInvalidFiles()
     {
         SeedDocument("ordering target");

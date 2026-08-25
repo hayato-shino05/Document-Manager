@@ -68,17 +68,20 @@ public sealed class BackupOperationStateTests
     }
 
     [Fact]
-    public async Task BackupAsync_CancelAfterCompletionWinsAndKeepsSuccessState()
+    public async Task BackupAsync_CancelAfterCompletionNotified_KeepsSuccessState()
     {
-        var backup = new ControlledBackupService { BackupResult = (true, "backup.db", null) };
+        var backup = new ControlledBackupService { BackupResult = (true, "backup.db", null), GateCancelCheck = true };
         var model = CreateModel(backup);
         var operation = model.BackupDatabaseCommand.ExecuteAsync(null);
         await backup.Started.Task;
+        backup.Release();
+        await backup.CompletionNotified.Task;
 
         model.CancelBackupCommand.Execute(null);
-        backup.Release();
+        backup.CancelGate.TrySetResult(true);
         await operation;
 
+        Assert.True(backup.ObservedCancelAfterRelease);
         Assert.False(model.IsBackingUp);
         Assert.False(model.BackupCancelled);
         Assert.Equal(100, model.BackupProgress);
@@ -86,17 +89,20 @@ public sealed class BackupOperationStateTests
     }
 
     [Fact]
-    public async Task RestoreAsync_CancelAfterCompletionWinsAndKeepsSuccessState()
+    public async Task RestoreAsync_CancelAfterCompletionNotified_KeepsSuccessState()
     {
-        var backup = new ControlledBackupService { RestoreResult = (true, null), BlockRestore = true };
+        var backup = new ControlledBackupService { RestoreResult = (true, null), BlockRestore = true, GateCancelCheck = true };
         var model = CreateModel(backup);
         var operation = model.RestoreDatabaseCommand.ExecuteAsync(null);
         await backup.Started.Task;
+        backup.Release();
+        await backup.CompletionNotified.Task;
 
         model.CancelRestoreCommand.Execute(null);
-        backup.Release();
+        backup.CancelGate.TrySetResult(true);
         await operation;
 
+        Assert.True(backup.ObservedCancelAfterRelease);
         Assert.False(model.IsRestoring);
         Assert.False(model.RestoreCancelled);
         Assert.Equal(100, model.RestoreProgress);
@@ -221,7 +227,12 @@ public sealed class BackupOperationStateTests
         public bool BlockRestore { get; set; }
         public bool ObserveCancelAfterRelease { get; set; }
         public bool ObservedCancelAfterRelease { get; private set; }
+        public CancellationToken CapturedBackupToken { get; private set; }
+        public CancellationToken CapturedRestoreToken { get; private set; }
         public TaskCompletionSource<bool> Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource<bool> CompletionNotified { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource<bool> CancelGate { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public bool GateCancelCheck { get; set; }
         private readonly TaskCompletionSource<bool> _release = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public Task<(bool Success, string? Path, string? Error)> BackupAsync(CancellationToken cancellationToken)
@@ -231,14 +242,16 @@ public sealed class BackupOperationStateTests
             CancellationToken cancellationToken,
             (bool Success, string? Path, string? Error) result)
         {
+            CapturedBackupToken = cancellationToken;
             cancellationToken.ThrowIfCancellationRequested();
             Started.TrySetResult(true);
             await _release.Task;
-            if (ObserveCancelAfterRelease)
-            {
-                ObservedCancelAfterRelease = true;
-                cancellationToken.ThrowIfCancellationRequested();
-            }
+            CompletionNotified.TrySetResult(true);
+            if (GateCancelCheck)
+                await CancelGate.Task;
+            ObservedCancelAfterRelease = cancellationToken.IsCancellationRequested;
+            if (ObserveCancelAfterRelease && cancellationToken.IsCancellationRequested)
+                throw new OperationCanceledException();
             if (ExceptionToThrow is not null)
                 throw ExceptionToThrow;
             return result;
@@ -248,6 +261,7 @@ public sealed class BackupOperationStateTests
         {
             Started.TrySetResult(true);
             await _release.Task;
+            CompletionNotified.TrySetResult(true);
             if (ExceptionToThrow is not null)
                 throw ExceptionToThrow;
             return BackupResult;
@@ -260,16 +274,18 @@ public sealed class BackupOperationStateTests
             CancellationToken cancellationToken,
             (bool Success, string? Error) result)
         {
+            CapturedRestoreToken = cancellationToken;
             cancellationToken.ThrowIfCancellationRequested();
             Started.TrySetResult(true);
             if (!BlockRestore)
                 _release.TrySetResult(true);
             await _release.Task;
-            if (ObserveCancelAfterRelease)
-            {
-                ObservedCancelAfterRelease = true;
-                cancellationToken.ThrowIfCancellationRequested();
-            }
+            CompletionNotified.TrySetResult(true);
+            if (GateCancelCheck)
+                await CancelGate.Task;
+            ObservedCancelAfterRelease = cancellationToken.IsCancellationRequested;
+            if (ObserveCancelAfterRelease && cancellationToken.IsCancellationRequested)
+                throw new OperationCanceledException();
             if (ExceptionToThrow is not null)
                 throw ExceptionToThrow;
             return result;
@@ -281,6 +297,7 @@ public sealed class BackupOperationStateTests
             if (!BlockRestore)
                 _release.TrySetResult(true);
             await _release.Task;
+            CompletionNotified.TrySetResult(true);
             if (ExceptionToThrow is not null)
                 throw ExceptionToThrow;
             return RestoreResult;
@@ -305,5 +322,121 @@ public sealed class BackupOperationStateTests
         public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = [];
         public event EventHandler? LanguageChanged { add { } remove { } }
         public void SetLanguage(SupportedLanguage language) { }
+    }
+
+    [Fact]
+    public void DashboardModel_Dispose_UnsubscribesLanguageChanged()
+    {
+        var loc = new CountingLocalization();
+        var model = new DashboardModel(
+            null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, loc);
+
+        Assert.Equal(1, loc.SubscriberCount);
+        model.Dispose();
+        Assert.Equal(0, loc.SubscriberCount);
+        loc.Raise();
+    }
+
+    [Fact]
+    public async Task Dispose_CancelsInFlightBackupTokenAndResetsState()
+    {
+        var backup = new ControlledBackupService();
+        var model = CreateModel(backup);
+
+        var operation = model.BackupDatabaseCommand.ExecuteAsync(null);
+        await backup.Started.Task;
+
+        Assert.False(backup.CapturedBackupToken.IsCancellationRequested);
+
+        model.Dispose();
+
+        Assert.True(backup.CapturedBackupToken.IsCancellationRequested);
+
+        backup.Release();
+        await operation;
+
+        Assert.True(model.BackupCancelled);
+        Assert.False(model.IsBackingUp);
+        Assert.Empty(model.BackupError);
+    }
+
+    [Fact]
+    public async Task Dispose_CancelsInFlightRestoreTokenAndResetsState()
+    {
+        var backup = new ControlledBackupService { BlockRestore = true };
+        var model = CreateModel(backup);
+
+        var operation = model.RestoreDatabaseCommand.ExecuteAsync(null);
+        await backup.Started.Task;
+
+        Assert.False(backup.CapturedRestoreToken.IsCancellationRequested);
+
+        model.Dispose();
+
+        Assert.True(backup.CapturedRestoreToken.IsCancellationRequested);
+
+        backup.Release();
+        await operation;
+
+        Assert.True(model.RestoreCancelled);
+        Assert.False(model.IsRestoring);
+        Assert.Empty(model.RestoreError);
+    }
+
+    [Fact]
+    public async Task Dispose_AllowsSubsequentBackupAfterCancellation()
+    {
+        var backup = new ControlledBackupService();
+        var model = CreateModel(backup);
+
+        var first = model.BackupDatabaseCommand.ExecuteAsync(null);
+        await backup.Started.Task;
+        model.Dispose();
+        backup.Release();
+        await first;
+        Assert.True(model.BackupCancelled);
+
+        var second = new ControlledBackupService { BackupResult = (true, "backup.db", null) };
+        var fresh = CreateModel(second);
+        var op = fresh.BackupDatabaseCommand.ExecuteAsync(null);
+        await second.Started.Task;
+        second.Release();
+        await op;
+
+        Assert.False(fresh.IsBackingUp);
+        Assert.False(fresh.BackupCancelled);
+        Assert.Equal(100, fresh.BackupProgress);
+    }
+
+    [Fact]
+    public void Dispose_IsSafeToCallMultipleTimes()
+    {
+        var model = new DashboardModel(
+            null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!, new TestLocalization());
+
+        var ex = Record.Exception(() =>
+        {
+            model.Dispose();
+            model.Dispose();
+            model.Dispose();
+        });
+
+        Assert.Null(ex);
+    }
+
+    private sealed class CountingLocalization : ILocalizationService
+    {
+        private EventHandler? _handler;
+        public int SubscriberCount { get; private set; }
+        public string this[string key] => key;
+        public SupportedLanguage CurrentLanguage => SupportedLanguage.Japanese;
+        public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = [];
+        public event EventHandler? LanguageChanged
+        {
+            add { _handler += value; SubscriberCount++; }
+            remove { _handler -= value; SubscriberCount--; }
+        }
+        public void SetLanguage(SupportedLanguage language) { }
+        public void Raise() => _handler?.Invoke(this, EventArgs.Empty);
     }
 }

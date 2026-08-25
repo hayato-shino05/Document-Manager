@@ -78,7 +78,18 @@ public class VersionedBackupService : IVersionedBackupService
         return validated;
     }
 
-    public BackupVersionInfo? GetLatest() => ListVersions().FirstOrDefault();
+    public BackupVersionInfo? GetLatest()
+    {
+        // 最新のバックアップが破損している場合でも、有効な最新版を返す。
+        // 無効な最新ファイルだけが存在する場合は null を返す。
+        foreach (var version in ListVersions())
+        {
+            if (version.IsValid)
+                return version with { IsLatest = true };
+        }
+
+        return null;
+    }
 
     public BackupVersionInfo? CreateVersion()
     {

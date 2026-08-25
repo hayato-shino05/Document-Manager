@@ -157,8 +157,12 @@ public partial class RecoveryCenterModel : ModelBase, IDisposable
     private async Task RestoreSelectedAsync()
     {
         if (SelectedVersion is null) return;
+        await RestoreFromPathAsync(SelectedVersion.FilePath);
+    }
 
-        var plan = await Task.Run(() => _backupService.PlanRestore(SelectedVersion.FilePath));
+    private async Task RestoreFromPathAsync(string sourcePath)
+    {
+        var plan = await Task.Run(() => _backupService.PlanRestore(sourcePath));
         if (plan is null)
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["RC_ErrorInvalidVersion"]);
@@ -239,7 +243,6 @@ public partial class RecoveryCenterModel : ModelBase, IDisposable
             return;
         }
 
-        SelectedVersion = new BackupVersionInfo(path, File.GetLastWriteTime(path), 0, IsValid: true, IsLatest: false);
-        await RestoreSelectedAsync();
+        await RestoreFromPathAsync(path);
     }
 }

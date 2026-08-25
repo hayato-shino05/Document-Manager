@@ -11,7 +11,7 @@ using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
 
-public partial class DashboardModel : ModelBase
+public partial class DashboardModel : ModelBase, IDisposable
 {
     private const string FILTER_ALL_SUBJECTS_KEY = "Filter_AllSubjects";
     private const string FILTER_ALL_TYPES_KEY = "Filter_AllTypes";
@@ -187,25 +187,44 @@ public partial class DashboardModel : ModelBase
         _loc = localizationService;
         BuildStatusOptions();
         _statusText = _loc[_statusKey];
-        _loc.LanguageChanged += (_, _) =>
-        {
-            Subjects = [FILTER_ALL_SUBJECTS_KEY, .._availableSubjects];
-            Types = [FILTER_ALL_TYPES_KEY, .._availableTypes];
-            BuildStatusOptions();
-
-            if (_allDocuments.Count > 0 || Documents.Count > 0 || IsEmptyState || HasLoadError)
-                BuildCategoryTree(_allDocuments, _availableSubjects, _availableTypes);
-
-            StateMessage = HasLoadError
-                ? _loc["Dashboard_LoadError"]
-                : IsEmptyState
-                    ? _loc["Dashboard_EmptyState"]
-                    : string.Empty;
-            RefreshLocalizedStatus();
-        };
+        _loc.LanguageChanged += OnLanguageChanged;
         // DO NOT call LoadData() here — it causes StackOverflowException
         // because DataGrid layout hasn't completed yet.
         // Call Initialize() from View.Loaded event instead.
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        Subjects = [FILTER_ALL_SUBJECTS_KEY, .._availableSubjects];
+        Types = [FILTER_ALL_TYPES_KEY, .._availableTypes];
+        BuildStatusOptions();
+
+        if (_allDocuments.Count > 0 || Documents.Count > 0 || IsEmptyState || HasLoadError)
+            BuildCategoryTree(_allDocuments, _availableSubjects, _availableTypes);
+
+        StateMessage = HasLoadError
+            ? _loc["Dashboard_LoadError"]
+            : IsEmptyState
+                ? _loc["Dashboard_EmptyState"]
+                : string.Empty;
+        RefreshLocalizedStatus();
+    }
+
+    public void Dispose()
+    {
+        if (_backupCancellation is not null)
+        {
+            _backupCancellation.Cancel();
+            _backupCancellation.Dispose();
+            _backupCancellation = null;
+        }
+        if (_restoreCancellation is not null)
+        {
+            _restoreCancellation.Cancel();
+            _restoreCancellation.Dispose();
+            _restoreCancellation = null;
+        }
+        _loc.LanguageChanged -= OnLanguageChanged;
     }
 
     /// <summary>
