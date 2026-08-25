@@ -873,6 +873,12 @@
   <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>このファイルは有効なバックアップ世代ではありません。</value></data>
   <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>復元に失敗しました。現在のデータベースは変更されていません。</value></data>
   <data name="RC_RecoveryPaths" xml:space="preserve"><value>関連する復旧ツール:</value></data>
+  <data name="FileState_AccessDenied" xml:space="preserve"><value>ファイルへのアクセス権限がありません</value></data>
+  <data name="FileState_DriveDisconnected" xml:space="preserve"><value>ドライブが接続されていません</value></data>
+  <data name="FileState_InvalidPath" xml:space="preserve"><value>パスが無効です</value></data>
+  <data name="Integrity_DatabaseLocation" xml:space="preserve"><value>データベースの保存先:</value></data>
+  <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>保存フォルダーを開く</value></data>
+  <data name="Integrity_PathCopied" xml:space="preserve"><value>パスをクリップボードにコピーしました。</value></data>
 </root>
 
 

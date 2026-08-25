@@ -765,4 +765,10 @@ Please check your network connection.</value></data>
   <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>This file is not a valid backup version.</value></data>
   <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>Restore failed. The current database was not changed.</value></data>
   <data name="RC_RecoveryPaths" xml:space="preserve"><value>Related recovery tools:</value></data>
+  <data name="FileState_AccessDenied" xml:space="preserve"><value>No permission to access this file</value></data>
+  <data name="FileState_DriveDisconnected" xml:space="preserve"><value>The drive is not connected</value></data>
+  <data name="FileState_InvalidPath" xml:space="preserve"><value>Invalid path</value></data>
+  <data name="Integrity_DatabaseLocation" xml:space="preserve"><value>Database location:</value></data>
+  <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>Open containing folder</value></data>
+  <data name="Integrity_PathCopied" xml:space="preserve"><value>Path copied to clipboard.</value></data>
 </root>

@@ -40,13 +40,21 @@ public class ProcessLauncherService : IProcessLauncherService
 
         if (File.Exists(filePath))
         {
-            Process.Start("explorer.exe", $"/select,\"{filePath}\"");
+            _startProcess(new ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = $"/select,\"{filePath}\""
+            });
         }
         else
         {
             var dir = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
-                Process.Start("explorer.exe", dir);
+                _startProcess(new ProcessStartInfo
+                {
+                    FileName = "explorer.exe",
+                    Arguments = $"\"{dir}\""
+                });
         }
     }
 
@@ -60,7 +68,7 @@ public class ProcessLauncherService : IProcessLauncherService
 
         if (Directory.Exists(folderPath))
         {
-            Process.Start(new ProcessStartInfo
+            _startProcess(new ProcessStartInfo
             {
                 FileName = folderPath,
                 UseShellExecute = true

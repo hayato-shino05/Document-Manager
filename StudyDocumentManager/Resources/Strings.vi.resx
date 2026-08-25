@@ -974,4 +974,10 @@
   <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>Tệp này không phải bản sao lưu hợp lệ.</value></data>
   <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>Khôi phục thất bại. Cơ sở dữ liệu hiện tại không bị thay đổi.</value></data>
   <data name="RC_RecoveryPaths" xml:space="preserve"><value>Công cụ khôi phục liên quan:</value></data>
+  <data name="FileState_AccessDenied" xml:space="preserve"><value>Không có quyền truy cập tệp này</value></data>
+  <data name="FileState_DriveDisconnected" xml:space="preserve"><value>Ổ đĩa chưa được kết nối</value></data>
+  <data name="FileState_InvalidPath" xml:space="preserve"><value>Đường dẫn không hợp lệ</value></data>
+  <data name="Integrity_DatabaseLocation" xml:space="preserve"><value>Vị trí cơ sở dữ liệu:</value></data>
+  <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>Mở thư mục chứa</value></data>
+  <data name="Integrity_PathCopied" xml:space="preserve"><value>Đã sao chép đường dẫn vào clipboard.</value></data>
 </root>

@@ -110,6 +110,24 @@ public sealed class StubProcessLauncherService : IProcessLauncherService
     public void OpenUrl(string url) => OpenedUrls.Add(url);
 }
 
+public sealed class StubClipboardService : IClipboardService
+{
+    public List<string> Copied { get; } = new();
+
+    public Task SetTextAsync(string text)
+    {
+        Copied.Add(text);
+        return Task.CompletedTask;
+    }
+}
+
+public sealed class StubPlatformInfo(bool isLinux = false) : IPlatformInfo
+{
+    public bool IsLinux => isLinux;
+
+    public string AnalyticsPlatform => "Test";
+}
+
 /// <summary>
 /// Returns format templates for keys under assertion and the raw key otherwise,
 /// so formatted messages stay deterministic without loading resx resources.
@@ -132,5 +150,7 @@ public sealed class KeyLocalizationService : ILocalizationService
 
     public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = Array.Empty<SupportedLanguage>();
 
+#pragma warning disable CS0067 // Test stub: subscribers are never notified by design.
     public event EventHandler? LanguageChanged;
+#pragma warning restore CS0067
 }

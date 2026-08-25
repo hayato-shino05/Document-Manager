@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
+using StudyDocumentManager.Core.Services;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager.Models;
@@ -10,9 +11,13 @@ namespace StudyDocumentManager.Models;
 public partial class FileIntegrityCheckModel : ModelBase
 {
     private readonly IDocumentRepository _repository;
-    private readonly IFileIntegrityRepository _fileIntegrityRepo;
+    private readonly IFileIntegrityRepository? _fileIntegrityRepo;
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialogService;
+    private readonly IClipboardService? _clipboardService;
+    private readonly IProcessLauncherService? _processLauncher;
+    private readonly Func<string, bool> _fileProbe;
+    private readonly Func<string, bool>? _rootReadyProbe;
     private readonly ILocalizationService _loc;
     private readonly Action<int>? _scanProgress;
     private CancellationTokenSource? _checkCancellation;
@@ -25,16 +30,22 @@ public partial class FileIntegrityCheckModel : ModelBase
     [ObservableProperty] private int _totalChecked;
     [ObservableProperty] private int _missingCount;
     [ObservableProperty] private string _statusText = string.Empty;
+    [ObservableProperty] private string _databaseLocation = string.Empty;
 
-    public FileIntegrityCheckModel(IDocumentRepository repository, IFileIntegrityRepository fileIntegrityRepo, IDialogService dialogService, IFileDialogService fileDialogService, ILocalizationService loc, Action<int>? scanProgress = null)
+    public FileIntegrityCheckModel(IDocumentRepository repository, IFileIntegrityRepository? fileIntegrityRepo, IDialogService dialogService, IFileDialogService fileDialogService, ILocalizationService loc, Action<int>? scanProgress = null, IClipboardService? clipboardService = null, IProcessLauncherService? processLauncher = null, Func<string, bool>? fileProbe = null, Func<string, bool>? rootReadyProbe = null)
     {
         _repository = repository;
         _fileIntegrityRepo = fileIntegrityRepo;
         _dialogService = dialogService;
         _fileDialogService = fileDialogService;
+        _clipboardService = clipboardService;
+        _processLauncher = processLauncher;
+        _fileProbe = fileProbe ?? FileStateClassifier.ReadableProbe;
+        _rootReadyProbe = rootReadyProbe ?? FileStateClassifier.RootReadyProbe;
         _loc = loc;
         _scanProgress = scanProgress;
         _loc.LanguageChanged += (_, _) => RefreshLocalizedStrings();
+        DatabaseLocation = _fileIntegrityRepo?.DatabasePath ?? string.Empty;
         SetLocalizedStatus("Status_ScanPrompt");
     }
 
@@ -57,8 +68,8 @@ public partial class FileIntegrityCheckModel : ModelBase
         {
             var scan = await Task.Run(() => ScanDocuments(_repository.GetAll(), cancellation.Token), cancellation.Token);
             TotalChecked = scan.Processed;
-            foreach (var document in scan.MissingDocuments)
-                Results.Add(CreateMissingResult(document));
+            foreach (var hit in scan.BrokenDocuments)
+                Results.Add(CreateMissingResult(hit.Document, hit.State));
             MissingCount = Results.Count;
 
             if (scan.IsCancelled)
@@ -111,7 +122,7 @@ public partial class FileIntegrityCheckModel : ModelBase
 
     private ScanResult ScanDocuments(IReadOnlyList<StudyDocument> documents, CancellationToken cancellationToken)
     {
-        var missingDocuments = new List<StudyDocument>();
+        var brokenDocuments = new List<FileStateHit>();
         var processed = 0;
 
         foreach (var document in documents)
@@ -119,24 +130,34 @@ public partial class FileIntegrityCheckModel : ModelBase
             if (cancellationToken.IsCancellationRequested)
                 break;
 
-            if (!string.IsNullOrEmpty(document.FilePath) && !File.Exists(document.FilePath))
-                missingDocuments.Add(document);
+            var state = FileStateClassifier.Classify(document.FilePath, _fileProbe, _rootReadyProbe);
+            if (state is not DocumentFileState.Ok and not DocumentFileState.NotSet)
+                brokenDocuments.Add(new FileStateHit(document, state));
 
             processed++;
             _scanProgress?.Invoke(processed);
         }
 
-        return new ScanResult(processed, documents.Count, missingDocuments, cancellationToken.IsCancellationRequested);
+        return new ScanResult(processed, documents.Count, brokenDocuments, cancellationToken.IsCancellationRequested);
     }
 
-    private IntegrityResult CreateMissingResult(StudyDocument document)
+    private IntegrityResult CreateMissingResult(StudyDocument document, DocumentFileState state)
         => new()
         {
             Document = document,
             FilePath = document.FilePath,
-            StatusKey = "Integrity_FileNotExist",
-            Status = _loc["Integrity_FileNotExist"]
+            State = state,
+            StatusKey = GetStatusKey(state),
+            Status = _loc[GetStatusKey(state)]
         };
+
+    private static string GetStatusKey(DocumentFileState state) => state switch
+    {
+        DocumentFileState.AccessDenied => "FileState_AccessDenied",
+        DocumentFileState.DriveDisconnected => "FileState_DriveDisconnected",
+        DocumentFileState.InvalidPath => "FileState_InvalidPath",
+        _ => "Integrity_FileNotExist"
+    };
 
     [RelayCommand]
     private async Task RetryMissingAsync()
@@ -158,12 +179,12 @@ public partial class FileIntegrityCheckModel : ModelBase
             var scan = await Task.Run(() => ScanDocuments(documents, cancellation.Token), cancellation.Token);
             Results.Clear();
             TotalChecked = scan.Processed;
-            foreach (var document in scan.MissingDocuments)
-                Results.Add(CreateMissingResult(document));
+            foreach (var hit in scan.BrokenDocuments)
+                Results.Add(CreateMissingResult(hit.Document, hit.State));
             if (scan.IsCancelled)
             {
                 foreach (var document in documents.Skip(scan.Processed))
-                    Results.Add(CreateMissingResult(document));
+                    Results.Add(CreateMissingResult(document, DocumentFileState.Missing));
             }
             MissingCount = Results.Count;
 
@@ -214,7 +235,16 @@ public partial class FileIntegrityCheckModel : ModelBase
                 _loc["Integrity_SelectNewFile"], _loc["Integrity_FileFilter"]);
             if (IsChecking || string.IsNullOrWhiteSpace(newPath) || !IsRemovalSnapshotCurrent(snapshot)) return;
 
-            if (!_fileIntegrityRepo.UpdateDocumentPath(snapshot.DocumentId, newPath))
+            // Relink only points the document at an accessible replacement file.
+            // The document row (identity + metadata) is preserved; the original file is never moved or deleted.
+            var newState = FileStateClassifier.Classify(newPath, _fileProbe);
+            if (newState != DocumentFileState.Ok)
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc[GetStatusKey(newState)]);
+                return;
+            }
+
+            if (_fileIntegrityRepo is null || !_fileIntegrityRepo.UpdateDocumentPath(snapshot.DocumentId, newPath))
             {
                 await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
                 return;
@@ -235,6 +265,43 @@ public partial class FileIntegrityCheckModel : ModelBase
     }
 
     /// <summary>
+    /// Opens the containing folder of the broken path via the platform launcher.
+    /// </summary>
+    [RelayCommand]
+    private async Task OpenContainingFolderAsync(IntegrityResult? item)
+    {
+        if (item == null || _processLauncher == null) return;
+
+        try
+        {
+            var directory = Path.GetDirectoryName(item.FilePath);
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+            {
+                await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+                return;
+            }
+
+            _processLauncher.RevealInExplorer(item.FilePath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
+        }
+    }
+
+    /// <summary>
+    /// Copies the stored path to the clipboard so the user can repair it manually.
+    /// </summary>
+    [RelayCommand]
+    private async Task CopyPathAsync(IntegrityResult? item)
+    {
+        if (item == null || _clipboardService == null) return;
+
+        await _clipboardService.SetTextAsync(item.FilePath);
+        SetLocalizedStatus("Integrity_PathCopied");
+    }
+
+    /// <summary>
     /// Clear the file path but keep metadata.
     /// </summary>
     [RelayCommand]
@@ -249,7 +316,7 @@ public partial class FileIntegrityCheckModel : ModelBase
                 _loc["Integrity_ConfirmClearPath"]);
             if (IsChecking || !confirmed || !IsRemovalSnapshotCurrent(snapshot)) return;
 
-            if (!_fileIntegrityRepo.ClearDocumentPath(snapshot.DocumentId))
+            if (_fileIntegrityRepo is null || !_fileIntegrityRepo.ClearDocumentPath(snapshot.DocumentId))
             {
                 await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
                 return;
@@ -415,14 +482,17 @@ public partial class FileIntegrityCheckModel : ModelBase
     private sealed record ScanResult(
         int Processed,
         int Total,
-        IReadOnlyList<StudyDocument> MissingDocuments,
+        IReadOnlyList<FileStateHit> BrokenDocuments,
         bool IsCancelled);
+
+    private sealed record FileStateHit(StudyDocument Document, DocumentFileState State);
 }
 
 public partial class IntegrityResult : ObservableObject
 {
     public StudyDocument Document { get; set; } = new();
     public string FilePath { get; set; } = string.Empty;
+    public DocumentFileState State { get; set; } = DocumentFileState.Missing;
     public string StatusKey { get; set; } = string.Empty;
     public object[] StatusArguments { get; set; } = [];
     [ObservableProperty] private string _status = string.Empty;

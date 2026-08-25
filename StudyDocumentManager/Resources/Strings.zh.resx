@@ -974,4 +974,10 @@
   <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>该文件不是有效的备份版本。</value></data>
   <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>恢复失败。当前数据库未被更改。</value></data>
   <data name="RC_RecoveryPaths" xml:space="preserve"><value>相关恢复工具：</value></data>
+  <data name="FileState_AccessDenied" xml:space="preserve"><value>没有访问此文件的权限</value></data>
+  <data name="FileState_DriveDisconnected" xml:space="preserve"><value>驱动器未连接</value></data>
+  <data name="FileState_InvalidPath" xml:space="preserve"><value>路径无效</value></data>
+  <data name="Integrity_DatabaseLocation" xml:space="preserve"><value>数据库位置：</value></data>
+  <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>打开所在文件夹</value></data>
+  <data name="Integrity_PathCopied" xml:space="preserve"><value>路径已复制到剪贴板。</value></data>
 </root>
