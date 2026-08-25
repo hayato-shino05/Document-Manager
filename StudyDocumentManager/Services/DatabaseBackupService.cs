@@ -57,8 +57,10 @@ public class DatabaseBackupService : IBackupService
         try
         {
             var succeeded = await Task.Run(
-                () => _fileIntegrityRepo.BackupDatabase(path, overwrite: true),
+                () => _fileIntegrityRepo.BackupDatabase(path, overwrite: true, cancellationToken),
                 cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+                return (false, null, null);
             return succeeded
                 ? (true, path, null)
                 : (false, null, _loc["Dashboard_BackupFailed"]);
@@ -121,7 +123,7 @@ public class DatabaseBackupService : IBackupService
         try
         {
             restored = await Task.Run(
-                () => _fileIntegrityRepo.RestoreDatabase(path),
+                () => _fileIntegrityRepo.RestoreDatabase(path, cancellationToken),
                 cancellationToken);
         }
         catch (Exception)
@@ -129,10 +131,17 @@ public class DatabaseBackupService : IBackupService
             return (false, _loc["Dashboard_RestoreFailed"]);
         }
 
+        if (cancellationToken.IsCancellationRequested)
+            return (false, null);
+
         if (!restored)
             return (false, _loc["Dashboard_RestoreFailed"]);
 
         await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Dashboard_RestoreRestartRequired"]);
+
+        if (cancellationToken.IsCancellationRequested)
+            return (false, null);
+
         _lifecycleService.Shutdown();
         return (true, null);
     }

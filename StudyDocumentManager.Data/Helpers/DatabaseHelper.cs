@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Linq;
+using System.Threading;
 using Microsoft.Data.Sqlite;
 using StudyDocumentManager.Core.DTOs;
 using StudyDocumentManager.Core.Entities;
@@ -605,11 +606,17 @@ public class DatabaseHelper
         => BackupDatabase(destPath, overwrite: true);
 
     public bool BackupDatabase(string destPath, bool overwrite)
+        => BackupDatabase(destPath, overwrite, CancellationToken.None);
+
+    public bool BackupDatabase(string destPath, bool overwrite, CancellationToken cancellationToken)
     {
         string? stagingPath = null;
         try
         {
             if (string.IsNullOrWhiteSpace(destPath))
+                return false;
+
+            if (cancellationToken.IsCancellationRequested)
                 return false;
 
             var destinationPath = Path.GetFullPath(destPath);
@@ -631,6 +638,9 @@ public class DatabaseHelper
             }
 
             ValidateBackupCandidate(stagingPath);
+
+            if (ShouldAbortOperation(cancellationToken))
+                return false;
 
             if (File.Exists(destinationPath))
                 File.Replace(stagingPath, destinationPath, null);
@@ -667,6 +677,9 @@ public class DatabaseHelper
     }
 
     public bool RestoreDatabase(string sourcePath)
+        => RestoreDatabase(sourcePath, CancellationToken.None);
+
+    public bool RestoreDatabase(string sourcePath, CancellationToken cancellationToken)
     {
         using var operationLock = AcquireDatabaseOperationLock(DatabasePath);
         string? stagingPath = null;
@@ -676,6 +689,9 @@ public class DatabaseHelper
         try
         {
             if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath) || PathsReferToSameFile(DatabasePath, sourcePath))
+                return false;
+
+            if (cancellationToken.IsCancellationRequested)
                 return false;
 
             stagingPath = CreateStagingPath(DatabasePath);
@@ -698,10 +714,14 @@ public class DatabaseHelper
             }
 
             ValidateBackupCandidate(rollbackPath);
+
+            if (ShouldAbortOperation(cancellationToken))
+                return false;
+
             CloseAllConnections();
-            swapped = true;
             DeleteSqliteSidecars(DatabasePath);
             File.Replace(stagingPath, DatabasePath, null);
+            swapped = true;
             ValidateBackupCandidate(DatabasePath);
             return true;
         }
@@ -712,8 +732,9 @@ public class DatabaseHelper
                 try
                 {
                     CloseAllConnections();
-                    DeleteSqliteSidecars(DatabasePath);
                     File.Replace(rollbackPath, DatabasePath, null);
+                    DeleteFileIfExists($"{DatabasePath}-wal");
+                    DeleteFileIfExists($"{DatabasePath}-shm");
                 }
                 catch
                 {
@@ -730,6 +751,14 @@ public class DatabaseHelper
                 DeleteFileIfExists(rollbackPath);
         }
     }
+
+    /// <summary>
+    /// Single decision point for whether a backup/restore commit (File.Replace/File.Move)
+    /// must be aborted. Checked immediately before the commit so the commit is never started
+    /// once cancellation is requested. Overridable for deterministic boundary testing.
+    /// </summary>
+    protected virtual bool ShouldAbortOperation(CancellationToken cancellationToken)
+        => cancellationToken.IsCancellationRequested;
 
     private static void InsertCatalogValue(SqliteConnection connection, SqliteTransaction transaction, string tableName, string value)
     {
@@ -833,14 +862,41 @@ public class DatabaseHelper
 
     private static void DeleteFileIfExists(string path)
     {
-        if (File.Exists(path))
-            File.Delete(path);
+        try
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
     }
 
-    private static void DeleteSqliteSidecars(string databasePath)
+    protected virtual void DeleteSqliteSidecars(string databasePath)
     {
-        DeleteFileIfExists($"{databasePath}-wal");
-        DeleteFileIfExists($"{databasePath}-shm");
+        DeleteSidecarOrThrow($"{databasePath}-wal");
+        DeleteSidecarOrThrow($"{databasePath}-shm");
+    }
+
+    private static void DeleteSidecarOrThrow(string path)
+    {
+        if (!File.Exists(path))
+            return;
+
+        try
+        {
+            File.Delete(path);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            throw new IOException(
+                $"Failed to delete SQLite sidecar '{path}' before replacing the live database; " +
+                "aborting the replace so the new database is not paired with stale write-ahead logs.",
+                ex);
+        }
     }
 
     private static void ValidateBackupCandidate(string databasePath, bool requireDocumentPathIndex = true)

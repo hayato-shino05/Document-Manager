@@ -1,4 +1,5 @@
-﻿using StudyDocumentManager.Core.Entities;
+﻿using System.Threading;
+using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Data.Helpers;
 
@@ -107,9 +108,15 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
 
     public bool BackupDatabase(string destPath, bool overwrite) => _db.BackupDatabase(destPath, overwrite);
 
+    public bool BackupDatabase(string destPath, bool overwrite, CancellationToken cancellationToken)
+        => _db.BackupDatabase(destPath, overwrite, cancellationToken);
+
     public bool CanRestoreDatabase(string sourcePath) => _db.CanRestoreDatabase(sourcePath);
 
     public bool RestoreDatabase(string sourcePath) => _db.RestoreDatabase(sourcePath);
+
+    public bool RestoreDatabase(string sourcePath, CancellationToken cancellationToken)
+        => _db.RestoreDatabase(sourcePath, cancellationToken);
 
     public int GetDocumentCount() => _db.GetDocumentCount();
 
