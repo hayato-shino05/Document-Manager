@@ -627,6 +627,9 @@ Please check your network connection.</value></data>
   <data name="BatchImport_ColSize" xml:space="preserve"><value>Size</value></data>
   <data name="BatchImport_ColFailure" xml:space="preserve"><value>Failure reason</value></data>
   <data name="BatchImport_ItemFailed" xml:space="preserve"><value>Import failed</value></data>
+  <data name="BatchImport_FileError" xml:space="preserve"><value>Could not read the file</value></data>
+  <data name="BatchImport_PermissionError" xml:space="preserve"><value>Access denied</value></data>
+  <data name="BatchImport_DatabaseError" xml:space="preserve"><value>A database error occurred</value></data>
   <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>Default Subject</value></data>
   <data name="BatchImport_LblFolder" xml:space="preserve"><value>Folder</value></data>
   <data name="BatchImport_BtnRetryFailed" xml:space="preserve"><value>Retry failed</value></data>

@@ -836,6 +836,9 @@
   <data name="BatchImport_ColSize" xml:space="preserve"><value>大小</value></data>
   <data name="BatchImport_ColFailure" xml:space="preserve"><value>失败原因</value></data>
   <data name="BatchImport_ItemFailed" xml:space="preserve"><value>导入失败</value></data>
+  <data name="BatchImport_FileError" xml:space="preserve"><value>无法读取文件</value></data>
+  <data name="BatchImport_PermissionError" xml:space="preserve"><value>访问被拒绝</value></data>
+  <data name="BatchImport_DatabaseError" xml:space="preserve"><value>发生数据库错误</value></data>
   <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>默认分类</value></data>
   <data name="BatchImport_LblFolder" xml:space="preserve"><value>文件夹</value></data>
   <data name="BatchImport_BtnRetryFailed" xml:space="preserve"><value>重试失败项</value></data>

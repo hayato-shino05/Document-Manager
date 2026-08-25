@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Microsoft.Data.Sqlite;
 using StudyDocumentManager.Core;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
@@ -54,9 +55,78 @@ public sealed class BatchImportOperationStateTests
     [Theory]
     [InlineData("C:\\Users\\private\\study.db; SELECT * FROM documents; user@example.com")]
     [InlineData("")]
-    public async Task Import_WhenSaveThrows_UsesLocalizedFailureFallback(string failureMessage)
+    public async Task Import_WhenFileReadThrows_ClassifiesAsFileErrorWithLocalizedFallback(string failureMessage)
     {
         var importer = new ControlledImportService { FailureMessage = failureMessage };
+        var model = CreateModel(importer, new RecordingNavigationService());
+        model.Files = new ObservableCollection<FileImportItem>
+        {
+            new() { FileName = "A", FilePath = "A.pdf", FileType = "PDF" }
+        };
+
+        await model.ImportCommand.ExecuteAsync(null);
+
+        Assert.True(model.Files[0].IsFailed);
+        Assert.Equal(BatchImportFailureCode.FileError, model.Files[0].FailureCode);
+        Assert.Equal("BatchImport_FileError", model.Files[0].FailureReason);
+        Assert.DoesNotContain("study.db", model.Files[0].FailureReason);
+        Assert.DoesNotContain("documents", model.Files[0].FailureReason);
+        Assert.DoesNotContain("user@example.com", model.Files[0].FailureReason);
+    }
+
+    [Fact]
+    public async Task Import_WhenDatabaseThrows_ClassifiesAsDatabaseErrorWithoutLeakingDetail()
+    {
+        var importer = new ControlledImportService
+        {
+            SaveException = new Microsoft.Data.Sqlite.SqliteException(
+                "C:\\Users\\private\\study.db; CHECK constraint failed; user@example.com",
+                1)
+        };
+        var model = CreateModel(importer, new RecordingNavigationService());
+        model.Files = new ObservableCollection<FileImportItem>
+        {
+            new() { FileName = "A", FilePath = "A.pdf", FileType = "PDF" }
+        };
+
+        await model.ImportCommand.ExecuteAsync(null);
+
+        Assert.True(model.Files[0].IsFailed);
+        Assert.Equal(BatchImportFailureCode.DatabaseError, model.Files[0].FailureCode);
+        Assert.Equal("BatchImport_DatabaseError", model.Files[0].FailureReason);
+        Assert.DoesNotContain("study.db", model.Files[0].FailureReason);
+        Assert.DoesNotContain("CHECK", model.Files[0].FailureReason);
+        Assert.DoesNotContain("user@example.com", model.Files[0].FailureReason);
+    }
+
+    [Fact]
+    public async Task Import_WhenAccessDenied_ClassifiesAsPermissionError()
+    {
+        var importer = new ControlledImportService
+        {
+            SaveException = new UnauthorizedAccessException("C:\\Users\\private\\secret\\study.db")
+        };
+        var model = CreateModel(importer, new RecordingNavigationService());
+        model.Files = new ObservableCollection<FileImportItem>
+        {
+            new() { FileName = "A", FilePath = "A.pdf", FileType = "PDF" }
+        };
+
+        await model.ImportCommand.ExecuteAsync(null);
+
+        Assert.True(model.Files[0].IsFailed);
+        Assert.Equal(BatchImportFailureCode.PermissionError, model.Files[0].FailureCode);
+        Assert.Equal("BatchImport_PermissionError", model.Files[0].FailureReason);
+        Assert.DoesNotContain("study.db", model.Files[0].FailureReason);
+    }
+
+    [Fact]
+    public async Task Import_WhenUnknownException_StaysGenericImportFailed()
+    {
+        var importer = new ControlledImportService
+        {
+            SaveException = new InvalidOperationException("C:\\Users\\private\\study.db internal detail")
+        };
         var model = CreateModel(importer, new RecordingNavigationService());
         model.Files = new ObservableCollection<FileImportItem>
         {
@@ -69,8 +139,6 @@ public sealed class BatchImportOperationStateTests
         Assert.Equal(BatchImportFailureCode.ImportFailed, model.Files[0].FailureCode);
         Assert.Equal("BatchImport_ItemFailed", model.Files[0].FailureReason);
         Assert.DoesNotContain("study.db", model.Files[0].FailureReason);
-        Assert.DoesNotContain("documents", model.Files[0].FailureReason);
-        Assert.DoesNotContain("user@example.com", model.Files[0].FailureReason);
     }
 
     [Fact]
@@ -181,6 +249,30 @@ public sealed class BatchImportOperationStateTests
     }
 
     [Fact]
+    public void LanguageChange_RefreshesCategorizedFailureFromMachineCode()
+    {
+        var localization = new CategoryLocalizationService();
+        var model = new BatchImportModel(
+            new RecordingDialogService(),
+            new FakeFileDialogService(),
+            new RecordingNavigationService(),
+            localization,
+            new ControlledImportService());
+        var item = new FileImportItem
+        {
+            IsFailed = true,
+            FailureCode = BatchImportFailureCode.DatabaseError,
+            FailureReason = localization["BatchImport_DatabaseError"]
+        };
+        model.Files = new ObservableCollection<FileImportItem> { item };
+
+        localization.SwitchToEnglish();
+
+        Assert.Equal("Database error (en)", item.FailureReason);
+        Assert.Equal(BatchImportFailureCode.DatabaseError, item.FailureCode);
+    }
+
+    [Fact]
     public async Task Dispose_DuringImport_CancelsOperationWithoutNavigating()
     {
         var importer = new ControlledImportService();
@@ -283,6 +375,7 @@ public sealed class BatchImportOperationStateTests
         public bool FailFirstA { get; init; }
         public bool AlwaysFailA { get; init; }
         public string? FailureMessage { get; init; }
+        public Exception? SaveException { get; init; }
         public List<string> AttemptedPaths { get; } = [];
         public Action? OnFirstSave { get; set; }
 
@@ -295,6 +388,8 @@ public sealed class BatchImportOperationStateTests
             AttemptedPaths.Add(document.FilePath);
             if (AttemptedPaths.Count == 1)
                 OnFirstSave?.Invoke();
+            if (SaveException is not null && document.FilePath == "A.pdf")
+                throw SaveException;
             if (FailureMessage is not null && document.FilePath == "A.pdf")
                 throw new IOException(FailureMessage);
             if (AlwaysFailA && document.FilePath == "A.pdf")
@@ -354,6 +449,34 @@ public sealed class BatchImportOperationStateTests
             => _english && key == "BatchImport_ItemFailed"
                 ? "Import failed (en)"
                 : key;
+
+        public SupportedLanguage CurrentLanguage
+            => _english ? SupportedLanguage.English : SupportedLanguage.Japanese;
+
+        public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = [];
+        public event EventHandler? LanguageChanged;
+
+        public void SetLanguage(SupportedLanguage language)
+        {
+            _english = language == SupportedLanguage.English;
+            LanguageChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void SwitchToEnglish() => SetLanguage(SupportedLanguage.English);
+    }
+
+    private sealed class CategoryLocalizationService : ILocalizationService
+    {
+        private bool _english;
+
+        public string this[string key] => _english ? key switch
+        {
+            "BatchImport_ItemFailed" => "Import failed (en)",
+            "BatchImport_FileError" => "File error (en)",
+            "BatchImport_PermissionError" => "Permission error (en)",
+            "BatchImport_DatabaseError" => "Database error (en)",
+            _ => key
+        } : key;
 
         public SupportedLanguage CurrentLanguage
             => _english ? SupportedLanguage.English : SupportedLanguage.Japanese;

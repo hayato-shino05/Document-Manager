@@ -735,6 +735,9 @@
   <data name="BatchImport_ColSize" xml:space="preserve"><value>サイズ</value></data>
   <data name="BatchImport_ColFailure" xml:space="preserve"><value>失敗理由</value></data>
   <data name="BatchImport_ItemFailed" xml:space="preserve"><value>インポートに失敗しました</value></data>
+  <data name="BatchImport_FileError" xml:space="preserve"><value>ファイルの読み込みに失敗しました</value></data>
+  <data name="BatchImport_PermissionError" xml:space="preserve"><value>アクセス権限がありません</value></data>
+  <data name="BatchImport_DatabaseError" xml:space="preserve"><value>データベースエラーが発生しました</value></data>
   <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>デフォルト科目</value></data>
   <data name="BatchImport_LblFolder" xml:space="preserve"><value>フォルダ</value></data>
   <data name="BatchImport_BtnRetryFailed" xml:space="preserve"><value>失敗を再試行</value></data>

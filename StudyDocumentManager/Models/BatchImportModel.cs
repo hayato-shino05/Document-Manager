@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Data.Sqlite;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Core.Services;
@@ -11,7 +12,10 @@ namespace StudyDocumentManager.Models;
 public enum BatchImportFailureCode
 {
     None,
-    ImportFailed
+    ImportFailed,
+    FileError,
+    PermissionError,
+    DatabaseError
 }
 
 public partial class BatchImportModel : ModelBase, IDisposable
@@ -73,8 +77,10 @@ public partial class BatchImportModel : ModelBase, IDisposable
     private string GetFailureReason(BatchImportFailureCode code)
         => code switch
         {
-            BatchImportFailureCode.ImportFailed => _loc["BatchImport_ItemFailed"],
-            _ => string.Empty
+            BatchImportFailureCode.FileError => _loc["BatchImport_FileError"],
+            BatchImportFailureCode.PermissionError => _loc["BatchImport_PermissionError"],
+            BatchImportFailureCode.DatabaseError => _loc["BatchImport_DatabaseError"],
+            _ => _loc["BatchImport_ItemFailed"]
         };
 
     public void Dispose()
@@ -245,6 +251,7 @@ public partial class BatchImportModel : ModelBase, IDisposable
                 };
 
                 DocumentImportOutcome outcome;
+                var failureCode = BatchImportFailureCode.ImportFailed;
                 try
                 {
                     outcome = await Task.Run(
@@ -257,9 +264,25 @@ public partial class BatchImportModel : ModelBase, IDisposable
                     IsImportCancelled = true;
                     break;
                 }
+                catch (UnauthorizedAccessException)
+                {
+                    outcome = DocumentImportOutcome.Failed;
+                    failureCode = BatchImportFailureCode.PermissionError;
+                }
+                catch (IOException)
+                {
+                    outcome = DocumentImportOutcome.Failed;
+                    failureCode = BatchImportFailureCode.FileError;
+                }
+                catch (SqliteException)
+                {
+                    outcome = DocumentImportOutcome.Failed;
+                    failureCode = BatchImportFailureCode.DatabaseError;
+                }
                 catch (Exception)
                 {
                     outcome = DocumentImportOutcome.Failed;
+                    failureCode = BatchImportFailureCode.ImportFailed;
                 }
 
                 switch (outcome)
@@ -282,7 +305,7 @@ public partial class BatchImportModel : ModelBase, IDisposable
                         break;
                     case DocumentImportOutcome.Failed:
                         item.IsFailed = true;
-                        item.FailureCode = BatchImportFailureCode.ImportFailed;
+                        item.FailureCode = failureCode;
                         item.FailureReason = GetFailureReason(item.FailureCode);
                         _operationProgress.RecordFailure(item.FilePath);
                         break;
