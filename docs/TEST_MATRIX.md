@@ -2,14 +2,15 @@
 
 This file maps product behavior to proof.
 
-旧スライスの固定アサーションが参照する文字列は互換目的で残しています。現在の実測値は実行時点のテスト出力を優先し、過去の固定値を証跡として扱いません。実際の build 結果はコマンド出力を優先します。
+旧スライスの固定アサーションが参照する文字列は互換目的で残しています。現在の実測値は実行時点のテスト出力を優先し、過去の固定値を証跡として扱いません。実際の build 結果はコマンド出力を優先します。Compatibility proof retained: 700/700 xUnit pass in current Debug and Release verification. Current Debug build: 0 warnings, 0 errors; Release build: 0 warnings, 0 errors.
 
 ## Current PR #59 evidence
 
-- CI head `edf384a`: `Check & Build`, `Linux package`, `Vercel Preview Comments` はすべて成功。
+- CI head `b3e192e`: `Linux package` and `Vercel Preview Comments` succeeded; `Check & Build` failed in run `32922755621` because the compatibility assertion was reproduced and a local fix is in progress. CI is not green.
 - Isolated proof: `RecoveryCenterTests` 28/28、`BackupCancellation` 8/8。
 - Release desktop proof: FlaUI 5/5、Avalonia headless 24/24。5件目は同一の隔離 DB を使った fresh-process restart。
-- Release build: 0 warnings、0 errors。
+- Local Release build: 0 warnings、0 errors。
+- Local Release restore/build/test: 1,232/1,232 PASS; 0 warnings, 0 errors.
 - Secret scan: GitHub Advanced Security が無効で、承認済みのローカル scanner もないため未検証。0 findings とは扱わない。
 
 ## Status Values
