@@ -533,6 +533,10 @@
   <data name="AddEdit_FileFilter" xml:space="preserve"><value>所有文件|*.*|PDF|*.pdf|Word|*.doc;*.docx|Excel|*.xls;*.xlsx|图像|*.png;*.jpg;*.jpeg;*.gif;*.bmp</value></data>
   <data name="Duplicate_NoDuplicates" xml:space="preserve"><value>未发现重复文档 ✅</value></data>
   <data name="Duplicate_ConfirmDelete" xml:space="preserve"><value>要删除文档“{0}”（ID：{1}）吗？</value></data>
+  <data name="Duplicate_Merge" xml:space="preserve"><value>合并</value></data>
+  <data name="Duplicate_ConfirmMerge" xml:space="preserve"><value>保留“{0}”，并将 {1} 个重复文档合并到其中吗？</value></data>
+  <data name="Duplicate_MergeSuccess" xml:space="preserve"><value>已将 {1} 个重复文档合并到“{0}”。</value></data>
+  <data name="Duplicate_MatchInfo" xml:space="preserve"><value>{0} 个文档</value></data>
   <data name="Related_ConfirmRemove" xml:space="preserve"><value>要取消与“{0}”的关联吗？</value></data>
   <data name="Related_TypeRelated" xml:space="preserve"><value>相关</value></data>
   <data name="Related_TypeReference" xml:space="preserve"><value>参考</value></data>

@@ -274,6 +274,10 @@
   <!-- DuplicateDetection -->
   <data name="Duplicate_NoDuplicates" xml:space="preserve"><value>重複した文書は見つかりませんでした ✅</value></data>
   <data name="Duplicate_ConfirmDelete" xml:space="preserve"><value>文書 '{0}' (ID: {1}) を削除しますか？</value></data>
+  <data name="Duplicate_Merge" xml:space="preserve"><value>統合</value></data>
+  <data name="Duplicate_ConfirmMerge" xml:space="preserve"><value>「{0}」を残し、重複文書 {1} 件を統合しますか？</value></data>
+  <data name="Duplicate_MergeSuccess" xml:space="preserve"><value>重複文書 {1} 件を「{0}」に統合しました。</value></data>
+  <data name="Duplicate_MatchInfo" xml:space="preserve"><value>{0}件の文書</value></data>
 
   <!-- RelatedDocuments -->
   <data name="Related_ConfirmRemove" xml:space="preserve"><value>'{0}' とのリンクを解除しますか？</value></data>

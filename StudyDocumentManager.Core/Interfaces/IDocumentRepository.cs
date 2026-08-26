@@ -27,6 +27,9 @@ public interface IDocumentRepository
 
     bool Add(StudyDocument document);
 
+    bool MergeDocuments(int survivorId, IReadOnlyList<int> duplicateIds)
+        => throw new NotSupportedException($"{nameof(MergeDocuments)} is not implemented by this repository.");
+
     bool AddWithCatalogs(StudyDocument document);
     bool Update(StudyDocument document);
     bool Delete(int id);

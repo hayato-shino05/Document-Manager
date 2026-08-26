@@ -99,8 +99,14 @@
                                                         Command="{Binding ViewCommand}" Padding="{StaticResource PaddingSm}">
                                                     <TextBlock Text="{loc:Localize DuplicateDetection_BtnView}" FontSize="{StaticResource FontSizeXs}"/>
                                                 </Button>
-                                                <Button Classes="danger" AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnDelete}"
-                                                        Command="{Binding DeleteDuplicateCommand}" Padding="{StaticResource PaddingSm}">
+                                                <Button Classes="danger" AutomationProperties.Name="{loc:Localize DuplicateDetection_Merge}"
+                                                        Command="{Binding DataContext.MergeDuplicateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}" Padding="{StaticResource PaddingSm}">
+                                                    <TextBlock Text="{loc:Localize DuplicateDetection_Merge}" FontSize="{StaticResource FontSizeXs}"/>
+                                                </Button>
+                                                <Button Classes="secondary" AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnDelete}"
+                                                        Command="{Binding DataContext.DeleteDuplicateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding Documents[1]}" Padding="{StaticResource PaddingSm}">
                                                     <TextBlock Text="{loc:Localize DuplicateDetection_BtnDelete}" FontSize="{StaticResource FontSizeXs}"/>
                                                 </Button>
                                             </StackPanel>

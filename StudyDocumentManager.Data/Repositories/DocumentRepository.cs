@@ -38,6 +38,9 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
 
     public bool Add(StudyDocument document) => _db.InsertDocument(document);
 
+    public bool MergeDocuments(int survivorId, IReadOnlyList<int> duplicateIds)
+        => _db.MergeDocuments(survivorId, duplicateIds);
+
 
     public bool AddWithCatalogs(StudyDocument document) => _db.InsertDocumentWithCatalogs(document);
 

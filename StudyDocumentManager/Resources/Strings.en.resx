@@ -260,6 +260,10 @@ Please check your network connection.</value></data>
   <data name="AddEdit_FileFilter" xml:space="preserve"><value>All Files|*.*|PDF|*.pdf|Word|*.doc;*.docx|Excel|*.xls;*.xlsx|Image|*.png;*.jpg;*.jpeg;*.gif;*.bmp</value></data>
   <data name="Duplicate_NoDuplicates" xml:space="preserve"><value>No duplicate documents found</value></data>
   <data name="Duplicate_ConfirmDelete" xml:space="preserve"><value>Delete document '{0}' (ID: {1})?</value></data>
+  <data name="Duplicate_Merge" xml:space="preserve"><value>Merge</value></data>
+  <data name="Duplicate_ConfirmMerge" xml:space="preserve"><value>Keep '{0}' and merge {1} duplicate document(s) into it?</value></data>
+  <data name="Duplicate_MergeSuccess" xml:space="preserve"><value>Merged {1} duplicate document(s) into '{0}'.</value></data>
+  <data name="Duplicate_MatchInfo" xml:space="preserve"><value>{0} documents</value></data>
   <data name="Related_ConfirmRemove" xml:space="preserve"><value>Unlink from '{0}'?</value></data>
   <data name="Related_TypeRelated" xml:space="preserve"><value>Related</value></data>
   <data name="Related_TypeReference" xml:space="preserve"><value>Reference</value></data>

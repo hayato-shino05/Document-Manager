@@ -414,6 +414,153 @@ public class DatabaseHelper
         return ExecuteNonQuery(query, new SqliteParameter("@id", id)) > 0;
     }
 
+    public bool MergeDocuments(int survivorId, IReadOnlyList<int> duplicateIds)
+    {
+        var duplicates = duplicateIds
+            .Where(id => id != survivorId)
+            .Distinct()
+            .ToArray();
+        if (duplicates.Length == 0)
+            return false;
+
+        using var connection = OpenConnection();
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            if (!DocumentRowIsActive(connection, transaction, survivorId))
+                return false;
+
+            foreach (var duplicateId in duplicates)
+            {
+                if (!DocumentRowIsActive(connection, transaction, duplicateId))
+                    throw new InvalidOperationException($"Duplicate document {duplicateId} is no longer available.");
+
+                MergeCollectionMemberships(connection, transaction, survivorId, duplicateId);
+                MergePersonalNotes(connection, transaction, survivorId, duplicateId);
+                MergeRecentFile(connection, transaction, survivorId, duplicateId);
+                MergeRelations(connection, transaction, survivorId, duplicateId);
+                SoftDeleteDocument(connection, transaction, duplicateId);
+            }
+
+            transaction.Commit();
+            return true;
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+    private static bool DocumentRowIsActive(SqliteConnection connection, SqliteTransaction transaction, int id)
+    {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = "SELECT COUNT(*) FROM documents WHERE id = @id AND (is_deleted IS NULL OR is_deleted = 0)";
+        command.Parameters.AddWithValue("@id", id);
+        return Convert.ToInt32(command.ExecuteScalar()) == 1;
+    }
+
+    private static void MergeCollectionMemberships(SqliteConnection connection, SqliteTransaction transaction, int survivorId, int duplicateId)
+    {
+        using var add = connection.CreateCommand();
+        add.Transaction = transaction;
+        add.CommandText = """
+            INSERT OR IGNORE INTO collection_items (collection_id, document_id)
+            SELECT collection_id, @survivorId FROM collection_items WHERE document_id = @duplicateId;
+            DELETE FROM collection_items WHERE document_id = @duplicateId;
+            """;
+        add.Parameters.AddWithValue("@survivorId", survivorId);
+        add.Parameters.AddWithValue("@duplicateId", duplicateId);
+        add.ExecuteNonQuery();
+    }
+
+    private static void MergePersonalNotes(SqliteConnection connection, SqliteTransaction transaction, int survivorId, int duplicateId)
+    {
+        using var read = connection.CreateCommand();
+        read.Transaction = transaction;
+        read.CommandText = "SELECT content FROM personal_notes WHERE document_id IN (@survivorId, @duplicateId) ORDER BY document_id";
+        read.Parameters.AddWithValue("@survivorId", survivorId);
+        read.Parameters.AddWithValue("@duplicateId", duplicateId);
+        var contents = new List<string>();
+        using (var reader = read.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                var content = reader.IsDBNull(0) ? string.Empty : reader.GetString(0).Trim();
+                if (content.Length > 0 && !contents.Contains(content, StringComparer.Ordinal))
+                    contents.Add(content);
+            }
+        }
+
+        using var delete = connection.CreateCommand();
+        delete.Transaction = transaction;
+        delete.CommandText = "DELETE FROM personal_notes WHERE document_id IN (@survivorId, @duplicateId)";
+        delete.Parameters.AddWithValue("@survivorId", survivorId);
+        delete.Parameters.AddWithValue("@duplicateId", duplicateId);
+        delete.ExecuteNonQuery();
+
+        if (contents.Count == 0)
+            return;
+
+        using var insert = connection.CreateCommand();
+        insert.Transaction = transaction;
+        insert.CommandText = "INSERT INTO personal_notes (document_id, content) VALUES (@documentId, @content)";
+        insert.Parameters.AddWithValue("@documentId", survivorId);
+        insert.Parameters.AddWithValue("@content", string.Join(Environment.NewLine + Environment.NewLine, contents));
+        insert.ExecuteNonQuery();
+    }
+
+    private static void MergeRecentFile(SqliteConnection connection, SqliteTransaction transaction, int survivorId, int duplicateId)
+    {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = """
+            INSERT OR IGNORE INTO recent_files (document_id, opened_at)
+            SELECT @survivorId, MAX(opened_at) FROM recent_files WHERE document_id IN (@survivorId, @duplicateId);
+            UPDATE recent_files SET opened_at = (
+                SELECT MAX(opened_at) FROM recent_files WHERE document_id IN (@survivorId, @duplicateId)
+            ) WHERE document_id = @survivorId;
+            DELETE FROM recent_files WHERE document_id = @duplicateId;
+            """;
+        command.Parameters.AddWithValue("@survivorId", survivorId);
+        command.Parameters.AddWithValue("@duplicateId", duplicateId);
+        command.ExecuteNonQuery();
+    }
+
+    private static void MergeRelations(SqliteConnection connection, SqliteTransaction transaction, int survivorId, int duplicateId)
+    {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = """
+            INSERT OR IGNORE INTO document_relations (doc_id_1, doc_id_2, relation_type)
+            SELECT
+                CASE WHEN doc_id_1 = @duplicateId THEN @survivorId ELSE doc_id_1 END,
+                CASE WHEN doc_id_2 = @duplicateId THEN @survivorId ELSE doc_id_2 END,
+                relation_type
+            FROM document_relations
+            WHERE (doc_id_1 = @duplicateId OR doc_id_2 = @duplicateId)
+              AND NOT (
+                  CASE WHEN doc_id_1 = @duplicateId THEN @survivorId ELSE doc_id_1 END = @survivorId
+                  AND CASE WHEN doc_id_2 = @duplicateId THEN @survivorId ELSE doc_id_2 END = @survivorId
+              );
+            DELETE FROM document_relations WHERE doc_id_1 = @duplicateId OR doc_id_2 = @duplicateId;
+            """;
+        command.Parameters.AddWithValue("@survivorId", survivorId);
+        command.Parameters.AddWithValue("@duplicateId", duplicateId);
+        command.ExecuteNonQuery();
+    }
+
+    private static void SoftDeleteDocument(SqliteConnection connection, SqliteTransaction transaction, int id)
+    {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = "UPDATE documents SET is_deleted = 1, deleted_at = datetime('now','localtime') WHERE id = @id";
+        command.Parameters.AddWithValue("@id", id);
+        if (command.ExecuteNonQuery() != 1)
+            throw new InvalidOperationException($"Failed to merge duplicate document {id}.");
+    }
+
 
 
     public List<string> GetDistinctSubjects()
