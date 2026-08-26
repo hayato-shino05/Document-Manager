@@ -18,6 +18,10 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
 
     public StudyDocument? GetById(int id) => _db.GetDocumentById(id);
 
+    public StudyDocument? GetByFilePath(string filePath) => _db.GetDocumentByFilePath(filePath);
+
+    public IReadOnlyList<StudyDocument> FindActiveByName(string name) => _db.FindActiveDocumentsByName(name);
+
     public List<StudyDocument> Search(string keyword) => _db.SearchDocuments(keyword);
 
     public List<StudyDocument> Filter(string subject, string type) => _db.FilterDocuments(subject, type);

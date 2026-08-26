@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Data.Sqlite;
@@ -25,6 +26,7 @@ public partial class BatchImportModel : ModelBase, IDisposable
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
     private readonly IDroppedFileImportService _droppedFileImportService;
+    private readonly IImportInboxRepository? _importInboxRepository;
     private readonly IAnalyticsService? _analytics;
     private readonly OperationProgress _operationProgress = new();
     private CancellationTokenSource? _importCancellation;
@@ -57,6 +59,7 @@ public partial class BatchImportModel : ModelBase, IDisposable
         INavigationService navigationService,
         ILocalizationService loc,
         IDroppedFileImportService droppedFileImportService,
+        IImportInboxRepository? importInboxRepository = null,
         IAnalyticsService? analytics = null)
     {
         _dialogService = dialogService;
@@ -64,6 +67,7 @@ public partial class BatchImportModel : ModelBase, IDisposable
         _navigationService = navigationService;
         _loc = loc;
         _droppedFileImportService = droppedFileImportService;
+        _importInboxRepository = importInboxRepository;
         _analytics = analytics;
         _loc.LanguageChanged += OnLanguageChanged;
     }
@@ -203,6 +207,10 @@ public partial class BatchImportModel : ModelBase, IDisposable
             return;
         }
 
+        selected = selected
+            .GroupBy(file => file.FilePath, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .ToList();
         IsImporting = true;
         IsImportCancelled = false;
         if (!preserveCounters)
@@ -231,6 +239,24 @@ public partial class BatchImportModel : ModelBase, IDisposable
         try
         {
             var defaultSubject = DefaultSubject.Trim();
+            var inboxIds = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var item in selected)
+            {
+                var pending = new ImportInboxItem { SourcePath = item.FilePath, DisplayName = item.FileName, Subject = defaultSubject, Type = item.FileType, State = ImportInboxState.Pending };
+                var persistCode = PersistInboxSafe(pending);
+                if (persistCode != BatchImportFailureCode.None)
+                {
+                    item.IsFailed = true;
+                    item.FailureCode = persistCode;
+                    item.FailureReason = GetFailureReason(persistCode);
+                    FailedCount = Files.Count(file => file.IsFailed);
+                    _operationProgress.RecordFailure(item.FilePath);
+                    continue;
+                }
+
+                if (pending.Id > 0)
+                    inboxIds[item.FilePath] = pending.Id;
+            }
 
             foreach (var item in selected)
             {
@@ -240,6 +266,9 @@ public partial class BatchImportModel : ModelBase, IDisposable
                     IsImportCancelled = true;
                     break;
                 }
+
+                if (item.IsFailed && !preserveCounters)
+                    continue;
 
                 var document = new StudyDocument
                 {
@@ -289,6 +318,20 @@ public partial class BatchImportModel : ModelBase, IDisposable
                 {
                     case DocumentImportOutcome.Imported:
                         ImportedCount++;
+                        var ambiguousMatches = _droppedFileImportService
+                            .FindExistingByName(document?.Name ?? string.Empty)
+                            .Where(match => match.Id != (document?.Id ?? 0))
+                            .ToList();
+                        if (ambiguousMatches.Count >= 2)
+                        {
+                            var candidateList = string.Join("|", ambiguousMatches.Select(match => $"{match.Id}:{match.Name}"));
+                            UpdateInboxOutcome(inboxIds, item, document, ImportInboxState.Ambiguous, candidateList);
+                        }
+                        else
+                        {
+                            var missingMetadata = string.IsNullOrWhiteSpace(document?.Subject) || string.IsNullOrWhiteSpace(document?.Type);
+                            UpdateInboxOutcome(inboxIds, item, document, missingMetadata ? ImportInboxState.MissingMetadata : ImportInboxState.Processed, null);
+                        }
                         item.IsSelected = false;
                         item.IsFailed = false;
                         item.FailureCode = BatchImportFailureCode.None;
@@ -297,6 +340,9 @@ public partial class BatchImportModel : ModelBase, IDisposable
                         break;
                     case DocumentImportOutcome.SkippedDuplicate:
                         SkippedDuplicateCount++;
+                        var existingDoc = _droppedFileImportService.FindExistingByFilePath(item.FilePath);
+                        var duplicateCandidate = existingDoc is not null ? $"{existingDoc.Id}:{existingDoc.Name}" : item.FilePath;
+                        UpdateInboxOutcome(inboxIds, item, null, ImportInboxState.Held, duplicateCandidate);
                         item.IsSelected = false;
                         item.IsFailed = false;
                         item.FailureCode = BatchImportFailureCode.None;
@@ -304,6 +350,7 @@ public partial class BatchImportModel : ModelBase, IDisposable
                         _operationProgress.RecordSkipped(item.FilePath);
                         break;
                     case DocumentImportOutcome.Failed:
+                        UpdateInboxOutcome(inboxIds, item, null, ImportInboxState.Failed, null, failureCode.ToString());
                         item.IsFailed = true;
                         item.FailureCode = failureCode;
                         item.FailureReason = GetFailureReason(item.FailureCode);
@@ -358,6 +405,31 @@ public partial class BatchImportModel : ModelBase, IDisposable
 
         await _dialogService.ShowMessageAsync(_loc["Dialog_Complete"], ImportStatusMessage);
         _navigationService.NavigateTo("dashboard");
+    }
+
+    private BatchImportFailureCode PersistInboxSafe(ImportInboxItem item)
+    {
+        try
+        {
+            _importInboxRepository?.Add(item);
+            return BatchImportFailureCode.None;
+        }
+        catch (SqliteException) { return BatchImportFailureCode.DatabaseError; }
+        catch (IOException) { return BatchImportFailureCode.FileError; }
+    }
+
+    private void UpdateInboxOutcome(Dictionary<string, int> inboxIds, FileImportItem item, StudyDocument? document, ImportInboxState state, string? duplicateCandidate, string? failureCode = null)
+    {
+        if (_importInboxRepository is null || !inboxIds.TryGetValue(item.FilePath, out var id)) return;
+        var pending = _importInboxRepository.GetById(id);
+        if (pending is null) return;
+        pending.DocumentId = document?.Id;
+        pending.Subject = document?.Subject ?? pending.Subject;
+        pending.Type = document?.Type ?? pending.Type;
+        pending.DuplicateCandidate = duplicateCandidate ?? pending.DuplicateCandidate;
+        pending.FailureCode = failureCode;
+        pending.State = state;
+        _importInboxRepository.Update(pending);
     }
 
     private void NotifyFailureStateChanged()

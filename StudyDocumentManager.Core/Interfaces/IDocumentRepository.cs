@@ -9,6 +9,8 @@ public interface IDocumentRepository
 {
     List<StudyDocument> GetAll();
     StudyDocument? GetById(int id);
+    StudyDocument? GetByFilePath(string filePath) => null;
+    IReadOnlyList<StudyDocument> FindActiveByName(string name) => [];
     List<StudyDocument> Search(string keyword);
     List<StudyDocument> Filter(string subject, string type);
     List<StudyDocument> SearchAdvanced(

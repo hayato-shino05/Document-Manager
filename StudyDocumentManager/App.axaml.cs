@@ -116,6 +116,8 @@ public partial class App : Application
         services.AddSingleton<IBulkOperationRepository>(sp => sp.GetRequiredService<DocumentRepository>());
         services.AddSingleton<IFileIntegrityRepository>(sp => sp.GetRequiredService<DocumentRepository>());
         services.AddSingleton<IUndoRepository>(sp => sp.GetRequiredService<DocumentRepository>());
+        services.AddSingleton<IImportInboxRepository, ImportInboxRepository>();
+        services.AddSingleton<IWatchedFolderRepository, WatchedFolderRepository>();
         services.AddSingleton<ICategoryRepository, CategoryRepository>();
         services.AddSingleton<ICollectionRepository, CollectionRepository>();
         services.AddSingleton<IPersonalNoteRepository, PersonalNoteRepository>();
@@ -166,6 +168,11 @@ services.AddSingleton<IVersionedBackupService, VersionedBackupService>();
         services.AddSingleton<IUndoService>(sp => sp.GetRequiredService<UndoService>());
         services.AddSingleton<IUndoApplier, UndoApplier>();
 
+        // Watched Folder / file-system watcher
+        services.AddSingleton<ILog, TraceLog>();
+        services.AddSingleton<IFileSystemWatcherAdapterFactory, FileSystemWatcherAdapterFactory>();
+        services.AddSingleton<IWatchedFolderWatcherFactory, WatchedFolderWatcherFactory>();
+
         // モデル — メイン
         services.AddSingleton<MainWindowModel>();
         services.AddTransient<DashboardModel>();
@@ -173,6 +180,8 @@ services.AddSingleton<IVersionedBackupService, VersionedBackupService>();
         // モデル — 文書
         services.AddTransient<AddEditModel>();
         services.AddTransient<BatchImportModel>();
+        services.AddTransient<ImportInboxModel>();
+        services.AddTransient<WatchedFolderModel>();
         services.AddTransient<BulkDeleteModel>();
         services.AddTransient<DuplicateDetectionModel>();
         services.AddTransient<PersonalNoteModel>();

@@ -38,6 +38,8 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             "recyclebin" or "recycle" => serviceProvider.GetRequiredService<RecycleBinModel>(),
             "recovery" or "recoverycenter" or "recovery-center" => serviceProvider.GetRequiredService<RecoveryCenterModel>(),
             "batchimport" or "batch-import" => serviceProvider.GetRequiredService<BatchImportModel>(),
+            "importinbox" or "import-inbox" or "inbox" => serviceProvider.GetRequiredService<ImportInboxModel>(),
+            "watchedfolder" or "watched-folder" or "watcher" => serviceProvider.GetRequiredService<WatchedFolderModel>(),
             "bulkdelete" or "bulk-delete" => serviceProvider.GetRequiredService<BulkDeleteModel>(),
             "duplicates" => serviceProvider.GetRequiredService<DuplicateDetectionModel>(),
             "fileintegrity" or "integrity" => serviceProvider.GetRequiredService<FileIntegrityCheckModel>(),

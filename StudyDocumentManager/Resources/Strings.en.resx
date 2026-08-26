@@ -303,6 +303,26 @@ Please check your network connection.</value></data>
   <data name="Menu_ManageCategories" xml:space="preserve"><value>Category Management</value></data>
   <data name="Menu_Collections" xml:space="preserve"><value>Collections</value></data>
   <data name="Menu_BatchImport" xml:space="preserve"><value>Batch Import</value></data>
+  <data name="ImportInbox_Title" xml:space="preserve"><value>Import Inbox</value></data>
+  <data name="ImportInbox_ShowProcessed" xml:space="preserve"><value>Show processed</value></data>
+  <data name="ImportInbox_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="ImportInbox_State" xml:space="preserve"><value>State</value></data>
+  <data name="ImportInbox_Source" xml:space="preserve"><value>Source</value></data>
+  <data name="ImportInbox_Retry" xml:space="preserve"><value>Retry</value></data>
+  <data name="ImportInbox_Reveal" xml:space="preserve"><value>Reveal</value></data>
+  <data name="ImportInbox_SourceMissing" xml:space="preserve"><value>Source file is missing.</value></data>
+  <data name="ImportInbox_Status" xml:space="preserve"><value>{0} inbox items</value></data>
+  <data name="ImportInbox_Empty" xml:space="preserve"><value>No items in the import inbox.</value></data>
+  <data name="ImportInbox_Subject" xml:space="preserve"><value>Subject</value></data>  <data name="ImportInbox_ApplyMetadata" xml:space="preserve"><value>Apply metadata</value></data>
+  <data name="ImportInbox_Type" xml:space="preserve"><value>Type</value></data>  <data name="ImportInbox_All" xml:space="preserve"><value>All</value></data>
+  <data name="ImportInbox_State_Pending" xml:space="preserve"><value>Pending</value></data>
+  <data name="ImportInbox_State_Held" xml:space="preserve"><value>Held</value></data>
+  <data name="ImportInbox_State_Failed" xml:space="preserve"><value>Failed</value></data>
+  <data name="ImportInbox_State_Processed" xml:space="preserve"><value>Processed</value></data>
+  <data name="ImportInbox_State_MissingMetadata" xml:space="preserve"><value>Missing Metadata</value></data>
+  <data name="ImportInbox_State_Ambiguous" xml:space="preserve"><value>Ambiguous Name</value></data>
+  <data name="ImportInbox_Failure" xml:space="preserve"><value>Failure</value></data>
+  <data name="ImportInbox_Duplicate" xml:space="preserve"><value>Duplicate candidate</value></data>
   <data name="Menu_BulkDelete" xml:space="preserve"><value>Bulk Delete</value></data>
   <data name="Menu_FindDuplicates" xml:space="preserve"><value>Find Duplicates</value></data>
   <data name="Menu_FileCheck" xml:space="preserve"><value>File Integrity</value></data>
@@ -823,4 +843,20 @@ Please check your network connection.</value></data>
   <data name="SW_Deadline_Overdue" xml:space="preserve"><value>Overdue</value></data>
   <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>Due soon</value></data>
   <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>Scheduled</value></data>
+  <data name="Btn_Back" xml:space="preserve"><value>Back</value></data>
+  <data name="WF_Title" xml:space="preserve"><value>Watched Folders</value></data>
+  <data name="WF_Add" xml:space="preserve"><value>Add</value></data>
+  <data name="WF_Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="WF_Enable" xml:space="preserve"><value>Enable</value></data>
+  <data name="WF_Start" xml:space="preserve"><value>Start Watching</value></data>
+  <data name="WF_Stop" xml:space="preserve"><value>Stop Watching</value></data>
+  <data name="WF_FolderPath" xml:space="preserve"><value>Folder Path</value></data>
+  <data name="WF_NoFolders" xml:space="preserve"><value>No folders are being watched.</value></data>
+  <data name="WF_Status_Watching" xml:space="preserve"><value>Watching {0} folder(s).</value></data>
+  <data name="WF_Status_Stopped" xml:space="preserve"><value>Watcher stopped.</value></data>
+  <data name="WF_Status_NoFolders" xml:space="preserve"><value>No folders are watched.</value></data>
+  <data name="WF_Error_PathRequired" xml:space="preserve"><value>Folder path is required.</value></data>
+  <data name="WF_Error_NotFound" xml:space="preserve"><value>Folder does not exist.</value></data>
+  <data name="WF_Error_StartFailed" xml:space="preserve"><value>Could not start the watcher.</value></data>
+  <data name="WF_IncludeSub" xml:space="preserve"><value>Include subfolders</value></data>
 </root>

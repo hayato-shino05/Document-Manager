@@ -576,6 +576,26 @@
   <data name="Menu_ManageCategories" xml:space="preserve"><value>Quản lý danh mục</value></data>
   <data name="Menu_Collections" xml:space="preserve"><value>Bộ sưu tập</value></data>
   <data name="Menu_BatchImport" xml:space="preserve"><value>Nhập hàng loạt</value></data>
+  <data name="ImportInbox_Title" xml:space="preserve"><value>Hộp thư nhập</value></data>
+  <data name="ImportInbox_ShowProcessed" xml:space="preserve"><value>Hiện đã xử lý</value></data>
+  <data name="ImportInbox_Name" xml:space="preserve"><value>Tên</value></data>
+  <data name="ImportInbox_State" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="ImportInbox_Source" xml:space="preserve"><value>Nguồn</value></data>
+  <data name="ImportInbox_Retry" xml:space="preserve"><value>Thử lại</value></data>
+  <data name="ImportInbox_Reveal" xml:space="preserve"><value>Mở vị trí</value></data>
+  <data name="ImportInbox_SourceMissing" xml:space="preserve"><value>Không tìm thấy tệp nguồn.</value></data>
+  <data name="ImportInbox_Status" xml:space="preserve"><value>{0} mục trong hộp thư nhập</value></data>
+  <data name="ImportInbox_Empty" xml:space="preserve"><value>Hộp thư nhập không có mục nào.</value></data>
+  <data name="ImportInbox_Subject" xml:space="preserve"><value>Môn học</value></data>  <data name="ImportInbox_ApplyMetadata" xml:space="preserve"><value>Áp dụng siêu dữ liệu</value></data>
+  <data name="ImportInbox_Type" xml:space="preserve"><value>Loại</value></data>  <data name="ImportInbox_All" xml:space="preserve"><value>Tất cả</value></data>
+  <data name="ImportInbox_State_Pending" xml:space="preserve"><value>Đang chờ</value></data>
+  <data name="ImportInbox_State_Held" xml:space="preserve"><value>Đang giữ</value></data>
+  <data name="ImportInbox_State_Failed" xml:space="preserve"><value>Thất bại</value></data>
+  <data name="ImportInbox_State_Processed" xml:space="preserve"><value>Đã xử lý</value></data>
+  <data name="ImportInbox_State_MissingMetadata" xml:space="preserve"><value>Thiếu siêu dữ liệu</value></data>
+  <data name="ImportInbox_State_Ambiguous" xml:space="preserve"><value>Tên không rõ ràng</value></data>
+  <data name="ImportInbox_Failure" xml:space="preserve"><value>Lỗi</value></data>
+  <data name="ImportInbox_Duplicate" xml:space="preserve"><value>Ứng viên trùng lặp</value></data>
   <data name="Menu_BulkDelete" xml:space="preserve"><value>Xóa hàng loạt</value></data>
   <data name="Menu_FindDuplicates" xml:space="preserve"><value>Tìm tài liệu trùng lặp</value></data>
   <data name="Menu_FileCheck" xml:space="preserve"><value>Kiểm tra tính toàn vẹn của tệp</value></data>
@@ -1032,4 +1052,20 @@
   <data name="SW_Deadline_Overdue" xml:space="preserve"><value>Quá hạn</value></data>
   <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>Sắp đến hạn</value></data>
   <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>Đã lên lịch</value></data>
+  <data name="Btn_Back" xml:space="preserve"><value>Quay lại</value></data>
+  <data name="WF_Title" xml:space="preserve"><value>Thư mục theo dõi</value></data>
+  <data name="WF_Add" xml:space="preserve"><value>Thêm</value></data>
+  <data name="WF_Remove" xml:space="preserve"><value>Xóa</value></data>
+  <data name="WF_Enable" xml:space="preserve"><value>Bật</value></data>
+  <data name="WF_Start" xml:space="preserve"><value>Bắt đầu theo dõi</value></data>
+  <data name="WF_Stop" xml:space="preserve"><value>Dừng theo dõi</value></data>
+  <data name="WF_FolderPath" xml:space="preserve"><value>Đường dẫn thư mục</value></data>
+  <data name="WF_NoFolders" xml:space="preserve"><value>Chưa có thư mục nào được theo dõi.</value></data>
+  <data name="WF_Status_Watching" xml:space="preserve"><value>Đang theo dõi {0} thư mục.</value></data>
+  <data name="WF_Status_Stopped" xml:space="preserve"><value>Đã dừng theo dõi.</value></data>
+  <data name="WF_Status_NoFolders" xml:space="preserve"><value>Chưa theo dõi thư mục nào.</value></data>
+  <data name="WF_Error_PathRequired" xml:space="preserve"><value>Đường dẫn thư mục là bắt buộc.</value></data>
+  <data name="WF_Error_NotFound" xml:space="preserve"><value>Thư mục không tồn tại.</value></data>
+  <data name="WF_Error_StartFailed" xml:space="preserve"><value>Không thể khởi động trình theo dõi.</value></data>
+  <data name="WF_IncludeSub" xml:space="preserve"><value>Bao gồm thư mục con</value></data>
 </root>

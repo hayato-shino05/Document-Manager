@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             xmlns:ent="using:StudyDocumentManager.Core.Entities"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             x:Class="StudyDocumentManager.Views.WatchedFolder"
+             x:Name="Root"
+             AutomationProperties.AutomationId="WatchedFolder_Screen"
+             x:DataType="vm:WatchedFolderModel">
+  <DockPanel Margin="24">
+    <StackPanel DockPanel.Dock="Top" Spacing="10">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button AutomationProperties.AutomationId="WatchedFolder_Back" Content="{loc:Localize Btn_Back}" Command="{Binding GoBackCommand}" />
+        <TextBlock Text="{loc:Localize WF_Title}" FontSize="24" />
+        <Button AutomationProperties.AutomationId="WatchedFolder_Start" Content="{loc:Localize WF_Start}" Command="{Binding StartWatchingCommand}" IsEnabled="{Binding !IsWatching}" />
+        <Button AutomationProperties.AutomationId="WatchedFolder_Stop" Content="{loc:Localize WF_Stop}" Command="{Binding StopWatchingCommand}" IsEnabled="{Binding IsWatching}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <TextBox AutomationProperties.AutomationId="WatchedFolder_Path" AutomationProperties.Name="{loc:Localize WF_FolderPath}" Width="420" Text="{Binding NewFolderPath}" />
+        <CheckBox AutomationProperties.AutomationId="WatchedFolder_IncludeSub" Content="{loc:Localize WF_IncludeSub}" IsChecked="{Binding NewFolderIncludeSubdirectories}" />
+        <Button AutomationProperties.AutomationId="WatchedFolder_Add" Content="{loc:Localize WF_Add}" Command="{Binding AddNewFolderCommand}" />
+      </StackPanel>
+      <TextBlock AutomationProperties.AutomationId="WatchedFolder_Status" Text="{Binding StatusMessage}" IsVisible="{Binding StatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+      <TextBlock AutomationProperties.AutomationId="WatchedFolder_Error" Text="{Binding LastError}" Foreground="Red" IsVisible="{Binding LastError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+      <TextBlock AutomationProperties.AutomationId="WatchedFolder_NoFolders" Text="{loc:Localize WF_NoFolders}" IsVisible="{Binding !HasFolders}" />
+    </StackPanel>
+    <ListBox AutomationProperties.AutomationId="WatchedFolder_List" ItemsSource="{Binding Folders}">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="ent:WatchedFolder">
+          <Grid ColumnDefinitions="*,Auto,Auto" Margin="4">
+            <StackPanel Grid.Column="0" Spacing="2">
+              <TextBlock Text="{Binding FolderPath}" FontWeight="Bold" />
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="{Binding LastScanAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" FontSize="11" Opacity="0.7" />
+                <TextBlock Text="{Binding WatcherStatus}" FontSize="11" Opacity="0.7" />
+              </StackPanel>
+              <TextBlock AutomationProperties.AutomationId="WatchedFolder_ItemError" Text="{Binding WatcherError}" FontSize="11" Foreground="Red" IsVisible="{Binding WatcherError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            </StackPanel>
+            <CheckBox Grid.Column="1" Content="{loc:Localize WF_Enable}" IsChecked="{Binding Enabled}" Command="{Binding DataContext.ToggleEnabledCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding .}" />
+            <Button Grid.Column="2" Content="{loc:Localize WF_Remove}" Command="{Binding DataContext.RemoveFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}" />
+          </Grid>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </DockPanel>
+</UserControl>

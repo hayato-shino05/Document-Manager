@@ -15,4 +15,6 @@ public interface IDroppedFileImportService
     List<string> GetAvailableTypes(IReadOnlyList<string> fallbackTypes);
     DocumentImportOutcome SaveDocument(StudyDocument document);
     StudyDocument BuildDocumentFromPath(string filePath);
+    StudyDocument? FindExistingByFilePath(string filePath) => null;
+    IReadOnlyList<StudyDocument> FindExistingByName(string name) => [];
 }

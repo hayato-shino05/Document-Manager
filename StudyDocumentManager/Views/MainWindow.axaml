@@ -88,6 +88,8 @@
                     <MenuItem Header="{loc:Localize Menu_Import}"
                               AutomationProperties.AutomationId="Menu_Import">
                         <MenuItem Header="{loc:Localize Menu_BatchImport}" Command="{Binding NavigateCommand}" CommandParameter="batch-import"/>
+                        <MenuItem Header="{loc:Localize ImportInbox_Title}" Command="{Binding NavigateCommand}" CommandParameter="import-inbox"/>
+                        <MenuItem Header="{loc:Localize WF_Title}" Command="{Binding NavigateCommand}" CommandParameter="watchedfolder"/>
                     </MenuItem>
             <MenuItem Header="{loc:Localize Menu_Maintenance}"
                       AutomationProperties.AutomationId="Menu_Maintenance">
@@ -250,6 +252,12 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:BulkDeleteModel}">
                     <v:BulkDelete />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:ImportInboxModel}">
+                    <v:ImportInbox />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:WatchedFolderModel}">
+                    <v:WatchedFolder />
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:DuplicateDetectionModel}">
                     <v:DuplicateDetection />

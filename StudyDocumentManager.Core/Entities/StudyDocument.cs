@@ -6,6 +6,8 @@ namespace StudyDocumentManager.Core.Entities;
 /// </summary>
 public class StudyDocument
 {
+    public static string NormalizeName(string? name)
+        => (name ?? string.Empty).Trim().ToLowerInvariant();
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Subject { get; set; } = string.Empty;

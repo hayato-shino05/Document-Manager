@@ -94,6 +94,29 @@ public static class DatabaseMigrator
                 value TEXT
             );
 
+            CREATE TABLE IF NOT EXISTS import_inbox (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                document_id INTEGER,
+                source_path TEXT NOT NULL,
+                display_name TEXT NOT NULL,
+                failure_code TEXT,
+                duplicate_candidate TEXT,
+                subject TEXT,
+                type TEXT,
+                state TEXT NOT NULL DEFAULT 'Pending',
+                created_at DATETIME DEFAULT (datetime('now', 'localtime')),
+                updated_at DATETIME DEFAULT (datetime('now', 'localtime')),
+                FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE SET NULL
+            );
+            CREATE TABLE IF NOT EXISTS watched_folders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                folder_path TEXT NOT NULL,
+                enabled INTEGER NOT NULL DEFAULT 1,
+                include_subdirectories INTEGER NOT NULL DEFAULT 0,
+                last_scan_at DATETIME,
+                created_at DATETIME DEFAULT (datetime('now', 'localtime'))
+            );
+            CREATE UNIQUE INDEX IF NOT EXISTS ux_watched_folders_path ON watched_folders(folder_path COLLATE NOCASE);
             CREATE TABLE IF NOT EXISTS saved_searches (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL UNIQUE COLLATE NOCASE,
@@ -172,6 +195,9 @@ public static class DatabaseMigrator
             MigrateAddColumn(conn, transaction, "documents", "is_deleted", "INTEGER DEFAULT 0");
             MigrateAddColumn(conn, transaction, "documents", "deleted_at", "DATETIME");
             MigrateAddColumn(conn, transaction, "documents", "status", "TEXT NOT NULL DEFAULT 'unread'");
+            MigrateAddColumn(conn, transaction, "import_inbox", "subject", "TEXT");
+            MigrateAddColumn(conn, transaction, "import_inbox", "type", "TEXT");
+            MigrateImportInboxSourceUniqueness(conn, transaction);
             ExecuteSql(conn, transaction, "PRAGMA defer_foreign_keys = ON");
 
             if (preflight.RebuildDocuments)
@@ -255,7 +281,7 @@ public static class DatabaseMigrator
         {
             "documents", "collections", "collection_items", "personal_notes", "recent_files",
             "document_relations", "categories", "document_types", "app_settings",
-            "saved_searches", "student_context", "courses", "semesters", "assignments", "assignment_documents",
+            "saved_searches", "student_context", "courses", "semesters", "assignments", "assignment_documents", "watched_folders",
             "tai_lieu", "danh_muc", "loai_tai_lieu"
         };
         var unsupportedTables = tables.Where(table => !supportedTables.Contains(table)).ToList();
@@ -413,7 +439,7 @@ public static class DatabaseMigrator
         {
             "documents", "collections", "collection_items", "personal_notes", "recent_files",
             "document_relations", "categories", "document_types", "app_settings", "saved_searches",
-            "student_context", "courses", "semesters", "assignments", "assignment_documents"
+            "student_context", "courses", "semesters", "assignments", "assignment_documents", "import_inbox", "watched_folders"
         };
         var unsupportedTables = tables.Where(table => !supportedTables.Contains(table)).ToList();
         if (unsupportedTables.Count > 0)
@@ -431,6 +457,10 @@ public static class DatabaseMigrator
         ValidateKnownTable(connection, "semesters", ["id", "name", "starts_on", "ends_on", "is_active"]);
         ValidateKnownTable(connection, "assignments", ["id", "title", "course_id", "semester_id", "official_deadline", "personal_deadline", "status", "priority", "milestone", "notes"]);
         ValidateKnownTable(connection, "assignment_documents", ["assignment_id", "document_id"]);
+        if (TableExists(connection, "import_inbox"))
+            RequireColumns(connection, "import_inbox", ["id", "document_id", "source_path", "display_name", "failure_code", "duplicate_candidate", "subject", "type", "state", "created_at", "updated_at"], ["subject", "type"]);
+        if (TableExists(connection, "watched_folders"))
+            RequireColumns(connection, "watched_folders", ["id", "folder_path", "enabled", "include_subdirectories", "last_scan_at", "created_at"], []);
 
         var tablesToRebuild = new List<string>();
         ValidateChildTable(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"],
@@ -472,7 +502,8 @@ public static class DatabaseMigrator
             throw new InvalidOperationException($"Required table '{tableName}' is missing.");
 
         var actualColumns = GetColumns(connection, tableName);
-        var unsupportedColumns = actualColumns.Except(expectedColumns, StringComparer.Ordinal).ToList();
+        var supportedColumns = expectedColumns.Concat(optionalColumns).ToArray();
+        var unsupportedColumns = actualColumns.Except(supportedColumns, StringComparer.Ordinal).ToList();
         if (unsupportedColumns.Count > 0)
             throw new InvalidOperationException($"Unsupported columns in '{tableName}': {string.Join(", ", unsupportedColumns)}.");
 
@@ -732,6 +763,17 @@ public static class DatabaseMigrator
 
         using var cmd = new SqliteCommand($"ALTER TABLE {table} ADD COLUMN {column} {type}", conn, transaction);
         cmd.ExecuteNonQuery();
+    }
+
+    private static void MigrateImportInboxSourceUniqueness(SqliteConnection conn, SqliteTransaction transaction)
+    {
+        if (!TableExists(conn, "import_inbox"))
+            return;
+
+        ExecuteSql(conn, transaction,
+            "DELETE FROM import_inbox WHERE id NOT IN (SELECT MAX(id) FROM import_inbox GROUP BY COALESCE(lower(source_path), ''))");
+        ExecuteSql(conn, transaction,
+            "CREATE UNIQUE INDEX IF NOT EXISTS ux_import_inbox_source ON import_inbox(source_path COLLATE NOCASE)");
     }
 
     private static void MigrateSeedCategories(SqliteConnection conn)
