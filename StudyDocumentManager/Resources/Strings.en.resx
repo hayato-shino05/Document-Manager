@@ -779,4 +779,48 @@ Please check your network connection.</value></data>
   <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>Open containing folder</value></data>
   <data name="Integrity_PathCopied" xml:space="preserve"><value>Path copied to clipboard.</value></data>
   <data name="RC_Loading" xml:space="preserve"><value>Loading…</value></data>
+  <data name="SW_Title" xml:space="preserve"><value>Student workspace</value></data>
+  <data name="SW_AcademicYear" xml:space="preserve"><value>Academic year</value></data>
+  <data name="SW_ContextSemester" xml:space="preserve"><value>Semester</value></data>
+  <data name="SW_ContextCourse" xml:space="preserve"><value>Course</value></data>
+  <data name="SW_ContextModule" xml:space="preserve"><value>Module</value></data>
+  <data name="SW_ContextOwner" xml:space="preserve"><value>Owner</value></data>
+  <data name="SW_SaveContext" xml:space="preserve"><value>Save context</value></data>
+  <data name="SW_ContextSaved" xml:space="preserve"><value>Learning context saved</value></data>
+  <data name="SW_StatusReady" xml:space="preserve"><value>{0} assignments</value></data>
+  <data name="SW_Courses" xml:space="preserve"><value>Courses</value></data>
+  <data name="SW_Semesters" xml:space="preserve"><value>Semesters</value></data>
+  <data name="SW_Assignments" xml:space="preserve"><value>Assignments</value></data>
+  <data name="SW_AddCourse" xml:space="preserve"><value>Add course</value></data>
+  <data name="SW_AddSemester" xml:space="preserve"><value>Add semester</value></data>
+  <data name="SW_CourseName" xml:space="preserve"><value>Course name</value></data>
+  <data name="SW_SemesterName" xml:space="preserve"><value>Semester name</value></data>
+  <data name="SW_DeleteCourseConfirm" xml:space="preserve"><value>Delete course “{0}”?</value></data>
+  <data name="SW_DeleteSemesterConfirm" xml:space="preserve"><value>Delete semester “{0}”?</value></data>
+  <data name="SW_ShowHistory" xml:space="preserve"><value>Show history</value></data>
+  <data name="SW_NewAssignment" xml:space="preserve"><value>New assignment</value></data>
+  <data name="SW_AssignmentEditor" xml:space="preserve"><value>Assignment editor</value></data>
+  <data name="SW_AssignmentTitle" xml:space="preserve"><value>Assignment title</value></data>
+  <data name="SW_OfficialDeadline" xml:space="preserve"><value>Official deadline</value></data>
+  <data name="SW_PersonalDeadline" xml:space="preserve"><value>Personal deadline</value></data>
+  <data name="SW_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="SW_Priority" xml:space="preserve"><value>Priority</value></data>
+  <data name="SW_Milestone" xml:space="preserve"><value>Milestone</value></data>
+  <data name="SW_Notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="SW_DeleteAssignmentConfirm" xml:space="preserve"><value>Delete assignment “{0}”?</value></data>
+  <data name="SW_TitleRequired" xml:space="preserve"><value>Assignment title is required</value></data>
+  <data name="SW_OpenRelatedDocument" xml:space="preserve"><value>Open related document</value></data>
+  <data name="SW_NoRelatedDocument" xml:space="preserve"><value>No related document</value></data>
+  <data name="SW_RelatedDocumentMissing" xml:space="preserve"><value>Related document file is missing</value></data>
+  <data name="SW_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="SW_Status_Planned" xml:space="preserve"><value>Planned</value></data>
+  <data name="SW_Status_InProgress" xml:space="preserve"><value>In progress</value></data>
+  <data name="SW_Status_Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="SW_Priority_Low" xml:space="preserve"><value>Low</value></data>
+  <data name="SW_Priority_Normal" xml:space="preserve"><value>Normal</value></data>
+  <data name="SW_Priority_High" xml:space="preserve"><value>High</value></data>
+  <data name="SW_Deadline_NoDate" xml:space="preserve"><value>No deadline</value></data>
+  <data name="SW_Deadline_Overdue" xml:space="preserve"><value>Overdue</value></data>
+  <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>Due soon</value></data>
+  <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>Scheduled</value></data>
 </root>

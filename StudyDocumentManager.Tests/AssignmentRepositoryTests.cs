@@ -124,6 +124,63 @@ public sealed class AssignmentRepositoryTests : DatabaseTestBase
     }
 
     [Fact]
+    public void UpdateAssignment_PersistsEditableFields()
+    {
+        var courseId = _assignments.AddCourse(new Course { Name = "Algorithms" });
+        var semesterId = _assignments.AddSemester(new Semester { Name = "2026 Spring" });
+        var assignmentId = _assignments.AddAssignment(new Assignment
+        {
+            Title = "Initial title",
+            CourseId = courseId,
+            SemesterId = semesterId,
+            OfficialDeadline = new DateTime(2026, 9, 1),
+            Status = "planned",
+            Priority = "normal",
+            Milestone = "Draft",
+            Notes = "Initial notes"
+        });
+
+        var assignment = _assignments.GetAssignment(assignmentId);
+        Assert.NotNull(assignment);
+        assignment!.Title = "Updated title";
+        assignment.Status = "completed";
+        assignment.Priority = "high";
+        assignment.Milestone = "Final";
+        assignment.Notes = "Updated notes";
+        assignment.CourseId = courseId;
+        assignment.SemesterId = semesterId;
+        assignment.OfficialDeadline = new DateTime(2026, 10, 1);
+        assignment.PersonalDeadline = new DateTime(2026, 9, 12);
+
+        Assert.True(_assignments.UpdateAssignment(assignment));
+
+        var updated = _assignments.GetAssignment(assignmentId);
+        Assert.NotNull(updated);
+        Assert.Equal("Updated title", updated!.Title);
+        Assert.Equal("completed", updated.Status);
+        Assert.Equal("high", updated.Priority);
+        Assert.Equal("Final", updated.Milestone);
+        Assert.Equal("Updated notes", updated.Notes);
+        Assert.Equal(courseId, updated.CourseId);
+        Assert.Equal(semesterId, updated.SemesterId);
+        Assert.Equal(new DateTime(2026, 10, 1), updated.OfficialDeadline);
+        Assert.Equal(new DateTime(2026, 9, 12), updated.PersonalDeadline);
+    }
+
+    [Fact]
+    public void DeleteAssignment_RemovesAssignmentAndRejectsFurtherUpdate()
+    {
+        var assignmentId = _assignments.AddAssignment(new Assignment { Title = "To delete" });
+        var assignment = _assignments.GetAssignment(assignmentId);
+        Assert.NotNull(assignment);
+
+        Assert.True(_assignments.DeleteAssignment(assignmentId));
+        Assert.Null(_assignments.GetAssignment(assignmentId));
+        Assert.False(_assignments.UpdateAssignment(assignment!));
+        Assert.False(_assignments.DeleteAssignment(assignmentId));
+    }
+
+    [Fact]
     public void CourseAndSemester_UpdateAndDelete_AreExposedByContract()
     {
         var courseId = _assignments.AddCourse(new Course { Name = "Networks", Code = "N1" });

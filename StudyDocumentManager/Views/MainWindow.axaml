@@ -83,6 +83,7 @@
                         <MenuItem Header="{loc:Localize Menu_ManageCategories}" Command="{Binding NavigateCommand}" CommandParameter="categories" InputGesture="Ctrl+M"/>
                         <MenuItem Header="{loc:Localize Menu_Collections}" Command="{Binding NavigateCommand}" CommandParameter="collections"/>
                         <MenuItem Header="{loc:Localize Menu_SmartViews}" Command="{Binding NavigateCommand}" CommandParameter="smartviews"/>
+                        <MenuItem Header="{loc:Localize SW_Title}" Command="{Binding NavigateCommand}" CommandParameter="student-workspace"/>
                     </MenuItem>
                     <MenuItem Header="{loc:Localize Menu_Import}"
                               AutomationProperties.AutomationId="Menu_Import">
@@ -273,6 +274,9 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:SmartViewsModel}">
                     <v:SmartViews />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:StudentWorkspaceModel}">
+                    <v:StudentWorkspace />
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:RecoveryCenterModel}">
                     <v:RecoveryCenterView />

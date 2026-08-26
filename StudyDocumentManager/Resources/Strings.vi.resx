@@ -988,4 +988,48 @@
   <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>Mở thư mục chứa</value></data>
   <data name="Integrity_PathCopied" xml:space="preserve"><value>Đã sao chép đường dẫn vào clipboard.</value></data>
   <data name="RC_Loading" xml:space="preserve"><value>Đang tải…</value></data>
+  <data name="SW_Title" xml:space="preserve"><value>Không gian học tập</value></data>
+  <data name="SW_AcademicYear" xml:space="preserve"><value>Năm học</value></data>
+  <data name="SW_ContextSemester" xml:space="preserve"><value>Học kỳ</value></data>
+  <data name="SW_ContextCourse" xml:space="preserve"><value>Khóa học</value></data>
+  <data name="SW_ContextModule" xml:space="preserve"><value>Mô-đun</value></data>
+  <data name="SW_ContextOwner" xml:space="preserve"><value>Người phụ trách</value></data>
+  <data name="SW_SaveContext" xml:space="preserve"><value>Lưu ngữ cảnh</value></data>
+  <data name="SW_ContextSaved" xml:space="preserve"><value>Đã lưu ngữ cảnh học tập</value></data>
+  <data name="SW_StatusReady" xml:space="preserve"><value>{0} bài tập</value></data>
+  <data name="SW_Courses" xml:space="preserve"><value>Khóa học</value></data>
+  <data name="SW_Semesters" xml:space="preserve"><value>Học kỳ</value></data>
+  <data name="SW_Assignments" xml:space="preserve"><value>Bài tập</value></data>
+  <data name="SW_AddCourse" xml:space="preserve"><value>Thêm khóa học</value></data>
+  <data name="SW_AddSemester" xml:space="preserve"><value>Thêm học kỳ</value></data>
+  <data name="SW_CourseName" xml:space="preserve"><value>Tên khóa học</value></data>
+  <data name="SW_SemesterName" xml:space="preserve"><value>Tên học kỳ</value></data>
+  <data name="SW_DeleteCourseConfirm" xml:space="preserve"><value>Xóa khóa học “{0}”?</value></data>
+  <data name="SW_DeleteSemesterConfirm" xml:space="preserve"><value>Xóa học kỳ “{0}”?</value></data>
+  <data name="SW_ShowHistory" xml:space="preserve"><value>Hiện lịch sử</value></data>
+  <data name="SW_NewAssignment" xml:space="preserve"><value>Thêm bài tập</value></data>
+  <data name="SW_AssignmentEditor" xml:space="preserve"><value>Chỉnh sửa bài tập</value></data>
+  <data name="SW_AssignmentTitle" xml:space="preserve"><value>Tiêu đề bài tập</value></data>
+  <data name="SW_OfficialDeadline" xml:space="preserve"><value>Hạn chính thức</value></data>
+  <data name="SW_PersonalDeadline" xml:space="preserve"><value>Hạn cá nhân</value></data>
+  <data name="SW_Status" xml:space="preserve"><value>Trạng thái</value></data>
+  <data name="SW_Priority" xml:space="preserve"><value>Ưu tiên</value></data>
+  <data name="SW_Milestone" xml:space="preserve"><value>Cột mốc</value></data>
+  <data name="SW_Notes" xml:space="preserve"><value>Ghi chú</value></data>
+  <data name="SW_DeleteAssignmentConfirm" xml:space="preserve"><value>Xóa bài tập “{0}”?</value></data>
+  <data name="SW_TitleRequired" xml:space="preserve"><value>Cần nhập tiêu đề bài tập</value></data>
+  <data name="SW_OpenRelatedDocument" xml:space="preserve"><value>Mở tài liệu liên quan</value></data>
+  <data name="SW_NoRelatedDocument" xml:space="preserve"><value>Không có tài liệu liên quan</value></data>
+  <data name="SW_RelatedDocumentMissing" xml:space="preserve"><value>Không tìm thấy tệp tài liệu liên quan</value></data>
+  <data name="SW_Active" xml:space="preserve"><value>Đang hoạt động</value></data>
+  <data name="SW_Status_Planned" xml:space="preserve"><value>Đã lên kế hoạch</value></data>
+  <data name="SW_Status_InProgress" xml:space="preserve"><value>Đang thực hiện</value></data>
+  <data name="SW_Status_Completed" xml:space="preserve"><value>Đã hoàn thành</value></data>
+  <data name="SW_Priority_Low" xml:space="preserve"><value>Thấp</value></data>
+  <data name="SW_Priority_Normal" xml:space="preserve"><value>Bình thường</value></data>
+  <data name="SW_Priority_High" xml:space="preserve"><value>Cao</value></data>
+  <data name="SW_Deadline_NoDate" xml:space="preserve"><value>Không có hạn</value></data>
+  <data name="SW_Deadline_Overdue" xml:space="preserve"><value>Quá hạn</value></data>
+  <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>Sắp đến hạn</value></data>
+  <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>Đã lên lịch</value></data>
 </root>

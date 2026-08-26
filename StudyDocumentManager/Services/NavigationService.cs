@@ -47,6 +47,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             "personal-note" => CreatePersonalNoteModel(parameter),
             "related-docs" => CreateRelatedDocsModel(parameter),
             "smartviews" or "smart-views" or "savedsearches" => serviceProvider.GetRequiredService<SmartViewsModel>(),
+            "student" or "assignments" or "student-workspace" => serviceProvider.GetRequiredService<StudentWorkspaceModel>(),
             "run-smartview" => CreateDashboardWithSavedSearch(parameter),
             _ => serviceProvider.GetRequiredService<DashboardModel>(),
         };

@@ -123,6 +123,7 @@ public partial class App : Application
         services.AddSingleton<IRecentFileRepository, RecentFileRepository>();
         services.AddSingleton<IReportRepository, ReportRepository>();
         services.AddSingleton<ISavedSearchRepository, SavedSearchRepository>();
+        services.AddSingleton<IAssignmentRepository, AssignmentRepository>();
         services.AddSingleton<ISettingsService, SettingsRepository>();
 
         // Services
@@ -184,6 +185,7 @@ services.AddSingleton<IVersionedBackupService, VersionedBackupService>();
 services.AddTransient<RecoveryCenterModel>();
         services.AddTransient<FileIntegrityCheckModel>();
         services.AddTransient<SmartViewsModel>();
+        services.AddTransient<StudentWorkspaceModel>();
 
         // モデル — レポート
         services.AddTransient<ReportModel>();

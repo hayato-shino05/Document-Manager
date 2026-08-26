@@ -988,4 +988,48 @@
   <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>打开所在文件夹</value></data>
   <data name="Integrity_PathCopied" xml:space="preserve"><value>路径已复制到剪贴板。</value></data>
   <data name="RC_Loading" xml:space="preserve"><value>加载中…</value></data>
+  <data name="SW_Title" xml:space="preserve"><value>学生工作区</value></data>
+  <data name="SW_AcademicYear" xml:space="preserve"><value>学年</value></data>
+  <data name="SW_ContextSemester" xml:space="preserve"><value>学期</value></data>
+  <data name="SW_ContextCourse" xml:space="preserve"><value>课程</value></data>
+  <data name="SW_ContextModule" xml:space="preserve"><value>模块</value></data>
+  <data name="SW_ContextOwner" xml:space="preserve"><value>负责人</value></data>
+  <data name="SW_SaveContext" xml:space="preserve"><value>保存上下文</value></data>
+  <data name="SW_ContextSaved" xml:space="preserve"><value>学习上下文已保存</value></data>
+  <data name="SW_StatusReady" xml:space="preserve"><value>{0} 个作业</value></data>
+  <data name="SW_Courses" xml:space="preserve"><value>课程</value></data>
+  <data name="SW_Semesters" xml:space="preserve"><value>学期</value></data>
+  <data name="SW_Assignments" xml:space="preserve"><value>作业</value></data>
+  <data name="SW_AddCourse" xml:space="preserve"><value>添加课程</value></data>
+  <data name="SW_AddSemester" xml:space="preserve"><value>添加学期</value></data>
+  <data name="SW_CourseName" xml:space="preserve"><value>课程名称</value></data>
+  <data name="SW_SemesterName" xml:space="preserve"><value>学期名称</value></data>
+  <data name="SW_DeleteCourseConfirm" xml:space="preserve"><value>删除课程“{0}”吗？</value></data>
+  <data name="SW_DeleteSemesterConfirm" xml:space="preserve"><value>删除学期“{0}”吗？</value></data>
+  <data name="SW_ShowHistory" xml:space="preserve"><value>显示历史</value></data>
+  <data name="SW_NewAssignment" xml:space="preserve"><value>新建作业</value></data>
+  <data name="SW_AssignmentEditor" xml:space="preserve"><value>作业编辑器</value></data>
+  <data name="SW_AssignmentTitle" xml:space="preserve"><value>作业标题</value></data>
+  <data name="SW_OfficialDeadline" xml:space="preserve"><value>官方截止日期</value></data>
+  <data name="SW_PersonalDeadline" xml:space="preserve"><value>个人截止日期</value></data>
+  <data name="SW_Status" xml:space="preserve"><value>状态</value></data>
+  <data name="SW_Priority" xml:space="preserve"><value>优先级</value></data>
+  <data name="SW_Milestone" xml:space="preserve"><value>里程碑</value></data>
+  <data name="SW_Notes" xml:space="preserve"><value>备注</value></data>
+  <data name="SW_DeleteAssignmentConfirm" xml:space="preserve"><value>删除作业“{0}”吗？</value></data>
+  <data name="SW_TitleRequired" xml:space="preserve"><value>请输入作业标题</value></data>
+  <data name="SW_OpenRelatedDocument" xml:space="preserve"><value>打开相关文档</value></data>
+  <data name="SW_NoRelatedDocument" xml:space="preserve"><value>没有相关文档</value></data>
+  <data name="SW_RelatedDocumentMissing" xml:space="preserve"><value>找不到相关文档文件</value></data>
+  <data name="SW_Active" xml:space="preserve"><value>当前</value></data>
+  <data name="SW_Status_Planned" xml:space="preserve"><value>计划中</value></data>
+  <data name="SW_Status_InProgress" xml:space="preserve"><value>进行中</value></data>
+  <data name="SW_Status_Completed" xml:space="preserve"><value>已完成</value></data>
+  <data name="SW_Priority_Low" xml:space="preserve"><value>低</value></data>
+  <data name="SW_Priority_Normal" xml:space="preserve"><value>普通</value></data>
+  <data name="SW_Priority_High" xml:space="preserve"><value>高</value></data>
+  <data name="SW_Deadline_NoDate" xml:space="preserve"><value>无截止日期</value></data>
+  <data name="SW_Deadline_Overdue" xml:space="preserve"><value>已逾期</value></data>
+  <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>即将到期</value></data>
+  <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>已安排</value></data>
 </root>

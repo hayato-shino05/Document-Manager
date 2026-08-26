@@ -887,6 +887,50 @@
   <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>保存フォルダーを開く</value></data>
   <data name="Integrity_PathCopied" xml:space="preserve"><value>パスをクリップボードにコピーしました。</value></data>
   <data name="RC_Loading" xml:space="preserve"><value>読み込み中…</value></data>
+  <data name="SW_Title" xml:space="preserve"><value>学生ワークスペース</value></data>
+  <data name="SW_AcademicYear" xml:space="preserve"><value>学年度</value></data>
+  <data name="SW_ContextSemester" xml:space="preserve"><value>学期</value></data>
+  <data name="SW_ContextCourse" xml:space="preserve"><value>コース</value></data>
+  <data name="SW_ContextModule" xml:space="preserve"><value>モジュール</value></data>
+  <data name="SW_ContextOwner" xml:space="preserve"><value>担当者</value></data>
+  <data name="SW_SaveContext" xml:space="preserve"><value>コンテキストを保存</value></data>
+  <data name="SW_ContextSaved" xml:space="preserve"><value>学習コンテキストを保存しました</value></data>
+  <data name="SW_StatusReady" xml:space="preserve"><value>課題 {0} 件</value></data>
+  <data name="SW_Courses" xml:space="preserve"><value>コース</value></data>
+  <data name="SW_Semesters" xml:space="preserve"><value>学期</value></data>
+  <data name="SW_Assignments" xml:space="preserve"><value>課題</value></data>
+  <data name="SW_AddCourse" xml:space="preserve"><value>コース追加</value></data>
+  <data name="SW_AddSemester" xml:space="preserve"><value>学期追加</value></data>
+  <data name="SW_CourseName" xml:space="preserve"><value>コース名</value></data>
+  <data name="SW_SemesterName" xml:space="preserve"><value>学期名</value></data>
+  <data name="SW_DeleteCourseConfirm" xml:space="preserve"><value>コース「{0}」を削除しますか？</value></data>
+  <data name="SW_DeleteSemesterConfirm" xml:space="preserve"><value>学期「{0}」を削除しますか？</value></data>
+  <data name="SW_ShowHistory" xml:space="preserve"><value>履歴を表示</value></data>
+  <data name="SW_NewAssignment" xml:space="preserve"><value>課題追加</value></data>
+  <data name="SW_AssignmentEditor" xml:space="preserve"><value>課題編集</value></data>
+  <data name="SW_AssignmentTitle" xml:space="preserve"><value>課題名</value></data>
+  <data name="SW_OfficialDeadline" xml:space="preserve"><value>公式期限</value></data>
+  <data name="SW_PersonalDeadline" xml:space="preserve"><value>個人期限</value></data>
+  <data name="SW_Status" xml:space="preserve"><value>ステータス</value></data>
+  <data name="SW_Priority" xml:space="preserve"><value>優先度</value></data>
+  <data name="SW_Milestone" xml:space="preserve"><value>マイルストーン</value></data>
+  <data name="SW_Notes" xml:space="preserve"><value>メモ</value></data>
+  <data name="SW_DeleteAssignmentConfirm" xml:space="preserve"><value>課題「{0}」を削除しますか？</value></data>
+  <data name="SW_TitleRequired" xml:space="preserve"><value>課題名を入力してください</value></data>
+  <data name="SW_OpenRelatedDocument" xml:space="preserve"><value>関連文書を開く</value></data>
+  <data name="SW_NoRelatedDocument" xml:space="preserve"><value>関連文書がありません</value></data>
+  <data name="SW_RelatedDocumentMissing" xml:space="preserve"><value>関連文書ファイルが見つかりません</value></data>
+  <data name="SW_Active" xml:space="preserve"><value>有効</value></data>
+  <data name="SW_Status_Planned" xml:space="preserve"><value>予定</value></data>
+  <data name="SW_Status_InProgress" xml:space="preserve"><value>進行中</value></data>
+  <data name="SW_Status_Completed" xml:space="preserve"><value>完了</value></data>
+  <data name="SW_Priority_Low" xml:space="preserve"><value>低</value></data>
+  <data name="SW_Priority_Normal" xml:space="preserve"><value>通常</value></data>
+  <data name="SW_Priority_High" xml:space="preserve"><value>高</value></data>
+  <data name="SW_Deadline_NoDate" xml:space="preserve"><value>期限なし</value></data>
+  <data name="SW_Deadline_Overdue" xml:space="preserve"><value>期限切れ</value></data>
+  <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>期限間近</value></data>
+  <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>予定あり</value></data>
 </root>
 
 
