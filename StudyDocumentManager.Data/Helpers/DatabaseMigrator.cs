@@ -101,6 +101,53 @@ public static class DatabaseMigrator
                 created_at DATETIME DEFAULT (datetime('now', 'localtime'))
             );
 
+            CREATE TABLE IF NOT EXISTS student_context (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                academic_year TEXT NOT NULL DEFAULT '',
+                semester TEXT NOT NULL DEFAULT '',
+                course TEXT NOT NULL DEFAULT '',
+                module TEXT NOT NULL DEFAULT '',
+                owner TEXT NOT NULL DEFAULT ''
+            );
+
+            CREATE TABLE IF NOT EXISTS courses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                code TEXT NOT NULL DEFAULT '',
+                UNIQUE(name, code)
+            );
+
+            CREATE TABLE IF NOT EXISTS semesters (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                starts_on DATETIME,
+                ends_on DATETIME,
+                is_active INTEGER NOT NULL DEFAULT 0
+            );
+
+            CREATE TABLE IF NOT EXISTS assignments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                course_id INTEGER,
+                semester_id INTEGER,
+                official_deadline DATETIME,
+                personal_deadline DATETIME,
+                status TEXT NOT NULL DEFAULT 'planned',
+                priority TEXT NOT NULL DEFAULT 'normal',
+                milestone TEXT NOT NULL DEFAULT '',
+                notes TEXT NOT NULL DEFAULT '',
+                FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL,
+                FOREIGN KEY (semester_id) REFERENCES semesters(id) ON DELETE SET NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS assignment_documents (
+                assignment_id INTEGER NOT NULL,
+                document_id INTEGER NOT NULL,
+                PRIMARY KEY (assignment_id, document_id),
+                FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE,
+                FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
+            );
+
             CREATE INDEX IF NOT EXISTS idx_documents_subject ON documents(subject);
             CREATE INDEX IF NOT EXISTS idx_documents_type ON documents(type);
             CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at);
@@ -208,7 +255,7 @@ public static class DatabaseMigrator
         {
             "documents", "collections", "collection_items", "personal_notes", "recent_files",
             "document_relations", "categories", "document_types", "app_settings",
-            "saved_searches",
+            "saved_searches", "student_context", "courses", "semesters", "assignments", "assignment_documents",
             "tai_lieu", "danh_muc", "loai_tai_lieu"
         };
         var unsupportedTables = tables.Where(table => !supportedTables.Contains(table)).ToList();
@@ -365,7 +412,8 @@ public static class DatabaseMigrator
         var supportedTables = new HashSet<string>(StringComparer.Ordinal)
         {
             "documents", "collections", "collection_items", "personal_notes", "recent_files",
-            "document_relations", "categories", "document_types", "app_settings", "saved_searches"
+            "document_relations", "categories", "document_types", "app_settings", "saved_searches",
+            "student_context", "courses", "semesters", "assignments", "assignment_documents"
         };
         var unsupportedTables = tables.Where(table => !supportedTables.Contains(table)).ToList();
         if (unsupportedTables.Count > 0)
@@ -378,6 +426,11 @@ public static class DatabaseMigrator
         ValidateKnownTable(connection, "document_types", ["id", "name", "created_at"]);
         ValidateKnownTable(connection, "app_settings", ["key", "value"]);
         ValidateKnownTable(connection, "saved_searches", ["id", "name", "criteria_json", "created_at"]);
+        ValidateKnownTable(connection, "student_context", ["id", "academic_year", "semester", "course", "module", "owner"]);
+        ValidateKnownTable(connection, "courses", ["id", "name", "code"]);
+        ValidateKnownTable(connection, "semesters", ["id", "name", "starts_on", "ends_on", "is_active"]);
+        ValidateKnownTable(connection, "assignments", ["id", "title", "course_id", "semester_id", "official_deadline", "personal_deadline", "status", "priority", "milestone", "notes"]);
+        ValidateKnownTable(connection, "assignment_documents", ["assignment_id", "document_id"]);
 
         var tablesToRebuild = new List<string>();
         ValidateChildTable(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"],

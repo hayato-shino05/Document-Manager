@@ -1053,7 +1053,8 @@ public class DatabaseHelper
         var requiredTables = new[]
         {
             "documents", "collections", "collection_items", "personal_notes", "recent_files",
-            "document_relations", "categories", "document_types", "app_settings"
+            "document_relations", "categories", "document_types", "app_settings",
+            "student_context", "courses", "semesters", "assignments", "assignment_documents"
         };
         using var tableCommand = connection.CreateCommand();
         tableCommand.CommandText = "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'";
@@ -1063,7 +1064,17 @@ public class DatabaseHelper
             actualTables.Add(tableReader.GetString(0));
 
         var hasSavedSearches = actualTables.Contains("saved_searches");
-        var expectedTables = hasSavedSearches ? [.. requiredTables, "saved_searches"] : requiredTables;
+        var metadataTables = new[] { "student_context", "courses", "semesters", "assignments", "assignment_documents" };
+        var metadataTableCount = metadataTables.Count(actualTables.Contains);
+        var hasStudentMetadata = metadataTableCount == metadataTables.Length;
+        if (metadataTableCount != 0 && !hasStudentMetadata)
+            throw new InvalidOperationException("Backup database student metadata schema is incomplete.");
+
+        var expectedTables = requiredTables.ToList();
+        if (hasSavedSearches)
+            expectedTables.Add("saved_searches");
+        if (hasStudentMetadata)
+            expectedTables.AddRange(metadataTables);
 
         if (!actualTables.SetEquals(expectedTables))
             throw new InvalidOperationException("Backup database tables are not supported.");
@@ -1079,14 +1090,31 @@ public class DatabaseHelper
         ValidateRequiredColumns(connection, "app_settings", ["key", "value"]);
         if (hasSavedSearches)
             ValidateRequiredColumns(connection, "saved_searches", ["id", "name", "criteria_json", "created_at"]);
+        if (hasStudentMetadata)
+        {
+            ValidateRequiredColumns(connection, "student_context", ["id", "academic_year", "semester", "course", "module", "owner"]);
+            ValidateRequiredColumns(connection, "courses", ["id", "name", "code"]);
+            ValidateRequiredColumns(connection, "semesters", ["id", "name", "starts_on", "ends_on", "is_active"]);
+            ValidateRequiredColumns(connection, "assignments", ["id", "title", "course_id", "semester_id", "official_deadline", "personal_deadline", "status", "priority", "milestone", "notes"]);
+            ValidateRequiredColumns(connection, "assignment_documents", ["assignment_id", "document_id"]);
+        }
 
         ValidateCascadeForeignKeys(connection, "collection_items", [("collection_id", "collections", "id"), ("document_id", "documents", "id")]);
         ValidateCascadeForeignKeys(connection, "personal_notes", [("document_id", "documents", "id")]);
         ValidateCascadeForeignKeys(connection, "recent_files", [("document_id", "documents", "id")]);
         ValidateCascadeForeignKeys(connection, "document_relations", [("doc_id_1", "documents", "id"), ("doc_id_2", "documents", "id")]);
+        if (hasStudentMetadata)
+        {
+            ValidateForeignKeys(connection, "assignments", [
+                ("course_id", "courses", "id", "SET NULL"),
+                ("semester_id", "semesters", "id", "SET NULL")]);
+            ValidateCascadeForeignKeys(connection, "assignment_documents", [("assignment_id", "assignments", "id"), ("document_id", "documents", "id")]);
+        }
         ValidateUniqueConstraint(connection, "collection_items", ["collection_id", "document_id"]);
         ValidateUniqueConstraint(connection, "recent_files", ["document_id"]);
         ValidateUniqueConstraint(connection, "document_relations", ["doc_id_1", "doc_id_2"]);
+        if (hasStudentMetadata)
+            ValidateUniqueConstraint(connection, "assignment_documents", ["assignment_id", "document_id"]);
         ValidateDocumentPathIndex(connection, requireDocumentPathIndex);
 
         foreach (var tableName in expectedTables)
@@ -1174,6 +1202,22 @@ public class DatabaseHelper
         {
             throw new InvalidOperationException($"Backup database foreign key layout for '{tableName}' is not supported.");
         }
+    }
+
+    private static void ValidateForeignKeys(
+        SqliteConnection connection,
+        string tableName,
+        IReadOnlyCollection<(string From, string ParentTable, string ParentColumn, string OnDelete)> expectedForeignKeys)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA foreign_key_list({tableName})";
+        using var reader = command.ExecuteReader();
+        var actualForeignKeys = new List<(string From, string ParentTable, string ParentColumn, string OnDelete)>();
+        while (reader.Read())
+            actualForeignKeys.Add((reader.GetString(3), reader.GetString(2), reader.GetString(4), reader.GetString(6)));
+
+        if (actualForeignKeys.Count != expectedForeignKeys.Count || actualForeignKeys.Any(foreignKey => !expectedForeignKeys.Contains(foreignKey)))
+            throw new InvalidOperationException($"Backup database foreign key layout for '{tableName}' is not supported.");
     }
 
     private static void ValidateUniqueConstraint(SqliteConnection connection, string tableName, IReadOnlyList<string> expectedColumns)
@@ -2333,6 +2377,280 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
             Name = reader["name"]?.ToString() ?? string.Empty,
             CriteriaJson = reader["criteria_json"]?.ToString() ?? string.Empty,
             CreatedAt = reader["created_at"] is DBNull ? DateTime.Now : DateTime.Parse(reader["created_at"].ToString()!)
+        };
+    }
+
+    public StudentContext? GetStudentContext()
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT id, academic_year, semester, course, module, owner FROM student_context WHERE id = 1";
+        using var reader = cmd.ExecuteReader();
+        if (!reader.Read()) return null;
+        return new StudentContext
+        {
+            Id = reader.GetInt32(0),
+            AcademicYear = reader.GetString(1),
+            Semester = reader.GetString(2),
+            Course = reader.GetString(3),
+            Module = reader.GetString(4),
+            Owner = reader.GetString(5)
+        };
+    }
+
+    public bool SaveStudentContext(StudentContext context)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "INSERT INTO student_context(id, academic_year, semester, course, module, owner) VALUES(1, @academic_year, @semester, @course, @module, @owner) ON CONFLICT(id) DO UPDATE SET academic_year=excluded.academic_year, semester=excluded.semester, course=excluded.course, module=excluded.module, owner=excluded.owner";
+        cmd.Parameters.AddWithValue("@academic_year", context.AcademicYear.Trim());
+        cmd.Parameters.AddWithValue("@semester", context.Semester.Trim());
+        cmd.Parameters.AddWithValue("@course", context.Course.Trim());
+        cmd.Parameters.AddWithValue("@module", context.Module.Trim());
+        cmd.Parameters.AddWithValue("@owner", context.Owner.Trim());
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public List<Course> GetCourses()
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT id, name, code FROM courses ORDER BY name, code";
+        using var reader = cmd.ExecuteReader();
+        var result = new List<Course>();
+        while (reader.Read())
+            result.Add(new Course { Id = reader.GetInt32(0), Name = reader.GetString(1), Code = reader.GetString(2) });
+        return result;
+    }
+
+    public int AddCourse(Course course)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "INSERT INTO courses(name, code) VALUES(@name, @code); SELECT last_insert_rowid();";
+        cmd.Parameters.AddWithValue("@name", course.Name.Trim());
+        cmd.Parameters.AddWithValue("@code", course.Code.Trim());
+        return Convert.ToInt32(cmd.ExecuteScalar());
+    }
+
+    public bool UpdateCourse(Course course)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "UPDATE courses SET name=@name, code=@code WHERE id=@id";
+        cmd.Parameters.AddWithValue("@id", course.Id);
+        cmd.Parameters.AddWithValue("@name", course.Name.Trim());
+        cmd.Parameters.AddWithValue("@code", course.Code.Trim());
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public bool DeleteCourse(int id)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "DELETE FROM courses WHERE id=@id";
+        cmd.Parameters.AddWithValue("@id", id);
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public List<Semester> GetSemesters()
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT id, name, starts_on, ends_on, is_active FROM semesters ORDER BY starts_on, name";
+        using var reader = cmd.ExecuteReader();
+        var result = new List<Semester>();
+        while (reader.Read())
+        {
+            result.Add(new Semester
+            {
+                Id = reader.GetInt32(0),
+                Name = reader.GetString(1),
+                StartsOn = reader.IsDBNull(2) ? null : DateTime.Parse(reader.GetString(2)),
+                EndsOn = reader.IsDBNull(3) ? null : DateTime.Parse(reader.GetString(3)),
+                IsActive = reader.GetInt64(4) != 0
+            });
+        }
+        return result;
+    }
+
+    public int AddSemester(Semester semester)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "INSERT INTO semesters(name, starts_on, ends_on, is_active) VALUES(@name, @starts, @ends, @active); SELECT last_insert_rowid();";
+        cmd.Parameters.AddWithValue("@name", semester.Name.Trim());
+        cmd.Parameters.AddWithValue("@starts", (object?)semester.StartsOn ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@ends", (object?)semester.EndsOn ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@active", semester.IsActive ? 1 : 0);
+        return Convert.ToInt32(cmd.ExecuteScalar());
+    }
+
+    public bool UpdateSemester(Semester semester)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "UPDATE semesters SET name=@name, starts_on=@starts, ends_on=@ends, is_active=@active WHERE id=@id";
+        cmd.Parameters.AddWithValue("@id", semester.Id);
+        cmd.Parameters.AddWithValue("@name", semester.Name.Trim());
+        cmd.Parameters.AddWithValue("@starts", (object?)semester.StartsOn ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@ends", (object?)semester.EndsOn ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@active", semester.IsActive ? 1 : 0);
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public bool DeleteSemester(int id)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "DELETE FROM semesters WHERE id=@id";
+        cmd.Parameters.AddWithValue("@id", id);
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public List<Assignment> GetAssignments()
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT id, title, course_id, semester_id, official_deadline, personal_deadline, status, priority, milestone, notes FROM assignments ORDER BY COALESCE(personal_deadline, official_deadline), title";
+        using var reader = cmd.ExecuteReader();
+        var result = new List<Assignment>();
+        while (reader.Read())
+            result.Add(MapToAssignment(reader));
+        return result;
+    }
+
+    public Assignment? GetAssignment(int id)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT id, title, course_id, semester_id, official_deadline, personal_deadline, status, priority, milestone, notes FROM assignments WHERE id = @id";
+        cmd.Parameters.AddWithValue("@id", id);
+        using var reader = cmd.ExecuteReader();
+        return reader.Read() ? MapToAssignment(reader) : null;
+    }
+
+    public int AddAssignment(Assignment assignment)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "INSERT INTO assignments(title, course_id, semester_id, official_deadline, personal_deadline, status, priority, milestone, notes) VALUES(@title, @course, @semester, @official, @personal, @status, @priority, @milestone, @notes); SELECT last_insert_rowid();";
+        BindAssignment(cmd, assignment);
+        return Convert.ToInt32(cmd.ExecuteScalar());
+    }
+
+    public bool UpdateAssignment(Assignment assignment)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "UPDATE assignments SET title=@title, course_id=@course, semester_id=@semester, official_deadline=@official, personal_deadline=@personal, status=@status, priority=@priority, milestone=@milestone, notes=@notes WHERE id=@id";
+        cmd.Parameters.AddWithValue("@id", assignment.Id);
+        BindAssignment(cmd, assignment);
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public bool DeleteAssignment(int id)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "DELETE FROM assignments WHERE id=@id";
+        cmd.Parameters.AddWithValue("@id", id);
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public bool LinkAssignmentDocument(int assignmentId, int documentId)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "INSERT OR IGNORE INTO assignment_documents(assignment_id, document_id) SELECT @assignment, @document WHERE EXISTS (SELECT 1 FROM assignments WHERE id=@assignment) AND EXISTS (SELECT 1 FROM documents WHERE id=@document)";
+        cmd.Parameters.AddWithValue("@assignment", assignmentId);
+        cmd.Parameters.AddWithValue("@document", documentId);
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public bool UnlinkAssignmentDocument(int assignmentId, int documentId)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "DELETE FROM assignment_documents WHERE assignment_id=@assignment AND document_id=@document";
+        cmd.Parameters.AddWithValue("@assignment", assignmentId);
+        cmd.Parameters.AddWithValue("@document", documentId);
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public bool ReplaceAssignmentDocumentLinks(int assignmentId, IReadOnlyList<int> documentIds)
+    {
+        using var conn = OpenConnection();
+        using var tx = conn.BeginTransaction();
+        try
+        {
+            using (var delete = conn.CreateCommand())
+            {
+                delete.Transaction = tx;
+                delete.CommandText = "DELETE FROM assignment_documents WHERE assignment_id=@assignment";
+                delete.Parameters.AddWithValue("@assignment", assignmentId);
+                delete.ExecuteNonQuery();
+            }
+
+            foreach (var documentId in documentIds.Distinct())
+            {
+                using var insert = conn.CreateCommand();
+                insert.Transaction = tx;
+                insert.CommandText = "INSERT INTO assignment_documents(assignment_id, document_id) VALUES(@assignment, @document)";
+                insert.Parameters.AddWithValue("@assignment", assignmentId);
+                insert.Parameters.AddWithValue("@document", documentId);
+                insert.ExecuteNonQuery();
+            }
+
+            tx.Commit();
+            return true;
+        }
+        catch
+        {
+            tx.Rollback();
+            return false;
+        }
+    }
+
+    public List<int> GetAssignmentDocumentIds(int assignmentId)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT document_id FROM assignment_documents WHERE assignment_id=@assignment ORDER BY document_id";
+        cmd.Parameters.AddWithValue("@assignment", assignmentId);
+        using var reader = cmd.ExecuteReader();
+        var result = new List<int>();
+        while (reader.Read()) result.Add(reader.GetInt32(0));
+        return result;
+    }
+
+    private static void BindAssignment(SqliteCommand cmd, Assignment assignment)
+    {
+        cmd.Parameters.AddWithValue("@title", assignment.Title.Trim());
+        cmd.Parameters.AddWithValue("@course", (object?)assignment.CourseId ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@semester", (object?)assignment.SemesterId ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@official", (object?)assignment.OfficialDeadline ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@personal", (object?)assignment.PersonalDeadline ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@status", assignment.Status.Trim());
+        cmd.Parameters.AddWithValue("@priority", assignment.Priority.Trim());
+        cmd.Parameters.AddWithValue("@milestone", assignment.Milestone.Trim());
+        cmd.Parameters.AddWithValue("@notes", assignment.Notes);
+    }
+
+    private static Assignment MapToAssignment(SqliteDataReader reader)
+    {
+        return new Assignment
+        {
+            Id = reader.GetInt32(0),
+            Title = reader.GetString(1),
+            CourseId = reader.IsDBNull(2) ? null : reader.GetInt32(2),
+            SemesterId = reader.IsDBNull(3) ? null : reader.GetInt32(3),
+            OfficialDeadline = reader.IsDBNull(4) ? null : DateTime.Parse(reader.GetString(4)),
+            PersonalDeadline = reader.IsDBNull(5) ? null : DateTime.Parse(reader.GetString(5)),
+            Status = reader.GetString(6),
+            Priority = reader.GetString(7),
+            Milestone = reader.GetString(8),
+            Notes = reader.GetString(9)
         };
     }
 
