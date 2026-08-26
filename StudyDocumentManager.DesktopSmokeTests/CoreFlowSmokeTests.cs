@@ -1,3 +1,5 @@
+using StudyDocumentManager.Data.Helpers;
+
 namespace StudyDocumentManager.DesktopSmokeTests;
 
 [Collection(DesktopTestCollection.Name)]
@@ -58,5 +60,27 @@ public sealed class CoreFlowSmokeTests
         Assert.True(_fixture.App.HasExited is false);
         Assert.True(_fixture.Window.IsAvailable);
         _fixture.MainWindow.AssertRootVisible("Screen_Dashboard");
+    }
+
+    [Fact]
+    public void 新しいプロセスを起動しても分離データベースの文書が保持される()
+    {
+        _fixture.RestartProcess();
+        _fixture.MainWindow.AssertRootVisible("Screen_Dashboard");
+        _fixture.MainWindow.WaitForAutomationId("Dashboard_DocumentGrid", requireVisible: true);
+
+        var database = new DatabaseHelper();
+        database.SetDatabasePath(_fixture.DatabasePath);
+        database.InitializeDatabase();
+        try
+        {
+            Assert.Contains(
+                database.GetAllDocuments(),
+                document => document.Name == "Desktop smoke document");
+        }
+        finally
+        {
+            database.CloseAllConnections();
+        }
     }
 }
