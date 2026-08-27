@@ -12,7 +12,8 @@ public sealed class DesktopAppFixture : IDisposable
     private static readonly TimeSpan LaunchTimeout = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan CleanupTimeout = TimeSpan.FromSeconds(10);
     private readonly string _sourcePublishFolder;
-    private readonly int _processId = -1;
+    private readonly string _databasePath;
+    private int _processId = -1;
     private bool _disposed;
     private UIA3Automation? _automation;
 
@@ -23,25 +24,9 @@ public sealed class DesktopAppFixture : IDisposable
 
         try
         {
-            var databasePath = SeedDatabase(PublishFolder);
-            var startInfo = new ProcessStartInfo(Path.Combine(PublishFolder, "DocumentManager.exe"))
-            {
-                WorkingDirectory = PublishFolder,
-                UseShellExecute = false
-            };
-            startInfo.Environment["SDM_DATABASE_PATH"] = databasePath;
-
-            using var process = Process.Start(startInfo)
-                ?? throw new InvalidOperationException("DocumentManager process を開始できませんでした。");
-            _processId = process.Id;
-            App = Application.Attach(process.Id);
+            _databasePath = SeedDatabase(PublishFolder);
             _automation = new UIA3Automation();
-            Window = WaitUntil(
-                () => App.GetMainWindow(_automation!)!,
-                window => window is not null && window.IsAvailable,
-                LaunchTimeout,
-                "メインウィンドウ");
-            MainWindow = new MainWindowPage(Window);
+            LaunchProcess();
         }
         catch
         {
@@ -58,6 +43,18 @@ public sealed class DesktopAppFixture : IDisposable
 
     public string PublishFolder { get; }
 
+    public string DatabasePath => _databasePath;
+
+    public void RestartProcess()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(nameof(DesktopAppFixture));
+
+        CloseCurrentProcess();
+        App.Dispose();
+        LaunchProcess();
+    }
+
     public void Dispose()
     {
         if (_disposed)
@@ -66,22 +63,7 @@ public sealed class DesktopAppFixture : IDisposable
         _disposed = true;
         try
         {
-            RequestProcessClose();
-            try
-            {
-                WaitUntil(
-                    () => HasExited(_processId),
-                    exited => exited,
-                    CleanupTimeout,
-                    "アプリケーション終了");
-            }
-            catch (TimeoutException)
-            {
-                KillCapturedProcessIfNeeded();
-            }
-
-            if (!HasExited(_processId))
-                throw new TimeoutException("アプリケーションを終了できませんでした。");
+            CloseCurrentProcess();
         }
         finally
         {
@@ -179,6 +161,47 @@ public sealed class DesktopAppFixture : IDisposable
         });
         database.CloseAllConnections();
         return databasePath;
+    }
+
+    private void LaunchProcess()
+    {
+        var startInfo = new ProcessStartInfo(Path.Combine(PublishFolder, "DocumentManager.exe"))
+        {
+            WorkingDirectory = PublishFolder,
+            UseShellExecute = false
+        };
+        startInfo.Environment["SDM_DATABASE_PATH"] = _databasePath;
+
+        using var process = Process.Start(startInfo)
+            ?? throw new InvalidOperationException("DocumentManager process を開始できませんでした。");
+        _processId = process.Id;
+        App = Application.Attach(process.Id);
+        Window = WaitUntil(
+            () => App.GetMainWindow(_automation!)!,
+            window => window is not null && window.IsAvailable,
+            LaunchTimeout,
+            "メインウィンドウ");
+        MainWindow = new MainWindowPage(Window);
+    }
+
+    private void CloseCurrentProcess()
+    {
+        RequestProcessClose();
+        try
+        {
+            WaitUntil(
+                () => HasExited(_processId),
+                exited => exited,
+                CleanupTimeout,
+                "アプリケーション終了");
+        }
+        catch (TimeoutException)
+        {
+            KillCapturedProcessIfNeeded();
+        }
+
+        if (!HasExited(_processId))
+            throw new TimeoutException("アプリケーションを終了できませんでした。");
     }
 
     private void RequestProcessClose()

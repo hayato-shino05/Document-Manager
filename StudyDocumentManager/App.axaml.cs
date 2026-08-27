@@ -1,6 +1,7 @@
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using StudyDocumentManager.Core;
@@ -34,6 +35,36 @@ public partial class App : Application
         var db = Services.GetRequiredService<DatabaseHelper>();
         db.InitializeDatabase();
 
+        // シングルトンのフォルダ監視サービスを開始し、画面ナビゲーションを跨いでも監視を継続する。
+        // 停止されるのはアプリケーション終了時のみである。
+        // UI スレッドで実行する必要がある：Start/ReloadConfig は ObservableCollection を変更し、
+        // バインドされたコントロールが UI スレッド上で要求する StateChanged を発生させる。
+        // ウォッチャのバックグラウンド コールバック（致命的なアダプタ エラー）は Dispatcher を
+        // 経由して UI スレッドへ戻され、エンティティのプロパティ変更が安全に保たれる。
+        var folderWatch = Services.GetRequiredService<IFolderWatchService>();
+        folderWatch.UiThreadMarshal = action => Dispatcher.UIThread.Post(action);
+        try
+        {
+            folderWatch.Start();
+        }
+        catch (Exception)
+        {
+            Console.Error.WriteLine("Folder watch start skipped.");
+        }
+
+        // Versioned backup housekeeping: keep a fresh restore point without blocking startup.
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                Services.GetRequiredService<IVersionedBackupService>().EnsureFreshBackup(TimeSpan.FromHours(24));
+            }
+            catch (Exception)
+            {
+                Console.Error.WriteLine("Versioned backup skipped.");
+            }
+        });
+
         var localization = Services.GetRequiredService<LocalizationService>();
         var settings = Services.GetRequiredService<ISettingsService>();
         InitializeLanguage(localization, settings, osCulture);
@@ -47,6 +78,8 @@ public partial class App : Application
 
             var navService = Services.GetRequiredService<NavigationService>();
             navService.SetMainModel(mainModel);
+
+            desktop.Exit += (_, _) => folderWatch.Dispose();
 
             desktop.MainWindow = new MainWindow
             {
@@ -103,6 +136,8 @@ public partial class App : Application
         services.AddSingleton<IBulkOperationRepository>(sp => sp.GetRequiredService<DocumentRepository>());
         services.AddSingleton<IFileIntegrityRepository>(sp => sp.GetRequiredService<DocumentRepository>());
         services.AddSingleton<IUndoRepository>(sp => sp.GetRequiredService<DocumentRepository>());
+        services.AddSingleton<IImportInboxRepository, ImportInboxRepository>();
+        services.AddSingleton<IWatchedFolderRepository, WatchedFolderRepository>();
         services.AddSingleton<ICategoryRepository, CategoryRepository>();
         services.AddSingleton<ICollectionRepository, CollectionRepository>();
         services.AddSingleton<IPersonalNoteRepository, PersonalNoteRepository>();
@@ -110,6 +145,7 @@ public partial class App : Application
         services.AddSingleton<IRecentFileRepository, RecentFileRepository>();
         services.AddSingleton<IReportRepository, ReportRepository>();
         services.AddSingleton<ISavedSearchRepository, SavedSearchRepository>();
+        services.AddSingleton<IAssignmentRepository, AssignmentRepository>();
         services.AddSingleton<ISettingsService, SettingsRepository>();
 
         // Services
@@ -143,6 +179,7 @@ public partial class App : Application
         services.AddSingleton<IProcessLauncherService, ProcessLauncherService>();
         services.AddSingleton<IExportService, CsvExportService>();
         services.AddSingleton<IBackupService, DatabaseBackupService>();
+services.AddSingleton<IVersionedBackupService, VersionedBackupService>();
         services.AddSingleton<LocalizationService>();
         services.AddSingleton<ILocalizationService>(sp => sp.GetRequiredService<LocalizationService>());
         services.AddSingleton<IUpdateService, Services.UpdateService>();
@@ -151,6 +188,12 @@ public partial class App : Application
         services.AddSingleton<IUndoService>(sp => sp.GetRequiredService<UndoService>());
         services.AddSingleton<IUndoApplier, UndoApplier>();
 
+        // Watched Folder / file-system watcher
+        services.AddSingleton<ILog, TraceLog>();
+        services.AddSingleton<IFileSystemWatcherAdapterFactory, FileSystemWatcherAdapterFactory>();
+        services.AddSingleton<IWatchedFolderWatcherFactory, WatchedFolderWatcherFactory>();
+        services.AddSingleton<IFolderWatchService, FolderWatchService>();
+
         // モデル — メイン
         services.AddSingleton<MainWindowModel>();
         services.AddTransient<DashboardModel>();
@@ -158,6 +201,8 @@ public partial class App : Application
         // モデル — 文書
         services.AddTransient<AddEditModel>();
         services.AddTransient<BatchImportModel>();
+        services.AddTransient<ImportInboxModel>();
+        services.AddTransient<WatchedFolderModel>();
         services.AddTransient<BulkDeleteModel>();
         services.AddTransient<DuplicateDetectionModel>();
         services.AddTransient<PersonalNoteModel>();
@@ -167,8 +212,10 @@ public partial class App : Application
         services.AddTransient<CategoryManagementModel>();
         services.AddTransient<CollectionManagementModel>();
         services.AddTransient<RecycleBinModel>();
+services.AddTransient<RecoveryCenterModel>();
         services.AddTransient<FileIntegrityCheckModel>();
         services.AddTransient<SmartViewsModel>();
+        services.AddTransient<StudentWorkspaceModel>();
 
         // モデル — レポート
         services.AddTransient<ReportModel>();

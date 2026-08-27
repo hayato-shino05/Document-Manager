@@ -9,6 +9,8 @@ public interface IDocumentRepository
 {
     List<StudyDocument> GetAll();
     StudyDocument? GetById(int id);
+    StudyDocument? GetByFilePath(string filePath) => null;
+    IReadOnlyList<StudyDocument> FindActiveByName(string name) => [];
     List<StudyDocument> Search(string keyword);
     List<StudyDocument> Filter(string subject, string type);
     List<StudyDocument> SearchAdvanced(
@@ -26,6 +28,9 @@ public interface IDocumentRepository
         => throw new NotSupportedException($"{nameof(GetStatusCounts)} is not implemented by this repository.");
 
     bool Add(StudyDocument document);
+
+    bool MergeDocuments(int survivorId, IReadOnlyList<int> duplicateIds)
+        => throw new NotSupportedException($"{nameof(MergeDocuments)} is not implemented by this repository.");
 
     bool AddWithCatalogs(StudyDocument document);
     bool Update(StudyDocument document);

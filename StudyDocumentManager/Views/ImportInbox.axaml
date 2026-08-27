@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             x:Class="StudyDocumentManager.Views.ImportInbox"
+             AutomationProperties.AutomationId="ImportInbox_Screen"
+             x:DataType="vm:ImportInboxModel">
+  <DockPanel Margin="24">
+    <StackPanel DockPanel.Dock="Top" Spacing="10">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button AutomationProperties.AutomationId="ImportInbox_Back" Content="{loc:Localize Btn_Back}" Command="{Binding GoBackCommand}" />
+        <TextBlock Text="{loc:Localize ImportInbox_Title}" FontSize="24" />
+        <Button AutomationProperties.AutomationId="ImportInbox_Refresh" Content="{loc:Localize Btn_Refresh}" Command="{Binding RefreshCommand}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <CheckBox AutomationProperties.AutomationId="ImportInbox_ShowProcessed" Content="{loc:Localize ImportInbox_ShowProcessed}" IsChecked="{Binding IncludeProcessed}" />
+        <ComboBox AutomationProperties.AutomationId="ImportInbox_StateFilter" AutomationProperties.Name="{loc:Localize ImportInbox_State}" Width="160" SelectedItem="{Binding SelectedStateOption}" ItemsSource="{Binding StateOptions}" />
+      </StackPanel>
+    </StackPanel>
+    <TextBlock Text="{loc:Localize ImportInbox_Empty}" IsVisible="{Binding IsEmpty}" Margin="0,24" />
+    <DataGrid AutomationProperties.AutomationId="ImportInbox_DataGrid" AutomationProperties.Name="{loc:Localize ImportInbox_Title}" IsVisible="{Binding HasItems}" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}" SelectionMode="Extended" SelectionChanged="OnSelectionChanged" AutoGenerateColumns="False" IsReadOnly="True">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="{loc:Localize ImportInbox_Name}" Binding="{Binding DisplayName}" Width="2*" />
+        <DataGridTextColumn Header="{loc:Localize ImportInbox_State}" Binding="{Binding StateLabel}" Width="*" />
+        <DataGridTextColumn Header="{loc:Localize ImportInbox_Subject}" Binding="{Binding Subject}" Width="*" />
+        <DataGridTextColumn Header="{loc:Localize ImportInbox_Type}" Binding="{Binding Type}" Width="*" />
+        <DataGridTextColumn Header="{loc:Localize ImportInbox_Failure}" Binding="{Binding FailureLabel}" Width="*" />
+        <DataGridTextColumn Header="{loc:Localize ImportInbox_Duplicate}" Binding="{Binding DuplicateCandidate}" Width="*" />
+        <DataGridTextColumn Header="{loc:Localize ImportInbox_Source}" Binding="{Binding SourcePath}" Width="3*" />
+      </DataGrid.Columns>
+    </DataGrid>
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" Margin="0,10,0,0">
+      <Button AutomationProperties.AutomationId="ImportInbox_Retry" Content="{loc:Localize ImportInbox_Retry}" Command="{Binding RetrySelectedCommand}" />
+      <Button AutomationProperties.AutomationId="ImportInbox_Reveal" Content="{loc:Localize ImportInbox_Reveal}" Command="{Binding RevealSelectedCommand}" />
+      <TextBox AutomationProperties.AutomationId="ImportInbox_Subject" Width="180" Text="{Binding BulkSubject}" Watermark="{loc:Localize ImportInbox_Subject}" />
+      <TextBox AutomationProperties.AutomationId="ImportInbox_Type" Width="180" Text="{Binding BulkType}" Watermark="{loc:Localize ImportInbox_Type}" />
+      <Button AutomationProperties.AutomationId="ImportInbox_ApplyMetadata" Content="{loc:Localize ImportInbox_ApplyMetadata}" Command="{Binding ApplyBulkMetadataCommand}" IsEnabled="{Binding CanBulkEdit}" />
+    </StackPanel>
+  </DockPanel>
+</UserControl>

@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:loc="using:StudyDocumentManager.Markup"
@@ -18,11 +18,27 @@
                     <Button Classes="primary"
                             AutomationProperties.AutomationId="FileIntegrity_Scan"
                             AutomationProperties.Name="{loc:Localize FileIntegrity_BtnScan}"
-                            Command="{Binding CheckIntegrityCommand}">
+                            Command="{Binding CheckIntegrityCommand}"
+                            IsEnabled="{Binding !IsChecking}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16"/>
                             <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
                         </StackPanel>
+                    </Button>
+                    <Button Classes="secondary"
+                            AutomationProperties.AutomationId="FileIntegrity_RetryMissing"
+                            AutomationProperties.Name="{loc:Localize FileIntegrity_BtnRetryMissing}"
+                            Command="{Binding RetryMissingCommand}"
+                            IsVisible="{Binding Results.Count}"
+                            IsEnabled="{Binding !IsChecking}">
+                        <TextBlock Text="{loc:Localize FileIntegrity_BtnRetryMissing}" FontSize="{StaticResource FontSizeSm}"/>
+                    </Button>
+                    <Button Classes="secondary"
+                            AutomationProperties.AutomationId="FileIntegrity_Cancel"
+                            AutomationProperties.Name="{loc:Localize FileIntegrity_BtnCancel}"
+                            Command="{Binding CancelCheckCommand}"
+                            IsVisible="{Binding IsChecking}">
+                        <TextBlock Text="{loc:Localize FileIntegrity_BtnCancel}" FontSize="{StaticResource FontSizeSm}"/>
                     </Button>
                 </StackPanel>
             </DockPanel>
@@ -67,6 +83,13 @@
                                            AutomationProperties.LiveSetting="Polite"
                                            Text="{Binding StatusText}" FontSize="{StaticResource FontSizeSm}"
                                            Foreground="{StaticResource TextSecondary}"/>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="{loc:Localize Integrity_DatabaseLocation}"
+                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}"/>
+                                    <TextBlock AutomationProperties.AutomationId="FileIntegrity_DatabaseLocation"
+                                               Text="{Binding DatabaseLocation}" FontSize="{StaticResource FontSizeXs}"
+                                               Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
 
@@ -100,17 +123,37 @@
                                                                Foreground="{StaticResource StatRedFg}"/>
                                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                                         <Button Classes="secondary"
+                                                                AutomationProperties.AutomationId="FileIntegrity_OpenFolder"
+                                                                AutomationProperties.Name="{loc:Localize Integrity_OpenContainingFolder}"
+                                                                IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                Command="{Binding DataContext.OpenContainingFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+                                                            <TextBlock Text="{loc:Localize Integrity_OpenContainingFolder}" FontSize="{StaticResource FontSizeXs}"/>
+                                                        </Button>
+                                                        <Button Classes="secondary"
+                                                                AutomationProperties.AutomationId="FileIntegrity_CopyPath"
+                                                                AutomationProperties.Name="{loc:Localize Context_CopyPath}"
+                                                                IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                Command="{Binding DataContext.CopyPathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+                                                            <TextBlock Text="{loc:Localize Context_CopyPath}" FontSize="{StaticResource FontSizeXs}"/>
+                                                        </Button>
+                                                        <Button Classes="secondary"
+                                                                AutomationProperties.AutomationId="FileIntegrity_BtnRelink"
                                                                 AutomationProperties.Name="{loc:Localize FileIntegrity_BtnRelink}"
+                                                                IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 Command="{Binding DataContext.SelectNewFileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
                                                             <TextBlock Text="{loc:Localize FileIntegrity_BtnRelink}" FontSize="{StaticResource FontSizeXs}"/>
                                                         </Button>
                                                         <Button Classes="secondary"
+                                                                AutomationProperties.AutomationId="FileIntegrity_BtnClearPath"
                                                                 AutomationProperties.Name="{loc:Localize FileIntegrity_BtnClearPath}"
+                                                                IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 Command="{Binding DataContext.ClearFilePathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
                                                             <TextBlock Text="{loc:Localize FileIntegrity_BtnClearPath}" FontSize="{StaticResource FontSizeXs}"/>
                                                         </Button>
                                                         <Button Classes="danger"
+                                                                AutomationProperties.AutomationId="FileIntegrity_BtnDelete"
                                                                 AutomationProperties.Name="{loc:Localize Action_Delete}"
+                                                                IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 Command="{Binding DataContext.DeleteDocumentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
                                                             <TextBlock Text="{loc:Localize Action_Delete}" FontSize="{StaticResource FontSizeXs}"/>
                                                         </Button>

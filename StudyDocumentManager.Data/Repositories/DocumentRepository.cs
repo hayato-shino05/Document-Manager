@@ -1,4 +1,5 @@
-﻿using StudyDocumentManager.Core.Entities;
+﻿using System.Threading;
+using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Data.Helpers;
 
@@ -16,6 +17,10 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
     public List<StudyDocument> GetAll() => _db.GetAllDocuments();
 
     public StudyDocument? GetById(int id) => _db.GetDocumentById(id);
+
+    public StudyDocument? GetByFilePath(string filePath) => _db.GetDocumentByFilePath(filePath);
+
+    public IReadOnlyList<StudyDocument> FindActiveByName(string name) => _db.FindActiveDocumentsByName(name);
 
     public List<StudyDocument> Search(string keyword) => _db.SearchDocuments(keyword);
 
@@ -36,6 +41,9 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
     public Dictionary<string, int> GetStatusCounts() => _db.GetStatusCounts();
 
     public bool Add(StudyDocument document) => _db.InsertDocument(document);
+
+    public bool MergeDocuments(int survivorId, IReadOnlyList<int> duplicateIds)
+        => _db.MergeDocuments(survivorId, duplicateIds);
 
 
     public bool AddWithCatalogs(StudyDocument document) => _db.InsertDocumentWithCatalogs(document);
@@ -107,9 +115,17 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
 
     public bool BackupDatabase(string destPath, bool overwrite) => _db.BackupDatabase(destPath, overwrite);
 
+    public bool BackupDatabase(string destPath, bool overwrite, CancellationToken cancellationToken)
+        => _db.BackupDatabase(destPath, overwrite, cancellationToken);
+
     public bool CanRestoreDatabase(string sourcePath) => _db.CanRestoreDatabase(sourcePath);
 
     public bool RestoreDatabase(string sourcePath) => _db.RestoreDatabase(sourcePath);
+
+    public bool RestoreDatabase(string sourcePath, CancellationToken cancellationToken)
+        => _db.RestoreDatabase(sourcePath, cancellationToken);
+
+    public int GetDocumentCount() => _db.GetDocumentCount();
 
     public string DatabasePath => _db.DatabasePath;
 }

@@ -58,4 +58,8 @@ public class DroppedFileImportService(
             FileSize = fileInfo.Length / (1024.0 * 1024.0)
         };
     }
+
+    public StudyDocument? FindExistingByFilePath(string filePath) => _repository.GetByFilePath(filePath);
+
+    public IReadOnlyList<StudyDocument> FindExistingByName(string name) => _repository.FindActiveByName(name);
 }

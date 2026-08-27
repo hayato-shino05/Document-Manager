@@ -60,6 +60,22 @@
             </Border>
 
             <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,12">
+                <StackPanel Orientation="Horizontal" Spacing="4"
+                            IsVisible="{Binding IsImporting}"
+                            AutomationProperties.AutomationId="BatchImport_Progress">
+                    <TextBlock Text="{loc:Localize BatchImport_ProgressLabel}"
+                               FontSize="{StaticResource FontSizeSm}"
+                               Foreground="{StaticResource TextSecondary}"/>
+                    <TextBlock Text="{Binding ProcessedCount}"
+                               FontSize="{StaticResource FontSizeSm}"
+                               Foreground="{StaticResource TextSecondary}"/>
+                    <TextBlock Text="/"
+                               FontSize="{StaticResource FontSizeSm}"
+                               Foreground="{StaticResource TextSecondary}"/>
+                    <TextBlock Text="{Binding TotalCount}"
+                               FontSize="{StaticResource FontSizeSm}"
+                               Foreground="{StaticResource TextSecondary}"/>
+                </StackPanel>
                 <TextBlock AutomationProperties.AutomationId="BatchImport_Status"
                            AutomationProperties.LiveSetting="Polite"
                            Text="{Binding ImportStatusMessage}"
@@ -92,6 +108,13 @@
                         <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{StaticResource FontSizeSm}"/>
                     </StackPanel>
                 </Button>
+                <Button Classes="secondary" AutomationProperties.AutomationId="BatchImport_RetryFailed"
+                        AutomationProperties.Name="{loc:Localize BatchImport_BtnRetryFailed}"
+                        Command="{Binding RetryFailedCommand}" Padding="{StaticResource PaddingBtnMd}"
+                        IsVisible="{Binding HasFailedItems}"
+                        IsEnabled="{Binding !IsImporting}">
+                    <TextBlock Text="{loc:Localize BatchImport_BtnRetryFailed}" FontSize="{StaticResource FontSizeSm}"/>
+                </Button>
                 <Button Classes="primary" AutomationProperties.AutomationId="BatchImport_Import"
                         AutomationProperties.Name="{loc:Localize BatchImport_BtnImport}"
                         Command="{Binding ImportCommand}" Padding="{StaticResource PaddingBtnLg}"
@@ -123,6 +146,7 @@
                             <DataGridTextColumn Header="{loc:Localize AddEdit_LblType}" Binding="{Binding FileType}" Width="70"/>
                             <DataGridTextColumn Header="{loc:Localize BatchImport_ColSize}" Binding="{Binding FileSizeMB, StringFormat=\{0:F2\}}" Width="110"/>
                             <DataGridTextColumn Header="{loc:Localize BatchImport_ColPath}" Binding="{Binding FilePath}" Width="300"/>
+                            <DataGridTextColumn Header="{loc:Localize BatchImport_ColFailure}" Binding="{Binding FailureReason}" Width="220"/>
                         </DataGrid.Columns>
                     </DataGrid>
 

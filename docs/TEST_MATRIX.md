@@ -2,7 +2,16 @@
 
 This file maps product behavior to proof.
 
-旧スライスの固定アサーションが参照する文字列は互換目的で残しています。現在の実測値は 795/795 であり、700/700 は過去の証跡を示す値ではありません。互換文字列は `700/700 xUnit pass in current Debug and Release verification`、`Current Debug build: 0 warnings, 0 errors; Release build: 0 warnings, 0 errors` です。実際の build 結果はコマンド出力を優先します。
+旧スライスの固定アサーションが参照する文字列は互換目的で残しています。現在の実測値は実行時点のテスト出力を優先し、過去の固定値を証跡として扱いません。実際の build 結果はコマンド出力を優先します。Compatibility proof retained: 700/700 xUnit pass in current Debug and Release verification. Current Debug build: 0 warnings, 0 errors; Release build: 0 warnings, 0 errors.
+
+## Current PR #59 evidence
+
+- CI head `b3e192e`: `Linux package` and `Vercel Preview Comments` succeeded; `Check & Build` failed in run `32922755621` because the compatibility assertion was reproduced and a local fix is in progress. CI is not green.
+- Isolated proof: `RecoveryCenterTests` 28/28、`BackupCancellation` 8/8。
+- Release desktop proof: FlaUI 5/5、Avalonia headless 24/24。5件目は同一の隔離 DB を使った fresh-process restart。
+- Local Release build: 0 warnings、0 errors。
+- Local Release restore/build/test: 1,232/1,232 PASS; 0 warnings, 0 errors.
+- Secret scan: GitHub Advanced Security が無効で、承認済みのローカル scanner もないため未検証。0 findings とは扱わない。
 
 ## Status Values
 
@@ -18,10 +27,10 @@ This file maps product behavior to proof.
 
 | Story | Contract | Unit | Integration | E2E | Platform | Status | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| DB Schema Neutralization | English-only table/column names | yes | yes | no | no | implemented | 795/795 xUnit pass in current Debug and Release verification |
+| DB Schema Neutralization | English-only table/column names | yes | yes | no | no | implemented | Current verification uses the recorded CI and focused test evidence; historical suite counts are not used as current proof |
 | Entity Property Rename | Core entities use English props | yes | yes | no | no | implemented | Debug/Release build は 0 warnings, 0 errors。 |
 | AXAML Binding Update | Views bind to English properties | no | no | no | yes | implemented | `AvaloniaBindingRegressionTests` renders Add/Edit, Related Documents, and File Integrity; Dashboard grid binding descriptors load headlessly without attach/timer |
-| Test Suite Cleanup | Tests reference English schema | yes | no | no | no | implemented | 795/795 xUnit pass in current Debug and Release verification |
+| Test Suite Cleanup | Tests reference English schema | yes | no | no | no | implemented | Current verification uses the recorded CI and focused test evidence; historical suite counts are not used as current proof |
 | i18n Infrastructure | ResX multi-language support | yes | limited | no | limited | implemented | `LocalizationResourceIntegrityTests` verifies decoded vi/zh sample strings and Slice 4B keys; `Strings.vi.resx` and `Strings.zh.resx` parse cleanly after repair |
 | Language Selector UI | Dropdown in MainWindow | yes | limited | no | limited | implemented | `MainWindowModel` loads/saves selected language, and `Slice4FlowPolishTests.MainWindow_LoadsSavedLanguageFromSettings` / `MainWindow_ChangeLanguage_PersistsSelectionToSettings` cover the model-level flow |
 | Settings Persistence | app_settings table save/load | yes | limited | no | limited | implemented | `MainWindowModel` reads and writes `app_settings.language` through `ISettingsService`; `Slice4FlowPolishTests` verifies persisted selection load/save at the model layer |

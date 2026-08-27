@@ -21,6 +21,7 @@ codegrove.sqlite
 # User-specific files
 *.rsuser
 *.suo
+.artifacts/
 *.user
 *.userosscache
 *.sln.docstates

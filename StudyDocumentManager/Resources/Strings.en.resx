@@ -260,6 +260,10 @@ Please check your network connection.</value></data>
   <data name="AddEdit_FileFilter" xml:space="preserve"><value>All Files|*.*|PDF|*.pdf|Word|*.doc;*.docx|Excel|*.xls;*.xlsx|Image|*.png;*.jpg;*.jpeg;*.gif;*.bmp</value></data>
   <data name="Duplicate_NoDuplicates" xml:space="preserve"><value>No duplicate documents found</value></data>
   <data name="Duplicate_ConfirmDelete" xml:space="preserve"><value>Delete document '{0}' (ID: {1})?</value></data>
+  <data name="Duplicate_Merge" xml:space="preserve"><value>Merge</value></data>
+  <data name="Duplicate_ConfirmMerge" xml:space="preserve"><value>Keep '{0}' and merge {1} duplicate document(s) into it?</value></data>
+  <data name="Duplicate_MergeSuccess" xml:space="preserve"><value>Merged {1} duplicate document(s) into '{0}'.</value></data>
+  <data name="Duplicate_MatchInfo" xml:space="preserve"><value>{0} documents</value></data>
   <data name="Related_ConfirmRemove" xml:space="preserve"><value>Unlink from '{0}'?</value></data>
   <data name="Related_TypeRelated" xml:space="preserve"><value>Related</value></data>
   <data name="Related_TypeReference" xml:space="preserve"><value>Reference</value></data>
@@ -299,6 +303,26 @@ Please check your network connection.</value></data>
   <data name="Menu_ManageCategories" xml:space="preserve"><value>Category Management</value></data>
   <data name="Menu_Collections" xml:space="preserve"><value>Collections</value></data>
   <data name="Menu_BatchImport" xml:space="preserve"><value>Batch Import</value></data>
+  <data name="ImportInbox_Title" xml:space="preserve"><value>Import Inbox</value></data>
+  <data name="ImportInbox_ShowProcessed" xml:space="preserve"><value>Show processed</value></data>
+  <data name="ImportInbox_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="ImportInbox_State" xml:space="preserve"><value>State</value></data>
+  <data name="ImportInbox_Source" xml:space="preserve"><value>Source</value></data>
+  <data name="ImportInbox_Retry" xml:space="preserve"><value>Retry</value></data>
+  <data name="ImportInbox_Reveal" xml:space="preserve"><value>Reveal</value></data>
+  <data name="ImportInbox_SourceMissing" xml:space="preserve"><value>Source file is missing.</value></data>
+  <data name="ImportInbox_Status" xml:space="preserve"><value>{0} inbox items</value></data>
+  <data name="ImportInbox_Empty" xml:space="preserve"><value>No items in the import inbox.</value></data>
+  <data name="ImportInbox_Subject" xml:space="preserve"><value>Subject</value></data>  <data name="ImportInbox_ApplyMetadata" xml:space="preserve"><value>Apply metadata</value></data>
+  <data name="ImportInbox_Type" xml:space="preserve"><value>Type</value></data>  <data name="ImportInbox_All" xml:space="preserve"><value>All</value></data>
+  <data name="ImportInbox_State_Pending" xml:space="preserve"><value>Pending</value></data>
+  <data name="ImportInbox_State_Held" xml:space="preserve"><value>Held</value></data>
+  <data name="ImportInbox_State_Failed" xml:space="preserve"><value>Failed</value></data>
+  <data name="ImportInbox_State_Processed" xml:space="preserve"><value>Processed</value></data>
+  <data name="ImportInbox_State_MissingMetadata" xml:space="preserve"><value>Missing Metadata</value></data>
+  <data name="ImportInbox_State_Ambiguous" xml:space="preserve"><value>Ambiguous Name</value></data>
+  <data name="ImportInbox_Failure" xml:space="preserve"><value>Failure</value></data>
+  <data name="ImportInbox_Duplicate" xml:space="preserve"><value>Duplicate candidate</value></data>
   <data name="Menu_BulkDelete" xml:space="preserve"><value>Bulk Delete</value></data>
   <data name="Menu_FindDuplicates" xml:space="preserve"><value>Find Duplicates</value></data>
   <data name="Menu_FileCheck" xml:space="preserve"><value>File Integrity</value></data>
@@ -555,6 +579,9 @@ Please check your network connection.</value></data>
   <data name="FileIntegrity_StatValid" xml:space="preserve"><value>Valid</value></data>
   <data name="FileIntegrity_StatMissing" xml:space="preserve"><value>Missing</value></data>
   <data name="FileIntegrity_StatCorrupted" xml:space="preserve"><value>Corrupted</value></data>
+  <data name="FileIntegrity_BtnCancel" xml:space="preserve"><value>Cancel scan</value></data>
+  <data name="FileIntegrity_BtnRetryMissing" xml:space="preserve"><value>Recheck missing</value></data>
+  <data name="FileIntegrity_Cancelled" xml:space="preserve"><value>Scan cancelled after {0} of {1} files.</value></data>
   <data name="AddEdit_LblDocName" xml:space="preserve"><value>Document Name *</value></data>
   <data name="AddEdit_PlaceholderDocName" xml:space="preserve"><value>Enter document name...</value></data>
   <data name="AddEdit_LblCategory" xml:space="preserve"><value>Category (Subject)</value></data>
@@ -596,10 +623,12 @@ Please check your network connection.</value></data>
   <data name="Collection_DeselectAll" xml:space="preserve"><value>Deselect All</value></data>
   <data name="Collection_AddToTitle" xml:space="preserve"><value>Add documents to "{0}"</value></data>
   <data name="Dashboard_BackupFailed" xml:space="preserve"><value>Could not create the backup file</value></data>
+  <data name="Dashboard_BackupCancelled" xml:space="preserve"><value>Backup cancelled</value></data>
   <data name="Dashboard_ConfirmOverwriteBackup" xml:space="preserve"><value>Overwrite backup</value></data>
   <data name="Dashboard_OverwriteBackupWarning" xml:space="preserve"><value>The existing backup file will be overwritten. Continue?</value></data>
   <data name="Dashboard_OverwriteBackup" xml:space="preserve"><value>Overwrite</value></data>
   <data name="Dashboard_RestoreFailed" xml:space="preserve"><value>Could not validate or restore the backup file</value></data>
+  <data name="Dashboard_RestoreCancelled" xml:space="preserve"><value>Restore cancelled</value></data>
   <data name="Dashboard_RestoreRestartRequired" xml:space="preserve"><value>The database was restored. Please reopen the application.</value></data>
   <data name="Dashboard_ExportWriteFailed" xml:space="preserve"><value>Could not write the CSV file</value></data>
   <data name="BatchImport_InvalidDrop" xml:space="preserve"><value>Files cannot be dropped on this screen</value></data>
@@ -620,8 +649,16 @@ Please check your network connection.</value></data>
   <data name="BatchImport_BtnScan" xml:space="preserve"><value>Scan</value></data>
   <data name="BatchImport_ColPath" xml:space="preserve"><value>Path</value></data>
   <data name="BatchImport_ColSize" xml:space="preserve"><value>Size</value></data>
+  <data name="BatchImport_ColFailure" xml:space="preserve"><value>Failure reason</value></data>
+  <data name="BatchImport_ItemFailed" xml:space="preserve"><value>Import failed</value></data>
+  <data name="BatchImport_FileError" xml:space="preserve"><value>Could not read the file</value></data>
+  <data name="BatchImport_PermissionError" xml:space="preserve"><value>Access denied</value></data>
+  <data name="BatchImport_DatabaseError" xml:space="preserve"><value>A database error occurred</value></data>
   <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>Default Subject</value></data>
   <data name="BatchImport_LblFolder" xml:space="preserve"><value>Folder</value></data>
+  <data name="BatchImport_BtnRetryFailed" xml:space="preserve"><value>Retry failed</value></data>
+  <data name="BatchImport_ProgressLabel" xml:space="preserve"><value>Progress:</value></data>
+  <data name="BatchImport_Cancelled" xml:space="preserve"><value>Import cancelled: {1} files total, {0} processed.</value></data>
   <data name="Bulk_BtnDeselectAll" xml:space="preserve"><value>Deselect All</value></data>
   <data name="BulkDelete_ColDateAdded" xml:space="preserve"><value>Date Added</value></data>
   <data name="Menu_ChangeLanguage" xml:space="preserve"><value>Change Language</value></data>
@@ -728,4 +765,104 @@ Please check your network connection.</value></data>
   <data name="PV_CascadeTitle" xml:space="preserve"><value>Delete {0}?</value></data>
   <data name="PV_MembershipNote" xml:space="preserve"><value>The collection and its members can be restored afterwards with Undo. The documents themselves are not deleted.</value></data>
   <data name="PV_RecycleBinNote" xml:space="preserve"><value>Deleted documents can be restored from the Recycle Bin or with Undo.</value></data>
+  <data name="RC_Title" xml:space="preserve"><value>Recovery Center</value></data>
+  <data name="RC_LatestBackup" xml:space="preserve"><value>Latest backup:</value></data>
+  <data name="RC_LatestNone" xml:space="preserve"><value>No backup yet</value></data>
+  <data name="RC_StatusNone" xml:space="preserve"><value>—</value></data>
+  <data name="RC_StatusValid" xml:space="preserve"><value>Valid</value></data>
+  <data name="RC_StatusInvalid" xml:space="preserve"><value>Invalid</value></data>
+  <data name="RC_Location" xml:space="preserve"><value>Location:</value></data>
+  <data name="RC_Retention" xml:space="preserve"><value>Versions to keep:</value></data>
+  <data name="RC_SaveRetention" xml:space="preserve"><value>Save retention</value></data>
+  <data name="RC_CreateBackup" xml:space="preserve"><value>Create backup</value></data>
+  <data name="RC_Restore" xml:space="preserve"><value>Restore</value></data>
+  <data name="RC_OpenFolder" xml:space="preserve"><value>Open folder</value></data>
+  <data name="RC_RestoreFromFile" xml:space="preserve"><value>Restore from file…</value></data>
+  <data name="RC_ColName" xml:space="preserve"><value>Backup file</value></data>
+  <data name="RC_ColCreated" xml:space="preserve"><value>Created</value></data>
+  <data name="RC_ColSize" xml:space="preserve"><value>Size</value></data>
+  <data name="RC_ColStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="RC_EmptyState" xml:space="preserve"><value>No backup versions yet. Create your first backup.</value></data>
+  <data name="RC_ConfirmRestoreTitle" xml:space="preserve"><value>Confirm restore</value></data>
+  <data name="RC_ConfirmRestoreMessage" xml:space="preserve"><value>Restore the backup created at {0}?&#10;&#10;The current database ({2}) with {1} documents will be replaced. This cannot be undone.</value></data>
+  <data name="RC_RestoreRestartMessage" xml:space="preserve"><value>Restore completed.&#10;&#10;The application must restart to finish the restore.&#10;Steps:&#10;1. Save your work and close this window if it does not close automatically.&#10;2. Start Study Document Manager again.&#10;3. Verify your documents on the Dashboard.</value></data>
+  <data name="RC_BackupCreated" xml:space="preserve"><value>Backup created successfully.</value></data>
+  <data name="RC_BackupFailed" xml:space="preserve"><value>Backup failed.</value></data>
+  <data name="RC_RetentionSaved" xml:space="preserve"><value>Retention setting saved.</value></data>
+  <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>This file is not a valid backup version.</value></data>
+  <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>Restore failed. The current database was not changed.</value></data>
+  <data name="RC_RecoveryPaths" xml:space="preserve"><value>Related recovery tools:</value></data>
+  <data name="FileState_AccessDenied" xml:space="preserve"><value>No permission to access this file</value></data>
+  <data name="FileState_DriveDisconnected" xml:space="preserve"><value>The drive is not connected</value></data>
+  <data name="FileState_InvalidPath" xml:space="preserve"><value>Invalid path</value></data>
+  <data name="Integrity_DatabaseLocation" xml:space="preserve"><value>Database location:</value></data>
+  <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>Open containing folder</value></data>
+  <data name="Integrity_PathCopied" xml:space="preserve"><value>Path copied to clipboard.</value></data>
+  <data name="RC_Loading" xml:space="preserve"><value>Loading…</value></data>
+  <data name="SW_Title" xml:space="preserve"><value>Student workspace</value></data>
+  <data name="SW_AcademicYear" xml:space="preserve"><value>Academic year</value></data>
+  <data name="SW_ContextSemester" xml:space="preserve"><value>Semester</value></data>
+  <data name="SW_ContextCourse" xml:space="preserve"><value>Course</value></data>
+  <data name="SW_ContextModule" xml:space="preserve"><value>Module</value></data>
+  <data name="SW_ContextOwner" xml:space="preserve"><value>Owner</value></data>
+  <data name="SW_SaveContext" xml:space="preserve"><value>Save context</value></data>
+  <data name="SW_ContextSaved" xml:space="preserve"><value>Learning context saved</value></data>
+  <data name="SW_StatusReady" xml:space="preserve"><value>{0} assignments</value></data>
+  <data name="SW_Courses" xml:space="preserve"><value>Courses</value></data>
+  <data name="SW_Semesters" xml:space="preserve"><value>Semesters</value></data>
+  <data name="SW_Assignments" xml:space="preserve"><value>Assignments</value></data>
+  <data name="SW_AddCourse" xml:space="preserve"><value>Add course</value></data>
+  <data name="SW_AddSemester" xml:space="preserve"><value>Add semester</value></data>
+  <data name="SW_CourseName" xml:space="preserve"><value>Course name</value></data>
+  <data name="SW_SemesterName" xml:space="preserve"><value>Semester name</value></data>
+  <data name="SW_DeleteCourseConfirm" xml:space="preserve"><value>Delete course “{0}”?</value></data>
+  <data name="SW_DeleteSemesterConfirm" xml:space="preserve"><value>Delete semester “{0}”?</value></data>
+  <data name="SW_ShowHistory" xml:space="preserve"><value>Show history</value></data>
+  <data name="SW_NewAssignment" xml:space="preserve"><value>New assignment</value></data>
+  <data name="SW_AssignmentEditor" xml:space="preserve"><value>Assignment editor</value></data>
+  <data name="SW_AssignmentTitle" xml:space="preserve"><value>Assignment title</value></data>
+  <data name="SW_OfficialDeadline" xml:space="preserve"><value>Official deadline</value></data>
+  <data name="SW_PersonalDeadline" xml:space="preserve"><value>Personal deadline</value></data>
+  <data name="SW_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="SW_Priority" xml:space="preserve"><value>Priority</value></data>
+  <data name="SW_Milestone" xml:space="preserve"><value>Milestone</value></data>
+  <data name="SW_Notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="SW_DeleteAssignmentConfirm" xml:space="preserve"><value>Delete assignment “{0}”?</value></data>
+  <data name="SW_TitleRequired" xml:space="preserve"><value>Assignment title is required</value></data>
+  <data name="SW_OpenRelatedDocument" xml:space="preserve"><value>Open related document</value></data>
+  <data name="SW_NoRelatedDocument" xml:space="preserve"><value>No related document</value></data>
+  <data name="SW_RelatedDocumentMissing" xml:space="preserve"><value>Related document file is missing</value></data>
+  <data name="SW_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="SW_Status_Planned" xml:space="preserve"><value>Planned</value></data>
+  <data name="SW_Status_InProgress" xml:space="preserve"><value>In progress</value></data>
+  <data name="SW_Status_Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="SW_Priority_Low" xml:space="preserve"><value>Low</value></data>
+  <data name="SW_Priority_Normal" xml:space="preserve"><value>Normal</value></data>
+  <data name="SW_Priority_High" xml:space="preserve"><value>High</value></data>
+  <data name="SW_Deadline_NoDate" xml:space="preserve"><value>No deadline</value></data>
+  <data name="SW_Deadline_Overdue" xml:space="preserve"><value>Overdue</value></data>
+  <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>Due soon</value></data>
+  <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>Scheduled</value></data>
+  <data name="Btn_Back" xml:space="preserve"><value>Back</value></data>
+  <data name="WF_Title" xml:space="preserve"><value>Watched Folders</value></data>
+  <data name="WF_Add" xml:space="preserve"><value>Add</value></data>
+  <data name="WF_Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="WF_Enable" xml:space="preserve"><value>Enable</value></data>
+  <data name="WF_Start" xml:space="preserve"><value>Start Watching</value></data>
+  <data name="WF_Stop" xml:space="preserve"><value>Stop Watching</value></data>
+  <data name="WF_FolderPath" xml:space="preserve"><value>Folder Path</value></data>
+  <data name="WF_NoFolders" xml:space="preserve"><value>No folders are being watched.</value></data>
+  <data name="WF_Status_Watching" xml:space="preserve"><value>Watching {0} folder(s).</value></data>
+  <data name="WF_Status_Stopped" xml:space="preserve"><value>Watcher stopped.</value></data>
+  <data name="WF_Status_NoFolders" xml:space="preserve"><value>No folders are watched.</value></data>
+  <data name="WF_Error_PathRequired" xml:space="preserve"><value>Folder path is required.</value></data>
+  <data name="WF_Error_NotFound" xml:space="preserve"><value>Folder does not exist.</value></data>
+  <data name="WF_Error_StartFailed" xml:space="preserve"><value>Could not start the watcher.</value></data>
+  <data name="WF_ItemStatus_Running" xml:space="preserve"><value>Watching</value></data>
+  <data name="WF_ItemStatus_Disabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="WF_ItemStatus_Error" xml:space="preserve"><value>Error</value></data>
+  <data name="WF_ItemStatus_Stopped" xml:space="preserve"><value>Stopped</value></data>
+  <data name="WF_ItemStatus_Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="WF_Error_WatcherFault" xml:space="preserve"><value>A fatal error occurred while watching the folder.</value></data>
+  <data name="WF_IncludeSub" xml:space="preserve"><value>Include subfolders</value></data>
 </root>

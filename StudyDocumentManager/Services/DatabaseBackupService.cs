@@ -24,7 +24,10 @@ public class DatabaseBackupService : IBackupService
         _loc = localizationService;
     }
 
-    public async Task<(bool Success, string? Path, string? Error)> BackupAsync()
+    public Task<(bool Success, string? Path, string? Error)> BackupAsync()
+        => BackupAsync(CancellationToken.None);
+
+    public async Task<(bool Success, string? Path, string? Error)> BackupAsync(CancellationToken cancellationToken)
     {
         var path = await _fileDialogService.ShowSaveFileAsync(
             _loc["Dashboard_BackupTitle"],
@@ -32,6 +35,9 @@ public class DatabaseBackupService : IBackupService
             _loc["Dashboard_BackupFileFilter"]);
 
         if (string.IsNullOrWhiteSpace(path))
+            return (false, null, null);
+
+        if (cancellationToken.IsCancellationRequested)
             return (false, null, null);
 
         if (File.Exists(path))
@@ -45,12 +51,30 @@ public class DatabaseBackupService : IBackupService
                 return (false, null, null);
         }
 
-        return _fileIntegrityRepo.BackupDatabase(path, overwrite: true)
-            ? (true, path, null)
-            : (false, null, _loc["Dashboard_BackupFailed"]);
+        if (cancellationToken.IsCancellationRequested)
+            return (false, null, null);
+
+        try
+        {
+            var succeeded = await Task.Run(
+                () => _fileIntegrityRepo.BackupDatabase(path, overwrite: true, cancellationToken),
+                cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+                return (false, null, null);
+            return succeeded
+                ? (true, path, null)
+                : (false, null, _loc["Dashboard_BackupFailed"]);
+        }
+        catch (Exception)
+        {
+            return (false, null, _loc["Dashboard_BackupFailed"]);
+        }
     }
 
-    public async Task<(bool Success, string? Error)> RestoreAsync()
+    public Task<(bool Success, string? Error)> RestoreAsync()
+        => RestoreAsync(CancellationToken.None);
+
+    public async Task<(bool Success, string? Error)> RestoreAsync(CancellationToken cancellationToken)
     {
         var path = await _fileDialogService.ShowOpenFileAsync(
             _loc["Dashboard_SelectBackup"],
@@ -59,11 +83,29 @@ public class DatabaseBackupService : IBackupService
         if (string.IsNullOrWhiteSpace(path))
             return (false, null);
 
+        if (cancellationToken.IsCancellationRequested)
+            return (false, null);
+
         if (!File.Exists(path))
             return (false, _loc["Dashboard_BackupNotExist"]);
 
-        if (!_fileIntegrityRepo.CanRestoreDatabase(path))
+        bool canRestore;
+        try
+        {
+            canRestore = await Task.Run(
+                () => _fileIntegrityRepo.CanRestoreDatabase(path),
+                cancellationToken);
+        }
+        catch (Exception)
+        {
             return (false, _loc["Dashboard_RestoreFailed"]);
+        }
+
+        if (!canRestore)
+            return (false, _loc["Dashboard_RestoreFailed"]);
+
+        if (cancellationToken.IsCancellationRequested)
+            return (false, null);
 
         var confirmed = await _dialogService.ShowConfirmAsync(
             _loc["Dashboard_ConfirmRestore"],
@@ -74,10 +116,32 @@ public class DatabaseBackupService : IBackupService
         if (!confirmed)
             return (false, null);
 
-        if (!_fileIntegrityRepo.RestoreDatabase(path))
+        if (cancellationToken.IsCancellationRequested)
+            return (false, null);
+
+        bool restored;
+        try
+        {
+            restored = await Task.Run(
+                () => _fileIntegrityRepo.RestoreDatabase(path, cancellationToken),
+                cancellationToken);
+        }
+        catch (Exception)
+        {
+            return (false, _loc["Dashboard_RestoreFailed"]);
+        }
+
+        if (cancellationToken.IsCancellationRequested)
+            return (false, null);
+
+        if (!restored)
             return (false, _loc["Dashboard_RestoreFailed"]);
 
         await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Dashboard_RestoreRestartRequired"]);
+
+        if (cancellationToken.IsCancellationRequested)
+            return (false, null);
+
         _lifecycleService.Shutdown();
         return (true, null);
     }

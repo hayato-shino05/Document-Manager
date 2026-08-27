@@ -14,7 +14,7 @@
 [![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/hayato-shino05/study-document-manager?style=for-the-badge&color=EF4444&logo=github&logoColor=white)](https://github.com/hayato-shino05/study-document-manager)
 
-<img src="./StudyDocumentManager/Assets/Brand/document-manager-banner-04.svg" alt="Document Manager banner" width="800" />
+<img src="./StudyDocumentManager/Assets/Brand/banner.svg" alt="Document Manager banner" width="800" />
 
 </div>
 
@@ -100,7 +100,7 @@ dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c De
 生成物:
 
 - publish: `artifacts\publish\win-x64\`
-- setup EXE: `artifacts\installer\DocumentManager_v4.0.0_Setup.exe`
+- setup EXE: `artifacts\installer\DocumentManager.exe`
 
 この setup は .NET Framework 4.8 を要求せず、`win-x64` 向け自己完結型の Windows アプリとして配布します。
 

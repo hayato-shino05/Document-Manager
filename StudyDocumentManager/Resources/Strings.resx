@@ -226,6 +226,7 @@
   <data name="Dashboard_BackupDone" xml:space="preserve"><value>データベースをバックアップしました：&#xA;{0}</value></data>
   <data name="Dashboard_BackupError" xml:space="preserve"><value>バックアップできません: {0}</value></data>
   <data name="Dashboard_BackupFailed" xml:space="preserve"><value>バックアップファイルを作成できませんでした</value></data>
+  <data name="Dashboard_BackupCancelled" xml:space="preserve"><value>バックアップをキャンセルしました</value></data>
   <data name="Dashboard_ConfirmOverwriteBackup" xml:space="preserve"><value>バックアップの上書き</value></data>
   <data name="Dashboard_OverwriteBackupWarning" xml:space="preserve"><value>既存のバックアップファイルを上書きします。よろしいですか？</value></data>
   <data name="Dashboard_OverwriteBackup" xml:space="preserve"><value>上書き</value></data>
@@ -241,6 +242,7 @@
   <data name="Dashboard_RestoreDone" xml:space="preserve"><value>データベースの復元が完了しました</value></data>
   <data name="Dashboard_RestoreError" xml:space="preserve"><value>復元できません: {0}</value></data>
   <data name="Dashboard_RestoreFailed" xml:space="preserve"><value>バックアップファイルを検証または復元できませんでした</value></data>
+  <data name="Dashboard_RestoreCancelled" xml:space="preserve"><value>復元をキャンセルしました</value></data>
   <data name="Dashboard_RestoreRestartRequired" xml:space="preserve"><value>データベースを復元しました。アプリケーションを再度開いてください。</value></data>
   <data name="Dashboard_ExportWriteFailed" xml:space="preserve"><value>CSVファイルを書き込めませんでした</value></data>
   <data name="Dashboard_NoCollections" xml:space="preserve"><value>コレクションがありません。先に「コレクション」メニューからコレクションを作成してください。</value></data>
@@ -272,6 +274,10 @@
   <!-- DuplicateDetection -->
   <data name="Duplicate_NoDuplicates" xml:space="preserve"><value>重複した文書は見つかりませんでした ✅</value></data>
   <data name="Duplicate_ConfirmDelete" xml:space="preserve"><value>文書 '{0}' (ID: {1}) を削除しますか？</value></data>
+  <data name="Duplicate_Merge" xml:space="preserve"><value>統合</value></data>
+  <data name="Duplicate_ConfirmMerge" xml:space="preserve"><value>「{0}」を残し、重複文書 {1} 件を統合しますか？</value></data>
+  <data name="Duplicate_MergeSuccess" xml:space="preserve"><value>重複文書 {1} 件を「{0}」に統合しました。</value></data>
+  <data name="Duplicate_MatchInfo" xml:space="preserve"><value>{0}件の文書</value></data>
 
   <!-- RelatedDocuments -->
   <data name="Related_ConfirmRemove" xml:space="preserve"><value>'{0}' とのリンクを解除しますか？</value></data>
@@ -330,6 +336,26 @@
   <data name="Menu_ManageCategories" xml:space="preserve"><value>カテゴリ管理</value></data>
   <data name="Menu_Collections" xml:space="preserve"><value>コレクション</value></data>
   <data name="Menu_BatchImport" xml:space="preserve"><value>一括インポート</value></data>
+  <data name="ImportInbox_Title" xml:space="preserve"><value>インポート受信箱</value></data>
+  <data name="ImportInbox_ShowProcessed" xml:space="preserve"><value>処理済みを表示</value></data>
+  <data name="ImportInbox_Name" xml:space="preserve"><value>名前</value></data>
+  <data name="ImportInbox_State" xml:space="preserve"><value>状態</value></data>
+  <data name="ImportInbox_Source" xml:space="preserve"><value>ソース</value></data>
+  <data name="ImportInbox_Retry" xml:space="preserve"><value>再試行</value></data>
+  <data name="ImportInbox_Reveal" xml:space="preserve"><value>場所を表示</value></data>
+  <data name="ImportInbox_SourceMissing" xml:space="preserve"><value>ソースファイルが見つかりません。</value></data>
+  <data name="ImportInbox_Status" xml:space="preserve"><value>受信箱の項目: {0}</value></data>
+  <data name="ImportInbox_Empty" xml:space="preserve"><value>インポート受信箱に項目はありません。</value></data>
+  <data name="ImportInbox_Subject" xml:space="preserve"><value>科目</value></data>  <data name="ImportInbox_ApplyMetadata" xml:space="preserve"><value>メタデータを適用</value></data>
+  <data name="ImportInbox_Type" xml:space="preserve"><value>種類</value></data>  <data name="ImportInbox_All" xml:space="preserve"><value>すべて</value></data>
+  <data name="ImportInbox_State_Pending" xml:space="preserve"><value>保留中</value></data>
+  <data name="ImportInbox_State_Held" xml:space="preserve"><value>保留</value></data>
+  <data name="ImportInbox_State_Failed" xml:space="preserve"><value>失敗</value></data>
+  <data name="ImportInbox_State_Processed" xml:space="preserve"><value>処理済み</value></data>
+  <data name="ImportInbox_State_MissingMetadata" xml:space="preserve"><value>メタデータ不足</value></data>
+  <data name="ImportInbox_State_Ambiguous" xml:space="preserve"><value>名前が重複</value></data>
+  <data name="ImportInbox_Failure" xml:space="preserve"><value>失敗理由</value></data>
+  <data name="ImportInbox_Duplicate" xml:space="preserve"><value>重複候補</value></data>
   <data name="Menu_BulkDelete" xml:space="preserve"><value>一括削除</value></data>
   <data name="Menu_FindDuplicates" xml:space="preserve"><value>重複検出</value></data>
   <data name="Menu_FileCheck" xml:space="preserve"><value>ファイル整合性</value></data>
@@ -657,6 +683,9 @@
   <data name="FileIntegrity_StatValid" xml:space="preserve"><value>正常</value></data>
   <data name="FileIntegrity_StatMissing" xml:space="preserve"><value>欠損</value></data>
   <data name="FileIntegrity_StatCorrupted" xml:space="preserve"><value>破損</value></data>
+  <data name="FileIntegrity_BtnCancel" xml:space="preserve"><value>スキャンをキャンセル</value></data>
+  <data name="FileIntegrity_BtnRetryMissing" xml:space="preserve"><value>欠損を再確認</value></data>
+  <data name="FileIntegrity_Cancelled" xml:space="preserve"><value>{1}件中{0}件を処理した時点でスキャンをキャンセルしました。</value></data>
 
   <!-- AddEdit View (additional) -->
   <data name="AddEdit_LblDocName" xml:space="preserve"><value>文書名 *</value></data>
@@ -728,8 +757,16 @@
   <data name="BatchImport_BtnScan" xml:space="preserve"><value>スキャン</value></data>
   <data name="BatchImport_ColPath" xml:space="preserve"><value>パス</value></data>
   <data name="BatchImport_ColSize" xml:space="preserve"><value>サイズ</value></data>
+  <data name="BatchImport_ColFailure" xml:space="preserve"><value>失敗理由</value></data>
+  <data name="BatchImport_ItemFailed" xml:space="preserve"><value>インポートに失敗しました</value></data>
+  <data name="BatchImport_FileError" xml:space="preserve"><value>ファイルの読み込みに失敗しました</value></data>
+  <data name="BatchImport_PermissionError" xml:space="preserve"><value>アクセス権限がありません</value></data>
+  <data name="BatchImport_DatabaseError" xml:space="preserve"><value>データベースエラーが発生しました</value></data>
   <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>デフォルト科目</value></data>
   <data name="BatchImport_LblFolder" xml:space="preserve"><value>フォルダ</value></data>
+  <data name="BatchImport_BtnRetryFailed" xml:space="preserve"><value>失敗を再試行</value></data>
+  <data name="BatchImport_ProgressLabel" xml:space="preserve"><value>進捗:</value></data>
+  <data name="BatchImport_Cancelled" xml:space="preserve"><value>{1}件中{0}件を処理した時点でインポートをキャンセルしました。</value></data>
   <data name="Bulk_BtnDeselectAll" xml:space="preserve"><value>すべて解除</value></data>
   <data name="BulkDelete_ColDateAdded" xml:space="preserve"><value>追加日</value></data>
   <data name="Menu_ChangeLanguage" xml:space="preserve"><value>言語を変更</value></data>
@@ -836,6 +873,106 @@
   <data name="PV_CascadeTitle" xml:space="preserve"><value>{0}を削除しますか？</value></data>
   <data name="PV_MembershipNote" xml:space="preserve"><value>削除後も「元に戻す」でコレクションとメンバー構成を復元できます。文書自体は削除されません。</value></data>
   <data name="PV_RecycleBinNote" xml:space="preserve"><value>削除された文書はごみ箱から復元できます。「元に戻す」でも復元できます。</value></data>
+  <data name="RC_Title" xml:space="preserve"><value>リカバリーセンター</value></data>
+  <data name="RC_LatestBackup" xml:space="preserve"><value>最新バックアップ:</value></data>
+  <data name="RC_LatestNone" xml:space="preserve"><value>バックアップはまだありません</value></data>
+  <data name="RC_StatusNone" xml:space="preserve"><value>—</value></data>
+  <data name="RC_StatusValid" xml:space="preserve"><value>正常</value></data>
+  <data name="RC_StatusInvalid" xml:space="preserve"><value>無効</value></data>
+  <data name="RC_Location" xml:space="preserve"><value>保存先:</value></data>
+  <data name="RC_Retention" xml:space="preserve"><value>保持する世代数:</value></data>
+  <data name="RC_SaveRetention" xml:space="preserve"><value>保持設定を保存</value></data>
+  <data name="RC_CreateBackup" xml:space="preserve"><value>バックアップを作成</value></data>
+  <data name="RC_Restore" xml:space="preserve"><value>復元</value></data>
+  <data name="RC_OpenFolder" xml:space="preserve"><value>フォルダーを開く</value></data>
+  <data name="RC_RestoreFromFile" xml:space="preserve"><value>ファイルから復元…</value></data>
+  <data name="RC_ColName" xml:space="preserve"><value>バックアップファイル</value></data>
+  <data name="RC_ColCreated" xml:space="preserve"><value>作成日時</value></data>
+  <data name="RC_ColSize" xml:space="preserve"><value>サイズ</value></data>
+  <data name="RC_ColStatus" xml:space="preserve"><value>状態</value></data>
+  <data name="RC_EmptyState" xml:space="preserve"><value>バックアップ世代はまだありません。最初のバックアップを作成しましょう。</value></data>
+  <data name="RC_ConfirmRestoreTitle" xml:space="preserve"><value>復元の確認</value></data>
+  <data name="RC_ConfirmRestoreMessage" xml:space="preserve"><value>{0} に作成されたバックアップを復元しますか？&#10;&#10;現在のデータベース（{2}、ドキュメント {1} 件）は置き換えられます。この操作は取り消せません。</value></data>
+  <data name="RC_RestoreRestartMessage" xml:space="preserve"><value>復元が完了しました。&#10;&#10;復元を完了するにはアプリケーションの再起動が必要です。&#10;手順:&#10;1. 作業中のデータを保存し、自動的に閉じない場合はこのウィンドウを閉じてください。&#10;2. Study Document Manager を再度起動します。&#10;3. ダッシュボードでドキュメントを確認してください。</value></data>
+  <data name="RC_BackupCreated" xml:space="preserve"><value>バックアップを作成しました。</value></data>
+  <data name="RC_BackupFailed" xml:space="preserve"><value>バックアップに失敗しました。</value></data>
+  <data name="RC_RetentionSaved" xml:space="preserve"><value>保持設定を保存しました。</value></data>
+  <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>このファイルは有効なバックアップ世代ではありません。</value></data>
+  <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>復元に失敗しました。現在のデータベースは変更されていません。</value></data>
+  <data name="RC_RecoveryPaths" xml:space="preserve"><value>関連する復旧ツール:</value></data>
+  <data name="FileState_AccessDenied" xml:space="preserve"><value>ファイルへのアクセス権限がありません</value></data>
+  <data name="FileState_DriveDisconnected" xml:space="preserve"><value>ドライブが接続されていません</value></data>
+  <data name="FileState_InvalidPath" xml:space="preserve"><value>パスが無効です</value></data>
+  <data name="Integrity_DatabaseLocation" xml:space="preserve"><value>データベースの保存先:</value></data>
+  <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>保存フォルダーを開く</value></data>
+  <data name="Integrity_PathCopied" xml:space="preserve"><value>パスをクリップボードにコピーしました。</value></data>
+  <data name="RC_Loading" xml:space="preserve"><value>読み込み中…</value></data>
+  <data name="SW_Title" xml:space="preserve"><value>学生ワークスペース</value></data>
+  <data name="SW_AcademicYear" xml:space="preserve"><value>学年度</value></data>
+  <data name="SW_ContextSemester" xml:space="preserve"><value>学期</value></data>
+  <data name="SW_ContextCourse" xml:space="preserve"><value>コース</value></data>
+  <data name="SW_ContextModule" xml:space="preserve"><value>モジュール</value></data>
+  <data name="SW_ContextOwner" xml:space="preserve"><value>担当者</value></data>
+  <data name="SW_SaveContext" xml:space="preserve"><value>コンテキストを保存</value></data>
+  <data name="SW_ContextSaved" xml:space="preserve"><value>学習コンテキストを保存しました</value></data>
+  <data name="SW_StatusReady" xml:space="preserve"><value>課題 {0} 件</value></data>
+  <data name="SW_Courses" xml:space="preserve"><value>コース</value></data>
+  <data name="SW_Semesters" xml:space="preserve"><value>学期</value></data>
+  <data name="SW_Assignments" xml:space="preserve"><value>課題</value></data>
+  <data name="SW_AddCourse" xml:space="preserve"><value>コース追加</value></data>
+  <data name="SW_AddSemester" xml:space="preserve"><value>学期追加</value></data>
+  <data name="SW_CourseName" xml:space="preserve"><value>コース名</value></data>
+  <data name="SW_SemesterName" xml:space="preserve"><value>学期名</value></data>
+  <data name="SW_DeleteCourseConfirm" xml:space="preserve"><value>コース「{0}」を削除しますか？</value></data>
+  <data name="SW_DeleteSemesterConfirm" xml:space="preserve"><value>学期「{0}」を削除しますか？</value></data>
+  <data name="SW_ShowHistory" xml:space="preserve"><value>履歴を表示</value></data>
+  <data name="SW_NewAssignment" xml:space="preserve"><value>課題追加</value></data>
+  <data name="SW_AssignmentEditor" xml:space="preserve"><value>課題編集</value></data>
+  <data name="SW_AssignmentTitle" xml:space="preserve"><value>課題名</value></data>
+  <data name="SW_OfficialDeadline" xml:space="preserve"><value>公式期限</value></data>
+  <data name="SW_PersonalDeadline" xml:space="preserve"><value>個人期限</value></data>
+  <data name="SW_Status" xml:space="preserve"><value>ステータス</value></data>
+  <data name="SW_Priority" xml:space="preserve"><value>優先度</value></data>
+  <data name="SW_Milestone" xml:space="preserve"><value>マイルストーン</value></data>
+  <data name="SW_Notes" xml:space="preserve"><value>メモ</value></data>
+  <data name="SW_DeleteAssignmentConfirm" xml:space="preserve"><value>課題「{0}」を削除しますか？</value></data>
+  <data name="SW_TitleRequired" xml:space="preserve"><value>課題名を入力してください</value></data>
+  <data name="SW_OpenRelatedDocument" xml:space="preserve"><value>関連文書を開く</value></data>
+  <data name="SW_NoRelatedDocument" xml:space="preserve"><value>関連文書がありません</value></data>
+  <data name="SW_RelatedDocumentMissing" xml:space="preserve"><value>関連文書ファイルが見つかりません</value></data>
+  <data name="SW_Active" xml:space="preserve"><value>有効</value></data>
+  <data name="SW_Status_Planned" xml:space="preserve"><value>予定</value></data>
+  <data name="SW_Status_InProgress" xml:space="preserve"><value>進行中</value></data>
+  <data name="SW_Status_Completed" xml:space="preserve"><value>完了</value></data>
+  <data name="SW_Priority_Low" xml:space="preserve"><value>低</value></data>
+  <data name="SW_Priority_Normal" xml:space="preserve"><value>通常</value></data>
+  <data name="SW_Priority_High" xml:space="preserve"><value>高</value></data>
+  <data name="SW_Deadline_NoDate" xml:space="preserve"><value>期限なし</value></data>
+  <data name="SW_Deadline_Overdue" xml:space="preserve"><value>期限切れ</value></data>
+  <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>期限間近</value></data>
+  <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>予定あり</value></data>
+  <data name="Btn_Back" xml:space="preserve"><value>戻る</value></data>
+  <data name="WF_Title" xml:space="preserve"><value>監視フォルダ</value></data>
+  <data name="WF_Add" xml:space="preserve"><value>追加</value></data>
+  <data name="WF_Remove" xml:space="preserve"><value>削除</value></data>
+  <data name="WF_Enable" xml:space="preserve"><value>有効</value></data>
+  <data name="WF_Start" xml:space="preserve"><value>監視開始</value></data>
+  <data name="WF_Stop" xml:space="preserve"><value>監視停止</value></data>
+  <data name="WF_FolderPath" xml:space="preserve"><value>フォルダパス</value></data>
+  <data name="WF_NoFolders" xml:space="preserve"><value>監視対象のフォルダがありません</value></data>
+  <data name="WF_Status_Watching" xml:space="preserve"><value>{0} 個のフォルダを監視中。</value></data>
+  <data name="WF_Status_Stopped" xml:space="preserve"><value>監視を停止しました。</value></data>
+  <data name="WF_Status_NoFolders" xml:space="preserve"><value>監視対象のフォルダはありません。</value></data>
+  <data name="WF_Error_PathRequired" xml:space="preserve"><value>フォルダパスは必須です。</value></data>
+  <data name="WF_Error_NotFound" xml:space="preserve"><value>フォルダが存在しません。</value></data>
+  <data name="WF_Error_StartFailed" xml:space="preserve"><value>監視を開始できませんでした。</value></data>
+  <data name="WF_ItemStatus_Running" xml:space="preserve"><value>監視中</value></data>
+  <data name="WF_ItemStatus_Disabled" xml:space="preserve"><value>無効</value></data>
+  <data name="WF_ItemStatus_Error" xml:space="preserve"><value>エラー</value></data>
+  <data name="WF_ItemStatus_Stopped" xml:space="preserve"><value>停止</value></data>
+  <data name="WF_ItemStatus_Unknown" xml:space="preserve"><value>未確定</value></data>
+  <data name="WF_Error_WatcherFault" xml:space="preserve"><value>フォルダー監視で致命的なエラーが発生しました</value></data>
+  <data name="WF_IncludeSub" xml:space="preserve"><value>サブフォルダを含める</value></data>
 </root>
 
 

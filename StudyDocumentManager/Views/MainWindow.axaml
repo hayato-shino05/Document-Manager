@@ -83,14 +83,18 @@
                         <MenuItem Header="{loc:Localize Menu_ManageCategories}" Command="{Binding NavigateCommand}" CommandParameter="categories" InputGesture="Ctrl+M"/>
                         <MenuItem Header="{loc:Localize Menu_Collections}" Command="{Binding NavigateCommand}" CommandParameter="collections"/>
                         <MenuItem Header="{loc:Localize Menu_SmartViews}" Command="{Binding NavigateCommand}" CommandParameter="smartviews"/>
+                        <MenuItem Header="{loc:Localize SW_Title}" Command="{Binding NavigateCommand}" CommandParameter="student-workspace"/>
                     </MenuItem>
                     <MenuItem Header="{loc:Localize Menu_Import}"
                               AutomationProperties.AutomationId="Menu_Import">
                         <MenuItem Header="{loc:Localize Menu_BatchImport}" Command="{Binding NavigateCommand}" CommandParameter="batch-import"/>
+                        <MenuItem Header="{loc:Localize ImportInbox_Title}" Command="{Binding NavigateCommand}" CommandParameter="import-inbox"/>
+                        <MenuItem Header="{loc:Localize WF_Title}" Command="{Binding NavigateCommand}" CommandParameter="watchedfolder"/>
                     </MenuItem>
-                    <MenuItem Header="{loc:Localize Menu_Maintenance}"
-                              AutomationProperties.AutomationId="Menu_Maintenance">
-                        <MenuItem Header="{loc:Localize Menu_BulkDelete}" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
+            <MenuItem Header="{loc:Localize Menu_Maintenance}"
+                      AutomationProperties.AutomationId="Menu_Maintenance">
+                <MenuItem Header="{loc:Localize RC_Title}" Command="{Binding NavigateCommand}" CommandParameter="recovery"/>
+                <MenuItem Header="{loc:Localize Menu_BulkDelete}" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
                         <MenuItem Header="{loc:Localize Menu_FindDuplicates}" Command="{Binding NavigateCommand}" CommandParameter="duplicates"/>
                         <MenuItem Header="{loc:Localize Menu_FileCheck}" Command="{Binding NavigateCommand}" CommandParameter="integrity"/>
                         <MenuItem Header="{loc:Localize Menu_RecycleBin}" Command="{Binding NavigateCommand}" CommandParameter="recycle"/>
@@ -249,6 +253,12 @@
                 <DataTemplate DataType="{x:Type vm:BulkDeleteModel}">
                     <v:BulkDelete />
                 </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:ImportInboxModel}">
+                    <v:ImportInbox />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:WatchedFolderModel}">
+                    <v:WatchedFolder />
+                </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:DuplicateDetectionModel}">
                     <v:DuplicateDetection />
                 </DataTemplate>
@@ -272,6 +282,12 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:SmartViewsModel}">
                     <v:SmartViews />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:StudentWorkspaceModel}">
+                    <v:StudentWorkspace />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:RecoveryCenterModel}">
+                    <v:RecoveryCenterView />
                 </DataTemplate>
             </ContentControl.DataTemplates>
         </ContentControl>

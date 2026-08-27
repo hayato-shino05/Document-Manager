@@ -36,7 +36,10 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             "categories" => serviceProvider.GetRequiredService<CategoryManagementModel>(),
             "collections" => serviceProvider.GetRequiredService<CollectionManagementModel>(),
             "recyclebin" or "recycle" => serviceProvider.GetRequiredService<RecycleBinModel>(),
+            "recovery" or "recoverycenter" or "recovery-center" => serviceProvider.GetRequiredService<RecoveryCenterModel>(),
             "batchimport" or "batch-import" => serviceProvider.GetRequiredService<BatchImportModel>(),
+            "importinbox" or "import-inbox" or "inbox" => serviceProvider.GetRequiredService<ImportInboxModel>(),
+            "watchedfolder" or "watched-folder" or "watcher" => serviceProvider.GetRequiredService<WatchedFolderModel>(),
             "bulkdelete" or "bulk-delete" => serviceProvider.GetRequiredService<BulkDeleteModel>(),
             "duplicates" => serviceProvider.GetRequiredService<DuplicateDetectionModel>(),
             "fileintegrity" or "integrity" => serviceProvider.GetRequiredService<FileIntegrityCheckModel>(),
@@ -46,13 +49,14 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             "personal-note" => CreatePersonalNoteModel(parameter),
             "related-docs" => CreateRelatedDocsModel(parameter),
             "smartviews" or "smart-views" or "savedsearches" => serviceProvider.GetRequiredService<SmartViewsModel>(),
+            "student" or "assignments" or "student-workspace" => serviceProvider.GetRequiredService<StudentWorkspaceModel>(),
             "run-smartview" => CreateDashboardWithSavedSearch(parameter),
             _ => serviceProvider.GetRequiredService<DashboardModel>(),
         };
 
         if (viewModel != null)
         {
-            _mainModel.CurrentView = viewModel;
+            SetCurrentView(viewModel);
         }
     }
 
@@ -60,7 +64,18 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
     public void GoBack()
     {
         if (_mainModel == null) return;
-        _mainModel.CurrentView = serviceProvider.GetRequiredService<DashboardModel>();
+        SetCurrentView(serviceProvider.GetRequiredService<DashboardModel>());
+    }
+
+    private void SetCurrentView(ModelBase viewModel)
+    {
+        if (_mainModel is null || ReferenceEquals(_mainModel.CurrentView, viewModel))
+            return;
+
+        if (_mainModel.CurrentView is IDisposable disposable)
+            disposable.Dispose();
+
+        _mainModel.CurrentView = viewModel;
     }
 
     private AddEditModel CreateAddEditModel(int? documentId)

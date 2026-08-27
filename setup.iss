@@ -16,7 +16,7 @@
 #define MyAppPublisher "hayato-shino05"
 #define MyAppURL "https://github.com/hayato-shino05/study-document-manager"
 #define MyAppExeName "DocumentManager.exe"
-#define MyAppSetupName "DocumentManager_v" + MyAppVersion + "_Setup"
+#define MyAppSetupName "DocumentManager"
 
 [Setup]
 AppId={{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}

@@ -61,7 +61,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "ISCC.exe failed with exit code $LASTEXITCODE"
 }
 
-$setupExe = Join-Path $installerDir "DocumentManager_v${Version}_Setup.exe"
+$setupExe = Join-Path $installerDir "DocumentManager.exe"
 if (-not (Test-Path $setupExe)) {
     throw "Setup EXE was not generated: $setupExe"
 }

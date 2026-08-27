@@ -213,6 +213,9 @@
   <data name="Dashboard_BackupFailed" xml:space="preserve">
     <value>无法创建备份文件</value>
   </data>
+  <data name="Dashboard_BackupCancelled" xml:space="preserve">
+    <value>已取消备份</value>
+  </data>
   <data name="Dashboard_ConfirmOverwriteBackup" xml:space="preserve">
     <value>覆盖备份</value>
   </data>
@@ -224,6 +227,9 @@
   </data>
   <data name="Dashboard_RestoreFailed" xml:space="preserve">
     <value>无法验证或恢复备份文件</value>
+  </data>
+  <data name="Dashboard_RestoreCancelled" xml:space="preserve">
+    <value>已取消恢复</value>
   </data>
   <data name="Dashboard_RestoreRestartRequired" xml:space="preserve">
     <value>数据库已恢复。请重新打开应用程序。</value>
@@ -527,6 +533,10 @@
   <data name="AddEdit_FileFilter" xml:space="preserve"><value>所有文件|*.*|PDF|*.pdf|Word|*.doc;*.docx|Excel|*.xls;*.xlsx|图像|*.png;*.jpg;*.jpeg;*.gif;*.bmp</value></data>
   <data name="Duplicate_NoDuplicates" xml:space="preserve"><value>未发现重复文档 ✅</value></data>
   <data name="Duplicate_ConfirmDelete" xml:space="preserve"><value>要删除文档“{0}”（ID：{1}）吗？</value></data>
+  <data name="Duplicate_Merge" xml:space="preserve"><value>合并</value></data>
+  <data name="Duplicate_ConfirmMerge" xml:space="preserve"><value>保留“{0}”，并将 {1} 个重复文档合并到其中吗？</value></data>
+  <data name="Duplicate_MergeSuccess" xml:space="preserve"><value>已将 {1} 个重复文档合并到“{0}”。</value></data>
+  <data name="Duplicate_MatchInfo" xml:space="preserve"><value>{0} 个文档</value></data>
   <data name="Related_ConfirmRemove" xml:space="preserve"><value>要取消与“{0}”的关联吗？</value></data>
   <data name="Related_TypeRelated" xml:space="preserve"><value>相关</value></data>
   <data name="Related_TypeReference" xml:space="preserve"><value>参考</value></data>
@@ -566,6 +576,26 @@
   <data name="Menu_ManageCategories" xml:space="preserve"><value>管理分类</value></data>
   <data name="Menu_Collections" xml:space="preserve"><value>收藏集</value></data>
   <data name="Menu_BatchImport" xml:space="preserve"><value>批量导入</value></data>
+  <data name="ImportInbox_Title" xml:space="preserve"><value>导入收件箱</value></data>
+  <data name="ImportInbox_ShowProcessed" xml:space="preserve"><value>显示已处理</value></data>
+  <data name="ImportInbox_Name" xml:space="preserve"><value>名称</value></data>
+  <data name="ImportInbox_State" xml:space="preserve"><value>状态</value></data>
+  <data name="ImportInbox_Source" xml:space="preserve"><value>来源</value></data>
+  <data name="ImportInbox_Retry" xml:space="preserve"><value>重试</value></data>
+  <data name="ImportInbox_Reveal" xml:space="preserve"><value>显示位置</value></data>
+  <data name="ImportInbox_SourceMissing" xml:space="preserve"><value>源文件不存在。</value></data>
+  <data name="ImportInbox_Status" xml:space="preserve"><value>{0} 个收件箱项目</value></data>
+  <data name="ImportInbox_Empty" xml:space="preserve"><value>导入收件箱中没有项目。</value></data>
+  <data name="ImportInbox_Subject" xml:space="preserve"><value>科目</value></data>  <data name="ImportInbox_ApplyMetadata" xml:space="preserve"><value>应用元数据</value></data>
+  <data name="ImportInbox_Type" xml:space="preserve"><value>类型</value></data>  <data name="ImportInbox_All" xml:space="preserve"><value>全部</value></data>
+  <data name="ImportInbox_State_Pending" xml:space="preserve"><value>待处理</value></data>
+  <data name="ImportInbox_State_Held" xml:space="preserve"><value>保留</value></data>
+  <data name="ImportInbox_State_Failed" xml:space="preserve"><value>失败</value></data>
+  <data name="ImportInbox_State_Processed" xml:space="preserve"><value>已处理</value></data>
+  <data name="ImportInbox_State_MissingMetadata" xml:space="preserve"><value>缺少元数据</value></data>
+  <data name="ImportInbox_State_Ambiguous" xml:space="preserve"><value>名称不明确</value></data>
+  <data name="ImportInbox_Failure" xml:space="preserve"><value>失败原因</value></data>
+  <data name="ImportInbox_Duplicate" xml:space="preserve"><value>重复候选</value></data>
   <data name="Menu_BulkDelete" xml:space="preserve"><value>批量删除</value></data>
   <data name="Menu_FindDuplicates" xml:space="preserve"><value>查找重复项</value></data>
   <data name="Menu_FileCheck" xml:space="preserve"><value>文件完整性检查</value></data>
@@ -786,6 +816,9 @@
   <data name="FileIntegrity_StatValid" xml:space="preserve"><value>正常</value></data>
   <data name="FileIntegrity_StatMissing" xml:space="preserve"><value>缺失</value></data>
   <data name="FileIntegrity_StatCorrupted" xml:space="preserve"><value>损坏</value></data>
+  <data name="FileIntegrity_BtnCancel" xml:space="preserve"><value>取消扫描</value></data>
+  <data name="FileIntegrity_BtnRetryMissing" xml:space="preserve"><value>重新检查缺失文件</value></data>
+  <data name="FileIntegrity_Cancelled" xml:space="preserve"><value>扫描已取消，已处理 {0}/{1} 个文件。</value></data>
   <data name="AddEdit_LblDocName" xml:space="preserve"><value>文档名称 *</value></data>
   <data name="AddEdit_PlaceholderDocName" xml:space="preserve"><value>输入文档名称...</value></data>
   <data name="AddEdit_LblCategory" xml:space="preserve"><value>分类（科目）</value></data>
@@ -825,8 +858,16 @@
   <data name="BatchImport_BtnScan" xml:space="preserve"><value>扫描</value></data>
   <data name="BatchImport_ColPath" xml:space="preserve"><value>路径</value></data>
   <data name="BatchImport_ColSize" xml:space="preserve"><value>大小</value></data>
+  <data name="BatchImport_ColFailure" xml:space="preserve"><value>失败原因</value></data>
+  <data name="BatchImport_ItemFailed" xml:space="preserve"><value>导入失败</value></data>
+  <data name="BatchImport_FileError" xml:space="preserve"><value>无法读取文件</value></data>
+  <data name="BatchImport_PermissionError" xml:space="preserve"><value>访问被拒绝</value></data>
+  <data name="BatchImport_DatabaseError" xml:space="preserve"><value>发生数据库错误</value></data>
   <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>默认分类</value></data>
   <data name="BatchImport_LblFolder" xml:space="preserve"><value>文件夹</value></data>
+  <data name="BatchImport_BtnRetryFailed" xml:space="preserve"><value>重试失败项</value></data>
+  <data name="BatchImport_ProgressLabel" xml:space="preserve"><value>进度：</value></data>
+  <data name="BatchImport_Cancelled" xml:space="preserve"><value>导入已取消：共 {1} 个文件，已处理 {0} 个。</value></data>
   <data name="Bulk_BtnDeselectAll" xml:space="preserve"><value>取消全选</value></data>
   <data name="BulkDelete_ColDateAdded" xml:space="preserve"><value>添加日期</value></data>
   <data name="Menu_ChangeLanguage" xml:space="preserve"><value>更改语言</value></data>
@@ -933,4 +974,104 @@
   <data name="PV_CascadeTitle" xml:space="preserve"><value>要删除{0}吗？</value></data>
   <data name="PV_MembershipNote" xml:space="preserve"><value>删除后可通过“撤销”恢复收藏集及其成员。文档本身不会被删除。</value></data>
   <data name="PV_RecycleBinNote" xml:space="preserve"><value>被删除的文档可从回收站或通过“撤销”恢复。</value></data>
+  <data name="RC_Title" xml:space="preserve"><value>恢复中心</value></data>
+  <data name="RC_LatestBackup" xml:space="preserve"><value>最新备份：</value></data>
+  <data name="RC_LatestNone" xml:space="preserve"><value>尚无备份</value></data>
+  <data name="RC_StatusNone" xml:space="preserve"><value>—</value></data>
+  <data name="RC_StatusValid" xml:space="preserve"><value>有效</value></data>
+  <data name="RC_StatusInvalid" xml:space="preserve"><value>无效</value></data>
+  <data name="RC_Location" xml:space="preserve"><value>保存位置：</value></data>
+  <data name="RC_Retention" xml:space="preserve"><value>保留版本数：</value></data>
+  <data name="RC_SaveRetention" xml:space="preserve"><value>保存保留设置</value></data>
+  <data name="RC_CreateBackup" xml:space="preserve"><value>创建备份</value></data>
+  <data name="RC_Restore" xml:space="preserve"><value>恢复</value></data>
+  <data name="RC_OpenFolder" xml:space="preserve"><value>打开文件夹</value></data>
+  <data name="RC_RestoreFromFile" xml:space="preserve"><value>从文件恢复…</value></data>
+  <data name="RC_ColName" xml:space="preserve"><value>备份文件</value></data>
+  <data name="RC_ColCreated" xml:space="preserve"><value>创建时间</value></data>
+  <data name="RC_ColSize" xml:space="preserve"><value>大小</value></data>
+  <data name="RC_ColStatus" xml:space="preserve"><value>状态</value></data>
+  <data name="RC_EmptyState" xml:space="preserve"><value>尚无备份版本，请创建第一个备份。</value></data>
+  <data name="RC_ConfirmRestoreTitle" xml:space="preserve"><value>确认恢复</value></data>
+  <data name="RC_ConfirmRestoreMessage" xml:space="preserve"><value>要恢复 {0} 创建的备份吗？&#10;&#10;当前数据库（{2}，共 {1} 个文档）将被替换。此操作无法撤销。</value></data>
+  <data name="RC_RestoreRestartMessage" xml:space="preserve"><value>恢复完成。&#10;&#10;需要重新启动应用程序以完成恢复。&#10;步骤：&#10;1. 保存当前工作；如果窗口未自动关闭，请手动关闭。&#10;2. 重新启动 Study Document Manager。&#10;3. 在仪表板上核对文档。</value></data>
+  <data name="RC_BackupCreated" xml:space="preserve"><value>备份已创建。</value></data>
+  <data name="RC_BackupFailed" xml:space="preserve"><value>备份失败。</value></data>
+  <data name="RC_RetentionSaved" xml:space="preserve"><value>保留设置已保存。</value></data>
+  <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>该文件不是有效的备份版本。</value></data>
+  <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>恢复失败。当前数据库未被更改。</value></data>
+  <data name="RC_RecoveryPaths" xml:space="preserve"><value>相关恢复工具：</value></data>
+  <data name="FileState_AccessDenied" xml:space="preserve"><value>没有访问此文件的权限</value></data>
+  <data name="FileState_DriveDisconnected" xml:space="preserve"><value>驱动器未连接</value></data>
+  <data name="FileState_InvalidPath" xml:space="preserve"><value>路径无效</value></data>
+  <data name="Integrity_DatabaseLocation" xml:space="preserve"><value>数据库位置：</value></data>
+  <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>打开所在文件夹</value></data>
+  <data name="Integrity_PathCopied" xml:space="preserve"><value>路径已复制到剪贴板。</value></data>
+  <data name="RC_Loading" xml:space="preserve"><value>加载中…</value></data>
+  <data name="SW_Title" xml:space="preserve"><value>学生工作区</value></data>
+  <data name="SW_AcademicYear" xml:space="preserve"><value>学年</value></data>
+  <data name="SW_ContextSemester" xml:space="preserve"><value>学期</value></data>
+  <data name="SW_ContextCourse" xml:space="preserve"><value>课程</value></data>
+  <data name="SW_ContextModule" xml:space="preserve"><value>模块</value></data>
+  <data name="SW_ContextOwner" xml:space="preserve"><value>负责人</value></data>
+  <data name="SW_SaveContext" xml:space="preserve"><value>保存上下文</value></data>
+  <data name="SW_ContextSaved" xml:space="preserve"><value>学习上下文已保存</value></data>
+  <data name="SW_StatusReady" xml:space="preserve"><value>{0} 个作业</value></data>
+  <data name="SW_Courses" xml:space="preserve"><value>课程</value></data>
+  <data name="SW_Semesters" xml:space="preserve"><value>学期</value></data>
+  <data name="SW_Assignments" xml:space="preserve"><value>作业</value></data>
+  <data name="SW_AddCourse" xml:space="preserve"><value>添加课程</value></data>
+  <data name="SW_AddSemester" xml:space="preserve"><value>添加学期</value></data>
+  <data name="SW_CourseName" xml:space="preserve"><value>课程名称</value></data>
+  <data name="SW_SemesterName" xml:space="preserve"><value>学期名称</value></data>
+  <data name="SW_DeleteCourseConfirm" xml:space="preserve"><value>删除课程“{0}”吗？</value></data>
+  <data name="SW_DeleteSemesterConfirm" xml:space="preserve"><value>删除学期“{0}”吗？</value></data>
+  <data name="SW_ShowHistory" xml:space="preserve"><value>显示历史</value></data>
+  <data name="SW_NewAssignment" xml:space="preserve"><value>新建作业</value></data>
+  <data name="SW_AssignmentEditor" xml:space="preserve"><value>作业编辑器</value></data>
+  <data name="SW_AssignmentTitle" xml:space="preserve"><value>作业标题</value></data>
+  <data name="SW_OfficialDeadline" xml:space="preserve"><value>官方截止日期</value></data>
+  <data name="SW_PersonalDeadline" xml:space="preserve"><value>个人截止日期</value></data>
+  <data name="SW_Status" xml:space="preserve"><value>状态</value></data>
+  <data name="SW_Priority" xml:space="preserve"><value>优先级</value></data>
+  <data name="SW_Milestone" xml:space="preserve"><value>里程碑</value></data>
+  <data name="SW_Notes" xml:space="preserve"><value>备注</value></data>
+  <data name="SW_DeleteAssignmentConfirm" xml:space="preserve"><value>删除作业“{0}”吗？</value></data>
+  <data name="SW_TitleRequired" xml:space="preserve"><value>请输入作业标题</value></data>
+  <data name="SW_OpenRelatedDocument" xml:space="preserve"><value>打开相关文档</value></data>
+  <data name="SW_NoRelatedDocument" xml:space="preserve"><value>没有相关文档</value></data>
+  <data name="SW_RelatedDocumentMissing" xml:space="preserve"><value>找不到相关文档文件</value></data>
+  <data name="SW_Active" xml:space="preserve"><value>当前</value></data>
+  <data name="SW_Status_Planned" xml:space="preserve"><value>计划中</value></data>
+  <data name="SW_Status_InProgress" xml:space="preserve"><value>进行中</value></data>
+  <data name="SW_Status_Completed" xml:space="preserve"><value>已完成</value></data>
+  <data name="SW_Priority_Low" xml:space="preserve"><value>低</value></data>
+  <data name="SW_Priority_Normal" xml:space="preserve"><value>普通</value></data>
+  <data name="SW_Priority_High" xml:space="preserve"><value>高</value></data>
+  <data name="SW_Deadline_NoDate" xml:space="preserve"><value>无截止日期</value></data>
+  <data name="SW_Deadline_Overdue" xml:space="preserve"><value>已逾期</value></data>
+  <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>即将到期</value></data>
+  <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>已安排</value></data>
+  <data name="Btn_Back" xml:space="preserve"><value>返回</value></data>
+  <data name="WF_Title" xml:space="preserve"><value>监视文件夹</value></data>
+  <data name="WF_Add" xml:space="preserve"><value>添加</value></data>
+  <data name="WF_Remove" xml:space="preserve"><value>删除</value></data>
+  <data name="WF_Enable" xml:space="preserve"><value>启用</value></data>
+  <data name="WF_Start" xml:space="preserve"><value>开始监视</value></data>
+  <data name="WF_Stop" xml:space="preserve"><value>停止监视</value></data>
+  <data name="WF_FolderPath" xml:space="preserve"><value>文件夹路径</value></data>
+  <data name="WF_NoFolders" xml:space="preserve"><value>未监视任何文件夹。</value></data>
+  <data name="WF_Status_Watching" xml:space="preserve"><value>正在监视 {0} 个文件夹。</value></data>
+  <data name="WF_Status_Stopped" xml:space="preserve"><value>已停止监视。</value></data>
+  <data name="WF_Status_NoFolders" xml:space="preserve"><value>未监视任何文件夹。</value></data>
+  <data name="WF_Error_PathRequired" xml:space="preserve"><value>文件夹路径为必填项。</value></data>
+  <data name="WF_Error_NotFound" xml:space="preserve"><value>文件夹不存在。</value></data>
+  <data name="WF_Error_StartFailed" xml:space="preserve"><value>无法启动监视。</value></data>
+  <data name="WF_ItemStatus_Running" xml:space="preserve"><value>监视中</value></data>
+  <data name="WF_ItemStatus_Disabled" xml:space="preserve"><value>已禁用</value></data>
+  <data name="WF_ItemStatus_Error" xml:space="preserve"><value>错误</value></data>
+  <data name="WF_ItemStatus_Stopped" xml:space="preserve"><value>已停止</value></data>
+  <data name="WF_ItemStatus_Unknown" xml:space="preserve"><value>未确定</value></data>
+  <data name="WF_Error_WatcherFault" xml:space="preserve"><value>监视文件夹时发生严重错误。</value></data>
+  <data name="WF_IncludeSub" xml:space="preserve"><value>包含子文件夹</value></data>
 </root>

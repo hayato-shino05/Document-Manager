@@ -40,13 +40,40 @@ public class ProcessLauncherService : IProcessLauncherService
 
         if (File.Exists(filePath))
         {
-            Process.Start("explorer.exe", $"/select,\"{filePath}\"");
+            _startProcess(new ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = $"/select,\"{filePath}\""
+            });
         }
         else
         {
             var dir = Path.GetDirectoryName(filePath);
             if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
-                Process.Start("explorer.exe", dir);
+                _startProcess(new ProcessStartInfo
+                {
+                    FileName = "explorer.exe",
+                    Arguments = $"\"{dir}\""
+                });
+        }
+    }
+
+    public void OpenFolder(string folderPath)
+    {
+        if (_platformInfo.IsLinux)
+        {
+            if (Directory.Exists(folderPath))
+                StartLinuxTarget(folderPath);
+            return;
+        }
+
+        if (Directory.Exists(folderPath))
+        {
+            _startProcess(new ProcessStartInfo
+            {
+                FileName = folderPath,
+                UseShellExecute = true
+            });
         }
     }
 

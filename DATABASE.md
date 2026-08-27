@@ -37,6 +37,7 @@
 | `deadline` | DATETIME | 任意の期限 |
 | `is_deleted` | INTEGER DEFAULT 0 | soft delete フラグ |
 | `deleted_at` | DATETIME | soft delete の日時 |
+| `status` | TEXT NOT NULL DEFAULT `'unread'` | 文書の状態。正規化された値は `unread` / `in-progress` / `read` / `needs-action` / `completed` / `archived` のみ |
 
 ### `collections`
 
@@ -135,6 +136,21 @@
 | `key` | TEXT PRIMARY KEY | 設定キー |
 | `value` | TEXT | 設定値 |
 
+### `saved_searches`
+
+保存済み検索の名前と条件（JSON）を保存します。
+
+| カラム | 型 | 説明 |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `name` | TEXT NOT NULL UNIQUE COLLATE NOCASE | 検索名。大文字小文字を区別せず一意 |
+| `criteria_json` | TEXT NOT NULL | 検索条件の JSON (`SavedSearchCriteria`) |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 作成日時 |
+
+制約:
+
+- `UNIQUE(name COLLATE NOCASE)`
+
 ## インデックス
 
 - `idx_documents_subject`: `documents(subject)`
@@ -154,11 +170,14 @@
 1. 現行スキーマの事前確認より前に、旧スキーマ一式の存在と構造を検出します。データをトランザクション内で現行スキーマへコピーし、関連する文書 ID を再マッピングし、子テーブルの外部キーを再構築します。`foreign_key_check` が成功した後に旧テーブルを削除します。
 2. 不完全または構造上サポートされない旧スキーマは、書き込み前に拒否します。
 3. 現行のテーブルとインデックスが存在しない場合に作成します。
-4. 古いデータベースを更新するときは、`is_deleted` と `deleted_at` を冪等に追加します。
+4. 古いデータベースを更新するときは、`is_deleted` と `deleted_at` を冪等に追加します。同じ方法で `status`（`TEXT NOT NULL DEFAULT 'unread'`）も冪等に追加し、既存行は `unread` で backfill されます。additive migration のため `schema_version` の更新は行いません（`is_deleted` / `deleted_at` 追加時と同じ扱いです）。
 5. 履歴データにある空でない `file_path` の完全一致重複を、同一トランザクション内で解消します。最小の `id` のパスを保持し、それ以降の重複行は `file_path = NULL` にしてから部分一意インデックスを作成します。途中で失敗した場合は、データ変更とインデックス作成をまとめてロールバックします。
 6. 既存の文書データから `categories` と `document_types` を seed し、新規インストールには既定値を追加します。
 7. 既存の値とファイル拡張子に基づいてファイルタイプのラベルを正規化します。
 8. `app_settings` を使い、schema version `3` までの旧 catalog ラベルを無効化します。
+9. 最後に、現在の `schema_version` が `4` 未満の場合に限り `4` に更新します。`saved_searches` テーブルは `CREATE TABLE IF NOT EXISTS` で作成されるため、この手順は冪等です。
+
+バックアップ検証（`ValidateBackupCandidate`）は `schema_version` として `3` または `4` を受け付けます。`saved_searches` を含まない旧バックアップ（version `3`）も restore 時に migrator がテーブルを再作成するため復元できます。`documents.status` は additive カラムのため、このカラムを持たない旧バックアップも引き続き検証と restore の対象になります。
 
 引退した WinForms 実装の旧テーブル名とカラム名は、検証済みの完全一致 migration 入力としてのみ受け付けます。現行スキーマの contract ではありません。
 
@@ -176,7 +195,7 @@
 | --- | --- | --- |
 | `IDocumentRepository` | `DocumentRepository` | 文書 CRUD、検索、フィルター、期限 |
 | `IRecycleBinRepository` | `DocumentRepository` | ごみ箱の動作 |
-| `IBulkOperationRepository` | `DocumentRepository` | 一括削除、subject 更新、重要フラグ切り替え |
+| `IBulkOperationRepository` | `DocumentRepository` | 一括削除、subject 更新、重要フラグ切り替え、status 更新、アイテム単位の結果を返す一括メタデータ編集（`BulkEditMetadata`） |
 | `IFileIntegrityRepository` | `DocumentRepository` | パス更新、バックアップ、データベースパス |
 | `ICategoryRepository` | `CategoryRepository` | カテゴリと文書タイプ |
 | `ICollectionRepository` | `CollectionRepository` | collection と collection item |
@@ -184,6 +203,7 @@
 | `IRecentFileRepository` | `RecentFileRepository` | 最近使ったファイル |
 | `IRelatedDocumentRepository` | `RelatedDocumentRepository` | 文書 relation |
 | `IReportRepository` | `ReportRepository` | 集計レポートクエリ |
+| `ISavedSearchRepository` | `SavedSearchRepository` | 保存済み検索 |
 | `ISettingsService` | `SettingsRepository` | key-value 設定 |
 
 ## スキーマ変更のルール
