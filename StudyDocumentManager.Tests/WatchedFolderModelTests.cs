@@ -78,10 +78,15 @@ public sealed class FakeWatchedFolderWatcher : IWatchedFolderWatcher
     public bool Stopped { get; private set; }
     public bool Disposed { get; private set; }
     public bool IsRunning { get; private set; }
+    public bool RetryEnqueuesCalled { get; private set; }
+    public IReadOnlyList<string> FailedPaths => new List<string>();
+    public event EventHandler? AdapterError;
 
     public void Start() { Started = true; IsRunning = true; }
     public void Stop() { Stopped = true; IsRunning = false; }
+    public void RetryEnqueues() => RetryEnqueuesCalled = true;
     public void Dispose() => Disposed = true;
+    public void RaiseAdapterError() => AdapterError?.Invoke(this, EventArgs.Empty);
 }
 
 public sealed class FakeWatchedFolderWatcherFactory : IWatchedFolderWatcherFactory
@@ -108,11 +113,19 @@ public sealed class FakeNavigationService : INavigationService
     public void GoBack() => LastNavigated = "dashboard";
 }
 
+public sealed class LogEntry
+{
+    public string Level = "";
+    public string Message = "";
+    public Exception? Exception;
+}
+
 public sealed class FakeLog : ILog
 {
-    public void Information(string message) { }
-    public void Warning(string message, Exception? exception = null) { }
-    public void Error(string message, Exception? exception = null) { }
+    public List<LogEntry> Entries { get; } = new();
+    public void Information(string message) => Entries.Add(new LogEntry { Level = "Information", Message = message });
+    public void Warning(string message, Exception? exception = null) => Entries.Add(new LogEntry { Level = "Warning", Message = message, Exception = exception });
+    public void Error(string message, Exception? exception = null) => Entries.Add(new LogEntry { Level = "Error", Message = message, Exception = exception });
 }
 
 public sealed class FakeLocalizationService : ILocalizationService
@@ -139,7 +152,8 @@ public class WatchedFolderModelTests
     {
         var repo = new FakeWatchedFolderRepository();
         var factory = new FakeWatchedFolderWatcherFactory();
-        var model = new WatchedFolderModel(repo, factory, new FakeLog(), new FakeNavigationService(), new FakeLocalizationService());
+        var service = new FolderWatchService(repo, factory, new FakeLog(), new FakeLocalizationService());
+        var model = new WatchedFolderModel(service, new FakeNavigationService(), new FakeLocalizationService(), new FakeLog());
         return (model, repo, factory);
     }
 
@@ -239,13 +253,14 @@ public class WatchedFolderModelTests
     {
         var (model, _, _) = Build();
         var nav = new FakeNavigationService();
-        var m2 = new WatchedFolderModel(new FakeWatchedFolderRepository(), new FakeWatchedFolderWatcherFactory(), new FakeLog(), nav, new FakeLocalizationService());
+        var svc2 = new FolderWatchService(new FakeWatchedFolderRepository(), new FakeWatchedFolderWatcherFactory(), new FakeLog(), new FakeLocalizationService());
+        var m2 = new WatchedFolderModel(svc2, nav, new FakeLocalizationService(), new FakeLog());
         m2.GoBack();
         Assert.Equal("dashboard", nav.LastNavigated);
     }
 
     [Fact]
-    public void Dispose_StopsWatchers()
+    public void Dispose_KeepsServiceWatchersRunning()
     {
         var (model, repo, factory) = Build();
         var dir = TempDir();
@@ -255,8 +270,29 @@ public class WatchedFolderModelTests
 
         model.Dispose();
 
+        // Continuous semantics: disposing the screen model must NOT stop the
+        // singleton service's watchers (they survive navigation away).
+        Assert.True(factory.Created[0].Started);
+        Assert.False(factory.Created[0].Stopped);
+        Assert.True(model.IsWatching);
+    }
+
+    [Fact]
+    public void ServiceDispose_StopsWatchers()
+    {
+        var repo = new FakeWatchedFolderRepository();
+        var factory = new FakeWatchedFolderWatcherFactory();
+        var service = new FolderWatchService(repo, factory, new FakeLog(), new FakeLocalizationService());
+        var dir = TempDir();
+        Directory.CreateDirectory(dir);
+        repo.Add(new WatchedFolder { FolderPath = dir, Enabled = true });
+        service.Start();
+
+        service.Dispose();
+
         Assert.True(factory.Created[0].Stopped);
         Assert.True(factory.Created[0].Disposed);
+        Assert.False(service.IsWatching);
     }
 
     [Fact]
@@ -329,7 +365,8 @@ public class WatchedFolderModelTests
         Directory.CreateDirectory(dir2);
         repo2.Add(new WatchedFolder { FolderPath = dir2, Enabled = true });
         var loc2 = new FakeLocalizationService();
-        var m2 = new WatchedFolderModel(repo2, new FakeWatchedFolderWatcherFactory(), new FakeLog(), new FakeNavigationService(), loc2);
+        var svc2 = new FolderWatchService(repo2, new FakeWatchedFolderWatcherFactory(), new FakeLog(), loc2);
+        var m2 = new WatchedFolderModel(svc2, new FakeNavigationService(), loc2, new FakeLog());
         m2.Load();
         Assert.Equal("WF_Status_Watching", m2.StatusMessage);
 
@@ -347,7 +384,8 @@ public class WatchedFolderModelTests
         Directory.CreateDirectory(dir);
         repo.Add(new WatchedFolder { FolderPath = dir, Enabled = true });
         var loc = new FakeLocalizationService();
-        var m = new WatchedFolderModel(repo, new FakeWatchedFolderWatcherFactory(), new FakeLog(), new FakeNavigationService(), loc);
+        var svc = new FolderWatchService(repo, new FakeWatchedFolderWatcherFactory(), new FakeLog(), loc);
+        var m = new WatchedFolderModel(svc, new FakeNavigationService(), loc, new FakeLog());
         m.Load();
         m.Dispose();
 
@@ -630,7 +668,8 @@ public class WatchedFolderModelTests
         repo.Add(new WatchedFolder { FolderPath = missing, Enabled = true });
         var loc = new FakeLocalizationService();
         var factory = new FakeWatchedFolderWatcherFactory();
-        var model = new WatchedFolderModel(repo, factory, new FakeLog(), new FakeNavigationService(), loc);
+        var service = new FolderWatchService(repo, factory, new FakeLog(), loc);
+        var model = new WatchedFolderModel(service, new FakeNavigationService(), loc, new FakeLog());
         model.Load();
 
         Assert.Equal("WF_Error_NotFound", model.Folders[0].WatcherError);
@@ -641,4 +680,69 @@ public class WatchedFolderModelTests
 
         Assert.Equal("WF_Error_NotFound#en", model.Folders[0].WatcherError);
     }
+
+    [Fact]
+    public void StopWatching_StatusMessage_UsesStoppedLabel()
+    {
+        var (model, repo, factory) = Build();
+        var dir = TempDir();
+        Directory.CreateDirectory(dir);
+        repo.Add(new WatchedFolder { FolderPath = dir, Enabled = true });
+        model.Load();
+        Assert.Equal(WatcherStatus.Running, model.Folders[0].WatcherStatus);
+
+        model.StopWatching();
+
+        Assert.True(model.IsStopped);
+        Assert.False(model.IsWatching);
+        Assert.Equal("WF_Status_Stopped", model.StatusMessage);
+    }
+
+    [Fact]
+    public void RefreshStatus_FormatsWatchingWithCount()
+    {
+        var repo = new FakeWatchedFolderRepository();
+        var factory = new FakeWatchedFolderWatcherFactory();
+        var loc = new CountingLocalizationService();
+        var service = new FolderWatchService(repo, factory, new FakeLog(), loc);
+        var model = new WatchedFolderModel(service, new FakeNavigationService(), loc, new FakeLog());
+        var dir = TempDir();
+        Directory.CreateDirectory(dir);
+        repo.Add(new WatchedFolder { FolderPath = dir, Enabled = true });
+        model.Load();
+
+        Assert.True(model.IsWatching);
+        Assert.Equal("1 watching", model.StatusMessage);
+    }
+
+    [Fact]
+    public void Dispose_PreventsLaterLoad()
+    {
+        var (model, repo, factory) = Build();
+        var dir = TempDir();
+        Directory.CreateDirectory(dir);
+        repo.Add(new WatchedFolder { FolderPath = dir, Enabled = true });
+        model.Load();
+        Assert.Single(model.Folders);
+
+        model.Dispose();
+        repo.Add(new WatchedFolder { FolderPath = Path.Combine(dir, "other"), Enabled = true });
+        model.Load();
+
+        // After dispose, Load is a no-op (the queued Dispatcher callback guard).
+        Assert.Single(model.Folders);
+    }
+}
+
+/// <summary>
+/// 監視状態の書式文字列を返すローカライズスタブ。<see cref="WatchedFolderModel"/>
+/// の件数書式を検証できるようにする。
+/// </summary>
+internal sealed class CountingLocalizationService : ILocalizationService
+{
+    public event EventHandler? LanguageChanged;
+    public SupportedLanguage CurrentLanguage { get; set; }
+    public IReadOnlyList<SupportedLanguage> AvailableLanguages => Array.Empty<SupportedLanguage>();
+    public string this[string key] => key == "WF_Status_Watching" ? "{0} watching" : key;
+    public void SetLanguage(SupportedLanguage language) { }
 }

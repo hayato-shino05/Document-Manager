@@ -1,6 +1,7 @@
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using StudyDocumentManager.Core;
@@ -34,6 +35,23 @@ public partial class App : Application
         var db = Services.GetRequiredService<DatabaseHelper>();
         db.InitializeDatabase();
 
+        // シングルトンのフォルダ監視サービスを開始し、画面ナビゲーションを跨いでも監視を継続する。
+        // 停止されるのはアプリケーション終了時のみである。
+        // UI スレッドで実行する必要がある：Start/ReloadConfig は ObservableCollection を変更し、
+        // バインドされたコントロールが UI スレッド上で要求する StateChanged を発生させる。
+        // ウォッチャのバックグラウンド コールバック（致命的なアダプタ エラー）は Dispatcher を
+        // 経由して UI スレッドへ戻され、エンティティのプロパティ変更が安全に保たれる。
+        var folderWatch = Services.GetRequiredService<IFolderWatchService>();
+        folderWatch.UiThreadMarshal = action => Dispatcher.UIThread.Post(action);
+        try
+        {
+            folderWatch.Start();
+        }
+        catch (Exception)
+        {
+            Console.Error.WriteLine("Folder watch start skipped.");
+        }
+
         // Versioned backup housekeeping: keep a fresh restore point without blocking startup.
         _ = Task.Run(() =>
         {
@@ -60,6 +78,8 @@ public partial class App : Application
 
             var navService = Services.GetRequiredService<NavigationService>();
             navService.SetMainModel(mainModel);
+
+            desktop.Exit += (_, _) => folderWatch.Dispose();
 
             desktop.MainWindow = new MainWindow
             {
@@ -172,6 +192,7 @@ services.AddSingleton<IVersionedBackupService, VersionedBackupService>();
         services.AddSingleton<ILog, TraceLog>();
         services.AddSingleton<IFileSystemWatcherAdapterFactory, FileSystemWatcherAdapterFactory>();
         services.AddSingleton<IWatchedFolderWatcherFactory, WatchedFolderWatcherFactory>();
+        services.AddSingleton<IFolderWatchService, FolderWatchService>();
 
         // モデル — メイン
         services.AddSingleton<MainWindowModel>();

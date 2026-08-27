@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
@@ -12,115 +10,95 @@ using StudyDocumentManager.Services;
 namespace StudyDocumentManager.Models;
 
 /// <summary>
-/// Owns the running folder watchers for the duration the Watched Folder screen
-/// is the active view. The model is registered transient and <see cref="NavigationService"/>
-/// disposes the previous view on navigation, so watchers are stopped when the
-/// user leaves this screen. Background watching across screens is NOT currently
-/// supported: issue #50 acceptance does not define off-screen semantics, and
-/// moving ownership to a singleton service is a separate product decision.
+/// <see cref="IFolderWatchService"/> の上に置かれた UI ファサード。実際のウォッチャは
+/// シングルトン サービスが所有しており、この画面からナビゲーションで離れても監視を継続する。
+/// このモデルはサービスの状態を反映し、ユーザー操作を転送するだけである。
+/// モデルはトランジエントとして登録され、<see cref="NavigationService"/> によるナビゲーションで
+/// 破棄されるが、その破棄がバックグラウンドのウォッチャを停止してはならない。
 /// </summary>
 public partial class WatchedFolderModel : ModelBase, IDisposable
 {
-    private readonly IWatchedFolderRepository _folders;
-    private readonly IWatchedFolderWatcherFactory _watcherFactory;
-    private readonly ILog _log;
+    private readonly IFolderWatchService _service;
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
-    private readonly Dictionary<int, IWatchedFolderWatcher> _active = new();
-    private readonly Dictionary<int, (string Path, bool IncludeSubdirectories)> _activeConfig = new();
-    private readonly object _sync = new();
-
-    private string? _statusKey;
-    private object[] _statusArgs = Array.Empty<object>();
-    private string? _errorKey;
-    private object[] _errorArgs = Array.Empty<object>();
+    private readonly ILog _log;
+    private string? _lastErrorKey;
+    private bool _disposed;
 
     [ObservableProperty] private string? _lastError;
-    [ObservableProperty] private bool _isWatching;
     [ObservableProperty] private string? _statusMessage;
     [ObservableProperty] private string? _newFolderPath;
     [ObservableProperty] private bool _newFolderIncludeSubdirectories;
-    [ObservableProperty] private bool _hasFolders;
 
-    public ObservableCollection<WatchedFolder> Folders { get; } = new();
+    public ObservableCollection<WatchedFolder> Folders => _service.Folders;
+    public bool IsWatching => _service.IsWatching;
+    public bool IsStopped => _service.IsStopped;
+    public bool HasFolders => Folders.Count > 0;
 
     public WatchedFolderModel(
-        IWatchedFolderRepository folders,
-        IWatchedFolderWatcherFactory watcherFactory,
-        ILog log,
+        IFolderWatchService service,
         INavigationService navigationService,
-        ILocalizationService loc)
+        ILocalizationService loc,
+        ILog log)
     {
-        _folders = folders ?? throw new ArgumentNullException(nameof(folders));
-        _watcherFactory = watcherFactory ?? throw new ArgumentNullException(nameof(watcherFactory));
-        _log = log ?? throw new ArgumentNullException(nameof(log));
+        _service = service ?? throw new ArgumentNullException(nameof(service));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
         _loc = loc ?? throw new ArgumentNullException(nameof(loc));
+        _log = log ?? throw new ArgumentNullException(nameof(log));
         _loc.LanguageChanged += OnLanguageChanged;
+        _service.StateChanged += OnServiceStateChanged;
+    }
+
+    private void OnServiceStateChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(IsWatching));
+        OnPropertyChanged(nameof(HasFolders));
+        RefreshStatus();
     }
 
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
-        if (_statusKey is not null)
-            StatusMessage = string.Format(_loc[_statusKey], _statusArgs);
-        if (_errorKey is not null)
-            LastError = string.Format(_loc[_errorKey], _errorArgs);
-        // Recompute each folder's error text from its key so the displayed
-        // string is never left in the previous language.
+        RefreshStatus();
+        if (_lastErrorKey is not null)
+            LastError = _loc[_lastErrorKey];
+        // 各フォルダのエラー文字列をキーから再計算し、表示文字列が直前の言語のままにならないようにする。
+        // また WatcherStatus プロパティを再通知し、コンバータを経由してバインドされた
+        // ローカライズ済みステータス ラベルが新しいカルチャで再評価されるようにする。
         foreach (var folder in Folders)
         {
             if (!string.IsNullOrEmpty(folder.WatcherErrorKey))
                 folder.WatcherError = _loc[folder.WatcherErrorKey];
+            folder.NotifyWatcherStatusChanged();
         }
     }
 
-    private void SetItemError(WatchedFolder item, string key)
+    private void RefreshStatus()
     {
-        item.WatcherErrorKey = key;
-        item.WatcherError = _loc[key];
+        if (_service.IsWatching)
+            StatusMessage = string.Format(_loc["WF_Status_Watching"], _service.WatchingCount);
+        else if (_service.IsStopped)
+            StatusMessage = _loc["WF_Status_Stopped"];
+        else
+            StatusMessage = _loc["WF_Status_NoFolders"];
     }
 
-    private void ClearItemError(WatchedFolder item)
+    private void SetError(string key)
     {
-        item.WatcherErrorKey = null;
-        item.WatcherError = null;
-    }
-
-    private static string Format(string localized, object[] args)
-        => args.Length == 0 ? localized : string.Format(localized, args);
-
-    private void SetStatus(string key, params object[] args)
-    {
-        _statusKey = key;
-        _statusArgs = args;
-        StatusMessage = Format(_loc[key], args);
-    }
-
-    private void SetError(string key, params object[] args)
-    {
-        _errorKey = key;
-        _errorArgs = args;
-        LastError = Format(_loc[key], args);
+        _lastErrorKey = key;
+        LastError = _loc[key];
     }
 
     private void ClearError()
     {
-        _errorKey = null;
-        _errorArgs = Array.Empty<object>();
+        _lastErrorKey = null;
         LastError = null;
     }
 
     public void Load()
     {
-        Folders.Clear();
-        foreach (var folder in _folders.GetAll())
-        {
-            if (!folder.Enabled)
-                folder.WatcherStatus = WatcherStatus.Disabled;
-            Folders.Add(folder);
-        }
-        HasFolders = Folders.Count > 0;
-        ReconcileWatchers();
+        if (_disposed)
+            return;
+        _service.ReloadConfig();
     }
 
     [RelayCommand]
@@ -138,221 +116,55 @@ public partial class WatchedFolderModel : ModelBase, IDisposable
             SetError("WF_Error_PathRequired");
             return;
         }
-        if (!Directory.Exists(path))
+        var key = _service.AddFolder(path, includeSubdirectories);
+        if (key is not null)
         {
-            SetError("WF_Error_NotFound");
-            _log.Warning($"Cannot watch missing folder '{path}'.");
+            SetError(key);
             return;
         }
-        if (_folders.GetByPath(path) is not null)
-        {
-            _log.Information($"Folder already watched: {path}");
-            return;
-        }
-
-        var item = new WatchedFolder
-        {
-            FolderPath = path,
-            Enabled = true,
-            IncludeSubdirectories = includeSubdirectories,
-            CreatedAt = DateTime.Now
-        };
-        _folders.Add(item);
-        Folders.Add(item);
-        HasFolders = true;
-        StartWatcher(item);
-        IsWatching = _active.Count > 0;
-        SetStatus("WF_Status_Watching", _active.Count);
         NewFolderPath = null;
         NewFolderIncludeSubdirectories = false;
     }
 
     [RelayCommand]
-    public void RemoveFolder(int id)
-    {
-        StopWatcher(id);
-        _folders.Delete(id);
-        var existing = Folders.FirstOrDefault(f => f.Id == id);
-        if (existing is not null)
-            Folders.Remove(existing);
-        HasFolders = Folders.Count > 0;
-        IsWatching = _active.Count > 0;
-    }
+    public void RemoveFolder(int id) => _service.RemoveFolder(id);
 
     [RelayCommand]
     public void ToggleEnabled(WatchedFolder item)
     {
-        if (item is null)
-            return;
-        _folders.SetEnabled(item.Id, item.Enabled);
-        if (item.Enabled)
-        {
-            item.WatcherStatus = WatcherStatus.Unknown;
-            ClearItemError(item);
-            StartWatcher(item);
-        }
-        else
-        {
-            StopWatcher(item.Id);
-            item.WatcherStatus = WatcherStatus.Disabled;
-        }
-        IsWatching = _active.Count > 0;
+        if (item is not null)
+            _service.ToggleEnabled(item.Id, item.Enabled);
     }
 
     [RelayCommand]
-    public void RetryFolder(int id)
-    {
-        var item = Folders.FirstOrDefault(f => f.Id == id);
-        if (item is null || !item.Enabled)
-            return;
-        item.WatcherStatus = WatcherStatus.Unknown;
-        ClearItemError(item);
-        StartWatcher(item);
-        IsWatching = _active.Count > 0;
-    }
+    public void RetryFolder(int id) => _service.RetryFolder(id);
 
     [RelayCommand]
     public void GoBack() => _navigationService.NavigateTo("dashboard");
 
     [RelayCommand]
-    public void StartWatching() => ReconcileWatchers();
-
-    /// <summary>
-    /// Reconciles the running watchers with the current configuration: stops
-    /// watchers for removed/disabled folders or folders whose path changed, and
-    /// starts watchers for enabled folders not already running. For folders that
-    /// are already running with an identical config, the freshly reloaded item is
-    /// updated to reflect the actual Running status (never left at Unknown). If
-    /// only IncludeSubdirectories changed, the watcher is restarted with the new
-    /// config. Idempotent: an already-correct watcher is left untouched.
-    /// </summary>
-    private void ReconcileWatchers()
-    {
-        var desired = Folders.Where(f => f.Enabled).ToList();
-        var desiredById = desired.ToDictionary(f => f.Id);
-
-        foreach (var id in _active.Keys.ToList())
-        {
-            if (!desiredById.TryGetValue(id, out var current) ||
-                _activeConfig[id].Path != current.FolderPath)
-            {
-                StopWatcher(id);
-            }
-        }
-
-        foreach (var folder in desired)
-        {
-            if (_active.ContainsKey(folder.Id))
-            {
-                if (_activeConfig[folder.Id].IncludeSubdirectories != folder.IncludeSubdirectories)
-                {
-                    StopWatcher(folder.Id);
-                    StartWatcher(folder);
-                }
-                else
-                {
-                    // Reloaded item must reflect the actually-running watcher.
-                    folder.WatcherStatus = WatcherStatus.Running;
-                    folder.WatcherError = null;
-                }
-            }
-            else
-            {
-                StartWatcher(folder);
-            }
-        }
-
-        IsWatching = _active.Count > 0;
-        if (IsWatching)
-            SetStatus("WF_Status_Watching", _active.Count);
-        else
-            SetStatus("WF_Status_NoFolders");
-    }
+    public void StartWatching() => _service.StartWatching();
 
     [RelayCommand]
     public void StopWatching()
     {
-        foreach (var id in _active.Keys.ToList())
-            StopWatcher(id);
-        IsWatching = false;
-        SetStatus("WF_Status_Stopped");
-    }
-
-    private void StartWatcher(WatchedFolder item)
-    {
-        lock (_sync)
-        {
-            if (_active.ContainsKey(item.Id))
-                return;
-            if (!item.Enabled)
-            {
-                item.WatcherStatus = WatcherStatus.Disabled;
-                return;
-            }
-            if (!Directory.Exists(item.FolderPath))
-            {
-                item.WatcherStatus = WatcherStatus.Error;
-                SetItemError(item, "WF_Error_NotFound");
-                _log.Warning($"Watched folder does not exist: '{item.FolderPath}'.");
-                return;
-            }
-
-            IWatchedFolderWatcher watcher;
-            try
-            {
-                watcher = _watcherFactory.Create(item);
-                watcher.Start();
-            }
-            catch (Exception ex)
-            {
-                _log.Error($"Failed to start watcher for '{item.FolderPath}'.", ex);
-                item.WatcherStatus = WatcherStatus.Error;
-                SetItemError(item, "WF_Error_StartFailed");
-                return;
-            }
-
-            if (watcher.IsRunning)
-            {
-                _active[item.Id] = watcher;
-                _activeConfig[item.Id] = (item.FolderPath, item.IncludeSubdirectories);
-                item.WatcherStatus = WatcherStatus.Running;
-                ClearItemError(item);
-            }
-            else
-            {
-                item.WatcherStatus = WatcherStatus.Error;
-                SetItemError(item, "WF_Error_StartFailed");
-                watcher.Dispose();
-            }
-        }
-    }
-
-    private void StopWatcher(int id)
-    {
-        IWatchedFolderWatcher? watcher;
-        lock (_sync)
-        {
-            if (!_active.TryGetValue(id, out watcher))
-                return;
-            _active.Remove(id);
-            _activeConfig.Remove(id);
-        }
-        watcher?.Stop();
-        watcher?.Dispose();
-        // Reflect the stopped state on the bound item so the UI never shows a
-        // stale "Running" indicator after the watcher is gone.
-        var item = Folders.FirstOrDefault(f => f.Id == id);
-        if (item is not null)
-        {
-            item.WatcherStatus = WatcherStatus.Stopped;
-            ClearItemError(item);
-        }
+        // サービス側の停止が例外を投げても UI コマンドがクラッシュしないよう防御する。
+        // 停止そのものの成否はサービス層で記録される。
+        try { _service.StopWatching(); }
+        catch (Exception ex) { _log.Error("Failed to stop watched folder monitoring.", ex); }
     }
 
     public void Dispose()
     {
-        _loc.LanguageChanged -= OnLanguageChanged;
-        foreach (var id in _active.Keys.ToList())
-            StopWatcher(id);
+        if (_disposed)
+            return;
+        _disposed = true;
+        // イベント登録解除は各ハンドラごとに個別の try/catch で扱い、
+        // 1 件が失敗しても残りの解除を続行する。
+        try { _loc.LanguageChanged -= OnLanguageChanged; }
+        catch (Exception ex) { _log.Warning("Failed to detach language handler.", ex); }
+        try { _service.StateChanged -= OnServiceStateChanged; }
+        catch (Exception ex) { _log.Warning("Failed to detach state handler.", ex); }
+        GC.SuppressFinalize(this);
     }
 }

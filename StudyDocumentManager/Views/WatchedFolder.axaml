@@ -32,7 +32,7 @@
               <TextBlock Text="{Binding FolderPath}" FontWeight="Bold" />
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="{Binding LastScanAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" FontSize="11" Opacity="0.7" />
-                <TextBlock Text="{Binding WatcherStatus}" FontSize="11" Opacity="0.7" />
+                <TextBlock Text="{Binding WatcherStatus, Converter={StaticResource WatcherStatusLabelConverter}}" FontSize="11" Opacity="0.7" />
               </StackPanel>
               <TextBlock AutomationProperties.AutomationId="WatchedFolder_ItemError" Text="{Binding WatcherError}" FontSize="11" Foreground="Red" IsVisible="{Binding WatcherError, Converter={x:Static ObjectConverters.IsNotNull}}" />
             </StackPanel>

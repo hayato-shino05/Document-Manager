@@ -858,5 +858,11 @@ Please check your network connection.</value></data>
   <data name="WF_Error_PathRequired" xml:space="preserve"><value>Folder path is required.</value></data>
   <data name="WF_Error_NotFound" xml:space="preserve"><value>Folder does not exist.</value></data>
   <data name="WF_Error_StartFailed" xml:space="preserve"><value>Could not start the watcher.</value></data>
+  <data name="WF_ItemStatus_Running" xml:space="preserve"><value>Watching</value></data>
+  <data name="WF_ItemStatus_Disabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="WF_ItemStatus_Error" xml:space="preserve"><value>Error</value></data>
+  <data name="WF_ItemStatus_Stopped" xml:space="preserve"><value>Stopped</value></data>
+  <data name="WF_ItemStatus_Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="WF_Error_WatcherFault" xml:space="preserve"><value>A fatal error occurred while watching the folder.</value></data>
   <data name="WF_IncludeSub" xml:space="preserve"><value>Include subfolders</value></data>
 </root>

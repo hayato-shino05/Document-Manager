@@ -61,4 +61,10 @@ public sealed class WatchedFolder : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    /// <summary>
+    /// <see cref="WatcherStatus"/> の変更を再通知し、それにバインドされた値コンバータ
+    /// （ローカライズされた状態ラベルなど）が言語切り替え後に再評価されるようにする。
+    /// </summary>
+    public void NotifyWatcherStatusChanged() => OnPropertyChanged(nameof(WatcherStatus));
 }

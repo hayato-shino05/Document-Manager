@@ -966,6 +966,12 @@
   <data name="WF_Error_PathRequired" xml:space="preserve"><value>フォルダパスは必須です。</value></data>
   <data name="WF_Error_NotFound" xml:space="preserve"><value>フォルダが存在しません。</value></data>
   <data name="WF_Error_StartFailed" xml:space="preserve"><value>監視を開始できませんでした。</value></data>
+  <data name="WF_ItemStatus_Running" xml:space="preserve"><value>監視中</value></data>
+  <data name="WF_ItemStatus_Disabled" xml:space="preserve"><value>無効</value></data>
+  <data name="WF_ItemStatus_Error" xml:space="preserve"><value>エラー</value></data>
+  <data name="WF_ItemStatus_Stopped" xml:space="preserve"><value>停止</value></data>
+  <data name="WF_ItemStatus_Unknown" xml:space="preserve"><value>未確定</value></data>
+  <data name="WF_Error_WatcherFault" xml:space="preserve"><value>フォルダー監視で致命的なエラーが発生しました</value></data>
   <data name="WF_IncludeSub" xml:space="preserve"><value>サブフォルダを含める</value></data>
 </root>
 

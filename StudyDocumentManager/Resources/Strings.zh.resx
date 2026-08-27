@@ -1067,5 +1067,11 @@
   <data name="WF_Error_PathRequired" xml:space="preserve"><value>文件夹路径为必填项。</value></data>
   <data name="WF_Error_NotFound" xml:space="preserve"><value>文件夹不存在。</value></data>
   <data name="WF_Error_StartFailed" xml:space="preserve"><value>无法启动监视。</value></data>
+  <data name="WF_ItemStatus_Running" xml:space="preserve"><value>监视中</value></data>
+  <data name="WF_ItemStatus_Disabled" xml:space="preserve"><value>已禁用</value></data>
+  <data name="WF_ItemStatus_Error" xml:space="preserve"><value>错误</value></data>
+  <data name="WF_ItemStatus_Stopped" xml:space="preserve"><value>已停止</value></data>
+  <data name="WF_ItemStatus_Unknown" xml:space="preserve"><value>未确定</value></data>
+  <data name="WF_Error_WatcherFault" xml:space="preserve"><value>监视文件夹时发生严重错误。</value></data>
   <data name="WF_IncludeSub" xml:space="preserve"><value>包含子文件夹</value></data>
 </root>
