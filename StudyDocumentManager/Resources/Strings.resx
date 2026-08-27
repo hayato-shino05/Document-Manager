@@ -952,6 +952,7 @@
   <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>期限間近</value></data>
   <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>予定あり</value></data>
   <data name="Btn_Back" xml:space="preserve"><value>戻る</value></data>
+  <data name="Btn_Refresh" xml:space="preserve"><value>更新</value></data>
   <data name="WF_Title" xml:space="preserve"><value>監視フォルダ</value></data>
   <data name="WF_Add" xml:space="preserve"><value>追加</value></data>
   <data name="WF_Remove" xml:space="preserve"><value>削除</value></data>

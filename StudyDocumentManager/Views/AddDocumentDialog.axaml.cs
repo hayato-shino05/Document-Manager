@@ -3,6 +3,7 @@ using StudyDocumentManager.Core.DTOs;
 using System;
 using System.IO;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using StudyDocumentManager.Core.Interfaces;
@@ -50,14 +51,17 @@ public partial class AddDocumentDialog : Window
         var name = txtTen?.Text?.Trim();
         if (string.IsNullOrWhiteSpace(name))
         {
-            txtNameError.Text = GetNameRequiredMessage();
+            var msg = GetNameRequiredMessage();
+            txtNameError.Text = msg;
             txtNameError.IsVisible = true;
+            txtTen?.SetValue(AutomationProperties.HelpTextProperty, msg);
             txtTen?.Focus();
             return;
         }
 
         txtNameError.IsVisible = false;
         txtNameError.Text = string.Empty;
+        txtTen?.ClearValue(AutomationProperties.HelpTextProperty);
 
         Result = new AddDocumentDraft
         {

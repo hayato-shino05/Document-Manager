@@ -530,12 +530,20 @@
                                             <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
                                                 <Image Source="{Binding Type, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}"
                                                        Width="16" Height="16" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                           ToolTip.Tip="{Binding Name}"/>
                                             </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="{loc:Localize Dashboard_ColSubject}" Binding="{Binding Subject, Mode=OneWay}" Width="120"/>
+                                <DataGridTemplateColumn Header="{loc:Localize Dashboard_ColSubject}" Width="120" SortMemberPath="Subject">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate x:DataType="core:StudyDocument">
+                                            <TextBlock Text="{Binding Subject}" VerticalAlignment="Center" Margin="8,0"
+                                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Subject}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                                 <DataGridTextColumn Header="{loc:Localize Dashboard_ColType}" Binding="{Binding Type, Mode=OneWay}" Width="80"/>
                                 <DataGridTextColumn Header="{loc:Localize Dashboard_ColDate}"
                                     Binding="{Binding CreatedAt, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
@@ -620,8 +628,9 @@
                             <!-- Metadata -->
                             <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding SelectedDocument.Name}" FontSize="{StaticResource FontSizeLg}" FontWeight="Bold"
-                                           Foreground="{StaticResource TextPrimary}"
-                                           TextTrimming="CharacterEllipsis"/>
+                                            Foreground="{StaticResource TextPrimary}"
+                                            TextTrimming="CharacterEllipsis"
+                                            ToolTip.Tip="{Binding SelectedDocument.Name}"/>
                                 <StackPanel Orientation="Horizontal" Spacing="12">
                                     <StackPanel Orientation="Horizontal" Spacing="3">
                                         <Image Source="{StaticResource IconCategory}" Width="11" Height="11"/>
@@ -640,7 +649,8 @@
                                 <StackPanel Orientation="Horizontal" Spacing="3">
                                     <Image Source="{StaticResource IconOpenFile}" Width="10" Height="10"/>
                                     <TextBlock Text="{Binding SelectedDocument.FilePath}" FontSize="{StaticResource FontSizeXs}"
-                                               Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
+                                                Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"
+                                                ToolTip.Tip="{Binding SelectedDocument.FilePath}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Spacing="12">
                                     <StackPanel Orientation="Horizontal" Spacing="3">
@@ -665,7 +675,8 @@
                                             IsVisible="{Binding SelectedDocument.Tags, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                                     <Image Source="{StaticResource IconTag}" Width="10" Height="10"/>
                                     <TextBlock Text="{Binding SelectedDocument.Tags}" FontSize="{StaticResource FontSizeXs}"
-                                               Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
+                                                Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"
+                                                ToolTip.Tip="{Binding SelectedDocument.Tags}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Grid>

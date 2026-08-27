@@ -23,6 +23,7 @@ public partial class ImportInboxModel : ModelBase, IDisposable
     [ObservableProperty] private bool _includeProcessed;
     [ObservableProperty] private ImportInboxItem? _selectedItem;
     [ObservableProperty] private string _statusText = string.Empty;
+    [ObservableProperty] private string _errorMessage = string.Empty;
     [ObservableProperty] private string _bulkSubject = string.Empty;
     [ObservableProperty] private string _bulkType = string.Empty;
     public ObservableCollection<ImportInboxItem> SelectedItems { get; } = [];
@@ -101,6 +102,7 @@ public partial class ImportInboxModel : ModelBase, IDisposable
         SelectedItem = null;
         NotifyBulkEditState();
         StatusText = FormatStatus();
+        ErrorMessage = string.Empty;
         OnPropertyChanged(nameof(HasItems));
         OnPropertyChanged(nameof(IsEmpty));
     }
@@ -131,7 +133,7 @@ public partial class ImportInboxModel : ModelBase, IDisposable
         if (SelectedItem is null) return;
         if (!File.Exists(SelectedItem.SourcePath))
         {
-            StatusText = _loc["ImportInbox_SourceMissing"];
+            ErrorMessage = _loc["ImportInbox_SourceMissing"];
             return;
         }
         if (_importService is null) return;
@@ -185,7 +187,7 @@ public partial class ImportInboxModel : ModelBase, IDisposable
     {
         if (SelectedItem is null || !File.Exists(SelectedItem.SourcePath))
         {
-            StatusText = _loc["ImportInbox_SourceMissing"];
+            ErrorMessage = _loc["ImportInbox_SourceMissing"];
             return;
         }
         _processLauncher.RevealInExplorer(SelectedItem.SourcePath);

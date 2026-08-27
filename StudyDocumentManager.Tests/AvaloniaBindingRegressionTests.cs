@@ -757,7 +757,8 @@ public class AvaloniaBindingRegressionTests
         Assert.NotNull(grid);
         var nameColumn = Assert.IsType<DataGridTemplateColumn>(grid.Columns[0]);
         Assert.Equal("Name", nameColumn.SortMemberPath);
-        Assert.Equal("Subject", GetPath(Assert.IsType<DataGridTextColumn>(grid.Columns[1])));
+        var subjectColumn = Assert.IsType<DataGridTemplateColumn>(grid.Columns[1]);
+        Assert.Equal("Subject", subjectColumn.SortMemberPath);
         Assert.Equal("Type", GetPath(Assert.IsType<DataGridTextColumn>(grid.Columns[2])));
         Assert.Equal("CreatedAt", GetPath(Assert.IsType<DataGridTextColumn>(grid.Columns[3])));
         Assert.Equal("FileSize", GetPath(Assert.IsType<DataGridTextColumn>(grid.Columns[4])));

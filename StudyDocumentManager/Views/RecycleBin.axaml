@@ -53,8 +53,9 @@
                     <DataGrid Classes="std"
                               AutomationProperties.AutomationId="RecycleBin_DocumentGrid"
                               AutomationProperties.Name="{loc:Localize RecycleBin_Title}"
+                              IsReadOnly="True"
                               ItemsSource="{Binding DeletedDocuments}"
-                              SelectedItem="{Binding SelectedDocument}">
+                                  SelectedItem="{Binding SelectedDocument, Mode=OneWayToSource}">
                         <DataGrid.Columns>
                             <DataGridTemplateColumn Header="{loc:Localize RecycleBin_ColName}" Width="*" MinWidth="200" SortMemberPath="Name">
                                 <DataGridTemplateColumn.CellTemplate>
@@ -67,9 +68,9 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColSubject}" Binding="{Binding Subject}" Width="120"/>
-                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColType}" Binding="{Binding Type}" Width="80"/>
-                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColDate}" Binding="{Binding CreatedAt, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColSubject}" Binding="{Binding Subject, Mode=OneWay}" Width="120"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColType}" Binding="{Binding Type, Mode=OneWay}" Width="80"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColDate}" Binding="{Binding CreatedAt, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
                         </DataGrid.Columns>
                     </DataGrid>
 

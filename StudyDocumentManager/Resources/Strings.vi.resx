@@ -1053,6 +1053,7 @@
   <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>Sắp đến hạn</value></data>
   <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>Đã lên lịch</value></data>
   <data name="Btn_Back" xml:space="preserve"><value>Quay lại</value></data>
+  <data name="Btn_Refresh" xml:space="preserve"><value>Làm mới</value></data>
   <data name="WF_Title" xml:space="preserve"><value>Thư mục theo dõi</value></data>
   <data name="WF_Add" xml:space="preserve"><value>Thêm</value></data>
   <data name="WF_Remove" xml:space="preserve"><value>Xóa</value></data>

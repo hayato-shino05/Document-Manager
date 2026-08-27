@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -257,6 +258,77 @@ public class KeyboardEnterEscapeGapTests
             Assert.NotNull(cancelButton);
             Assert.True(confirmButton!.IsDefault);
             Assert.True(cancelButton!.IsCancel);
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void AffectedItemsPreviewDialog_FocusesCancelButtonOnOpen()
+    {
+        var localization = GetLocalization();
+        var dialog = new AffectedItemsPreviewDialog("Title", 1, ["Doc"], "note", localization);
+        dialog.Show();
+
+        try
+        {
+            FlushAvaloniaBindings();
+
+            var cancelButton = dialog.FindControl<Button>("CancelButton");
+            Assert.NotNull(cancelButton);
+            Assert.Same(cancelButton, dialog.FocusManager?.GetFocusedElement());
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void BulkEditPreviewDialog_FocusesCancelButtonOnOpen()
+    {
+        var localization = GetLocalization();
+        var dialog = new BulkEditPreviewDialog(1, [("Field", "Value")], localization);
+        dialog.Show();
+
+        try
+        {
+            FlushAvaloniaBindings();
+
+            var cancelButton = dialog.FindControl<Button>("CancelButton");
+            Assert.NotNull(cancelButton);
+            Assert.Same(cancelButton, dialog.FocusManager?.GetFocusedElement());
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void AddDocumentDialog_NameValidationExposesHelpText()
+    {
+        var localization = GetLocalization();
+        var dialog = new AddDocumentDialog("C:/drop/test.pdf", ["Study"], ["PDF"]);
+        dialog.Show();
+
+        try
+        {
+            FlushAvaloniaBindings();
+
+            var saveButton = dialog.FindControl<Button>("btnSave");
+            var nameBox = dialog.FindControl<TextBox>("txtTen");
+            Assert.NotNull(saveButton);
+            Assert.NotNull(nameBox);
+
+            nameBox!.Text = string.Empty;
+            saveButton!.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+            FlushAvaloniaBindings();
+
+            var helpText = nameBox.GetValue(AutomationProperties.HelpTextProperty) as string;
+            Assert.Equal(localization["AddEdit_NameRequired"], helpText);
         }
         finally
         {
