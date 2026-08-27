@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -405,6 +406,144 @@ public sealed class FolderWatchServiceTests
         Assert.Null(ex);
         Assert.Equal(0, service.WatchingCount);
         Assert.True(factory.Created[0].Disposed);
+    }
+
+    // UI スレッドへのマーシャルをキューイングに差し替え、テスト側で任意のタイミングで
+    // キューを取り出して実行できるようにする。これにより「エラー発報 → 停止／破棄／置換 →
+    // キューを流す」という順序を決定的に再現し、古いコールバックが新しい状態を上書きしないことを検証する。
+    private sealed class QueuedUiThreadMarshal
+    {
+        private readonly Queue<Action> _queue = new();
+        public void Post(Action action) => _queue.Enqueue(action);
+        public void Drain() { while (_queue.Count > 0) _queue.Dequeue()(); }
+        public int Count => _queue.Count;
+    }
+
+    // アクションを実行直前でブロックし、テスト側が競合する停止／破棄を完了させた「あと」に
+    // 実行させるためのマーシャル。保留中のエラーコールバックが、処理時点の最新状態で検証される
+    // （検証と代入が同一ロック内で不可分）ことを決定的に検証する。
+    private sealed class BlockingUiThreadMarshal
+    {
+        private readonly ManualResetEventSlim _entered = new(false);
+        private readonly ManualResetEventSlim _release = new(false);
+        public ManualResetEventSlim Entered => _entered;
+        public void Release() => _release.Set();
+        public void Run(Action action)
+        {
+            _entered.Set();
+            _release.Wait(TimeSpan.FromSeconds(5));
+            action();
+        }
+    }
+
+    [Fact]
+    // ウォッチャ停止後に届く「古い」アダプタエラーは、Stopped 状態を Error で上書きしてはならない。
+    public void AdapterError_AfterStopWatching_DoesNotOverwriteStopped()
+    {
+        var marshal = new QueuedUiThreadMarshal();
+        var (service, repo, factory) = Build();
+        service.UiThreadMarshal = marshal.Post;
+        var dir = TempDir();
+        Directory.CreateDirectory(dir);
+        repo.Add(new WatchedFolder { FolderPath = dir, Enabled = true });
+        service.Start();
+
+        var watcher = factory.Created[0];
+        watcher.RaiseAdapterError();           // キューイングのみ（直ちには実行されない）
+        Assert.Equal(1, marshal.Count);
+
+        service.StopWatching();                // _active から除去され Stopped になる
+
+        marshal.Drain();                       // 古いコールバックを今流す
+
+        var item = service.Folders[0];
+        Assert.Equal(WatcherStatus.Stopped, item.WatcherStatus);
+        Assert.NotEqual(WatcherStatus.Error, item.WatcherStatus);
+        Assert.Equal(0, service.WatchingCount);
+    }
+
+    [Fact]
+    // 破棄後に届く「古い」アダプタエラーは、モデルの状態を Error で上書きしてはならない。
+    public void AdapterError_AfterDispose_DoesNotMutateModel()
+    {
+        var marshal = new QueuedUiThreadMarshal();
+        var (service, repo, factory) = Build();
+        service.UiThreadMarshal = marshal.Post;
+        var dir = TempDir();
+        Directory.CreateDirectory(dir);
+        repo.Add(new WatchedFolder { FolderPath = dir, Enabled = true });
+        service.Start();
+
+        var watcher = factory.Created[0];
+        watcher.RaiseAdapterError();
+        Assert.Equal(1, marshal.Count);
+
+        service.Dispose();
+
+        var ex = Record.Exception(() => marshal.Drain());
+
+        Assert.Null(ex);
+        var item = service.Folders[0];
+        Assert.NotEqual(WatcherStatus.Error, item.WatcherStatus);
+    }
+
+    [Fact]
+    // ウォッチャ置換（停止→再開で新インスタンス生成）後に届く「古い」アダプタエラーは、
+    // 新しいウォッチャの Running 状態を上書きしてはならない。
+    public void AdapterError_AfterReplacement_DoesNotOverwriteNewWatcherRunning()
+    {
+        var marshal = new QueuedUiThreadMarshal();
+        var (service, repo, factory) = Build();
+        service.UiThreadMarshal = marshal.Post;
+        var dir = TempDir();
+        Directory.CreateDirectory(dir);
+        repo.Add(new WatchedFolder { FolderPath = dir, Enabled = true });
+        service.Start();
+
+        var oldWatcher = factory.Created[0];
+        oldWatcher.RaiseAdapterError();
+        Assert.Equal(1, marshal.Count);
+
+        service.StopWatching();                // 古いウォッチャを除去
+        service.StartWatching();               // 新しいウォッチャ（Created[1]）で再開
+
+        marshal.Drain();                       // 古いコールバックを今流す
+
+        Assert.Equal(2, factory.Created.Count);
+        Assert.NotSame(oldWatcher, factory.Created[1]);
+        var item = service.Folders[0];
+        Assert.Equal(WatcherStatus.Running, item.WatcherStatus);
+        Assert.Equal(1, service.WatchingCount);
+    }
+
+    [Fact]
+    // アクティブなウォッチャで発報されたエラーが「保留」され、そのあと StopWatching が完了してから
+    // 処理された場合でも、検証と代入が同一ロック内で不可分であるため Stopped を Error で上書きしない。
+    public void AdapterError_PendingDuringStop_DoesNotClobberStopped()
+    {
+        var marshal = new BlockingUiThreadMarshal();
+        var (service, repo, factory) = Build();
+        service.UiThreadMarshal = marshal.Run;
+        var dir = TempDir();
+        Directory.CreateDirectory(dir);
+        repo.Add(new WatchedFolder { FolderPath = dir, Enabled = true });
+        service.Start();
+
+        var watcher = factory.Created[0];
+        // 発報は別スレッドで行い、マーシャル内で実行直前までブロックさせる（検証はまだ行われていない）。
+        var raiseTask = Task.Run(() => watcher.RaiseAdapterError());
+        Assert.True(marshal.Entered.Wait(TimeSpan.FromSeconds(5)));
+
+        service.StopWatching();                // _active から除去され Stopped になる（保留中のまま）
+        Assert.Equal(WatcherStatus.Stopped, service.Folders[0].WatcherStatus);
+
+        marshal.Release();                     // 保留されていたアクションを今実行する
+        Assert.True(raiseTask.Wait(TimeSpan.FromSeconds(5)));
+
+        var item = service.Folders[0];
+        Assert.Equal(WatcherStatus.Stopped, item.WatcherStatus);
+        Assert.NotEqual(WatcherStatus.Error, item.WatcherStatus);
+        Assert.Equal(0, service.WatchingCount);
     }
 
     [Fact]

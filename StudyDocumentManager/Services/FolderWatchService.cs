@@ -303,7 +303,8 @@ public sealed class FolderWatchService : IFolderWatchService
             try
             {
                 watcher = _watcherFactory.Create(item);
-                watcher.AdapterError += (_, _) => OnWatcherAdapterError(item.Id);
+                var captured = watcher;
+                watcher.AdapterError += (_, _) => OnWatcherAdapterError(item.Id, captured);
                 watcher.Start();
             }
             catch (Exception ex)
@@ -358,19 +359,32 @@ public sealed class FolderWatchService : IFolderWatchService
         }
     }
 
-    private void OnWatcherAdapterError(int folderId)
+    private void OnWatcherAdapterError(int folderId, IWatchedFolderWatcher? source)
     {
-        // 致命的なアダプタエラーをバインド中の項目へローカライズ済みエラーとして反映する。
-        // 単にログに留めず、UI が失敗を表示できるようにする。ReloadConfig で項目が作り直されても
-        // 古いインスタンスを更新しないよう、ここで Id から現在の項目を再解決する。
         RunMarshaled(() =>
         {
-            var current = Folders.FirstOrDefault(f => f.Id == folderId);
-            if (current is null)
-                return;
+            // 検証（_disposed／_active の同一インスタンス判定）と、項目の解決・Error 代入を
+            // 同じ _sync ロック内で一括して行う。検証と代入の間に競合する停止／破棄／置換が
+            // 割り込む窓（TOCTOU）を排除する。ロック内はウォッチャや IO を呼ばず、状態更新と
+            // 短いローカライズ済み文字列の参照のみを行うため、デッドロックしない。
+            lock (_sync)
+            {
+                if (_disposed)
+                    return;
 
-            current.WatcherStatus = WatcherStatus.Error;
-            SetItemError(current, "WF_Error_WatcherFault");
+                // 破棄・停止・置換されたウォッチャから届く「古い」エラーコールバックを無効化する。
+                // 登録時と同一インスタンスがいまもアクティブでなければ、現在の状態（Stopped や
+                // 新規ウォッチャの Running など）を上書きしてはならない。
+                if (!_active.TryGetValue(folderId, out var active) || !ReferenceEquals(active, source))
+                    return;
+
+                var current = Folders.FirstOrDefault(f => f.Id == folderId);
+                if (current is null)
+                    return;
+
+                current.WatcherStatus = WatcherStatus.Error;
+                SetItemError(current, "WF_Error_WatcherFault");
+            }
         });
     }
 
