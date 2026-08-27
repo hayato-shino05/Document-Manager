@@ -20,24 +20,25 @@
         <CheckBox AutomationProperties.AutomationId="WatchedFolder_IncludeSub" Content="{loc:Localize WF_IncludeSub}" IsChecked="{Binding NewFolderIncludeSubdirectories}" />
         <Button AutomationProperties.AutomationId="WatchedFolder_Add" Content="{loc:Localize WF_Add}" Command="{Binding AddNewFolderCommand}" />
       </StackPanel>
-      <TextBlock AutomationProperties.AutomationId="WatchedFolder_Status" Text="{Binding StatusMessage}" IsVisible="{Binding StatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
-      <TextBlock AutomationProperties.AutomationId="WatchedFolder_Error" Text="{Binding LastError}" Foreground="Red" IsVisible="{Binding LastError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+      <TextBlock AutomationProperties.AutomationId="WatchedFolder_Status" AutomationProperties.LiveSetting="Polite" Text="{Binding StatusMessage}" IsVisible="{Binding StatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+      <TextBlock AutomationProperties.AutomationId="WatchedFolder_Error" AutomationProperties.LiveSetting="Polite" Text="{Binding LastError}" Foreground="{StaticResource DangerBrush}" IsVisible="{Binding LastError, Converter={x:Static ObjectConverters.IsNotNull}}" />
       <TextBlock AutomationProperties.AutomationId="WatchedFolder_NoFolders" Text="{loc:Localize WF_NoFolders}" IsVisible="{Binding !HasFolders}" />
     </StackPanel>
     <ListBox AutomationProperties.AutomationId="WatchedFolder_List" ItemsSource="{Binding Folders}">
       <ListBox.ItemTemplate>
         <DataTemplate x:DataType="ent:WatchedFolder">
-          <Grid ColumnDefinitions="*,Auto,Auto" Margin="4">
+          <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="4">
             <StackPanel Grid.Column="0" Spacing="2">
               <TextBlock Text="{Binding FolderPath}" FontWeight="Bold" />
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock Text="{Binding LastScanAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" FontSize="11" Opacity="0.7" />
                 <TextBlock Text="{Binding WatcherStatus, Converter={StaticResource WatcherStatusLabelConverter}}" FontSize="11" Opacity="0.7" />
               </StackPanel>
-              <TextBlock AutomationProperties.AutomationId="WatchedFolder_ItemError" Text="{Binding WatcherError}" FontSize="11" Foreground="Red" IsVisible="{Binding WatcherError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+              <TextBlock AutomationProperties.AutomationId="WatchedFolder_ItemError" AutomationProperties.LiveSetting="Polite" Text="{Binding WatcherError}" FontSize="11" Foreground="{StaticResource DangerBrush}" IsVisible="{Binding WatcherError, Converter={x:Static ObjectConverters.IsNotNull}}" />
             </StackPanel>
             <CheckBox Grid.Column="1" Content="{loc:Localize WF_Enable}" IsChecked="{Binding Enabled}" Command="{Binding DataContext.ToggleEnabledCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding .}" />
-            <Button Grid.Column="2" Content="{loc:Localize WF_Remove}" Command="{Binding DataContext.RemoveFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}" />
+            <Button Grid.Column="2" AutomationProperties.AutomationId="WatchedFolder_Retry" AutomationProperties.Name="{loc:Localize ImportInbox_Retry}" Content="{loc:Localize ImportInbox_Retry}" Command="{Binding DataContext.RetryFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}" />
+            <Button Grid.Column="3" Content="{loc:Localize WF_Remove}" Command="{Binding DataContext.RemoveFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}" />
           </Grid>
         </DataTemplate>
       </ListBox.ItemTemplate>

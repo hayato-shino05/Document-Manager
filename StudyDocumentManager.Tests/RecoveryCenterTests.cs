@@ -576,6 +576,36 @@ public sealed class RecoveryCenterTests : IDisposable
     }
 
     [Fact]
+    public void SelectedVersion_Null_DisablesRestore()
+    {
+        var (model, _, _, _, _, _) = CreateModel();
+
+        model.SelectedVersion = null;
+
+        Assert.False(model.CanRestoreSelected);
+    }
+
+    [Fact]
+    public void SelectedVersion_Valid_EnablesRestore()
+    {
+        var (model, _, _, _, _, _) = CreateModel();
+        model.SelectedVersion = new BackupVersionInfo(
+            @"C:\\stub\\valid.db", DateTime.Now, 10, IsValid: true, IsLatest: true);
+
+        Assert.True(model.CanRestoreSelected);
+    }
+
+    [Fact]
+    public void SelectedVersion_Invalid_DisablesRestore()
+    {
+        var (model, _, _, _, _, _) = CreateModel();
+        model.SelectedVersion = new BackupVersionInfo(
+            @"C:\\stub\\invalid.db", DateTime.Now, 10, IsValid: false, IsLatest: false);
+
+        Assert.False(model.CanRestoreSelected);
+    }
+
+    [Fact]
     public async Task RestoreSelectedAsync_WhenConfirmationCancelled_DoesNotRestoreOrShutdown()
     {
         var version = SeedSingleVersionAndMutate();

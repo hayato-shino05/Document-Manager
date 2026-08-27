@@ -54,7 +54,7 @@ public partial class RecoveryCenterModel : ModelBase, IDisposable
     private void OnLanguageChanged(object? sender, EventArgs e) => UpdateLatestSummary(Versions);
 
     partial void OnSelectedVersionChanged(BackupVersionInfo? value)
-        => CanRestoreSelected = value is not null;
+        => CanRestoreSelected = value is { IsValid: true };
 
     [RelayCommand]
     private Task LoadDataAsync() => QueueLoad();
