@@ -86,31 +86,49 @@
                                 <DataTemplate>
                                     <Border Background="{StaticResource SidebarBackground}" CornerRadius="4"
                                             Padding="10,8" Margin="2,3">
-                                        <DockPanel>
-                                            <StackPanel Spacing="2">
-                                                <TextBlock Text="{Binding GroupTitle}" FontSize="{StaticResource FontSizeMd}"
-                                                           FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
-                                                <TextBlock Text="{Binding MatchInfo}" FontSize="{StaticResource FontSizeXs}"
-                                                           Foreground="{StaticResource TextSecondary}"/>
-                                            </StackPanel>
-                                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4"
-                                                        VerticalAlignment="Center" HorizontalAlignment="Right">
-                                                <Button Classes="secondary" AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnView}"
-                                                        Command="{Binding ViewCommand}" Padding="{StaticResource PaddingSm}">
-                                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnView}" FontSize="{StaticResource FontSizeXs}"/>
-                                                </Button>
-                                                <Button Classes="danger" AutomationProperties.Name="{loc:Localize DuplicateDetection_Merge}"
+                                        <StackPanel Spacing="6">
+                                            <DockPanel>
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="{Binding GroupTitle}" FontSize="{StaticResource FontSizeMd}"
+                                                                FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
+                                                    <TextBlock Text="{Binding MatchInfo}" FontSize="{StaticResource FontSizeXs}"
+                                                                Foreground="{StaticResource TextSecondary}"/>
+                                                </StackPanel>
+                                                <Button DockPanel.Dock="Right" Classes="danger" AutomationProperties.Name="{loc:Localize DuplicateDetection_Merge}"
                                                         Command="{Binding DataContext.MergeDuplicateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                         CommandParameter="{Binding}" Padding="{StaticResource PaddingSm}">
                                                     <TextBlock Text="{loc:Localize DuplicateDetection_Merge}" FontSize="{StaticResource FontSizeXs}"/>
                                                 </Button>
-                                                <Button Classes="secondary" AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnDelete}"
-                                                        Command="{Binding DataContext.DeleteDuplicateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding Documents[1]}" Padding="{StaticResource PaddingSm}">
-                                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnDelete}" FontSize="{StaticResource FontSizeXs}"/>
-                                                </Button>
-                                            </StackPanel>
-                                        </DockPanel>
+                                            </DockPanel>
+                                            <ItemsControl ItemsSource="{Binding Documents}" Margin="0,2,0,0">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <DockPanel Margin="0,2">
+                                                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4"
+                                                                        VerticalAlignment="Center">
+                                                                <Button Classes="secondary" AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnView}"
+                                                                        Command="{Binding DataContext.ViewDocumentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                        CommandParameter="{Binding}" Padding="{StaticResource PaddingSm}">
+                                                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnView}" FontSize="{StaticResource FontSizeXs}"/>
+                                                                </Button>
+                                                                <Button Classes="secondary" AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnDelete}"
+                                                                        Command="{Binding DataContext.DeleteDuplicateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                        CommandParameter="{Binding}" Padding="{StaticResource PaddingSm}">
+                                                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnDelete}" FontSize="{StaticResource FontSizeXs}"/>
+                                                                </Button>
+                                                            </StackPanel>
+                                                            <StackPanel Spacing="1" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeXs}"
+                                                                            FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
+                                                                <TextBlock Text="{Binding FilePath}" FontSize="{StaticResource FontSizeXs}"
+                                                                            Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"
+                                                                            ToolTip.Tip="{Binding FilePath}"/>
+                                                            </StackPanel>
+                                                        </DockPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
                                     </Border>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>

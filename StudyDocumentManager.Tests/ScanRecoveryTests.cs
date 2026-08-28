@@ -3,6 +3,7 @@ using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Models;
 using StudyDocumentManager.Services;
+using StudyDocumentManager.Tests.TestDoubles;
 using Xunit;
 
 namespace StudyDocumentManager.Tests;
@@ -286,6 +287,30 @@ public class ScanRecoveryTests
 
         Assert.Single(model.DuplicateGroups);
         Assert.Single(dialogs.Errors);
+    }
+
+    [Fact]
+    public void ViewDocumentCommand_OpensTheTargetDocumentFile()
+    {
+        var doc = new StudyDocument { Id = 7, Name = "dup.pdf", FilePath = Path.Combine(Path.GetTempPath(), "dup-view.pdf") };
+        var launcher = new StubProcessLauncherService();
+        var model = new DuplicateDetectionModel(new ThrowingDocumentRepository(), new RecordingDialogService(), new LocalizationServiceStub(), launcher);
+
+        model.ViewDocumentCommand.Execute(doc);
+
+        Assert.Contains(doc.FilePath, launcher.OpenedFiles);
+    }
+
+    [Fact]
+    public void ViewDocumentCommand_IgnoresNullDocumentAndEmptyPath()
+    {
+        var launcher = new StubProcessLauncherService();
+        var model = new DuplicateDetectionModel(new ThrowingDocumentRepository(), new RecordingDialogService(), new LocalizationServiceStub(), launcher);
+
+        model.ViewDocumentCommand.Execute(null);
+        model.ViewDocumentCommand.Execute(new StudyDocument { Id = 1 });
+
+        Assert.Empty(launcher.OpenedFiles);
     }
 
     [Fact]
