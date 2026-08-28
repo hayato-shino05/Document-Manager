@@ -455,6 +455,8 @@
   <data name="Note_SaveSuccess" xml:space="preserve"><value>Đã lưu ghi chú</value></data>
   <data name="Note_SaveError" xml:space="preserve"><value>Không thể lưu ghi chú</value></data>
   <data name="Note_ConfirmDelete" xml:space="preserve"><value>Xóa ghi chú này?</value></data>
+  <data name="Note_ConfirmDiscard" xml:space="preserve"><value>Hủy các thay đổi chưa lưu?</value></data>
+  <data name="Note_Discard" xml:space="preserve"><value>Hủy thay đổi</value></data>
   <data name="Note_DeleteSuccess" xml:space="preserve"><value>Đã xóa ghi chú</value></data>
   <data name="Recent_ConfirmClear" xml:space="preserve"><value>Xóa toàn bộ lịch sử xem?</value></data>
   <data name="Recent_FileExists" xml:space="preserve"><value>✓</value></data>

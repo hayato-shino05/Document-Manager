@@ -455,6 +455,8 @@
   <data name="Note_SaveSuccess" xml:space="preserve"><value>备注已保存</value></data>
   <data name="Note_SaveError" xml:space="preserve"><value>无法保存备注</value></data>
   <data name="Note_ConfirmDelete" xml:space="preserve"><value>要删除此备注吗？</value></data>
+  <data name="Note_ConfirmDiscard" xml:space="preserve"><value>要放弃未保存的更改吗？</value></data>
+  <data name="Note_Discard" xml:space="preserve"><value>放弃更改</value></data>
   <data name="Note_DeleteSuccess" xml:space="preserve"><value>备注已删除</value></data>
   <data name="Recent_ConfirmClear" xml:space="preserve"><value>要清除全部浏览历史吗？</value></data>
   <data name="Recent_FileExists" xml:space="preserve"><value>✓</value></data>

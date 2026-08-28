@@ -1022,7 +1022,7 @@ public partial class DashboardModel : ModelBase, IDisposable
     private void ShowUpcomingDeadlines()
     {
         var docs = _repository.GetUpcomingDeadlines(7);
-        Documents = docs.ToList();
+        UpdateVisibleState(docs);
         SetLocalizedStatus("Status_UpcomingDeadlines", docs.Count);
     }
 
@@ -1030,7 +1030,7 @@ public partial class DashboardModel : ModelBase, IDisposable
     private void ShowOverdue()
     {
         var docs = _repository.GetOverdueDocuments();
-        Documents = docs.ToList();
+        UpdateVisibleState(docs);
         SetLocalizedStatus("Status_Overdue", docs.Count);
     }
 

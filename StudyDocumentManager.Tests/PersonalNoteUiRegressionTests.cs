@@ -195,6 +195,43 @@ public sealed class PersonalNoteUiRegressionTests
         }
     }
 
+    [Fact]
+    public async Task PersonalNote_DirtyBack_ConfirmsBeforeNavigating()
+    {
+        var dialog = new DialogServiceStub { ConfirmResult = false };
+        var navigation = new NavigationServiceStub();
+        var model = new PersonalNoteModel(
+            new PersonalNoteRepositoryStub(), dialog, navigation, new LocalizationServiceStub());
+        model.Load(7, "Algebra");
+        model.NoteContent = "Draft note";
+
+        await model.GoBackCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, dialog.ConfirmCount);
+        Assert.False(navigation.WentBack);
+
+        dialog.ConfirmResult = true;
+        await model.GoBackCommand.ExecuteAsync(null);
+
+        Assert.Equal(2, dialog.ConfirmCount);
+        Assert.True(navigation.WentBack);
+    }
+
+    [Fact]
+    public async Task PersonalNote_UnchangedBack_NavigatesWithoutConfirmation()
+    {
+        var dialog = new DialogServiceStub();
+        var navigation = new NavigationServiceStub();
+        var model = new PersonalNoteModel(
+            new PersonalNoteRepositoryStub(), dialog, navigation, new LocalizationServiceStub());
+        model.Load(7, "Algebra");
+
+        await model.GoBackCommand.ExecuteAsync(null);
+
+        Assert.Equal(0, dialog.ConfirmCount);
+        Assert.True(navigation.WentBack);
+    }
+
     private sealed class PersonalNoteRepositoryStub : IPersonalNoteRepository
     {
         public string? SavedContent { get; private set; }
@@ -209,19 +246,26 @@ public sealed class PersonalNoteUiRegressionTests
 
     private sealed class DialogServiceStub : IDialogService
     {
+        public bool ConfirmResult { get; set; }
+        public int ConfirmCount { get; private set; }
         public Task ShowMessageAsync(string title, string message) => Task.CompletedTask;
         public Task ShowErrorAsync(string title, string message) => Task.CompletedTask;
         public Task<bool> ShowConfirmAsync(string title, string message) => Task.FromResult(false);
-        public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false) => Task.FromResult(false);
+        public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false)
+        {
+            ConfirmCount++;
+            return Task.FromResult(ConfirmResult);
+        }
         public Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "") => Task.FromResult<string?>(null);
     }
 
     private sealed class NavigationServiceStub : INavigationService
     {
         public bool CanGoBack => true;
+        public bool WentBack { get; private set; }
         public void NavigateTo(string viewKey) { }
         public void NavigateTo(string viewKey, object? parameter) { }
-        public void GoBack() { }
+        public void GoBack() => WentBack = true;
     }
 
     private sealed class LocalizationServiceStub : ILocalizationService

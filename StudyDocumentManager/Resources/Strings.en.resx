@@ -149,6 +149,8 @@
   <data name="Note_SaveSuccess" xml:space="preserve"><value>Note saved</value></data>
   <data name="Note_SaveError" xml:space="preserve"><value>Cannot save note</value></data>
   <data name="Note_ConfirmDelete" xml:space="preserve"><value>Delete this note?</value></data>
+  <data name="Note_ConfirmDiscard" xml:space="preserve"><value>Discard unsaved changes?</value></data>
+  <data name="Note_Discard" xml:space="preserve"><value>Discard</value></data>
   <data name="Note_DeleteSuccess" xml:space="preserve"><value>Note deleted</value></data>
   <data name="Recent_ConfirmClear" xml:space="preserve"><value>Clear all browsing history?</value></data>
   <data name="Recent_FileExists" xml:space="preserve"><value>✓</value></data>

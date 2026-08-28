@@ -50,6 +50,43 @@ public sealed class Task5DashboardRecentFilesTests
     }
 
     [Fact]
+    public void Dashboard_UpcomingQuickFilter_UpdatesVisibleStateAndStatus()
+    {
+        var repository = new Task5DocumentRepository([new StudyDocument { Id = 1, Name = "All", IsImportant = true }])
+        {
+            UpcomingDocuments = [new StudyDocument { Id = 2, Name = "Due soon", IsImportant = true }]
+        };
+        var model = CreateDashboard(repository);
+        model.Initialize();
+
+        model.ShowUpcomingDeadlinesCommand.Execute(null);
+
+        Assert.Single(model.Documents);
+        Assert.Equal("Due soon", model.Documents[0].Name);
+        Assert.Equal(1, model.TotalDocuments);
+        Assert.Equal(1, model.ImportantDocuments);
+        Assert.False(model.IsEmptyState);
+        Assert.Contains("Status_UpcomingDeadlines", model.StatusText);
+    }
+
+    [Fact]
+    public void Dashboard_OverdueQuickFilter_UpdatesEmptyStateAndStats()
+    {
+        var repository = new Task5DocumentRepository([new StudyDocument { Id = 1, Name = "All", IsImportant = true }]);
+        var model = CreateDashboard(repository);
+        model.Initialize();
+
+        model.ShowOverdueCommand.Execute(null);
+
+        Assert.Empty(model.Documents);
+        Assert.Equal(0, model.TotalDocuments);
+        Assert.Equal(0, model.ImportantDocuments);
+        Assert.True(model.IsEmptyState);
+        Assert.Equal("empty", model.StateMessage);
+        Assert.Contains("Status_Overdue", model.StatusText);
+    }
+
+    [Fact]
     public void Dashboard_CollectionFilter_UpdatesStatsAndEmptyState()
     {
         var repository = new Task5DocumentRepository([new StudyDocument { Id = 1, Name = "All" }]);
@@ -107,6 +144,26 @@ public sealed class Task5DashboardRecentFilesTests
 
             Assert.Equal([path], launcher.OpenedFiles);
             Assert.Equal([7], recent.AddedIds);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void RecentFiles_OpenSuccess_RefreshesVisibleHistory()
+    {
+        var path = Path.GetTempFileName();
+        try
+        {
+            var openedAt = DateTime.UtcNow.AddMinutes(-5);
+            var recent = new Task5RecentRepository((11, "Refresh", "Math", "PDF", path, openedAt));
+            var model = CreateRecent(recent, new Task5Launcher());
+
+            model.OpenFileCommand.Execute(Assert.Single(model.RecentFiles));
+
+            Assert.True(model.RecentFiles.Single().OpenedAt > openedAt);
         }
         finally
         {
@@ -193,6 +250,8 @@ public sealed class Task5DashboardRecentFilesTests
     {
         private readonly List<StudyDocument> _documents = documents;
         public bool ThrowOnNextGetAll { get; set; }
+        public List<StudyDocument> UpcomingDocuments { get; set; } = [];
+        public List<StudyDocument> OverdueDocuments { get; set; } = [];
         public List<StudyDocument> GetAll() { if (ThrowOnNextGetAll) { ThrowOnNextGetAll = false; throw new IOException("load failed"); } return [.._documents]; }
         public StudyDocument? GetById(int id) => _documents.FirstOrDefault(d => d.Id == id);
         public List<StudyDocument> Search(string keyword) => [];
@@ -205,8 +264,8 @@ public sealed class Task5DashboardRecentFilesTests
         public List<string> GetDistinctSubjects() => [];
         public List<string> GetDistinctTypes() => [];
         public List<string> GetDistinctTags() => [];
-        public List<StudyDocument> GetUpcomingDeadlines(int days) => [];
-        public List<StudyDocument> GetOverdueDocuments() => [];
+        public List<StudyDocument> GetUpcomingDeadlines(int days) => [..UpcomingDocuments];
+        public List<StudyDocument> GetOverdueDocuments() => [..OverdueDocuments];
         public void EnsureSubjectExists(string subject) { }
         public void EnsureTypeExists(string type) { }
     }
@@ -215,7 +274,17 @@ public sealed class Task5DashboardRecentFilesTests
     {
         public List<int> AddedIds { get; } = [];
         public List<(int Id, string Name, string? Subject, string? Type, string? FilePath, DateTime OpenedAt)> GetAll() => [..items];
-        public bool Add(int documentId) { AddedIds.Add(documentId); return true; }
+        public bool Add(int documentId)
+        {
+            AddedIds.Add(documentId);
+            for (var i = 0; i < items.Length; i++)
+            {
+                if (items[i].Id == documentId)
+                    items[i].OpenedAt = DateTime.UtcNow;
+            }
+
+            return true;
+        }
         public void Clear() { }
     }
 

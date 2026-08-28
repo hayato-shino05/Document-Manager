@@ -16,12 +16,13 @@
                     <TextBox Grid.Column="2" Text="{Binding StudentContext.Course, Mode=TwoWay}" Watermark="{loc:Localize SW_ContextCourse}" automation:AutomationProperties.Name="{loc:Localize SW_ContextCourse}"/>
                     <TextBox Grid.Column="3" Text="{Binding StudentContext.Module, Mode=TwoWay}" Watermark="{loc:Localize SW_ContextModule}" automation:AutomationProperties.Name="{loc:Localize SW_ContextModule}"/>
                     <TextBox Grid.Column="4" Text="{Binding StudentContext.Owner, Mode=TwoWay}" Watermark="{loc:Localize SW_ContextOwner}" automation:AutomationProperties.Name="{loc:Localize SW_ContextOwner}"/>
-                    <Button Grid.Row="1" Grid.Column="0" Content="{loc:Localize SW_SaveContext}" Command="{Binding SaveContextCommand}" HorizontalAlignment="Left"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Text="{Binding StatusText}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}"/>
+                    <Button Grid.Row="1" Grid.Column="0" Content="{loc:Localize SW_SaveContext}" Command="{Binding SaveContextCommand}" HorizontalAlignment="Left" automation:AutomationProperties.Name="{loc:Localize SW_SaveContext}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Text="{Binding StatusText}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" automation:AutomationProperties.LiveSetting="Polite"/>
                 </Grid>
             </StackPanel>
 
-            <Grid ColumnDefinitions="220,220,*">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Grid ColumnDefinitions="220,220,*">
                 <Border Grid.Column="0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="10">
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
@@ -50,10 +51,10 @@
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
                             <TextBlock Text="{loc:Localize SW_Assignments}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                            <CheckBox Content="{loc:Localize SW_ShowHistory}" IsChecked="{Binding ShowHistory}"/>
-                            <Button Content="{loc:Localize SW_NewAssignment}" Command="{Binding NewAssignmentCommand}"/>
-                            <Button Content="{loc:Localize Action_Edit}" Command="{Binding EditAssignmentCommand}" IsEnabled="{Binding HasSelection}"/>
-                            <Button Content="{loc:Localize Action_Refresh}" Command="{Binding RefreshCommand}"/>
+                            <CheckBox Content="{loc:Localize SW_ShowHistory}" IsChecked="{Binding ShowHistory}" automation:AutomationProperties.Name="{loc:Localize SW_ShowHistory}"/>
+                            <Button Content="{loc:Localize SW_NewAssignment}" Command="{Binding NewAssignmentCommand}" automation:AutomationProperties.Name="{loc:Localize SW_NewAssignment}"/>
+                            <Button Content="{loc:Localize Action_Edit}" Command="{Binding EditAssignmentCommand}" IsEnabled="{Binding HasSelection}" automation:AutomationProperties.Name="{loc:Localize Action_Edit}"/>
+                            <Button Content="{loc:Localize Action_Refresh}" Command="{Binding RefreshCommand}" automation:AutomationProperties.Name="{loc:Localize Action_Refresh}"/>
                         </StackPanel>
                         <Grid ColumnDefinitions="2*,3*">
                             <ListBox Grid.Column="0" ItemsSource="{Binding Assignments}" SelectedItem="{Binding SelectedAssignment, Mode=TwoWay}" automation:AutomationProperties.Name="{loc:Localize SW_Assignments}">
@@ -85,17 +86,18 @@
                                     <TextBox Text="{Binding EditorMilestone, Mode=TwoWay}" Watermark="{loc:Localize SW_Milestone}" automation:AutomationProperties.Name="{loc:Localize SW_Milestone}"/>
                                     <TextBox Text="{Binding EditorNotes, Mode=TwoWay}" Watermark="{loc:Localize SW_Notes}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60" automation:AutomationProperties.Name="{loc:Localize SW_Notes}"/>
                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <Button Content="{loc:Localize Action_Save}" Command="{Binding SaveAssignmentCommand}"/>
-                                        <Button Content="{loc:Localize Action_Cancel}" Command="{Binding CancelEditCommand}"/>
-                                        <Button Content="{loc:Localize Action_Delete}" Command="{Binding DeleteAssignmentCommand}"/>
-                                        <Button Content="{loc:Localize SW_OpenRelatedDocument}" Command="{Binding OpenRelatedDocumentCommand}" IsEnabled="{Binding HasRelatedDocuments}"/>
+                                        <Button Content="{loc:Localize Action_Save}" Command="{Binding SaveAssignmentCommand}" automation:AutomationProperties.Name="{loc:Localize Action_Save}"/>
+                                        <Button Content="{loc:Localize Action_Cancel}" Command="{Binding CancelEditCommand}" automation:AutomationProperties.Name="{loc:Localize Action_Cancel}"/>
+                                        <Button Content="{loc:Localize Action_Delete}" Command="{Binding DeleteAssignmentCommand}" automation:AutomationProperties.Name="{loc:Localize Action_Delete}"/>
+                                        <Button Content="{loc:Localize SW_OpenRelatedDocument}" Command="{Binding OpenRelatedDocumentCommand}" IsEnabled="{Binding HasRelatedDocuments}" automation:AutomationProperties.Name="{loc:Localize SW_OpenRelatedDocument}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>
                         </Grid>
                     </DockPanel>
                 </Border>
-            </Grid>
+                </Grid>
+            </ScrollViewer>
         </DockPanel>
     </Border>
 </UserControl>

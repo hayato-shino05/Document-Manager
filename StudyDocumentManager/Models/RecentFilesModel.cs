@@ -72,7 +72,8 @@ public partial class RecentFilesModel : ModelBase
             return;
         }
 
-        _recentRepo.Add(item.DocumentId);
+        if (_recentRepo.Add(item.DocumentId))
+            LoadData();
     }
 
     [RelayCommand]

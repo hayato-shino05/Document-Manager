@@ -149,6 +149,8 @@
   <data name="Note_SaveSuccess" xml:space="preserve"><value>メモを保存しました</value></data>
   <data name="Note_SaveError" xml:space="preserve"><value>メモを保存できません</value></data>
   <data name="Note_ConfirmDelete" xml:space="preserve"><value>このメモを削除しますか？</value></data>
+  <data name="Note_ConfirmDiscard" xml:space="preserve"><value>保存していない変更を破棄しますか？</value></data>
+  <data name="Note_Discard" xml:space="preserve"><value>破棄する</value></data>
   <data name="Note_DeleteSuccess" xml:space="preserve"><value>メモを削除しました</value></data>
 
   <!-- RecentFiles -->
