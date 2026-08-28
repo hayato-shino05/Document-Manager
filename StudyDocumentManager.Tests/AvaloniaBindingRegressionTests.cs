@@ -943,6 +943,101 @@ public class AvaloniaBindingRegressionTests
 
 
     [AvaloniaFact]
+    public void AuditedWorkflowViews_RenderAtNarrowWidthWithStableRootContracts()
+    {
+        GetLocalization();
+
+        var views = new Control[]
+        {
+            new BatchImport(),
+            new StudyDocumentManager.Views.WatchedFolder(),
+            new RecoveryCenterView(),
+            new DuplicateDetection()
+        };
+        var expectedIds = new[]
+        {
+            "Screen_BatchImport",
+            "WatchedFolder_Screen",
+            "Screen_RecoveryCenter",
+            "Screen_DuplicateDetection"
+        };
+
+        foreach (var (view, expectedId) in views.Zip(expectedIds))
+        {
+            var window = new Window { Width = 520, Height = 600, Content = view };
+            try
+            {
+                window.Show();
+                FlushAvaloniaBindings();
+
+                Assert.Equal(expectedId, view.GetValue(AutomationProperties.AutomationIdProperty));
+                Assert.True(view.Bounds.Width <= 520);
+                Assert.True(view.Bounds.Height <= 600);
+            }
+            finally
+            {
+                window.Close();
+            }
+        }
+    }
+
+    [AvaloniaFact]
+    public void AuditedWorkflowViews_ExposeCriticalActionMetadata()
+    {
+        GetLocalization();
+
+        var cases = new (Control View, string[] AutomationIds)[]
+        {
+            (new BatchImport(), ["BatchImport_BrowseFolder", "BatchImport_ScanFolder", "BatchImport_Import"]),
+            (new StudyDocumentManager.Views.WatchedFolder(), ["WatchedFolder_Back", "WatchedFolder_Start", "WatchedFolder_Stop"]),
+            (new RecoveryCenterView(), ["Recovery_CreateBackup", "Recovery_RestoreSelected", "Recovery_OpenFolder"]),
+            (new DuplicateDetection(), ["DuplicateDetection_Scan"])
+        };
+
+        foreach (var (view, automationIds) in cases)
+        {
+            var window = new Window { Content = view };
+            try
+            {
+                window.Show();
+                FlushAvaloniaBindings();
+
+                foreach (var automationId in automationIds)
+                {
+                    var control = view.GetVisualDescendants().FirstOrDefault(candidate =>
+                        AutomationProperties.GetAutomationId(candidate) == automationId);
+                    Assert.NotNull(control);
+                }
+            }
+            finally
+            {
+                window.Close();
+            }
+        }
+    }
+
+    [AvaloniaFact]
+    public void RecoveryCenter_HasScrollableContentAtNarrowWidth()
+    {
+        GetLocalization();
+        var view = new RecoveryCenterView();
+        var window = new Window { Width = 520, Height = 600, Content = view };
+
+        try
+        {
+            window.Show();
+            FlushAvaloniaBindings();
+
+            Assert.Contains(view.GetVisualDescendants().OfType<ScrollViewer>(), scrollViewer =>
+                scrollViewer.Bounds.Width <= 520);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void AppValidationPluginCleanup_RemovesOnlyDataAnnotationsPlugin()
     {
         var validators = Avalonia.Data.Core.Plugins.BindingPlugins.DataValidators;
