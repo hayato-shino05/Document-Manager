@@ -19,7 +19,12 @@ public partial class PersonalNoteModel : ModelBase
     [ObservableProperty] private string _noteContent = string.Empty;
     [ObservableProperty] private string _savedNoteContent = string.Empty;
     [ObservableProperty] private bool _hasExistingNote;
+    [ObservableProperty] private PersonalNote? _selectedNote;
+    [ObservableProperty] private string _selectedNoteType = "general";
+    [ObservableProperty] private bool _isPinned;
 
+    public ObservableCollection<PersonalNote> Notes { get; } = [];
+    public IReadOnlyList<string> NoteTypes => NoteType.All;
     public bool CanSaveNote => !string.IsNullOrWhiteSpace(NoteContent);
     public bool HasSavedNotePreview => HasExistingNote && !string.IsNullOrWhiteSpace(SavedNoteContent);
 
@@ -35,10 +40,7 @@ public partial class PersonalNoteModel : ModelBase
     {
         DocumentId = docId;
         DocumentName = docName;
-        var note = _noteRepo.GetNote(docId);
-        NoteContent = note ?? string.Empty;
-        SavedNoteContent = note ?? string.Empty;
-        HasExistingNote = note != null;
+        ReloadNotes();
     }
 
     partial void OnNoteContentChanged(string value)
@@ -49,6 +51,31 @@ public partial class PersonalNoteModel : ModelBase
 
     partial void OnHasExistingNoteChanged(bool value)
         => OnPropertyChanged(nameof(HasSavedNotePreview));
+
+    partial void OnSelectedNoteChanged(PersonalNote? value)
+    {
+        if (value is null)
+        {
+            NoteContent = string.Empty;
+            SavedNoteContent = string.Empty;
+            SelectedNoteType = "general";
+            IsPinned = false;
+            HasExistingNote = false;
+            return;
+        }
+
+        NoteContent = value.Content;
+        SavedNoteContent = value.Content;
+        SelectedNoteType = value.NoteType;
+        IsPinned = value.IsPinned;
+        HasExistingNote = true;
+    }
+
+    [RelayCommand]
+    private void NewNote()
+    {
+        SelectedNote = null;
+    }
 
     [RelayCommand]
     private async Task SaveNoteAsync()
@@ -61,22 +88,40 @@ public partial class PersonalNoteModel : ModelBase
         }
 
         NoteContent = content;
-        if (!_noteRepo.SaveNote(DocumentId, content))
+        var note = new PersonalNote(SelectedNote?.Id ?? 0, DocumentId, SelectedNoteType, content, IsPinned);
+        if (!_noteRepo.SaveNote(note))
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
             return;
         }
 
-        var persistedContent = _noteRepo.GetNote(DocumentId);
-        if (!string.Equals(persistedContent, content, StringComparison.Ordinal))
+        ReloadNotes(note.Id, note.NoteType, content);
+        if (!string.Equals(SelectedNote?.Content, content, StringComparison.Ordinal))
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
             return;
         }
 
-        SavedNoteContent = content;
-        HasExistingNote = true;
         await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["Note_SaveSuccess"]);
+    }
+
+    [RelayCommand]
+    private async Task TogglePinnedAsync()
+    {
+        var newValue = !IsPinned;
+        if (SelectedNote is not null && SelectedNote.Id != 0 && !_noteRepo.SetPinned(SelectedNote.Id, newValue))
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
+            return;
+        }
+
+        IsPinned = newValue;
+        if (SelectedNote is not null)
+        {
+            var updated = SelectedNote with { IsPinned = newValue };
+            Notes[Notes.IndexOf(SelectedNote)] = updated;
+            SelectedNote = updated;
+        }
     }
 
     [RelayCommand]
@@ -87,13 +132,17 @@ public partial class PersonalNoteModel : ModelBase
         var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"], _loc["Note_ConfirmDelete"]);
         if (!confirmed) return;
 
-        if (_noteRepo.DeleteNote(DocumentId))
+        var deleted = SelectedNote is { Id: not 0 }
+            ? _noteRepo.DeleteNoteById(SelectedNote.Id)
+            : _noteRepo.DeleteNote(DocumentId);
+        if (!deleted)
         {
-            NoteContent = string.Empty;
-            SavedNoteContent = string.Empty;
-            HasExistingNote = false;
-            await _dialogService.ShowMessageAsync(_loc["Dialog_Deleted"], _loc["Note_DeleteSuccess"]);
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
+            return;
         }
+
+        ReloadNotes();
+        await _dialogService.ShowMessageAsync(_loc["Dialog_Deleted"], _loc["Note_DeleteSuccess"]);
     }
 
     [RelayCommand]
@@ -108,5 +157,20 @@ public partial class PersonalNoteModel : ModelBase
         var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"], _loc["Note_ConfirmDiscard"], _loc["Note_Discard"]);
         if (confirmed)
             _navigationService.GoBack();
+    }
+
+    private void ReloadNotes(int noteId = 0, string? noteType = null, string? content = null)
+    {
+        Notes.Clear();
+        foreach (var note in _noteRepo.GetNotes(DocumentId))
+            Notes.Add(note);
+
+        SelectedNote = noteId == 0
+            ? Notes.FirstOrDefault(note => note.NoteType == "general") ?? Notes.FirstOrDefault()
+            : Notes.FirstOrDefault(note => note.Id == noteId)
+                ?? Notes.FirstOrDefault(note => note.NoteType == noteType && note.Content == content);
+
+        if (SelectedNote is null)
+            HasExistingNote = false;
     }
 }

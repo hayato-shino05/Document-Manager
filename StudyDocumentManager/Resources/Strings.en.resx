@@ -536,6 +536,10 @@ Please check your network connection.</value></data>
   <data name="PersonalNote_BtnSave" xml:space="preserve"><value>Save</value></data>
   <data name="PersonalNote_BtnDelete" xml:space="preserve"><value>Delete</value></data>
   <data name="PersonalNote_Placeholder" xml:space="preserve"><value>Enter notes...</value></data>
+  <data name="PersonalNote_Notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="PersonalNote_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="PersonalNote_Pinned" xml:space="preserve"><value>Pinned</value></data>
+  <data name="PersonalNote_BtnNew" xml:space="preserve"><value>New note</value></data>
   <data name="RelatedDocs_Title" xml:space="preserve"><value>Related Documents</value></data>
   <data name="RelatedDocs_BtnAdd" xml:space="preserve"><value>Add</value></data>
   <data name="RelatedDocs_BtnRemove" xml:space="preserve"><value>Remove</value></data>

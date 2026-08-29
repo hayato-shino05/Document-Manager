@@ -18,6 +18,13 @@ public interface IDocumentRepository
         DateTime? fromDate, DateTime? toDate,
         double? minSize, double? maxSize, bool? isImportant);
 
+    List<StudyDocument> SearchAdvancedWithNotes(
+        string? keyword, string? subject, string? type,
+        DateTime? fromDate, DateTime? toDate,
+        double? minSize, double? maxSize, bool? isImportant)
+        => SearchAdvanced(keyword ?? string.Empty, subject ?? string.Empty, type ?? string.Empty,
+            fromDate, toDate, minSize, maxSize, isImportant);
+
     List<StudyDocument> SearchAdvancedWithStatus(
         string? keyword, string? subject, string? type,
         DateTime? fromDate, DateTime? toDate,

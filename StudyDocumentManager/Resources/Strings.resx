@@ -621,6 +621,10 @@
   <data name="PersonalNote_BtnSave" xml:space="preserve"><value>保存</value></data>
   <data name="PersonalNote_BtnDelete" xml:space="preserve"><value>削除</value></data>
   <data name="PersonalNote_Placeholder" xml:space="preserve"><value>メモを入力...</value></data>
+  <data name="PersonalNote_Notes" xml:space="preserve"><value>メモ一覧</value></data>
+  <data name="PersonalNote_Type" xml:space="preserve"><value>種類</value></data>
+  <data name="PersonalNote_Pinned" xml:space="preserve"><value>固定</value></data>
+  <data name="PersonalNote_BtnNew" xml:space="preserve"><value>新規メモ</value></data>
 
   <!-- RelatedDocuments View -->
   <data name="RelatedDocs_Title" xml:space="preserve"><value>関連文書</value></data>

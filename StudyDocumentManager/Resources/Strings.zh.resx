@@ -779,6 +779,10 @@
   <data name="PersonalNote_BtnSave" xml:space="preserve"><value>保存</value></data>
   <data name="PersonalNote_BtnDelete" xml:space="preserve"><value>删除</value></data>
   <data name="PersonalNote_Placeholder" xml:space="preserve"><value>输入备注...</value></data>
+  <data name="PersonalNote_Notes" xml:space="preserve"><value>备注列表</value></data>
+  <data name="PersonalNote_Type" xml:space="preserve"><value>类型</value></data>
+  <data name="PersonalNote_Pinned" xml:space="preserve"><value>已固定</value></data>
+  <data name="PersonalNote_BtnNew" xml:space="preserve"><value>新建备注</value></data>
   <data name="RelatedDocs_Title" xml:space="preserve"><value>相关文档</value></data>
   <data name="RelatedDocs_BtnAdd" xml:space="preserve"><value>添加</value></data>
   <data name="RelatedDocs_BtnRemove" xml:space="preserve"><value>取消关联</value></data>

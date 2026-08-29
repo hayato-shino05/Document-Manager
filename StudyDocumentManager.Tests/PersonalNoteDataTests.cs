@@ -57,6 +57,29 @@ public sealed class PersonalNoteDataTests : DatabaseTestBase
     }
 
     [Fact]
+    public void Search_IncludesMatchingPersonalNoteContent_WithoutDuplicatingDocuments()
+    {
+        var document = AddDocument("Original title");
+        Assert.True(_noteRepository.SaveNote(new PersonalNote(0, document.Id, "summary", "unique note phrase", false)));
+        Assert.True(_noteRepository.SaveNote(new PersonalNote(0, document.Id, "action", "unique note phrase", true)));
+
+        var result = Repo.SearchAdvancedWithNotes("unique note phrase", null, null, null, null, null, null, null);
+
+        Assert.Single(result);
+        Assert.Equal(document.Id, result[0].Id);
+    }
+
+    [Fact]
+    public void Search_IncludesMatchingPersonalNoteContent_WithoutDeletedDocuments()
+    {
+        var active = AddDocument("Active");
+        Assert.True(_noteRepository.SaveNote(new PersonalNote(0, active.Id, "summary", "search active note", false)));
+        Repo.Delete(active.Id);
+
+        Assert.Empty(Repo.SearchAdvancedWithNotes("search active note", null, null, null, null, null, null, null));
+    }
+
+    [Fact]
     public void InitializeDatabase_AddsNoteColumnsWithoutForeignKeyViolations()
     {
         Db.CloseAllConnections();

@@ -281,6 +281,63 @@ public class DatabaseHelper
         return ExecuteReader(query, parameters.ToArray());
     }
 
+    public List<StudyDocument> SearchDocumentsAdvancedWithNotes(
+        string? keyword, string? subject, string? type,
+        DateTime? fromDate, DateTime? toDate,
+        double? minSize, double? maxSize, bool? isImportant)
+    {
+        var query = "SELECT * FROM documents WHERE (is_deleted IS NULL OR is_deleted = 0)";
+        var parameters = new List<SqliteParameter>();
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            query += " AND (name LIKE @keyword OR subject LIKE @keyword OR notes LIKE @keyword OR tags LIKE @keyword OR EXISTS (SELECT 1 FROM personal_notes WHERE personal_notes.document_id = documents.id AND personal_notes.is_deleted = 0 AND personal_notes.content LIKE @keyword))";
+            parameters.Add(new SqliteParameter("@keyword", $"%{keyword}%"));
+        }
+
+        if (!string.IsNullOrEmpty(subject) && subject != "All")
+        {
+            query += " AND subject = @subject";
+            parameters.Add(new SqliteParameter("@subject", subject));
+        }
+
+        if (!string.IsNullOrEmpty(type) && type != "All")
+        {
+            query += " AND type = @type";
+            parameters.Add(new SqliteParameter("@type", type));
+        }
+
+        if (fromDate.HasValue)
+        {
+            query += " AND date(created_at) >= date(@fromDate)";
+            parameters.Add(new SqliteParameter("@fromDate", fromDate.Value.ToString("yyyy-MM-dd")));
+        }
+
+        if (toDate.HasValue)
+        {
+            query += " AND date(created_at) <= date(@toDate)";
+            parameters.Add(new SqliteParameter("@toDate", toDate.Value.ToString("yyyy-MM-dd")));
+        }
+
+        if (minSize.HasValue)
+        {
+            query += " AND file_size >= @minSize";
+            parameters.Add(new SqliteParameter("@minSize", minSize.Value));
+        }
+
+        if (maxSize.HasValue)
+        {
+            query += " AND file_size <= @maxSize";
+            parameters.Add(new SqliteParameter("@maxSize", maxSize.Value));
+        }
+
+        if (isImportant is true)
+            query += " AND is_important = 1";
+
+        query += " ORDER BY created_at DESC";
+        return ExecuteReader(query, parameters.ToArray());
+    }
+
     public Dictionary<string, int> GetStatusCounts()
     {
         const string query = "SELECT status, COUNT(*) FROM documents WHERE (is_deleted IS NULL OR is_deleted = 0) AND status IS NOT NULL GROUP BY status";

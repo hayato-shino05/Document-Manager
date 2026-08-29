@@ -32,6 +32,12 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
         double? minSize, double? maxSize, bool? isImportant)
         => _db.SearchDocumentsAdvanced(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant);
 
+    public List<StudyDocument> SearchAdvancedWithNotes(
+        string? keyword, string? subject, string? type,
+        DateTime? fromDate, DateTime? toDate,
+        double? minSize, double? maxSize, bool? isImportant)
+        => _db.SearchDocumentsAdvancedWithNotes(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant);
+
     public List<StudyDocument> SearchAdvancedWithStatus(
         string? keyword, string? subject, string? type,
         DateTime? fromDate, DateTime? toDate,

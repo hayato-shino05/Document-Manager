@@ -779,6 +779,10 @@
   <data name="PersonalNote_BtnSave" xml:space="preserve"><value>Lưu</value></data>
   <data name="PersonalNote_BtnDelete" xml:space="preserve"><value>Xóa</value></data>
   <data name="PersonalNote_Placeholder" xml:space="preserve"><value>Nhập ghi chú...</value></data>
+  <data name="PersonalNote_Notes" xml:space="preserve"><value>Danh sách ghi chú</value></data>
+  <data name="PersonalNote_Type" xml:space="preserve"><value>Loại</value></data>
+  <data name="PersonalNote_Pinned" xml:space="preserve"><value>Đã ghim</value></data>
+  <data name="PersonalNote_BtnNew" xml:space="preserve"><value>Ghi chú mới</value></data>
   <data name="RelatedDocs_Title" xml:space="preserve"><value>Tài liệu liên quan</value></data>
   <data name="RelatedDocs_BtnAdd" xml:space="preserve"><value>Thêm</value></data>
   <data name="RelatedDocs_BtnRemove" xml:space="preserve"><value>Hủy liên kết</value></data>
