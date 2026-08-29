@@ -114,6 +114,33 @@ public partial class App : Application
         localization.SetLanguage(resolution.Language);
     }
 
+    internal static string GetStartupDiagnosticsPath()
+    {
+        var configuredPath = Environment.GetEnvironmentVariable(FileStartupDiagnostics.EnvironmentVariableName);
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(configuredPath) && Path.IsPathFullyQualified(configuredPath))
+                return Path.GetFullPath(configuredPath);
+        }
+        catch (ArgumentException)
+        {
+            configuredPath = null;
+        }
+
+        var localAppData = Environment.GetFolderPath(
+            Environment.SpecialFolder.LocalApplicationData,
+            Environment.SpecialFolderOption.DoNotVerify);
+        if (string.IsNullOrWhiteSpace(localAppData) || !Path.IsPathFullyQualified(localAppData))
+        {
+            localAppData = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                ".local",
+                "share");
+        }
+
+        return Path.Combine(localAppData, "StudyDocumentManager", "logs", "startup.log");
+    }
+
     private static void RemoveDataAnnotationsValidationPlugin()
     {
         var validators = Avalonia.Data.Core.Plugins.BindingPlugins.DataValidators;
@@ -127,6 +154,7 @@ public partial class App : Application
     private static void ConfigureServices(IServiceCollection services)
     {
         // Infrastructure
+        services.AddSingleton<IStartupDiagnostics>(_ => new FileStartupDiagnostics(GetStartupDiagnosticsPath()));
         services.AddSingleton<DatabaseHelper>();
 
         // Repositories

@@ -4,6 +4,7 @@ using System.Threading;
 using Microsoft.Data.Sqlite;
 using StudyDocumentManager.Core.DTOs;
 using StudyDocumentManager.Core.Entities;
+using StudyDocumentManager.Core.Interfaces;
 
 namespace StudyDocumentManager.Data.Helpers;
 
@@ -13,8 +14,14 @@ namespace StudyDocumentManager.Data.Helpers;
 public class DatabaseHelper
 {
     private const string DatabasePathEnvironmentVariable = "SDM_DATABASE_PATH";
+    private readonly IStartupDiagnostics? _startupDiagnostics;
     private string? _databasePath;
     private string? _connectionString;
+
+    public DatabaseHelper(IStartupDiagnostics? startupDiagnostics = null)
+    {
+        _startupDiagnostics = startupDiagnostics;
+    }
 
     /// <summary>
     /// DBファイルパス
@@ -100,9 +107,9 @@ public class DatabaseHelper
 
     public void InitializeDatabase()
     {
-        using var operationLock = AcquireDatabaseOperationLock(DatabasePath);
         try
         {
+            using var operationLock = AcquireDatabaseOperationLock(DatabasePath);
             string? dataFolder = Path.GetDirectoryName(DatabasePath);
             if (!string.IsNullOrEmpty(dataFolder) && !Directory.Exists(dataFolder))
             {
@@ -111,11 +118,34 @@ public class DatabaseHelper
 
             MigrateLegacyDatabaseIfNeeded();
             DatabaseMigrator.RunMigrations(ConnectionString);
+            TryRecordDatabaseInitializationSucceeded();
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Database initialization error: {ex.Message}");
+            TryRecordDatabaseInitializationFailed(ex);
             throw;
+        }
+    }
+
+    private void TryRecordDatabaseInitializationSucceeded()
+    {
+        try
+        {
+            _startupDiagnostics?.RecordDatabaseInitializationSucceeded();
+        }
+        catch
+        {
+        }
+    }
+
+    private void TryRecordDatabaseInitializationFailed(Exception exception)
+    {
+        try
+        {
+            _startupDiagnostics?.RecordDatabaseInitializationFailed(exception);
+        }
+        catch
+        {
         }
     }
 
