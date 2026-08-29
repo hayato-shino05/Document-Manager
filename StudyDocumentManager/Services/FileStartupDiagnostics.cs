@@ -42,9 +42,18 @@ public sealed class FileStartupDiagnostics : IStartupDiagnostics
             return "unsupported_legacy_tables";
         if (message.StartsWith("Unsupported columns in ", StringComparison.Ordinal))
             return "unsupported_legacy_columns";
-        if (message.StartsWith("Missing required columns in ", StringComparison.Ordinal))
+        if (message.StartsWith("Missing required columns in ", StringComparison.Ordinal) ||
+            message.StartsWith("Missing unique constraint in ", StringComparison.Ordinal) ||
+            message.StartsWith("Required table ", StringComparison.Ordinal) ||
+            message.StartsWith("Table ", StringComparison.Ordinal) && message.Contains(" references missing parent table ", StringComparison.Ordinal) ||
+            message.StartsWith("Orphaned records found in ", StringComparison.Ordinal) ||
+            message.StartsWith("Foreign key integrity check failed.", StringComparison.Ordinal))
             return "incomplete_legacy_schema";
-        if (message.StartsWith("Unsupported legacy database schema:", StringComparison.Ordinal))
+        if (message.StartsWith("Unsupported legacy database schema:", StringComparison.Ordinal) ||
+            message.StartsWith("Unsupported foreign key layout in ", StringComparison.Ordinal) ||
+            message.StartsWith("Unsupported index ", StringComparison.Ordinal) ||
+            message.StartsWith("Unsupported trigger on ", StringComparison.Ordinal) ||
+            message.StartsWith("Unsupported unique constraint ", StringComparison.Ordinal))
             return "unsupported_legacy_schema";
         if (message.StartsWith("SDM_DATABASE_PATH must be an absolute path.", StringComparison.Ordinal))
             return "invalid_database_path";
