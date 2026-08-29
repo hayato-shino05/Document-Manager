@@ -81,7 +81,8 @@ public partial class App : Application
 
             desktop.Exit += (_, _) => folderWatch.Dispose();
 
-            desktop.MainWindow = new MainWindow
+            desktop.MainWindow = new MainWindow(
+                () => Services.GetRequiredService<OnboardingModel>())
             {
                 DataContext = mainModel
             };
@@ -224,6 +225,7 @@ services.AddSingleton<IVersionedBackupService, VersionedBackupService>();
 
         // モデル — メイン
         services.AddSingleton<MainWindowModel>();
+        services.AddTransient<OnboardingModel>();
         services.AddTransient<DashboardModel>();
 
         // モデル — 文書

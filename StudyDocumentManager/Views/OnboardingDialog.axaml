@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:StudyDocumentManager.Models"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+        x:Class="StudyDocumentManager.Views.OnboardingDialog"
+        x:DataType="vm:OnboardingModel"
+        AutomationProperties.AutomationId="Dialog_Onboarding"
+        Title="{loc:Localize Onboarding_Title}"
+        Width="560" Height="520"
+        MinWidth="420" MinHeight="420"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="{StaticResource ContentBackground}">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="24">
+        <StackPanel Grid.Row="0" Spacing="6">
+            <TextBlock Text="{loc:Localize Onboarding_Welcome}"
+                       AutomationProperties.AutomationId="Onboarding_Welcome"
+                       FontSize="{StaticResource FontSizeXl}"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource TextPrimary}" />
+            <TextBlock Text="{loc:Localize Onboarding_Intro}"
+                       TextWrapping="Wrap"
+                       Foreground="{StaticResource TextSecondary}" />
+        </StackPanel>
+        <ScrollViewer Grid.Row="1" Margin="0,20,0,20"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="14">
+                <TextBlock Text="{loc:Localize Onboarding_StepStorage}" TextWrapping="Wrap" />
+                <TextBlock Text="{loc:Localize Onboarding_StepAdd}" TextWrapping="Wrap" />
+                <TextBlock Text="{loc:Localize Onboarding_StepOrganize}" TextWrapping="Wrap" />
+                <TextBlock Text="{loc:Localize Onboarding_StepBackup}" TextWrapping="Wrap" />
+                <TextBlock Text="{loc:Localize Onboarding_StepRecovery}" TextWrapping="Wrap" />
+                <TextBlock Text="{loc:Localize Onboarding_StepLanguage}" TextWrapping="Wrap" />
+            </StackPanel>
+        </ScrollViewer>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+            <Button Name="SkipButton"
+                    Content="{loc:Localize Onboarding_Skip}"
+                    AutomationProperties.AutomationId="Onboarding_Skip"
+                    Classes="secondary"
+                    Command="{Binding SkipCommand}" />
+            <Button Name="FinishButton"
+                    Content="{loc:Localize Onboarding_Finish}"
+                    AutomationProperties.AutomationId="Onboarding_Finish"
+                    Classes="primary"
+                    IsDefault="True"
+                    Command="{Binding FinishCommand}" />
+        </StackPanel>
+    </Grid>
+</Window>

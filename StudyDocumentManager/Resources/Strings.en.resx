@@ -868,4 +868,16 @@ Please check your network connection.</value></data>
   <data name="WF_ItemStatus_Unknown" xml:space="preserve"><value>Unknown</value></data>
   <data name="WF_Error_WatcherFault" xml:space="preserve"><value>A fatal error occurred while watching the folder.</value></data>
   <data name="WF_IncludeSub" xml:space="preserve"><value>Include subfolders</value></data>
+  <data name="Onboarding_Title" xml:space="preserve"><value>First-time Setup</value></data>
+  <data name="Onboarding_Welcome" xml:space="preserve"><value>Welcome to Document Manager</value></data>
+  <data name="Onboarding_Intro" xml:space="preserve"><value>This short guide covers the basics of managing your documents.</value></data>
+  <data name="Onboarding_StepStorage" xml:space="preserve"><value>Storage: Documents and settings are stored in a local database on this device.</value></data>
+  <data name="Onboarding_StepAdd" xml:space="preserve"><value>Add documents: Add files and record their name, subject, type, and more.</value></data>
+  <data name="Onboarding_StepOrganize" xml:space="preserve"><value>Organize: Use categories, collections, search, and filters to organize documents.</value></data>
+  <data name="Onboarding_StepBackup" xml:space="preserve"><value>Backup: Use the File menu to create a database backup.</value></data>
+  <data name="Onboarding_StepRecovery" xml:space="preserve"><value>Recovery: Use Recovery Center to check or restore backups and relink files.</value></data>
+  <data name="Onboarding_StepLanguage" xml:space="preserve"><value>Language: Change the display language from the language menu in the upper right.</value></data>
+  <data name="Onboarding_Skip" xml:space="preserve"><value>Skip</value></data>
+  <data name="Onboarding_Finish" xml:space="preserve"><value>Get started</value></data>
+  <data name="Onboarding_MenuItem" xml:space="preserve"><value>Getting Started</value></data>
 </root>

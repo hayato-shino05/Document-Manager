@@ -1077,4 +1077,16 @@
   <data name="WF_ItemStatus_Unknown" xml:space="preserve"><value>未确定</value></data>
   <data name="WF_Error_WatcherFault" xml:space="preserve"><value>监视文件夹时发生严重错误。</value></data>
   <data name="WF_IncludeSub" xml:space="preserve"><value>包含子文件夹</value></data>
+  <data name="Onboarding_Title" xml:space="preserve"><value>首次设置</value></data>
+  <data name="Onboarding_Welcome" xml:space="preserve"><value>欢迎使用 Document Manager</value></data>
+  <data name="Onboarding_Intro" xml:space="preserve"><value>本指南将介绍文档管理的基本操作。</value></data>
+  <data name="Onboarding_StepStorage" xml:space="preserve"><value>存储：文档和设置保存在此设备的本地数据库中。</value></data>
+  <data name="Onboarding_StepAdd" xml:space="preserve"><value>添加文档：添加文件并记录名称、科目、类型等信息。</value></data>
+  <data name="Onboarding_StepOrganize" xml:space="preserve"><value>整理：使用分类、收藏集、搜索和筛选来整理文档。</value></data>
+  <data name="Onboarding_StepBackup" xml:space="preserve"><value>备份：使用“文件”菜单创建数据库备份。</value></data>
+  <data name="Onboarding_StepRecovery" xml:space="preserve"><value>恢复：使用恢复中心检查或恢复备份，并重新链接文件。</value></data>
+  <data name="Onboarding_StepLanguage" xml:space="preserve"><value>语言：从右上角的语言菜单更改显示语言。</value></data>
+  <data name="Onboarding_Skip" xml:space="preserve"><value>跳过</value></data>
+  <data name="Onboarding_Finish" xml:space="preserve"><value>开始使用</value></data>
+  <data name="Onboarding_MenuItem" xml:space="preserve"><value>入门指南</value></data>
 </root>

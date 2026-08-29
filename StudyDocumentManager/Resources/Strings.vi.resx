@@ -1077,4 +1077,16 @@
   <data name="WF_ItemStatus_Unknown" xml:space="preserve"><value>Chưa xác định</value></data>
   <data name="WF_Error_WatcherFault" xml:space="preserve"><value>Đã xảy ra lỗi nghiêm trọng khi theo dõi thư mục.</value></data>
   <data name="WF_IncludeSub" xml:space="preserve"><value>Bao gồm thư mục con</value></data>
+  <data name="Onboarding_Title" xml:space="preserve"><value>Thiết lập lần đầu</value></data>
+  <data name="Onboarding_Welcome" xml:space="preserve"><value>Chào mừng đến với Document Manager</value></data>
+  <data name="Onboarding_Intro" xml:space="preserve"><value>Hướng dẫn ngắn này giới thiệu các thao tác quản lý tài liệu cơ bản.</value></data>
+  <data name="Onboarding_StepStorage" xml:space="preserve"><value>Lưu trữ: Tài liệu và cài đặt được lưu trong cơ sở dữ liệu cục bộ trên thiết bị này.</value></data>
+  <data name="Onboarding_StepAdd" xml:space="preserve"><value>Thêm tài liệu: Thêm tệp và lưu tên, môn học, loại cùng các thông tin khác.</value></data>
+  <data name="Onboarding_StepOrganize" xml:space="preserve"><value>Sắp xếp: Dùng danh mục, bộ sưu tập, tìm kiếm và bộ lọc để sắp xếp tài liệu.</value></data>
+  <data name="Onboarding_StepBackup" xml:space="preserve"><value>Sao lưu: Dùng menu Tệp để tạo bản sao lưu cơ sở dữ liệu.</value></data>
+  <data name="Onboarding_StepRecovery" xml:space="preserve"><value>Khôi phục: Dùng Trung tâm Khôi phục để kiểm tra, khôi phục bản sao lưu và liên kết lại tệp.</value></data>
+  <data name="Onboarding_StepLanguage" xml:space="preserve"><value>Ngôn ngữ: Đổi ngôn ngữ hiển thị từ menu ngôn ngữ ở góc trên bên phải.</value></data>
+  <data name="Onboarding_Skip" xml:space="preserve"><value>Bỏ qua</value></data>
+  <data name="Onboarding_Finish" xml:space="preserve"><value>Bắt đầu</value></data>
+  <data name="Onboarding_MenuItem" xml:space="preserve"><value>Hướng dẫn bắt đầu</value></data>
 </root>

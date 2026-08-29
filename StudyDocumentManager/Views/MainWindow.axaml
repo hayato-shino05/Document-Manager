@@ -106,6 +106,7 @@
                     </MenuItem>
                     <MenuItem Header="{loc:Localize Menu_Help}"
                               AutomationProperties.AutomationId="Menu_Help">
+                        <MenuItem Header="{loc:Localize Onboarding_MenuItem}" Command="{Binding ShowHelpCommand}"/>
                         <MenuItem Header="{loc:Localize Menu_CheckUpdate}" Command="{Binding CheckForUpdateCommand}"/>
                         <Separator/>
                         <MenuItem Header="{loc:Localize Menu_About}" Command="{Binding ShowAboutCommand}"/>
