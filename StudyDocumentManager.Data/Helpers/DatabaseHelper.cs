@@ -1135,7 +1135,7 @@ public class DatabaseHelper
         ValidateRequiredColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["status"]);
         ValidateRequiredColumns(connection, "collections", ["id", "name", "description", "created_at"]);
         ValidateRequiredColumns(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"]);
-        ValidateRequiredColumns(connection, "personal_notes", ["id", "document_id", "content", "created_at", "updated_at"]);
+        ValidateRequiredColumns(connection, "personal_notes", ["id", "document_id", "content", "created_at", "updated_at"], ["note_type", "is_pinned", "is_deleted"]);
         ValidateRequiredColumns(connection, "recent_files", ["id", "document_id", "opened_at"]);
         ValidateRequiredColumns(connection, "document_relations", ["id", "doc_id_1", "doc_id_2", "relation_type", "created_at"]);
         ValidateRequiredColumns(connection, "categories", ["id", "name", "created_at"]);
@@ -1486,39 +1486,99 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
 
 
 
-    public string? GetPersonalNote(int documentId)
+    public IReadOnlyList<PersonalNote> GetPersonalNotes(int documentId, bool includeDeleted = false)
     {
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = "SELECT content FROM personal_notes WHERE document_id = @documentId";
+        cmd.CommandText = $"""
+            SELECT id, document_id, note_type, content, is_pinned, is_deleted, created_at, updated_at
+            FROM personal_notes
+            WHERE document_id = @documentId {(includeDeleted ? string.Empty : "AND is_deleted = 0")}
+            ORDER BY is_pinned DESC, id
+            """;
         cmd.Parameters.AddWithValue("@documentId", documentId);
-        var result = cmd.ExecuteScalar();
-        return result == null || result == DBNull.Value ? null : result.ToString();
+
+        using var reader = cmd.ExecuteReader();
+        var notes = new List<PersonalNote>();
+        while (reader.Read())
+        {
+            notes.Add(new PersonalNote(
+                reader.GetInt32(0),
+                reader.GetInt32(1),
+                reader.GetString(2),
+                reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                reader.GetInt32(4) != 0)
+            {
+                IsDeleted = reader.GetInt32(5) != 0,
+                CreatedAt = reader.GetDateTime(6),
+                UpdatedAt = reader.GetDateTime(7)
+            });
+        }
+
+        return notes;
+    }
+
+    public string? GetPersonalNote(int documentId)
+        => GetPersonalNotes(documentId).FirstOrDefault(note => note.NoteType == "general")?.Content;
+
+    public bool SavePersonalNote(PersonalNote note)
+    {
+        if (!NoteType.TryParse(note.NoteType, out var noteType))
+            return false;
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        if (note.Id == 0)
+        {
+            cmd.CommandText = "INSERT INTO personal_notes (document_id, note_type, content, is_pinned, is_deleted) VALUES (@documentId, @noteType, @content, @isPinned, @isDeleted)";
+        }
+        else
+        {
+            cmd.CommandText = "UPDATE personal_notes SET note_type = @noteType, content = @content, is_pinned = @isPinned, is_deleted = @isDeleted, updated_at = datetime('now', 'localtime') WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", note.Id);
+        }
+
+        cmd.Parameters.AddWithValue("@documentId", note.DocumentId);
+        cmd.Parameters.AddWithValue("@noteType", noteType.Value);
+        cmd.Parameters.AddWithValue("@content", string.IsNullOrEmpty(note.Content) ? DBNull.Value : note.Content);
+        cmd.Parameters.AddWithValue("@isPinned", note.IsPinned ? 1 : 0);
+        cmd.Parameters.AddWithValue("@isDeleted", note.IsDeleted ? 1 : 0);
+        return cmd.ExecuteNonQuery() > 0;
     }
 
     public bool SavePersonalNote(int documentId, string content)
     {
         using var conn = OpenConnection();
+        using var update = conn.CreateCommand();
+        update.CommandText = "UPDATE personal_notes SET content = @content, is_deleted = 0, updated_at = datetime('now', 'localtime') WHERE id = (SELECT id FROM personal_notes WHERE document_id = @documentId AND note_type = 'general' ORDER BY id LIMIT 1)";
+        update.Parameters.AddWithValue("@documentId", documentId);
+        update.Parameters.AddWithValue("@content", string.IsNullOrEmpty(content) ? DBNull.Value : content);
+        if (update.ExecuteNonQuery() > 0)
+            return true;
 
-        using var checkCmd = conn.CreateCommand();
-        checkCmd.CommandText = "SELECT COUNT(*) FROM personal_notes WHERE document_id = @documentId";
-        checkCmd.Parameters.AddWithValue("@documentId", documentId);
-        var count = Convert.ToInt32(checkCmd.ExecuteScalar());
+        using var insert = conn.CreateCommand();
+        insert.CommandText = "INSERT INTO personal_notes (document_id, note_type, content, is_pinned, is_deleted) VALUES (@documentId, 'general', @content, 0, 0)";
+        insert.Parameters.AddWithValue("@documentId", documentId);
+        insert.Parameters.AddWithValue("@content", string.IsNullOrEmpty(content) ? DBNull.Value : content);
+        return insert.ExecuteNonQuery() > 0;
+    }
 
+    public bool DeletePersonalNoteById(int noteId)
+    {
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
-        if (count > 0)
-        {
-            cmd.CommandText = @"UPDATE personal_notes
-                                SET content = @content, updated_at = datetime('now', 'localtime')
-                                WHERE document_id = @documentId";
-        }
-        else
-        {
-            cmd.CommandText = @"INSERT INTO personal_notes (document_id, content)
-                                VALUES (@documentId, @content)";
-        }
-        cmd.Parameters.AddWithValue("@documentId", documentId);
-        cmd.Parameters.AddWithValue("@content", string.IsNullOrEmpty(content) ? DBNull.Value : content);
+        cmd.CommandText = "UPDATE personal_notes SET is_deleted = 1, updated_at = datetime('now', 'localtime') WHERE id = @id AND is_deleted = 0";
+        cmd.Parameters.AddWithValue("@id", noteId);
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public bool SetPersonalNotePinned(int noteId, bool isPinned)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "UPDATE personal_notes SET is_pinned = @isPinned, updated_at = datetime('now', 'localtime') WHERE id = @id AND is_deleted = 0";
+        cmd.Parameters.AddWithValue("@id", noteId);
+        cmd.Parameters.AddWithValue("@isPinned", isPinned ? 1 : 0);
         return cmd.ExecuteNonQuery() > 0;
     }
 
@@ -1526,7 +1586,7 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
     {
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = "DELETE FROM personal_notes WHERE document_id = @documentId";
+        cmd.CommandText = "UPDATE personal_notes SET is_deleted = 1, updated_at = datetime('now', 'localtime') WHERE document_id = @documentId AND note_type = 'general' AND is_deleted = 0";
         cmd.Parameters.AddWithValue("@documentId", documentId);
         return cmd.ExecuteNonQuery() > 0;
     }

@@ -300,6 +300,35 @@ public class DatabaseIntegrityTests : DatabaseTestBase
         Assert.Equal(before, File.ReadAllBytes(DbPath));
     }
 
+    [Fact]
+    public void InitializeDatabase_LegacyPersonalNotes_PreservesRowsWithContractDefaults()
+    {
+        _repository.Add(new StudyDocument { Name = "Legacy note" });
+        var document = Assert.Single(_repository.GetAll());
+
+        using (var connection = new SqliteConnection(Db.ConnectionString))
+        {
+            connection.Open();
+            Execute(connection, "DROP TABLE personal_notes");
+            Execute(connection, "CREATE TABLE personal_notes (id INTEGER PRIMARY KEY AUTOINCREMENT, document_id INTEGER NOT NULL, content TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), updated_at DATETIME DEFAULT (datetime('now', 'localtime')), FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE)");
+            Execute(connection, $"INSERT INTO personal_notes (document_id, content) VALUES ({document.Id}, 'Legacy content')");
+        }
+
+        Db.CloseAllConnections();
+        Db.InitializeDatabase();
+
+        using var verificationConnection = new SqliteConnection(Db.ConnectionString);
+        verificationConnection.Open();
+        using var command = verificationConnection.CreateCommand();
+        command.CommandText = "SELECT note_type, is_pinned, is_deleted, content FROM personal_notes";
+        using var reader = command.ExecuteReader();
+        Assert.True(reader.Read());
+        Assert.Equal("general", reader.GetString(0));
+        Assert.Equal(0L, reader.GetInt64(1));
+        Assert.Equal(0L, reader.GetInt64(2));
+        Assert.Equal("Legacy content", reader.GetString(3));
+    }
+
     private static long GetNamedCount(SqliteConnection connection, string tableName, string name)
     {
         using var command = connection.CreateCommand();
