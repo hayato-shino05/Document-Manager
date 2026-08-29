@@ -18,6 +18,31 @@ public sealed class OnboardingModelTests
         Assert.True(new OnboardingModel(settings).ShouldShow);
     }
 
+    [Fact]
+    public void Help_reentry_does_not_reset_completed_state()
+    {
+        var settings = new InMemorySettingsService();
+        settings.SetSetting(OnboardingModel.CompletionKey, "true");
+
+        var reentered = new OnboardingModel(settings);
+
+        Assert.False(reentered.ShouldShow);
+        Assert.Equal("true", settings.GetSetting(OnboardingModel.CompletionKey));
+    }
+
+    [Fact]
+    public void Language_setting_change_does_not_reset_onboarding_completion()
+    {
+        var settings = new InMemorySettingsService();
+        var model = new OnboardingModel(settings);
+        model.FinishCommand.Execute(null);
+
+        settings.SetSetting("language", "English");
+
+        Assert.False(new OnboardingModel(settings).ShouldShow);
+        Assert.Equal("true", settings.GetSetting(OnboardingModel.CompletionKey));
+    }
+
     [Theory]
     [InlineData("SkipCommand")]
     [InlineData("FinishCommand")]

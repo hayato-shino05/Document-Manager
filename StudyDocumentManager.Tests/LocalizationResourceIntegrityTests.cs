@@ -152,6 +152,22 @@ public class LocalizationResourceIntegrityTests
         }
     }
 
+    [Fact]
+    public void LocalizationService_LanguageSwitchRefreshesIndexerResources()
+    {
+        var localization = new LocalizationService();
+        var propertyNames = new List<string?>();
+        localization.PropertyChanged += (_, args) => propertyNames.Add(args.PropertyName);
+
+        var japanese = localization["Nav_Dashboard"];
+        localization.SetLanguage(SupportedLanguage.English);
+        var english = localization["Nav_Dashboard"];
+
+        Assert.NotEqual(japanese, english);
+        Assert.Contains("Item[]", propertyNames);
+        Assert.Contains(string.Empty, propertyNames);
+    }
+
     [Theory]
     [InlineData("Strings.resx")]
     [InlineData("Strings.en.resx")]
