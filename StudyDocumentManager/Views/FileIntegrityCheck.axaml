@@ -87,8 +87,9 @@
                                     <TextBlock Text="{loc:Localize Integrity_DatabaseLocation}"
                                                FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}"/>
                                     <TextBlock AutomationProperties.AutomationId="FileIntegrity_DatabaseLocation"
-                                               Text="{Binding DatabaseLocation}" FontSize="{StaticResource FontSizeXs}"
-                                               Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"/>
+                                                Text="{Binding DatabaseLocation}" FontSize="{StaticResource FontSizeXs}"
+                                                Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"
+                                                ToolTip.Tip="{Binding DatabaseLocation}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
@@ -114,10 +115,12 @@
                                                        Margin="0,0,8,0" VerticalAlignment="Center"/>
                                                 <StackPanel Spacing="2">
                                                     <TextBlock Text="{Binding Document.Name}" FontSize="{StaticResource FontSizeMd}"
-                                                               FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
+                                                                FontWeight="Medium" Foreground="{StaticResource TextPrimary}"
+                                                                TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Document.Name}"/>
                                                     <TextBlock AutomationProperties.Name="{Binding FilePath}"
-                                                               Text="{Binding FilePath}" FontSize="{StaticResource FontSizeXs}"
-                                                               Foreground="{StaticResource TextSecondary}"/>
+                                                                Text="{Binding FilePath}" FontSize="{StaticResource FontSizeXs}"
+                                                                Foreground="{StaticResource TextSecondary}"
+                                                                TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FilePath}"/>
                                                     <TextBlock AutomationProperties.LiveSetting="Polite"
                                                                Text="{Binding Status}" FontSize="{StaticResource FontSizeXs}"
                                                                Foreground="{StaticResource StatRedFg}"/>

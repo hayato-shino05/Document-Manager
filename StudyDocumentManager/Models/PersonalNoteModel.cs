@@ -97,5 +97,16 @@ public partial class PersonalNoteModel : ModelBase
     }
 
     [RelayCommand]
-    private void GoBack() => _navigationService.GoBack();
+    private async Task GoBackAsync()
+    {
+        if (string.Equals(NoteContent, SavedNoteContent, StringComparison.Ordinal))
+        {
+            _navigationService.GoBack();
+            return;
+        }
+
+        var confirmed = await _dialogService.ShowConfirmAsync(_loc["Dialog_Confirm"], _loc["Note_ConfirmDiscard"], _loc["Note_Discard"]);
+        if (confirmed)
+            _navigationService.GoBack();
+    }
 }

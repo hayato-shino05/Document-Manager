@@ -149,6 +149,8 @@
   <data name="Note_SaveSuccess" xml:space="preserve"><value>メモを保存しました</value></data>
   <data name="Note_SaveError" xml:space="preserve"><value>メモを保存できません</value></data>
   <data name="Note_ConfirmDelete" xml:space="preserve"><value>このメモを削除しますか？</value></data>
+  <data name="Note_ConfirmDiscard" xml:space="preserve"><value>保存していない変更を破棄しますか？</value></data>
+  <data name="Note_Discard" xml:space="preserve"><value>破棄する</value></data>
   <data name="Note_DeleteSuccess" xml:space="preserve"><value>メモを削除しました</value></data>
 
   <!-- RecentFiles -->
@@ -952,6 +954,7 @@
   <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>期限間近</value></data>
   <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>予定あり</value></data>
   <data name="Btn_Back" xml:space="preserve"><value>戻る</value></data>
+  <data name="Btn_Refresh" xml:space="preserve"><value>更新</value></data>
   <data name="WF_Title" xml:space="preserve"><value>監視フォルダ</value></data>
   <data name="WF_Add" xml:space="preserve"><value>追加</value></data>
   <data name="WF_Remove" xml:space="preserve"><value>削除</value></data>

@@ -12,16 +12,18 @@ public partial class DuplicateDetectionModel : ModelBase
     private readonly IDocumentRepository _repository;
     private readonly IDialogService _dialogService;
     private readonly ILocalizationService _loc;
+    private readonly IProcessLauncherService? _processLauncher;
 
     [ObservableProperty] private ObservableCollection<DuplicateGroup> _duplicateGroups = new();
     [ObservableProperty] private bool _isScanning;
     [ObservableProperty] private int _totalGroups;
 
-    public DuplicateDetectionModel(IDocumentRepository repository, IDialogService dialogService, ILocalizationService loc)
+    public DuplicateDetectionModel(IDocumentRepository repository, IDialogService dialogService, ILocalizationService loc, IProcessLauncherService? processLauncher = null)
     {
         _repository = repository;
         _dialogService = dialogService;
         _loc = loc;
+        _processLauncher = processLauncher;
     }
 
     public bool HasResults => DuplicateGroups.Count > 0;
@@ -136,6 +138,14 @@ public partial class DuplicateDetectionModel : ModelBase
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
         }
+    }
+
+    [RelayCommand]
+    private void ViewDocument(StudyDocument? doc)
+    {
+        if (doc is null || _processLauncher is null || string.IsNullOrEmpty(doc.FilePath))
+            return;
+        _processLauncher.OpenFile(doc.FilePath);
     }
 }
 

@@ -43,6 +43,8 @@ public partial class AffectedItemsPreviewDialog : Window
         confirmButton.Content = _loc == null ? "OK" : _loc["Action_Delete"];
         confirmButton.Click += (_, _) => { Result = true; Close(); };
         this.FindControl<Button>("CancelButton")!.Click += (_, _) => { Result = false; Close(); };
+
+        this.Opened += (_, _) => this.FindControl<Button>("CancelButton")?.Focus();
     }
 
     private void OnLanguageChanged(object? sender, EventArgs e)

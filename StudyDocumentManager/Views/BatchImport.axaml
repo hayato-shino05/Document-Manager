@@ -90,11 +90,11 @@
                            Foreground="{StaticResource DangerBrush}"/>
             </StackPanel>
 
-            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8"
+             <WrapPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
                         HorizontalAlignment="Right" Margin="0,12,0,0">
                 <Button Classes="secondary" AutomationProperties.AutomationId="BatchImport_SelectAll"
                         AutomationProperties.Name="{loc:Localize Bulk_BtnSelectAll}"
-                        Command="{Binding SelectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
+                        Command="{Binding SelectAllCommand}" Padding="{StaticResource PaddingBtnMd}" Margin="0,0,8,0">
                     <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                         <Image Source="{StaticResource IconCheckNeutral}" Width="14" Height="14" VerticalAlignment="Center"/>
                         <TextBlock Text="{loc:Localize Bulk_BtnSelectAll}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
@@ -102,7 +102,7 @@
                 </Button>
                 <Button Classes="secondary" AutomationProperties.AutomationId="BatchImport_DeselectAll"
                         AutomationProperties.Name="{loc:Localize Bulk_BtnDeselectAll}"
-                        Command="{Binding DeselectAllCommand}" Padding="{StaticResource PaddingBtnMd}">
+                        Command="{Binding DeselectAllCommand}" Padding="{StaticResource PaddingBtnMd}" Margin="0,0,8,0">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconClose}" Width="14" Height="14"/>
                         <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{StaticResource FontSizeSm}"/>
@@ -112,13 +112,13 @@
                         AutomationProperties.Name="{loc:Localize BatchImport_BtnRetryFailed}"
                         Command="{Binding RetryFailedCommand}" Padding="{StaticResource PaddingBtnMd}"
                         IsVisible="{Binding HasFailedItems}"
-                        IsEnabled="{Binding !IsImporting}">
+                        IsEnabled="{Binding !IsImporting}" Margin="0,0,8,0">
                     <TextBlock Text="{loc:Localize BatchImport_BtnRetryFailed}" FontSize="{StaticResource FontSizeSm}"/>
                 </Button>
                 <Button Classes="primary" AutomationProperties.AutomationId="BatchImport_Import"
                         AutomationProperties.Name="{loc:Localize BatchImport_BtnImport}"
                         Command="{Binding ImportCommand}" Padding="{StaticResource PaddingBtnLg}"
-                        IsEnabled="{Binding !IsImporting}">
+                        IsEnabled="{Binding !IsImporting}" Margin="0,0,8,0">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconImportWhite}" Width="16" Height="16"/>
                         <TextBlock Text="{loc:Localize BatchImport_BtnImport}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
@@ -127,9 +127,9 @@
                 <Button Classes="secondary" AutomationProperties.AutomationId="BatchImport_Cancel"
                         AutomationProperties.Name="{loc:Localize AddEdit_BtnCancel}"
                         Command="{Binding CancelCommand}" Padding="{StaticResource PaddingMd}">
-                    <TextBlock Text="{loc:Localize AddEdit_BtnCancel}" FontSize="{StaticResource FontSizeMd}"/>
+                        <TextBlock Text="{loc:Localize AddEdit_BtnCancel}" FontSize="{StaticResource FontSizeMd}"/>
                 </Button>
-            </StackPanel>
+             </WrapPanel>
 
             <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
                     BorderBrush="{StaticResource CardBorder}" BorderThickness="1" ClipToBounds="True">
@@ -142,11 +142,32 @@
                               GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                         <DataGrid.Columns>
                             <DataGridCheckBoxColumn Header="✓" Binding="{Binding IsSelected}" Width="40"/>
-                            <DataGridTextColumn Header="{loc:Localize BatchImport_ColFileName}" Binding="{Binding FileName}" Width="*" MinWidth="200"/>
+                            <DataGridTemplateColumn Header="{loc:Localize BatchImport_ColFileName}" Width="*" MinWidth="200" SortMemberPath="FileName">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="vm:FileImportItem">
+                                        <TextBlock Text="{Binding FileName}" VerticalAlignment="Center" Margin="8,0"
+                                                   TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FileName}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="{loc:Localize AddEdit_LblType}" Binding="{Binding FileType}" Width="70"/>
                             <DataGridTextColumn Header="{loc:Localize BatchImport_ColSize}" Binding="{Binding FileSizeMB, StringFormat=\{0:F2\}}" Width="110"/>
-                            <DataGridTextColumn Header="{loc:Localize BatchImport_ColPath}" Binding="{Binding FilePath}" Width="300"/>
-                            <DataGridTextColumn Header="{loc:Localize BatchImport_ColFailure}" Binding="{Binding FailureReason}" Width="220"/>
+                            <DataGridTemplateColumn Header="{loc:Localize BatchImport_ColPath}" Width="300" SortMemberPath="FilePath">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="vm:FileImportItem">
+                                        <TextBlock Text="{Binding FilePath}" VerticalAlignment="Center" Margin="8,0"
+                                                   TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FilePath}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="{loc:Localize BatchImport_ColFailure}" Width="220" SortMemberPath="FailureReason">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="vm:FileImportItem">
+                                        <TextBlock Text="{Binding FailureReason}" VerticalAlignment="Center" Margin="8,0"
+                                                   TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FailureReason}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 

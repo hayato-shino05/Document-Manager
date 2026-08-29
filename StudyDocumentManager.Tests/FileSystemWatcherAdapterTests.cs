@@ -26,14 +26,19 @@ public class FileSystemWatcherAdapterTests : IDisposable
     {
         using var adapter = new FileSystemWatcherAdapter(_dir, false);
         var signal = new ManualResetEventSlim();
+        var withExt = Path.Combine(_dir, "a.txt");
+        var noExt = Path.Combine(_dir, "b");
         adapter.FileCreated += (_, e) =>
         {
-            lock (_seen) { _seen.Add(e.FullPath); if (_seen.Count >= 2) signal.Set(); }
+            lock (_seen)
+            {
+                _seen.Add(e.FullPath);
+                if (_seen.Contains(noExt) && _seen.Contains(withExt))
+                    signal.Set();
+            }
         };
         adapter.Start();
 
-        var withExt = Path.Combine(_dir, "a.txt");
-        var noExt = Path.Combine(_dir, "b");
         File.WriteAllText(withExt, "x");
         File.WriteAllText(noExt, "y");
         File.AppendAllText(withExt, "z"); // triggers a Changed event

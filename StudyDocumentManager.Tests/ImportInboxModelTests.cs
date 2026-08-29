@@ -94,6 +94,36 @@ public sealed class ImportInboxModelTests : IDisposable
     }
 
     [Fact]
+    public void MissingSource_SetsErrorMessage_AndClearsOnRefresh()
+    {
+        var missing = Path.Combine(Path.GetTempPath(), $"missing-{Guid.NewGuid():N}.pdf");
+        var item = new ImportInboxItem { Id = 1, SourcePath = missing, DisplayName = "test", State = ImportInboxState.Failed };
+        _repository.Items.Add(item);
+        var model = new ImportInboxModel(_repository, new ModelLauncher(), new ModelNavigation(), new ModelLocalization(), new ModelImportService());
+        model.SelectedItem = item;
+
+        model.RetrySelectedCommand.Execute(null);
+
+        Assert.Equal("ImportInbox_SourceMissing", model.ErrorMessage);
+        Assert.NotEqual("ImportInbox_SourceMissing", model.StatusText);
+
+        model.RefreshCommand.Execute(null);
+        Assert.Equal(string.Empty, model.ErrorMessage);
+    }
+
+    [Fact]
+    public void Refresh_UpdatesStatusTextWithLoadedItemCount()
+    {
+        _repository.Items.Add(new ImportInboxItem { Id = 1, SourcePath = _source, DisplayName = "t", State = ImportInboxState.Held });
+        var model = new ImportInboxModel(_repository, new ModelLauncher(), new ModelNavigation(), new ModelLocalization(), new ModelImportService());
+        Assert.Equal("1", model.StatusText);
+
+        _repository.Items.Add(new ImportInboxItem { Id = 2, SourcePath = _source, DisplayName = "t2", State = ImportInboxState.Pending });
+        model.RefreshCommand.Execute(null);
+        Assert.Equal("2", model.StatusText);
+    }
+
+    [Fact]
     public void ApplyBulkMetadata_MixedSuccess_OnlySuccessfulBecomesProcessed()
     {
         var ok = new ImportInboxItem { Id = 1, SourcePath = _source, DisplayName = "ok", State = ImportInboxState.Held, DocumentId = 10, Subject = "Old" };

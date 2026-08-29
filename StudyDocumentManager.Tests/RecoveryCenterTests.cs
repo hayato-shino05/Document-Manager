@@ -408,6 +408,55 @@ public sealed class RecoveryCenterTests : IDisposable
     }
 
     [Fact]
+    public async Task LoadedVersions_PopulateRecoverySummaryState()
+    {
+        var created = new DateTime(2026, 3, 4, 5, 6, 7);
+        var version = new BackupVersionInfo(@"C:\stub\v.db", created, 10, IsValid: true, IsLatest: true);
+        var stub = new StubVersionedBackupService { ListHandler = () => [version] };
+
+        var model = new RecoveryCenterModel(
+            stub,
+            new RecordingDialogService(),
+            new StubFileDialogService(),
+            new StubNavigationService(),
+            new RecordingLifecycleService(),
+            new StubProcessLauncherService(),
+            new KeyLocalizationService());
+
+        for (var i = 0; i < 500 && model.IsLoading; i++)
+            await Task.Delay(10);
+
+        Assert.False(model.IsLoading);
+        Assert.True(model.HasVersions);
+        Assert.Equal(version.CreatedAtLocal.ToString("yyyy-MM-dd HH:mm:ss"), model.LatestBackupText);
+        Assert.Equal("RC_StatusValid", model.LatestStatusText);
+        Assert.Equal(stub.BackupDirectory, model.BackupLocationText);
+    }
+
+    [Fact]
+    public async Task NoVersions_ShowsNoneStateForRecoverySummary()
+    {
+        var stub = new StubVersionedBackupService { ListHandler = () => [] };
+
+        var model = new RecoveryCenterModel(
+            stub,
+            new RecordingDialogService(),
+            new StubFileDialogService(),
+            new StubNavigationService(),
+            new RecordingLifecycleService(),
+            new StubProcessLauncherService(),
+            new KeyLocalizationService());
+
+        for (var i = 0; i < 500 && model.IsLoading; i++)
+            await Task.Delay(10);
+
+        Assert.False(model.HasVersions);
+        Assert.Equal("RC_LatestNone", model.LatestBackupText);
+        Assert.Equal("RC_StatusNone", model.LatestStatusText);
+        Assert.Equal(stub.BackupDirectory, model.BackupLocationText);
+    }
+
+    [Fact]
     public async Task ConcurrentCreateAndRetention_EachCallerGetsOwnOutcome()
     {
         var version = new BackupVersionInfo(@"C:\stub\c.db", DateTime.Now, 10, IsValid: true, IsLatest: true);
@@ -573,6 +622,36 @@ public sealed class RecoveryCenterTests : IDisposable
         SeedDocument("added after backup");
         Assert.Equal(2, _repo.GetDocumentCount());
         return version!;
+    }
+
+    [Fact]
+    public void SelectedVersion_Null_DisablesRestore()
+    {
+        var (model, _, _, _, _, _) = CreateModel();
+
+        model.SelectedVersion = null;
+
+        Assert.False(model.CanRestoreSelected);
+    }
+
+    [Fact]
+    public void SelectedVersion_Valid_EnablesRestore()
+    {
+        var (model, _, _, _, _, _) = CreateModel();
+        model.SelectedVersion = new BackupVersionInfo(
+            @"C:\\stub\\valid.db", DateTime.Now, 10, IsValid: true, IsLatest: true);
+
+        Assert.True(model.CanRestoreSelected);
+    }
+
+    [Fact]
+    public void SelectedVersion_Invalid_DisablesRestore()
+    {
+        var (model, _, _, _, _, _) = CreateModel();
+        model.SelectedVersion = new BackupVersionInfo(
+            @"C:\\stub\\invalid.db", DateTime.Now, 10, IsValid: false, IsLatest: false);
+
+        Assert.False(model.CanRestoreSelected);
     }
 
     [Fact]

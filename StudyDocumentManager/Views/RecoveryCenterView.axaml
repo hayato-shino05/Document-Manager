@@ -18,11 +18,11 @@
                                AutomationProperties.AutomationId="Title_RecoveryCenter"
                                Text="{loc:Localize RC_Title}"/>
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
-                            HorizontalAlignment="Right">
+                <WrapPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                           HorizontalAlignment="Right">
                     <Button Classes="primary" AutomationProperties.AutomationId="Recovery_CreateBackup"
                             AutomationProperties.Name="{loc:Localize RC_CreateBackup}"
-                            Command="{Binding CreateBackupCommand}" Padding="{StaticResource PaddingMd}">
+                            Command="{Binding CreateBackupCommand}" Padding="{StaticResource PaddingMd}" Margin="0,0,8,0">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconSave}" Width="16" Height="16"/>
                             <TextBlock Text="{loc:Localize RC_CreateBackup}" FontSize="{StaticResource FontSizeMd}"/>
@@ -30,7 +30,7 @@
                     </Button>
                     <Button Classes="danger" AutomationProperties.AutomationId="Recovery_RestoreSelected"
                             AutomationProperties.Name="{loc:Localize RC_Restore}"
-                            Command="{Binding RestoreSelectedCommand}" IsEnabled="{Binding CanRestoreSelected}" Padding="{StaticResource PaddingMd}">
+                            Command="{Binding RestoreSelectedCommand}" IsEnabled="{Binding CanRestoreSelected}" Padding="{StaticResource PaddingMd}" Margin="0,0,8,0">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconRestore}" Width="16" Height="16"/>
                             <TextBlock Text="{loc:Localize RC_Restore}" FontSize="{StaticResource FontSizeMd}"/>
@@ -38,7 +38,7 @@
                     </Button>
                     <Button Classes="secondary" AutomationProperties.AutomationId="Recovery_OpenFolder"
                             AutomationProperties.Name="{loc:Localize RC_OpenFolder}"
-                            Command="{Binding OpenBackupFolderCommand}" Padding="{StaticResource PaddingMd}">
+                            Command="{Binding OpenBackupFolderCommand}" Padding="{StaticResource PaddingMd}" Margin="0,0,8,0">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconHDD}" Width="16" Height="16"/>
                             <TextBlock Text="{loc:Localize RC_OpenFolder}" FontSize="{StaticResource FontSizeMd}"/>
@@ -49,10 +49,10 @@
                             Command="{Binding RestoreFromFileCommand}" Padding="{StaticResource PaddingMd}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconOpenFile}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize RC_RestoreFromFile}" FontSize="{StaticResource FontSizeMd}"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
+                             <TextBlock Text="{loc:Localize RC_RestoreFromFile}" FontSize="{StaticResource FontSizeMd}"/>
+                         </StackPanel>
+                     </Button>
+                 </WrapPanel>
             </DockPanel>
 
             <ScrollViewer>
@@ -72,11 +72,12 @@
                                            Text="{Binding LatestStatusText}" VerticalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Image Source="{StaticResource IconFolderBase}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <Image Source="{StaticResource IconCategory}" Width="16" Height="16" VerticalAlignment="Center"/>
                                 <TextBlock Classes="caption" Text="{loc:Localize RC_Location}" VerticalAlignment="Center"/>
                                 <TextBlock Text="{Binding BackupLocationText}"
-                                           AutomationProperties.AutomationId="Recovery_Location"
-                                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                            AutomationProperties.AutomationId="Recovery_Location"
+                                            TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                                            ToolTip.Tip="{Binding BackupLocationText}"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
                                 <TextBlock Classes="caption" Text="{loc:Localize RC_Retention}" VerticalAlignment="Center"/>
@@ -102,7 +103,14 @@
                                       IsReadOnly="True"
                                       MinHeight="220">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{loc:Localize RC_ColName}" Binding="{Binding FilePath}" Width="*" MinWidth="260"/>
+                                    <DataGridTemplateColumn Header="{loc:Localize RC_ColName}" Width="*" MinWidth="260" SortMemberPath="FilePath">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate x:DataType="core:BackupVersionInfo">
+                                                <TextBlock Text="{Binding FilePath}" VerticalAlignment="Center" Margin="8,0"
+                                                           TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FilePath}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                     <DataGridTextColumn Header="{loc:Localize RC_ColCreated}" Binding="{Binding CreatedAtLocal, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" Width="170"/>
                                     <DataGridTextColumn Header="{loc:Localize RC_ColSize}" Binding="{Binding SizeBytes, Converter={x:Static conv:FileSizeConverter.Instance}}" Width="90"/>
                                     <DataGridTemplateColumn Header="{loc:Localize RC_ColStatus}" Width="110">
