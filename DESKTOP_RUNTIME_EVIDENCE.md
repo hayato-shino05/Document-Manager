@@ -18,4 +18,4 @@
 
 ## Evidence
 
-未実施です。各 Issue の acceptance criteria に沿って更新します。
+- #68: legacy `file_path TEXT COLLATE NOCASE UNIQUE` autoindex を含む backup を restore し、migration 後の document data、`archive_export_key`、`status`、BINARY partial path index を検証する focused test を追加した。`NULL`、空文字、大小文字のみ異なる path は許可し、完全一致 path は拒否する。rollback と invalid candidate の live data preservation は `BackupRestoreIntegrityTests` で確認する。

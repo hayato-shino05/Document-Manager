@@ -135,6 +135,41 @@ public sealed class DocumentPathUniquenessTests : DatabaseTestBase
     }
 
     [Fact]
+    public void RestoreDatabase_MigratesNoCaseAutoIndexAndPreservesCurrentDocumentContract()
+    {
+        var backupPath = Path.Combine(Path.GetTempPath(), $"sdm_nocase_contract_{Guid.NewGuid():N}.db");
+        try
+        {
+            Assert.True(Db.InsertDocumentWithCatalogs(new StudyDocument { Name = "Legacy source", FilePath = "C:/same.pdf" }));
+            Assert.True(Db.BackupDatabase(backupPath));
+            RebuildDocumentsWithNoCaseUniquePath(backupPath);
+
+            Assert.True(Db.CanRestoreDatabase(backupPath));
+            Assert.True(Db.RestoreDatabase(backupPath));
+
+            using var connection = new SqliteConnection(Db.ConnectionString);
+            connection.Open();
+            Assert.Equal(1L, Convert.ToInt64(Scalar(connection, "SELECT COUNT(*) FROM documents")));
+            Assert.Equal("Legacy source", Scalar(connection, "SELECT name FROM documents WHERE id = 1"));
+            Assert.Equal("unread", Scalar(connection, "SELECT status FROM documents WHERE id = 1"));
+            Assert.NotEqual(string.Empty, Scalar(connection, "SELECT archive_export_key FROM documents WHERE id = 1"));
+            Assert.Equal(
+                "CREATE UNIQUE INDEX idx_documents_file_path_unique ON documents(file_path COLLATE BINARY) WHERE file_path IS NOT NULL AND file_path <> ''",
+                Scalar(connection, "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = 'idx_documents_file_path_unique'"));
+            Assert.Equal(0L, Convert.ToInt64(Scalar(connection, "SELECT COUNT(*) FROM pragma_index_list('documents') AS idx JOIN pragma_index_info(idx.name) AS col WHERE idx.name LIKE 'sqlite_autoindex_documents_%' AND col.name = 'file_path'")));
+
+            ExecuteNonQuery(connection, "INSERT INTO documents (name, file_path) VALUES ('Case distinct', 'c:/SAME.pdf'), ('Null 1', NULL), ('Null 2', NULL), ('Empty 1', ''), ('Empty 2', '')");
+            Assert.Throws<SqliteException>(() => ExecuteNonQuery(connection, "INSERT INTO documents (name, file_path) VALUES ('Duplicate', 'C:/same.pdf')"));
+        }
+        finally
+        {
+            SqliteConnection.ClearAllPools();
+            if (File.Exists(backupPath))
+                File.Delete(backupPath);
+        }
+    }
+
+    [Fact]
     public void RestoreDatabase_MigratesNamedDocumentPathNoCaseIndex()
     {
         var backupPath = Path.Combine(Path.GetTempPath(), $"sdm_nocase_named_{Guid.NewGuid():N}.db");
@@ -172,6 +207,11 @@ public sealed class DocumentPathUniquenessTests : DatabaseTestBase
     {
         using var connection = new SqliteConnection($"Data Source={databasePath};Foreign Keys=True");
         connection.Open();
+        ExecuteNonQuery(connection, sql);
+    }
+
+    private static void ExecuteNonQuery(SqliteConnection connection, string sql)
+    {
         using var command = connection.CreateCommand();
         command.CommandText = sql;
         command.ExecuteNonQuery();

@@ -1778,7 +1778,7 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         return new StudyDocument
         {
             Id = reader.GetInt32(reader.GetOrdinal("id")),
-            ExportKey = DocumentExportKey.TryParse(reader["archive_export_key"]?.ToString(), out var exportKey) ? exportKey : null,
+            ExportKey = ReadExportKey(reader),
             Name = reader["name"]?.ToString() ?? string.Empty,
             Subject = reader["subject"]?.ToString() ?? string.Empty,
             Type = reader["type"]?.ToString() ?? string.Empty,
@@ -1792,6 +1792,17 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
             Deadline = reader["deadline"] is DBNull ? null : DateTime.Parse(reader["deadline"].ToString()!),
             Status = ReadStatus(reader)
         };
+    }
+
+    private static DocumentExportKey? ReadExportKey(SqliteDataReader reader)
+    {
+        for (var i = 0; i < reader.FieldCount; i++)
+        {
+            if (string.Equals(reader.GetName(i), "archive_export_key", StringComparison.Ordinal))
+                return DocumentExportKey.TryParse(reader.IsDBNull(i) ? null : reader.GetString(i), out var exportKey) ? exportKey : null;
+        }
+
+        return null;
     }
 
     private static string ReadStatus(SqliteDataReader reader)
