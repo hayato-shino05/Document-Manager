@@ -6,7 +6,7 @@ namespace StudyDocumentManager.Core.Services;
 /// </summary>
 public static class AppVersion
 {
-    public static string Current => "4.0.0";
+    public static string Current => "4.1.0";
 
     /// <summary>
     /// セマンティックバージョン比較: -1=古い, 0=同じ, 1=新しい

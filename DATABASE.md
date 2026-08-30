@@ -38,6 +38,7 @@
 | `is_deleted` | INTEGER DEFAULT 0 | soft delete フラグ |
 | `deleted_at` | DATETIME | soft delete の日時 |
 | `status` | TEXT NOT NULL DEFAULT `'unread'` | 文書の状態。正規化された値は `unread` / `in-progress` / `read` / `needs-action` / `completed` / `archived` のみ |
+| `archive_export_key` | TEXT UNIQUE | 個人文書アーカイブのエクスポート/インポートで利用する安定キー。`lower(hex(randomblob(16)))` で生成 |
 
 ### `collections`
 
@@ -205,6 +206,22 @@
 | `IReportRepository` | `ReportRepository` | 集計レポートクエリ |
 | `ISavedSearchRepository` | `SavedSearchRepository` | 保存済み検索 |
 | `ISettingsService` | `SettingsRepository` | key-value 設定 |
+| `IPersonalDocumentArchiveService` | `PersonalDocumentArchiveService` (in `Data/Services/`) | ZIP エクスポート/インポート、マニフェスト付き |
+|  | `PersonalDocumentArchiveRepository` (in `Data/Repositories/`) | アーカイブ用の一括読み書き、manifest の永続化 |
+
+## アーカイブマニフェスト
+
+個人文書アーカイブのエクスポート/インポートでは、`DocumentArchiveManifest` という
+JSON ファイルを ZIP 内に同梱します。エクスポート時には対象文書数、合計サイズ、
+ファイル単位の `ArchivePath` と SHA-256 `checksum` を保存します。インポート時は
+manifest と実際に ZIP に入っているファイルの checksum を突き合わせ、不一致なら
+そのファイルを skip して残りを処理します。
+
+stage 領域は `%TEMP%/sdm_archive_<guid>` 配下に文書ごとに
+`<archive_export_key>/<file_name>` の形で展開します。書き込みは transaction を
+分けて commit し、conflict は manifest の `duplicate_candidate` フラグとファイル
+レベルの同一性で判定します。`archive_export_key` は `documents.archive_export_key`
+と一致するため、re-import 後の文書と stable key 経由で照合できます。
 
 ## スキーマ変更のルール
 
