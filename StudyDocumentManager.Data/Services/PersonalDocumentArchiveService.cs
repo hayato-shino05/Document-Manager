@@ -227,12 +227,12 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                 }
                 var stagedPath = Path.Combine(stagingDirectory, file.DocumentExportKey, Path.GetFileName(file.ArchivePath));
                 Directory.CreateDirectory(Path.GetDirectoryName(stagedPath)!);
-                using var input = entry.Open();
-                using var output = File.Create(stagedPath);
-                input.CopyTo(output);
-                output.Flush(true);
-                output.Dispose();
-                input.Dispose();
+                using (var input = entry.Open())
+                using (var output = File.Create(stagedPath))
+                {
+                    input.CopyTo(output);
+                    output.Flush(true);
+                }
                 var bytes = File.ReadAllBytes(stagedPath);
                 var checksum = manifest.Checksums.Single(item => string.Equals(item.ArchivePath, file.ArchivePath, StringComparison.Ordinal));
                 if (!string.Equals(Convert.ToHexString(SHA256.HashData(bytes)), checksum.Sha256, StringComparison.OrdinalIgnoreCase) || bytes.LongLength != entry.Length)
