@@ -10,7 +10,8 @@
             <!-- Header -->
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
                 <Button Classes="secondary" Command="{Binding GoBackCommand}" Padding="{StaticResource PaddingSm}"
-                        VerticalAlignment="Center">
+                        VerticalAlignment="Center"
+                        AutomationProperties.AutomationId="RelatedDocs_Back">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconBack}" Width="12" Height="12"/>
                         <TextBlock Text="{loc:Localize RelatedDocs_BtnBack}" FontSize="{StaticResource FontSizeSm}"/>
@@ -111,7 +112,8 @@
                                               SelectedItem="{Binding SelectedRelationType}"
                                               Width="110" Height="26" FontSize="{StaticResource FontSizeSm}"/>
                                     <Button Classes="primary"
-                                            Command="{Binding AddRelationCommand}" Padding="{StaticResource PaddingBtnSm}">
+                                            Command="{Binding AddRelationCommand}" Padding="{StaticResource PaddingBtnSm}"
+                                            AutomationProperties.AutomationId="RelatedDocs_AddLink">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
                                             <TextBlock Text="{loc:Localize RelatedDocs_BtnAddLink}" FontSize="{StaticResource FontSizeSm}"/>
@@ -123,7 +125,8 @@
 
                         <ListBox ItemsSource="{Binding AvailableDocuments}"
                                  SelectedItem="{Binding SelectedAvailableDoc}"
-                                 Padding="{StaticResource PaddingIcon}">
+                                 Padding="{StaticResource PaddingIcon}"
+                                 AutomationProperties.AutomationId="RelatedDocs_AvailableList">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" Spacing="6" Margin="4,2">
