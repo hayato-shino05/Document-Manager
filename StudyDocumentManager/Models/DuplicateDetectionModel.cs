@@ -13,17 +13,27 @@ public partial class DuplicateDetectionModel : ModelBase
     private readonly IDialogService _dialogService;
     private readonly ILocalizationService _loc;
     private readonly IProcessLauncherService? _processLauncher;
+    private readonly IUndoRepository? _undoRepository;
+    private readonly IUndoService? _undo;
 
     [ObservableProperty] private ObservableCollection<DuplicateGroup> _duplicateGroups = new();
     [ObservableProperty] private bool _isScanning;
     [ObservableProperty] private int _totalGroups;
 
-    public DuplicateDetectionModel(IDocumentRepository repository, IDialogService dialogService, ILocalizationService loc, IProcessLauncherService? processLauncher = null)
+    public DuplicateDetectionModel(
+        IDocumentRepository repository,
+        IDialogService dialogService,
+        ILocalizationService loc,
+        IProcessLauncherService? processLauncher = null,
+        IUndoRepository? undoRepository = null,
+        IUndoService? undo = null)
     {
         _repository = repository;
         _dialogService = dialogService;
         _loc = loc;
         _processLauncher = processLauncher;
+        _undoRepository = undoRepository;
+        _undo = undo;
     }
 
     public bool HasResults => DuplicateGroups.Count > 0;
@@ -94,10 +104,21 @@ public partial class DuplicateDetectionModel : ModelBase
 
         try
         {
+            var mergeUndo = _undoRepository?.CaptureMergeUndo(survivor.Id, duplicateIds);
             if (!_repository.MergeDocuments(survivor.Id, duplicateIds))
             {
                 await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Msg_Error"]);
                 return;
+            }
+            if (mergeUndo is not null && _undo is not null)
+            {
+                _undo.Push(new UndoEntry
+                {
+                    DescriptionKey = "Duplicate_MergeSuccess",
+                    DescriptionArgs = [survivor.Name, duplicateIds.Length],
+                    Merge = mergeUndo,
+                    CreatedAt = DateTime.Now
+                });
             }
 
             await _dialogService.ShowMessageAsync(

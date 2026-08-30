@@ -51,6 +51,11 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
     public bool MergeDocuments(int survivorId, IReadOnlyList<int> duplicateIds)
         => _db.MergeDocuments(survivorId, duplicateIds);
 
+    public int SoftDeleteDocuments(IReadOnlyList<int> ids) => _db.SoftDeleteDocuments(ids);
+
+    public int RestoreDocuments(IReadOnlyList<int> ids) => _db.RestoreDocuments(ids);
+
+    public int PermanentlyDeleteDocuments(IReadOnlyList<int> ids) => _db.PermanentlyDeleteDocuments(ids);
 
     public bool AddWithCatalogs(StudyDocument document) => _db.InsertDocumentWithCatalogs(document);
 
@@ -60,6 +65,11 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
         IReadOnlyList<StudyDocument> originals,
         IReadOnlyList<(int CollectionId, int DocumentId)> addedCollectionMemberships)
         => _db.ApplyMetadataUndo(originals, addedCollectionMemberships);
+
+    public MergeUndoSnapshot CaptureMergeUndo(int survivorId, IReadOnlyList<int> duplicateIds)
+        => _db.CaptureMergeUndo(survivorId, duplicateIds);
+
+    public void ApplyMergeUndo(MergeUndoSnapshot snapshot) => _db.ApplyMergeUndo(snapshot);
 
     public bool Delete(int id) => _db.DeleteDocument(id);
 
@@ -93,8 +103,6 @@ public class DocumentRepository : IDocumentRepository, IRecycleBinRepository, IB
     public List<StudyDocument> GetDeletedDocuments() => _db.GetDeletedDocuments();
 
     public bool RestoreDocument(int id) => _db.RestoreDocument(id);
-
-    public int RestoreDocuments(IReadOnlyList<int> ids) => _db.RestoreDocuments(ids);
 
     public bool PermanentDeleteDocument(int id) => _db.PermanentDeleteDocument(id);
 

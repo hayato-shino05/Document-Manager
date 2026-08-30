@@ -503,6 +503,144 @@ public class DatabaseHelper
         }
     }
 
+    public MergeUndoSnapshot CaptureMergeUndo(int survivorId, IReadOnlyList<int> duplicateIds)
+    {
+        var duplicateIdsDistinct = duplicateIds.Where(id => id != survivorId).Distinct().ToArray();
+        var survivor = GetDocumentById(survivorId) ?? throw new InvalidOperationException("Merge survivor is no longer available.");
+        if (duplicateIdsDistinct.Length == 0)
+            throw new InvalidOperationException("At least one duplicate document is required.");
+
+        var documentIds = new[] { survivorId }.Concat(duplicateIdsDistinct).ToArray();
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        var names = AddIdParameters(command, documentIds);
+        var idSet = string.Join(",", names);
+
+        command.CommandText = $"SELECT id, document_id, note_type, content, is_pinned, is_deleted, created_at, updated_at FROM personal_notes WHERE document_id IN ({idSet})";
+        var notes = new List<PersonalNote>();
+        using (var reader = command.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                notes.Add(new PersonalNote(reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2), reader.IsDBNull(3) ? string.Empty : reader.GetString(3), reader.GetInt32(4) != 0)
+                {
+                    IsDeleted = reader.GetInt32(5) != 0,
+                    CreatedAt = reader.GetDateTime(6),
+                    UpdatedAt = reader.GetDateTime(7)
+                });
+            }
+        }
+
+        command.Parameters.Clear();
+        names = AddIdParameters(command, documentIds);
+        idSet = string.Join(",", names);
+        command.CommandText = $"SELECT collection_id, document_id FROM collection_items WHERE document_id IN ({idSet})";
+        var memberships = new List<CollectionMembershipSnapshot>();
+        using (var reader = command.ExecuteReader())
+        {
+            while (reader.Read())
+                memberships.Add(new CollectionMembershipSnapshot(reader.GetInt32(0), reader.GetInt32(1)));
+        }
+
+        command.Parameters.Clear();
+        names = AddIdParameters(command, documentIds);
+        idSet = string.Join(",", names);
+        command.CommandText = $"SELECT doc_id_1, doc_id_2, relation_type FROM document_relations WHERE doc_id_1 IN ({idSet}) OR doc_id_2 IN ({idSet})";
+        var relations = new List<DocumentRelationSnapshot>();
+        using (var reader = command.ExecuteReader())
+        {
+            while (reader.Read())
+                relations.Add(new DocumentRelationSnapshot(reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2)));
+        }
+
+        return new MergeUndoSnapshot(survivor, duplicateIdsDistinct, notes, memberships, relations);
+    }
+
+    public void ApplyMergeUndo(MergeUndoSnapshot snapshot)
+    {
+        using var connection = OpenConnection();
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            if (!UpdateDocumentCore(connection, transaction, snapshot.Survivor))
+                throw new InvalidOperationException("Merge undo survivor restoration failed.");
+
+            foreach (var duplicateId in snapshot.DuplicateIds)
+            {
+                if (!RestoreDocumentCore(connection, transaction, duplicateId))
+                    throw new InvalidOperationException("Merge undo duplicate restoration failed.");
+            }
+
+            foreach (var note in snapshot.Notes)
+            {
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "UPDATE personal_notes SET document_id = @documentId WHERE id = @id";
+                command.Parameters.AddWithValue("@documentId", note.DocumentId);
+                command.Parameters.AddWithValue("@id", note.Id);
+                if (command.ExecuteNonQuery() != 1)
+                    throw new InvalidOperationException("Merge undo note restoration failed.");
+            }
+
+            var documentIds = new[] { snapshot.Survivor.Id }.Concat(snapshot.DuplicateIds).ToArray();
+            using (var command = connection.CreateCommand())
+            {
+                command.Transaction = transaction;
+                var names = AddIdParameters(command, documentIds);
+                var idSet = string.Join(",", names);
+                command.CommandText = $"DELETE FROM collection_items WHERE document_id IN ({idSet})";
+                command.ExecuteNonQuery();
+            }
+            foreach (var membership in snapshot.CollectionMemberships)
+            {
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "INSERT INTO collection_items (collection_id, document_id) VALUES (@collectionId, @documentId)";
+                command.Parameters.AddWithValue("@collectionId", membership.CollectionId);
+                command.Parameters.AddWithValue("@documentId", membership.DocumentId);
+                command.ExecuteNonQuery();
+            }
+
+            using (var command = connection.CreateCommand())
+            {
+                command.Transaction = transaction;
+                var names = AddIdParameters(command, documentIds);
+                var idSet = string.Join(",", names);
+                command.CommandText = $"DELETE FROM document_relations WHERE doc_id_1 IN ({idSet}) OR doc_id_2 IN ({idSet})";
+                command.ExecuteNonQuery();
+            }
+            foreach (var relation in snapshot.Relations)
+            {
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "INSERT INTO document_relations (doc_id_1, doc_id_2, relation_type) VALUES (@id1, @id2, @type)";
+                command.Parameters.AddWithValue("@id1", relation.DocumentId1);
+                command.Parameters.AddWithValue("@id2", relation.DocumentId2);
+                command.Parameters.AddWithValue("@type", relation.RelationType);
+                command.ExecuteNonQuery();
+            }
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+    private static List<string> AddIdParameters(SqliteCommand command, IReadOnlyList<int> ids)
+    {
+        var names = new List<string>();
+        foreach (var id in ids)
+        {
+            var name = $"@id{names.Count}";
+            names.Add(name);
+            command.Parameters.AddWithValue(name, id);
+        }
+        return names;
+    }
+
     private static bool DocumentRowExists(SqliteConnection connection, SqliteTransaction transaction, int id)
     {
         using var command = connection.CreateCommand();
@@ -541,6 +679,7 @@ public class DatabaseHelper
 
                 MergeCollectionMemberships(connection, transaction, survivorId, duplicateId);
                 MergePersonalNotes(connection, transaction, survivorId, duplicateId);
+                MergeTags(connection, transaction, survivorId, duplicateId);
                 MergeRecentFile(connection, transaction, survivorId, duplicateId);
                 MergeRelations(connection, transaction, survivorId, duplicateId);
                 SoftDeleteDocument(connection, transaction, duplicateId);
@@ -581,38 +720,41 @@ public class DatabaseHelper
 
     private static void MergePersonalNotes(SqliteConnection connection, SqliteTransaction transaction, int survivorId, int duplicateId)
     {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = "UPDATE personal_notes SET document_id = @survivorId WHERE document_id = @duplicateId";
+        command.Parameters.AddWithValue("@survivorId", survivorId);
+        command.Parameters.AddWithValue("@duplicateId", duplicateId);
+        command.ExecuteNonQuery();
+    }
+
+    private static void MergeTags(SqliteConnection connection, SqliteTransaction transaction, int survivorId, int duplicateId)
+    {
         using var read = connection.CreateCommand();
         read.Transaction = transaction;
-        read.CommandText = "SELECT content FROM personal_notes WHERE document_id IN (@survivorId, @duplicateId) ORDER BY document_id";
+        read.CommandText = "SELECT tags FROM documents WHERE id IN (@survivorId, @duplicateId) ORDER BY id";
         read.Parameters.AddWithValue("@survivorId", survivorId);
         read.Parameters.AddWithValue("@duplicateId", duplicateId);
-        var contents = new List<string>();
+        var tags = new List<string>();
         using (var reader = read.ExecuteReader())
         {
-            while (reader.Read())
+            while (reader.Read() && !reader.IsDBNull(0))
             {
-                var content = reader.IsDBNull(0) ? string.Empty : reader.GetString(0).Trim();
-                if (content.Length > 0 && !contents.Contains(content, StringComparer.Ordinal))
-                    contents.Add(content);
+                foreach (var tag in reader.GetString(0).Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                {
+                    if (!tags.Contains(tag, StringComparer.OrdinalIgnoreCase))
+                        tags.Add(tag);
+                }
             }
         }
 
-        using var delete = connection.CreateCommand();
-        delete.Transaction = transaction;
-        delete.CommandText = "DELETE FROM personal_notes WHERE document_id IN (@survivorId, @duplicateId)";
-        delete.Parameters.AddWithValue("@survivorId", survivorId);
-        delete.Parameters.AddWithValue("@duplicateId", duplicateId);
-        delete.ExecuteNonQuery();
-
-        if (contents.Count == 0)
-            return;
-
-        using var insert = connection.CreateCommand();
-        insert.Transaction = transaction;
-        insert.CommandText = "INSERT INTO personal_notes (document_id, content) VALUES (@documentId, @content)";
-        insert.Parameters.AddWithValue("@documentId", survivorId);
-        insert.Parameters.AddWithValue("@content", string.Join(Environment.NewLine + Environment.NewLine, contents));
-        insert.ExecuteNonQuery();
+        using var update = connection.CreateCommand();
+        update.Transaction = transaction;
+        update.CommandText = "UPDATE documents SET tags = @tags WHERE id = @survivorId";
+        update.Parameters.AddWithValue("@survivorId", survivorId);
+        update.Parameters.AddWithValue("@tags", tags.Count == 0 ? DBNull.Value : string.Join(";", tags));
+        if (update.ExecuteNonQuery() != 1)
+            throw new InvalidOperationException("Failed to merge document tags.");
     }
 
     private static void MergeRecentFile(SqliteConnection connection, SqliteTransaction transaction, int survivorId, int duplicateId)
@@ -850,6 +992,27 @@ public class DatabaseHelper
         const string query = "DELETE FROM documents WHERE id = @id AND is_deleted = 1";
         return ExecuteNonQuery(query, new SqliteParameter("@id", id)) > 0;
     }
+
+    public int PermanentlyDeleteDocuments(IReadOnlyList<int> ids)
+    {
+        if (ids is null || ids.Count == 0)
+            return 0;
+
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        var names = new List<string>();
+        foreach (var id in ids.Distinct())
+        {
+            var name = $"@id{names.Count}";
+            names.Add(name);
+            command.Parameters.AddWithValue(name, id);
+        }
+        command.CommandText = $"DELETE FROM documents WHERE is_deleted = 1 AND id IN ({string.Join(",", names)})";
+        return command.ExecuteNonQuery();
+    }
+
+    public int SoftDeleteDocuments(IReadOnlyList<int> ids)
+        => BulkSoftDelete(ids?.ToList() ?? []);
 
 
 

@@ -39,6 +39,15 @@ public interface IDocumentRepository
     bool MergeDocuments(int survivorId, IReadOnlyList<int> duplicateIds)
         => throw new NotSupportedException($"{nameof(MergeDocuments)} is not implemented by this repository.");
 
+    int SoftDeleteDocuments(IReadOnlyList<int> ids)
+        => throw new NotSupportedException($"{nameof(SoftDeleteDocuments)} is not implemented by this repository.");
+
+    int RestoreDocuments(IReadOnlyList<int> ids)
+        => throw new NotSupportedException($"{nameof(RestoreDocuments)} is not implemented by this repository.");
+
+    int PermanentlyDeleteDocuments(IReadOnlyList<int> ids)
+        => throw new NotSupportedException($"{nameof(PermanentlyDeleteDocuments)} is not implemented by this repository.");
+
     bool AddWithCatalogs(StudyDocument document);
     bool Update(StudyDocument document);
     bool Delete(int id);
