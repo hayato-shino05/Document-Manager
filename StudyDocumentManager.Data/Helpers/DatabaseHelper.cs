@@ -1659,6 +1659,17 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         return columns.SequenceEqual(["file_path"], StringComparer.Ordinal);
     }
 
+    private static bool IsArchiveExportKeyUniqueIndex(SqliteConnection connection, string indexName)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA index_info(\"{indexName.Replace("\"", "\"\"")}\")";
+        using var reader = command.ExecuteReader();
+        var columns = new List<string>();
+        while (reader.Read())
+            columns.Add(reader.GetString(2));
+        return columns.SequenceEqual(["archive_export_key"], StringComparer.Ordinal);
+    }
+
     private static void ValidateIndexesAndTriggers(SqliteConnection connection, string tableName, bool allowLegacyDocumentPathIndexes)
     {
         var allowedIndexes = tableName switch
@@ -1694,9 +1705,10 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         foreach (var index in indexes)
         {
             var isLegacyDocumentPathIndex = allowLegacyDocumentPathIndexes && tableName == "documents" && index.IsUnique && IsDocumentPathUniqueIndex(connection, index.Name);
-            if (tableName == "documents" && index.Origin == "u" && !isLegacyDocumentPathIndex)
+            var isLegacyArchiveExportKeyIndex = allowLegacyDocumentPathIndexes && tableName == "documents" && index.IsUnique && IsArchiveExportKeyUniqueIndex(connection, index.Name);
+            if (tableName == "documents" && index.Origin == "u" && !isLegacyDocumentPathIndex && !isLegacyArchiveExportKeyIndex)
                 throw new InvalidOperationException($"Backup database unique constraint on '{tableName}' is not supported.");
-            if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isLegacyDocumentPathIndex)
+            if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isLegacyDocumentPathIndex && !isLegacyArchiveExportKeyIndex)
                 throw new InvalidOperationException($"Backup database index on '{tableName}' is not supported.");
         }
 
