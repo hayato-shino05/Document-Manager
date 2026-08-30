@@ -10,6 +10,7 @@ using StudyDocumentManager.Views;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Data.Repositories;
+using StudyDocumentManager.Data.Services;
 using StudyDocumentManager.Services;
 
 namespace StudyDocumentManager;
@@ -176,6 +177,7 @@ public partial class App : Application
         services.AddSingleton<ISavedSearchRepository, SavedSearchRepository>();
         services.AddSingleton<IAssignmentRepository, AssignmentRepository>();
         services.AddSingleton<ISettingsService, SettingsRepository>();
+        services.AddSingleton<PersonalDocumentArchiveRepository>();
 
         // Services
         services.AddKeyedSingleton<HttpClient>("Analytics", (_, _) =>
@@ -207,6 +209,7 @@ public partial class App : Application
         services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<IProcessLauncherService, ProcessLauncherService>();
         services.AddSingleton<IExportService, CsvExportService>();
+        services.AddSingleton<IPersonalDocumentArchiveService, PersonalDocumentArchiveService>();
         services.AddSingleton<IBackupService, DatabaseBackupService>();
 services.AddSingleton<IVersionedBackupService, VersionedBackupService>();
         services.AddSingleton<LocalizationService>();
