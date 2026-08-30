@@ -236,6 +236,20 @@ public partial class MainWindowModel : ModelBase
     }
 
     [RelayCommand]
+    private void ExportArchive()
+    {
+        if (CurrentView is DashboardModel dashboard)
+            dashboard.ExportArchiveCommand.Execute(null);
+    }
+
+    [RelayCommand]
+    private void ImportArchive()
+    {
+        if (CurrentView is DashboardModel dashboard)
+            dashboard.ImportArchiveCommand.Execute(null);
+    }
+
+    [RelayCommand]
     private void ShowHelp()
     {
         HelpRequested?.Invoke(this, EventArgs.Empty);

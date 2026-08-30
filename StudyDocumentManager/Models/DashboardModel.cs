@@ -30,6 +30,7 @@ public partial class DashboardModel : ModelBase, IDisposable
     private readonly IProcessLauncherService _processLauncher;
     private readonly IExportService _exportService;
     private readonly IBackupService _backupService;
+    private readonly IPersonalDocumentArchiveService _archiveService;
     private readonly ILocalizationService _loc;
     private bool _isLoadingData;
     private bool _isApplyingFilters;
@@ -170,6 +171,29 @@ public partial class DashboardModel : ModelBase, IDisposable
         IExportService exportService,
         IBackupService backupService,
         ILocalizationService localizationService)
+        : this(repository, recycleBinRepo, categoryRepo, collectionRepo, recentFileRepo,
+               dialogService, fileDialogService, customDialogService, navigationService,
+               clipboardService, processLauncher, exportService, backupService,
+               new NoopArchiveService(), localizationService)
+    {
+    }
+
+    public DashboardModel(
+        IDocumentRepository repository,
+        IRecycleBinRepository recycleBinRepo,
+        ICategoryRepository categoryRepo,
+        ICollectionRepository collectionRepo,
+        IRecentFileRepository recentFileRepo,
+        IDialogService dialogService,
+        IFileDialogService fileDialogService,
+        ICustomDialogService customDialogService,
+        INavigationService navigationService,
+        IClipboardService clipboardService,
+        IProcessLauncherService processLauncher,
+        IExportService exportService,
+        IBackupService backupService,
+        IPersonalDocumentArchiveService archiveService,
+        ILocalizationService localizationService)
     {
         _repository = repository;
         _recycleBinRepo = recycleBinRepo;
@@ -184,6 +208,7 @@ public partial class DashboardModel : ModelBase, IDisposable
         _processLauncher = processLauncher;
         _exportService = exportService;
         _backupService = backupService;
+        _archiveService = archiveService;
         _loc = localizationService;
         BuildStatusOptions();
         _statusText = _loc[_statusKey];
@@ -784,6 +809,55 @@ public partial class DashboardModel : ModelBase, IDisposable
     }
 
     [RelayCommand]
+    private async Task ExportArchiveAsync()
+    {
+        var zipPath = await _fileDialogService.ShowSaveFileAsync(
+            _loc["Archive_ExportTitle"], "documents_archive.zip", "Zip files (*.zip)|*.zip");
+        if (string.IsNullOrEmpty(zipPath)) return;
+
+        try
+        {
+            var report = await _archiveService.ExportAsync(zipPath, new ArchiveExportOptions());
+            if (report.Success)
+                await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
+                    string.Format(_loc["Archive_ExportSuccess"], report.ExportedDocuments));
+            else
+                await _dialogService.ShowErrorAsync(_loc["Archive_FailureMessage"], string.Join("; ", report.ValidationErrors.Select(item => item.Code)));
+        }
+        catch (Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Archive_FailureMessage"]);
+        }
+    }
+
+    [RelayCommand]
+    private async Task ImportArchiveAsync()
+    {
+        var zipPath = await _fileDialogService.ShowOpenFileAsync(_loc["Archive_ImportTitle"], "Zip files (*.zip)|*.zip");
+        if (string.IsNullOrEmpty(zipPath)) return;
+
+        try
+        {
+            var report = await _archiveService.ImportAsync(zipPath, new ArchiveImportOptions());
+            if (report.Success)
+            {
+                await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],
+                    string.Format(_loc["Archive_ImportSuccess"], report.ImportedDocuments));
+                RefreshCommand.Execute(null);
+            }
+            else
+            {
+                await _dialogService.ShowErrorAsync(_loc["Archive_FailureMessage"],
+                    string.Join("; ", report.ValidationErrors.Select(item => item.Code)));
+            }
+        }
+        catch (Exception)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Archive_FailureMessage"]);
+        }
+    }
+
+    [RelayCommand]
     private async Task RestoreDatabaseAsync()
     {
         if (IsBackingUp || IsRestoring) return;
@@ -1133,3 +1207,11 @@ public partial class DashboardModel : ModelBase, IDisposable
 }
 
 public sealed record StatusOption(string Value, string Display);
+
+internal sealed class NoopArchiveService : IPersonalDocumentArchiveService
+{
+    public Task<ArchiveExportReport> ExportAsync(string destinationZip, ArchiveExportOptions options)
+        => Task.FromResult(new ArchiveExportReport(false, 0, [], [], []));
+    public Task<ArchiveImportReport> ImportAsync(string sourceZip, ArchiveImportOptions options)
+        => Task.FromResult(new ArchiveImportReport(false, 0, 0, [], [], [], ArchiveTransactionOutcome.NotStarted));
+}

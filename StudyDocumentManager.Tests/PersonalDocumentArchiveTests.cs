@@ -272,6 +272,84 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
         }
     }
 
+    [Fact]
+    public async Task Export_Import_RoundTrip_PreservesDocumentsFilesAndManifest()
+    {
+        var sourceDbPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_source_{Guid.NewGuid():N}.db");
+        var archivePath = Path.Combine(Path.GetTempPath(), $"sdm_archive_{Guid.NewGuid():N}.zip");
+        var targetDbPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_target_{Guid.NewGuid():N}.db");
+        var filePaths = new[]
+        {
+            Path.Combine(Path.GetTempPath(), $"sdm_archive_file1_{Guid.NewGuid():N}.txt"),
+            Path.Combine(Path.GetTempPath(), $"sdm_archive_file2_{Guid.NewGuid():N}.txt")
+        };
+        var originalContents = new[] { "round-trip-content-1", "round-trip-content-2" };
+        try
+        {
+            var sourceDb = new DatabaseHelper();
+            sourceDb.SetDatabasePath(sourceDbPath);
+            sourceDb.InitializeDatabase();
+            var sourceRepo = new DocumentRepository(sourceDb);
+            File.WriteAllText(filePaths[0], originalContents[0]);
+            File.WriteAllText(filePaths[1], originalContents[1]);
+            Assert.True(sourceRepo.AddWithCatalogs(new StudyDocument { Name = "Doc1", FilePath = filePaths[0] }));
+            Assert.True(sourceRepo.AddWithCatalogs(new StudyDocument { Name = "Doc2", FilePath = filePaths[1] }));
+
+            var exportReport = await CreateService(sourceDb).ExportAsync(archivePath, new ArchiveExportOptions());
+            Assert.True(exportReport.Success, string.Join("; ", exportReport.ValidationErrors.Select(e => e.Code + ":" + e.Message)));
+            Assert.Equal(2, exportReport.ExportedDocuments);
+            Assert.NotNull(exportReport.Manifest);
+            Assert.Equal(2, exportReport.Manifest!.Documents.Count);
+            Assert.Equal(2, exportReport.Manifest.Files.Count);
+            Assert.Equal(2, exportReport.Manifest.Checksums.Count);
+            File.Delete(filePaths[0]);
+            File.Delete(filePaths[1]);
+
+            var targetDb = new DatabaseHelper();
+            targetDb.SetDatabasePath(targetDbPath);
+            targetDb.InitializeDatabase();
+            var targetRepo = new DocumentRepository(targetDb);
+
+            var importReport = await CreateService(targetDb).ImportAsync(archivePath, new ArchiveImportOptions());
+            Assert.True(importReport.Success, string.Join("; ", importReport.ValidationErrors.Select(e => e.Code + ":" + e.Message)));
+            Assert.Equal(2, importReport.ImportedDocuments);
+            Assert.Empty(importReport.Conflicts);
+            Assert.False(importReport.RolledBack);
+
+            var imported = targetRepo.GetAll();
+            Assert.Equal(2, imported.Count);
+            foreach (var doc in imported)
+            {
+                Assert.True(File.Exists(doc.FilePath), $"restored file missing: {doc.FilePath}");
+            }
+            var content1 = File.ReadAllText(filePaths[0]);
+            var content2 = File.ReadAllText(filePaths[1]);
+            Assert.Contains(originalContents[0], new[] { content1, content2 });
+            Assert.Contains(originalContents[1], new[] { content1, content2 });
+
+            foreach (var checksum in exportReport.Manifest.Checksums)
+            {
+                var matchingFile = exportReport.Manifest.Files.First(f => f.ArchivePath == checksum.ArchivePath);
+                var keyValue = matchingFile.DocumentExportKey;
+                var importedDoc = imported.Single(d => d.ExportKey?.Value == keyValue);
+                using var sha = System.Security.Cryptography.SHA256.Create();
+                var actual = Convert.ToHexString(sha.ComputeHash(File.ReadAllBytes(importedDoc.FilePath))).ToLowerInvariant();
+                Assert.Equal(checksum.Sha256, actual);
+            }
+
+            targetDb.CloseAllConnections();
+        }
+        finally
+        {
+            Db.CloseAllConnections();
+            TryDelete(sourceDbPath);
+            TryDelete(archivePath);
+            TryDelete(targetDbPath);
+            TryDelete(filePaths[0]);
+            TryDelete(filePaths[1]);
+        }
+    }
+
     private static PersonalDocumentArchiveService CreateService(DatabaseHelper database)
     {
         var documents = new DocumentRepository(database);

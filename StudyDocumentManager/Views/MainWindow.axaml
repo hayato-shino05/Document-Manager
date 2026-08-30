@@ -71,6 +71,8 @@
                         <MenuItem Header="{loc:Localize Menu_DeleteDocument}" Command="{Binding DeleteDocumentCommand}" InputGesture="Delete"/>
                         <Separator/>
                         <MenuItem Header="{loc:Localize Menu_ExportCsv}" Command="{Binding ExportCsvCommand}" InputGesture="Ctrl+E"/>
+                        <MenuItem Header="{loc:Localize Menu_ExportArchive}" Command="{Binding ExportArchiveCommand}" AutomationProperties.AutomationId="Menu_ExportArchive"/>
+                        <MenuItem Header="{loc:Localize Menu_ImportArchive}" Command="{Binding ImportArchiveCommand}" AutomationProperties.AutomationId="Menu_ImportArchive" InputGesture="Ctrl+Shift+I"/>
                         <MenuItem Header="{loc:Localize Menu_RefreshList}" Command="{Binding RefreshCommand}" InputGesture="F5"/>
                         <MenuItem Header="{loc:Localize RecentFiles_Title}" Command="{Binding NavigateCommand}" CommandParameter="recentfiles"/>
                         <MenuItem Header="{loc:Localize Menu_BackupDb}" Command="{Binding BackupDatabaseCommand}"/>

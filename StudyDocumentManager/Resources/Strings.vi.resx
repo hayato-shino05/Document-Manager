@@ -567,6 +567,14 @@
   <data name="Menu_AddNewDocument" xml:space="preserve"><value>Thêm tài liệu mới</value></data>
   <data name="Menu_OpenDocument" xml:space="preserve"><value>Mở tài liệu</value></data>
   <data name="Menu_ExportCsv" xml:space="preserve"><value>Xuất CSV</value></data>
+  <data name="Menu_ExportArchive" xml:space="preserve"><value>Xuất kho lưu trữ</value></data>
+  <data name="Menu_ImportArchive" xml:space="preserve"><value>Nhập kho lưu trữ</value></data>
+  <data name="Archive_ExportTitle" xml:space="preserve"><value>Xuất kho lưu trữ</value></data>
+  <data name="Archive_ImportTitle" xml:space="preserve"><value>Nhập kho lưu trữ</value></data>
+  <data name="Archive_ExportSuccess" xml:space="preserve"><value>Đã xuất kho lưu trữ ({0} tài liệu)</value></data>
+  <data name="Archive_ImportSuccess" xml:space="preserve"><value>Đã nhập kho lưu trữ ({0} tài liệu)</value></data>
+  <data name="Archive_FailureMessage" xml:space="preserve"><value>Thao tác kho lưu trữ thất bại</value></data>
+  <data name="Archive_NoZipSelected" xml:space="preserve"><value>Chưa chọn tệp ZIP</value></data>
   <data name="Menu_BackupDb" xml:space="preserve"><value>Sao lưu cơ sở dữ liệu</value></data>
   <data name="Menu_RestoreDb" xml:space="preserve"><value>Khôi phục cơ sở dữ liệu</value></data>
   <data name="Menu_Exit" xml:space="preserve"><value>Thoát</value></data>
