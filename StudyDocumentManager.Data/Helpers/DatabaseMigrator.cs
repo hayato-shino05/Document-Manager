@@ -641,11 +641,13 @@ public static class DatabaseMigrator
         foreach (var index in indexes)
         {
             var isDocumentPathIndex = index.IsUnique && HasUniqueIndex(connection, "documents", ["file_path"], index.Name);
+            var isArchiveExportKeyIndex = index.IsUnique && HasUniqueIndex(connection, "documents", ["archive_export_key"], index.Name);
             if (index.Origin == "u")
             {
-                if (!isDocumentPathIndex)
+                if (!isDocumentPathIndex && !isArchiveExportKeyIndex)
                     throw new InvalidOperationException($"Unsupported unique constraint '{index.Name}' on 'documents'.");
-                rebuildDocuments = true;
+                if (isDocumentPathIndex)
+                    rebuildDocuments = true;
             }
             else if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isDocumentPathIndex)
             {
@@ -707,9 +709,16 @@ public static class DatabaseMigrator
             var indexName = indexReader.GetString(1);
             var origin = indexReader.GetString(3);
             if (tableName == "documents" && origin == "u")
-                throw new InvalidOperationException($"Unsupported unique constraint '{indexName}' on '{tableName}'.");
-            if (origin == "c" && !allowedIndexes.Contains(indexName))
+            {
+                var isDocumentPathIndex = HasUniqueIndex(connection, "documents", ["file_path"], indexName);
+                var isArchiveExportKeyIndex = HasUniqueIndex(connection, "documents", ["archive_export_key"], indexName);
+                if (!isDocumentPathIndex && !isArchiveExportKeyIndex)
+                    throw new InvalidOperationException($"Unsupported unique constraint '{indexName}' on '{tableName}'.");
+            }
+            else if (origin == "c" && !allowedIndexes.Contains(indexName))
+            {
                 throw new InvalidOperationException($"Unsupported index '{indexName}' on '{tableName}'.");
+            }
         }
 
         using var triggers = connection.CreateCommand();
