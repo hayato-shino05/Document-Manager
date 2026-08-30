@@ -18,6 +18,13 @@ public interface IDocumentRepository
         DateTime? fromDate, DateTime? toDate,
         double? minSize, double? maxSize, bool? isImportant);
 
+    List<StudyDocument> SearchAdvancedWithNotes(
+        string? keyword, string? subject, string? type,
+        DateTime? fromDate, DateTime? toDate,
+        double? minSize, double? maxSize, bool? isImportant)
+        => SearchAdvanced(keyword ?? string.Empty, subject ?? string.Empty, type ?? string.Empty,
+            fromDate, toDate, minSize, maxSize, isImportant);
+
     List<StudyDocument> SearchAdvancedWithStatus(
         string? keyword, string? subject, string? type,
         DateTime? fromDate, DateTime? toDate,
@@ -31,6 +38,15 @@ public interface IDocumentRepository
 
     bool MergeDocuments(int survivorId, IReadOnlyList<int> duplicateIds)
         => throw new NotSupportedException($"{nameof(MergeDocuments)} is not implemented by this repository.");
+
+    int SoftDeleteDocuments(IReadOnlyList<int> ids)
+        => throw new NotSupportedException($"{nameof(SoftDeleteDocuments)} is not implemented by this repository.");
+
+    int RestoreDocuments(IReadOnlyList<int> ids)
+        => throw new NotSupportedException($"{nameof(RestoreDocuments)} is not implemented by this repository.");
+
+    int PermanentlyDeleteDocuments(IReadOnlyList<int> ids)
+        => throw new NotSupportedException($"{nameof(PermanentlyDeleteDocuments)} is not implemented by this repository.");
 
     bool AddWithCatalogs(StudyDocument document);
     bool Update(StudyDocument document);

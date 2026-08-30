@@ -105,6 +105,32 @@ public sealed class PersonalNoteUiRegressionTests
     }
 
     [AvaloniaFact]
+    public void PersonalNote_ExposesMultiNoteControlsWithAccessibleNames()
+    {
+        var view = new PersonalNote();
+        var window = new Window { Content = view };
+
+        try
+        {
+            window.Show();
+
+            var noteList = view.FindControl<ItemsControl>("lstNotes");
+            var noteType = view.FindControl<ComboBox>("cmbNoteType");
+            var pinned = view.FindControl<Button>("btnNotePinned");
+
+            Assert.NotNull(noteList);
+            Assert.NotNull(noteType);
+            Assert.NotNull(pinned);
+            Assert.False(string.IsNullOrWhiteSpace(noteType!.GetValue(Avalonia.Automation.AutomationProperties.NameProperty)));
+            Assert.False(string.IsNullOrWhiteSpace(pinned!.GetValue(Avalonia.Automation.AutomationProperties.NameProperty)));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void PersonalNote_EditorRemainsInsideNarrowViewport()
     {
         var view = new PersonalNote();

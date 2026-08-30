@@ -26,8 +26,29 @@ public sealed class DuplicateMergeTests : DatabaseTestBase
         Assert.Contains(Repo.GetDeletedDocuments(), document => document.Id == duplicate.Id);
         Assert.Contains(new CollectionRepository(Db).GetDocuments(collectionId), document => document.Id == survivor.Id);
         Assert.DoesNotContain(new CollectionRepository(Db).GetDocuments(collectionId), document => document.Id == duplicate.Id);
-        Assert.Equal($"Survivor note{Environment.NewLine}{Environment.NewLine}Duplicate note", Db.GetPersonalNote(survivor.Id));
+        Assert.Equal("Survivor note", Db.GetPersonalNote(survivor.Id));
         Assert.Contains(Db.GetRelatedDocuments(survivor.Id), relation => relation.Doc.Id == related.Id);
+    }
+
+    [Fact]
+    public void MergeDocuments_PreservesNoteIdentityTypePinAndTags()
+    {
+        var survivor = AddDocument("same", "survivor.pdf");
+        survivor.Tags = "alpha";
+        Assert.True(Repo.Update(survivor));
+        var duplicate = AddDocument("same", "duplicate.pdf");
+        duplicate.Tags = "beta;Alpha";
+        Assert.True(Repo.Update(duplicate));
+        Assert.True(Db.SavePersonalNote(new PersonalNote(0, duplicate.Id, "action", "Follow up", true)));
+        var note = Db.GetPersonalNotes(duplicate.Id).Single();
+
+        Assert.True(Repo.MergeDocuments(survivor.Id, [duplicate.Id]));
+
+        var mergedNote = Db.GetPersonalNotes(survivor.Id).Single(item => item.Id == note.Id);
+        Assert.Equal("action", mergedNote.NoteType);
+        Assert.True(mergedNote.IsPinned);
+        Assert.Equal("Follow up", mergedNote.Content);
+        Assert.Equal("alpha;beta", Repo.GetById(survivor.Id)!.Tags);
     }
 
     [Fact]
@@ -59,6 +80,40 @@ public sealed class DuplicateMergeTests : DatabaseTestBase
         Assert.Contains(Repo.GetAll(), document => document.Id == duplicate.Id);
         Assert.Contains(new CollectionRepository(Db).GetDocuments(collectionId), document => document.Id == duplicate.Id);
         Assert.Equal("Duplicate note", Db.GetPersonalNote(duplicate.Id));
+    }
+
+    [Fact]
+    public void ApplyMergeUndo_RestoresNotesCollectionsRelationsAndDuplicate()
+    {
+        var survivor = AddDocument("same", "survivor.pdf");
+        var duplicate = AddDocument("same", "duplicate.pdf");
+        var related = AddDocument("related", "related.pdf");
+        var collectionId = Db.CreateCollection("Reading");
+        Assert.True(Db.AddDocumentToCollection(collectionId, duplicate.Id));
+        Assert.True(Db.SavePersonalNote(new PersonalNote(0, duplicate.Id, "action", "Follow up", true)));
+        Db.AddDocumentRelation(duplicate.Id, related.Id, "reference");
+        var snapshot = Repo.CaptureMergeUndo(survivor.Id, [duplicate.Id]);
+
+        Assert.True(Repo.MergeDocuments(survivor.Id, [duplicate.Id]));
+        Repo.ApplyMergeUndo(snapshot);
+
+        Assert.Contains(Repo.GetAll(), item => item.Id == duplicate.Id);
+        Assert.Contains(Db.GetPersonalNotes(duplicate.Id), item => item.NoteType == "action" && item.IsPinned);
+        Assert.Contains(new CollectionRepository(Db).GetDocuments(collectionId), item => item.Id == duplicate.Id);
+        Assert.Contains(Db.GetRelatedDocuments(duplicate.Id), item => item.Doc.Id == related.Id);
+    }
+
+    [Fact]
+    public void PermanentlyDeleteDocuments_RemovesNotesAndDoesNotRestore()
+    {
+        var document = AddDocument("delete", "delete.pdf");
+        Assert.True(Db.SavePersonalNote(new PersonalNote(0, document.Id, "general", "content", false)));
+        Assert.True(Repo.Delete(document.Id));
+
+        Assert.Equal(1, Repo.PermanentlyDeleteDocuments([document.Id]));
+        Assert.Null(Repo.GetById(document.Id));
+        Assert.Empty(Db.GetPersonalNotes(document.Id, includeDeleted: true));
+        Assert.Equal(0, Repo.RestoreDocuments([document.Id]));
     }
 
     private StudyDocument AddDocument(string name, string path)

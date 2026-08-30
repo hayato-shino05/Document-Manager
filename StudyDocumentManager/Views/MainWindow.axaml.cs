@@ -8,14 +8,52 @@ namespace StudyDocumentManager.Views;
 
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    private readonly Func<OnboardingModel>? _onboardingModelFactory;
+
+    public MainWindow() : this(null)
     {
+    }
+
+    public MainWindow(Func<OnboardingModel>? onboardingModelFactory)
+    {
+        _onboardingModelFactory = onboardingModelFactory;
         InitializeComponent();
+        Opened += OnOpened;
+        Closed += OnClosed;
 
         // Enable drag & drop
         AddHandler(DragDrop.DropEvent, OnDrop);
         AddHandler(DragDrop.DragOverEvent, OnDragOver);
         DragDrop.SetAllowDrop(this, true);
+    }
+
+    private async void OnOpened(object? sender, EventArgs e)
+    {
+        if (DataContext is not MainWindowModel model || _onboardingModelFactory is null)
+            return;
+
+        model.HelpRequested += OnHelpRequested;
+        var onboarding = _onboardingModelFactory();
+        if (onboarding.ShouldShow)
+            await ShowOnboardingAsync(onboarding);
+    }
+
+    private void OnClosed(object? sender, EventArgs e)
+    {
+        if (DataContext is MainWindowModel model)
+            model.HelpRequested -= OnHelpRequested;
+    }
+
+    private async void OnHelpRequested(object? sender, EventArgs e)
+    {
+        if (_onboardingModelFactory is not null)
+            await ShowOnboardingAsync(_onboardingModelFactory());
+    }
+
+    private async Task ShowOnboardingAsync(OnboardingModel model)
+    {
+        var dialog = new OnboardingDialog(model);
+        await dialog.ShowDialog(this);
     }
 
     protected override void OnKeyDown(KeyEventArgs e)

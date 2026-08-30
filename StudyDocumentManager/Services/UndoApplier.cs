@@ -30,7 +30,13 @@ public sealed class UndoApplier : IUndoApplier
     {
         var entry = _undo.Peek() ?? throw new InvalidOperationException("Nothing to undo.");
 
-        if (entry.DeletedIds.Count > 0)
+        if (entry.Merge is { } merge)
+        {
+            if (_undoRepository is null)
+                throw new InvalidOperationException("Merge undo repository is required.");
+            _undoRepository.ApplyMergeUndo(merge);
+        }
+        else if (entry.DeletedIds.Count > 0)
         {
             var requested = entry.DeletedIds.Count;
             var restored = _recycleBin.RestoreDocuments(entry.DeletedIds);

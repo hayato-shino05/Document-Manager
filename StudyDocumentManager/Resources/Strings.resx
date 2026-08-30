@@ -621,6 +621,10 @@
   <data name="PersonalNote_BtnSave" xml:space="preserve"><value>保存</value></data>
   <data name="PersonalNote_BtnDelete" xml:space="preserve"><value>削除</value></data>
   <data name="PersonalNote_Placeholder" xml:space="preserve"><value>メモを入力...</value></data>
+  <data name="PersonalNote_Notes" xml:space="preserve"><value>メモ一覧</value></data>
+  <data name="PersonalNote_Type" xml:space="preserve"><value>種類</value></data>
+  <data name="PersonalNote_Pinned" xml:space="preserve"><value>固定</value></data>
+  <data name="PersonalNote_BtnNew" xml:space="preserve"><value>新規メモ</value></data>
 
   <!-- RelatedDocuments View -->
   <data name="RelatedDocs_Title" xml:space="preserve"><value>関連文書</value></data>
@@ -976,6 +980,18 @@
   <data name="WF_ItemStatus_Unknown" xml:space="preserve"><value>未確定</value></data>
   <data name="WF_Error_WatcherFault" xml:space="preserve"><value>フォルダー監視で致命的なエラーが発生しました</value></data>
   <data name="WF_IncludeSub" xml:space="preserve"><value>サブフォルダを含める</value></data>
+  <data name="Onboarding_Title" xml:space="preserve"><value>初回セットアップ</value></data>
+  <data name="Onboarding_Welcome" xml:space="preserve"><value>Document Managerへようこそ</value></data>
+  <data name="Onboarding_Intro" xml:space="preserve"><value>この短い案内で、文書管理の基本を確認できます。</value></data>
+  <data name="Onboarding_StepStorage" xml:space="preserve"><value>保存先: 文書と設定はこの端末のローカルデータベースに保存されます。</value></data>
+  <data name="Onboarding_StepAdd" xml:space="preserve"><value>文書追加: ファイルを追加し、名前、科目、種類などを登録できます。</value></data>
+  <data name="Onboarding_StepOrganize" xml:space="preserve"><value>整理: カテゴリ、コレクション、検索、フィルターで文書を整理できます。</value></data>
+  <data name="Onboarding_StepBackup" xml:space="preserve"><value>バックアップ: ファイルメニューからデータベースをバックアップできます。</value></data>
+  <data name="Onboarding_StepRecovery" xml:space="preserve"><value>復旧: リカバリーセンターでバックアップの確認、復元、ファイルの再リンクができます。</value></data>
+  <data name="Onboarding_StepLanguage" xml:space="preserve"><value>言語: 右上の言語メニューから表示言語を変更できます。</value></data>
+  <data name="Onboarding_Skip" xml:space="preserve"><value>スキップ</value></data>
+  <data name="Onboarding_Finish" xml:space="preserve"><value>始める</value></data>
+  <data name="Onboarding_MenuItem" xml:space="preserve"><value>使い方ガイド</value></data>
 </root>
 
 

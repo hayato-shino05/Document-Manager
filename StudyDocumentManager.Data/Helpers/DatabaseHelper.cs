@@ -4,6 +4,7 @@ using System.Threading;
 using Microsoft.Data.Sqlite;
 using StudyDocumentManager.Core.DTOs;
 using StudyDocumentManager.Core.Entities;
+using StudyDocumentManager.Core.Interfaces;
 
 namespace StudyDocumentManager.Data.Helpers;
 
@@ -13,8 +14,14 @@ namespace StudyDocumentManager.Data.Helpers;
 public class DatabaseHelper
 {
     private const string DatabasePathEnvironmentVariable = "SDM_DATABASE_PATH";
+    private readonly IStartupDiagnostics? _startupDiagnostics;
     private string? _databasePath;
     private string? _connectionString;
+
+    public DatabaseHelper(IStartupDiagnostics? startupDiagnostics = null)
+    {
+        _startupDiagnostics = startupDiagnostics;
+    }
 
     /// <summary>
     /// DBファイルパス
@@ -100,9 +107,9 @@ public class DatabaseHelper
 
     public void InitializeDatabase()
     {
-        using var operationLock = AcquireDatabaseOperationLock(DatabasePath);
         try
         {
+            using var operationLock = AcquireDatabaseOperationLock(DatabasePath);
             string? dataFolder = Path.GetDirectoryName(DatabasePath);
             if (!string.IsNullOrEmpty(dataFolder) && !Directory.Exists(dataFolder))
             {
@@ -111,11 +118,34 @@ public class DatabaseHelper
 
             MigrateLegacyDatabaseIfNeeded();
             DatabaseMigrator.RunMigrations(ConnectionString);
+            TryRecordDatabaseInitializationSucceeded();
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Database initialization error: {ex.Message}");
+            TryRecordDatabaseInitializationFailed(ex);
             throw;
+        }
+    }
+
+    private void TryRecordDatabaseInitializationSucceeded()
+    {
+        try
+        {
+            _startupDiagnostics?.RecordDatabaseInitializationSucceeded();
+        }
+        catch
+        {
+        }
+    }
+
+    private void TryRecordDatabaseInitializationFailed(Exception exception)
+    {
+        try
+        {
+            _startupDiagnostics?.RecordDatabaseInitializationFailed(exception);
+        }
+        catch
+        {
         }
     }
 
@@ -251,6 +281,63 @@ public class DatabaseHelper
         return ExecuteReader(query, parameters.ToArray());
     }
 
+    public List<StudyDocument> SearchDocumentsAdvancedWithNotes(
+        string? keyword, string? subject, string? type,
+        DateTime? fromDate, DateTime? toDate,
+        double? minSize, double? maxSize, bool? isImportant)
+    {
+        var query = "SELECT * FROM documents WHERE (is_deleted IS NULL OR is_deleted = 0)";
+        var parameters = new List<SqliteParameter>();
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            query += " AND (name LIKE @keyword OR subject LIKE @keyword OR notes LIKE @keyword OR tags LIKE @keyword OR EXISTS (SELECT 1 FROM personal_notes WHERE personal_notes.document_id = documents.id AND personal_notes.is_deleted = 0 AND personal_notes.content LIKE @keyword))";
+            parameters.Add(new SqliteParameter("@keyword", $"%{keyword}%"));
+        }
+
+        if (!string.IsNullOrEmpty(subject) && subject != "All")
+        {
+            query += " AND subject = @subject";
+            parameters.Add(new SqliteParameter("@subject", subject));
+        }
+
+        if (!string.IsNullOrEmpty(type) && type != "All")
+        {
+            query += " AND type = @type";
+            parameters.Add(new SqliteParameter("@type", type));
+        }
+
+        if (fromDate.HasValue)
+        {
+            query += " AND date(created_at) >= date(@fromDate)";
+            parameters.Add(new SqliteParameter("@fromDate", fromDate.Value.ToString("yyyy-MM-dd")));
+        }
+
+        if (toDate.HasValue)
+        {
+            query += " AND date(created_at) <= date(@toDate)";
+            parameters.Add(new SqliteParameter("@toDate", toDate.Value.ToString("yyyy-MM-dd")));
+        }
+
+        if (minSize.HasValue)
+        {
+            query += " AND file_size >= @minSize";
+            parameters.Add(new SqliteParameter("@minSize", minSize.Value));
+        }
+
+        if (maxSize.HasValue)
+        {
+            query += " AND file_size <= @maxSize";
+            parameters.Add(new SqliteParameter("@maxSize", maxSize.Value));
+        }
+
+        if (isImportant is true)
+            query += " AND is_important = 1";
+
+        query += " ORDER BY created_at DESC";
+        return ExecuteReader(query, parameters.ToArray());
+    }
+
     public Dictionary<string, int> GetStatusCounts()
     {
         const string query = "SELECT status, COUNT(*) FROM documents WHERE (is_deleted IS NULL OR is_deleted = 0) AND status IS NOT NULL GROUP BY status";
@@ -268,16 +355,18 @@ public class DatabaseHelper
     public bool InsertDocument(StudyDocument doc)
     {
         const string query = """
-            INSERT INTO documents (name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline, status)
-            VALUES (@name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline, @status);
+            INSERT INTO documents (archive_export_key, name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline, status)
+            VALUES (@archive_export_key, @name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline, @status);
             SELECT last_insert_rowid();
             """;
 
         using var conn = OpenConnection();
         using var cmd = new SqliteCommand(query, conn);
 
+        doc.ExportKey ??= DocumentExportKey.Create();
         foreach (var parameter in BuildDocumentParameters(doc))
             cmd.Parameters.Add(parameter);
+        cmd.Parameters.AddWithValue("@archive_export_key", doc.ExportKey.Value);
 
         var result = cmd.ExecuteScalar();
         if (result == null)
@@ -288,11 +377,114 @@ public class DatabaseHelper
     }
 
 
+    public IReadOnlyDictionary<string, int> ImportArchiveGraph(
+        DocumentArchiveManifest manifest,
+        IReadOnlyList<DocumentArchiveDocument> documents)
+    {
+        using var connection = OpenConnection();
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            var ids = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (var source in documents)
+            {
+                if (!DocumentExportKey.TryParse(source.ExportKey, out _))
+                    throw new InvalidOperationException("Archive document key is invalid.");
+
+                if (!string.IsNullOrWhiteSpace(source.Subject))
+                    InsertCatalogValue(connection, transaction, "categories", source.Subject);
+                if (!string.IsNullOrWhiteSpace(source.Type))
+                    InsertCatalogValue(connection, transaction, "document_types", source.Type);
+
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = """
+                    INSERT INTO documents (archive_export_key, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status)
+                    VALUES (@archiveExportKey, @name, @subject, @type, @filePath, @notes, @createdAt, @fileSize, @author, @isImportant, @tags, @deadline, @isDeleted, @deletedAt, @status);
+                    SELECT last_insert_rowid();
+                    """;
+                command.Parameters.AddWithValue("@archiveExportKey", source.ExportKey);
+                command.Parameters.AddWithValue("@name", source.Name ?? string.Empty);
+                command.Parameters.AddWithValue("@subject", (object?)source.Subject ?? DBNull.Value);
+                command.Parameters.AddWithValue("@type", (object?)source.Type ?? DBNull.Value);
+                command.Parameters.AddWithValue("@filePath", (object?)source.FilePath ?? DBNull.Value);
+                command.Parameters.AddWithValue("@notes", (object?)source.Notes ?? DBNull.Value);
+                command.Parameters.AddWithValue("@createdAt", source.CreatedAt);
+                command.Parameters.AddWithValue("@fileSize", (object?)source.FileSize ?? DBNull.Value);
+                command.Parameters.AddWithValue("@author", (object?)source.Author ?? DBNull.Value);
+                command.Parameters.AddWithValue("@isImportant", source.IsImportant ? 1 : 0);
+                command.Parameters.AddWithValue("@tags", (object?)source.Tags ?? DBNull.Value);
+                command.Parameters.AddWithValue("@deadline", (object?)source.Deadline ?? DBNull.Value);
+                command.Parameters.AddWithValue("@isDeleted", source.IsDeleted ? 1 : 0);
+                command.Parameters.AddWithValue("@deletedAt", source.IsDeleted ? DateTime.Now : DBNull.Value);
+                command.Parameters.AddWithValue("@status", string.IsNullOrWhiteSpace(source.Status) ? DocumentStatus.Unread : source.Status);
+                ids[source.ExportKey] = Convert.ToInt32(command.ExecuteScalar());
+            }
+
+            foreach (var note in manifest.Notes.Where(note => ids.ContainsKey(note.DocumentExportKey)))
+            {
+                if (!NoteType.TryParse(note.NoteType, out var noteType))
+                    throw new InvalidOperationException("Archive note type is invalid.");
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "INSERT INTO personal_notes (document_id, note_type, content, is_pinned, is_deleted) VALUES (@documentId, @noteType, @content, @isPinned, @isDeleted)";
+                command.Parameters.AddWithValue("@documentId", ids[note.DocumentExportKey]);
+                command.Parameters.AddWithValue("@noteType", noteType.Value);
+                command.Parameters.AddWithValue("@content", (object?)note.Content ?? DBNull.Value);
+                command.Parameters.AddWithValue("@isPinned", note.IsPinned ? 1 : 0);
+                command.Parameters.AddWithValue("@isDeleted", note.IsDeleted ? 1 : 0);
+                command.ExecuteNonQuery();
+            }
+
+            foreach (var collection in manifest.Collections)
+            {
+                var memberIds = collection.DocumentExportKeys.Where(ids.ContainsKey).Distinct(StringComparer.Ordinal).Select(key => ids[key]).ToArray();
+                if (memberIds.Length == 0)
+                    continue;
+                using var collectionCommand = connection.CreateCommand();
+                collectionCommand.Transaction = transaction;
+                collectionCommand.CommandText = "INSERT INTO collections (name) VALUES (@name); SELECT last_insert_rowid();";
+                collectionCommand.Parameters.AddWithValue("@name", collection.Name ?? string.Empty);
+                var collectionId = Convert.ToInt32(collectionCommand.ExecuteScalar());
+                foreach (var documentId in memberIds)
+                {
+                    using var itemCommand = connection.CreateCommand();
+                    itemCommand.Transaction = transaction;
+                    itemCommand.CommandText = "INSERT OR IGNORE INTO collection_items (collection_id, document_id) VALUES (@collectionId, @documentId)";
+                    itemCommand.Parameters.AddWithValue("@collectionId", collectionId);
+                    itemCommand.Parameters.AddWithValue("@documentId", documentId);
+                    itemCommand.ExecuteNonQuery();
+                }
+            }
+
+            foreach (var relation in manifest.Relations.Where(relation => ids.ContainsKey(relation.SourceDocumentExportKey) && ids.ContainsKey(relation.TargetDocumentExportKey)))
+            {
+                var first = Math.Min(ids[relation.SourceDocumentExportKey], ids[relation.TargetDocumentExportKey]);
+                var second = Math.Max(ids[relation.SourceDocumentExportKey], ids[relation.TargetDocumentExportKey]);
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "INSERT OR IGNORE INTO document_relations (doc_id_1, doc_id_2, relation_type) VALUES (@first, @second, @type)";
+                command.Parameters.AddWithValue("@first", first);
+                command.Parameters.AddWithValue("@second", second);
+                command.Parameters.AddWithValue("@type", string.IsNullOrWhiteSpace(relation.RelationType) ? "related" : relation.RelationType);
+                command.ExecuteNonQuery();
+            }
+
+            transaction.Commit();
+            return ids;
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
     public bool InsertDocumentWithCatalogs(StudyDocument document)
     {
         const string query = """
-            INSERT INTO documents (name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline, status)
-            VALUES (@name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline, @status)
+            INSERT INTO documents (archive_export_key, name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline, status)
+            VALUES (@archive_export_key, @name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline, @status)
             """;
 
         using var connection = OpenConnection();
@@ -309,8 +501,10 @@ public class DatabaseHelper
             using var command = connection.CreateCommand();
             command.Transaction = transaction;
             command.CommandText = query;
+            document.ExportKey ??= DocumentExportKey.Create();
             foreach (var parameter in BuildDocumentParameters(document))
                 command.Parameters.Add(parameter);
+            command.Parameters.AddWithValue("@archive_export_key", document.ExportKey.Value);
 
             if (command.ExecuteNonQuery() == 0)
             {
@@ -416,6 +610,144 @@ public class DatabaseHelper
         }
     }
 
+    public MergeUndoSnapshot CaptureMergeUndo(int survivorId, IReadOnlyList<int> duplicateIds)
+    {
+        var duplicateIdsDistinct = duplicateIds.Where(id => id != survivorId).Distinct().ToArray();
+        var survivor = GetDocumentById(survivorId) ?? throw new InvalidOperationException("Merge survivor is no longer available.");
+        if (duplicateIdsDistinct.Length == 0)
+            throw new InvalidOperationException("At least one duplicate document is required.");
+
+        var documentIds = new[] { survivorId }.Concat(duplicateIdsDistinct).ToArray();
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        var names = AddIdParameters(command, documentIds);
+        var idSet = string.Join(",", names);
+
+        command.CommandText = $"SELECT id, document_id, note_type, content, is_pinned, is_deleted, created_at, updated_at FROM personal_notes WHERE document_id IN ({idSet})";
+        var notes = new List<PersonalNote>();
+        using (var reader = command.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                notes.Add(new PersonalNote(reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2), reader.IsDBNull(3) ? string.Empty : reader.GetString(3), reader.GetInt32(4) != 0)
+                {
+                    IsDeleted = reader.GetInt32(5) != 0,
+                    CreatedAt = reader.GetDateTime(6),
+                    UpdatedAt = reader.GetDateTime(7)
+                });
+            }
+        }
+
+        command.Parameters.Clear();
+        names = AddIdParameters(command, documentIds);
+        idSet = string.Join(",", names);
+        command.CommandText = $"SELECT collection_id, document_id FROM collection_items WHERE document_id IN ({idSet})";
+        var memberships = new List<CollectionMembershipSnapshot>();
+        using (var reader = command.ExecuteReader())
+        {
+            while (reader.Read())
+                memberships.Add(new CollectionMembershipSnapshot(reader.GetInt32(0), reader.GetInt32(1)));
+        }
+
+        command.Parameters.Clear();
+        names = AddIdParameters(command, documentIds);
+        idSet = string.Join(",", names);
+        command.CommandText = $"SELECT doc_id_1, doc_id_2, relation_type FROM document_relations WHERE doc_id_1 IN ({idSet}) OR doc_id_2 IN ({idSet})";
+        var relations = new List<DocumentRelationSnapshot>();
+        using (var reader = command.ExecuteReader())
+        {
+            while (reader.Read())
+                relations.Add(new DocumentRelationSnapshot(reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2)));
+        }
+
+        return new MergeUndoSnapshot(survivor, duplicateIdsDistinct, notes, memberships, relations);
+    }
+
+    public void ApplyMergeUndo(MergeUndoSnapshot snapshot)
+    {
+        using var connection = OpenConnection();
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            if (!UpdateDocumentCore(connection, transaction, snapshot.Survivor))
+                throw new InvalidOperationException("Merge undo survivor restoration failed.");
+
+            foreach (var duplicateId in snapshot.DuplicateIds)
+            {
+                if (!RestoreDocumentCore(connection, transaction, duplicateId))
+                    throw new InvalidOperationException("Merge undo duplicate restoration failed.");
+            }
+
+            foreach (var note in snapshot.Notes)
+            {
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "UPDATE personal_notes SET document_id = @documentId WHERE id = @id";
+                command.Parameters.AddWithValue("@documentId", note.DocumentId);
+                command.Parameters.AddWithValue("@id", note.Id);
+                if (command.ExecuteNonQuery() != 1)
+                    throw new InvalidOperationException("Merge undo note restoration failed.");
+            }
+
+            var documentIds = new[] { snapshot.Survivor.Id }.Concat(snapshot.DuplicateIds).ToArray();
+            using (var command = connection.CreateCommand())
+            {
+                command.Transaction = transaction;
+                var names = AddIdParameters(command, documentIds);
+                var idSet = string.Join(",", names);
+                command.CommandText = $"DELETE FROM collection_items WHERE document_id IN ({idSet})";
+                command.ExecuteNonQuery();
+            }
+            foreach (var membership in snapshot.CollectionMemberships)
+            {
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "INSERT INTO collection_items (collection_id, document_id) VALUES (@collectionId, @documentId)";
+                command.Parameters.AddWithValue("@collectionId", membership.CollectionId);
+                command.Parameters.AddWithValue("@documentId", membership.DocumentId);
+                command.ExecuteNonQuery();
+            }
+
+            using (var command = connection.CreateCommand())
+            {
+                command.Transaction = transaction;
+                var names = AddIdParameters(command, documentIds);
+                var idSet = string.Join(",", names);
+                command.CommandText = $"DELETE FROM document_relations WHERE doc_id_1 IN ({idSet}) OR doc_id_2 IN ({idSet})";
+                command.ExecuteNonQuery();
+            }
+            foreach (var relation in snapshot.Relations)
+            {
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "INSERT INTO document_relations (doc_id_1, doc_id_2, relation_type) VALUES (@id1, @id2, @type)";
+                command.Parameters.AddWithValue("@id1", relation.DocumentId1);
+                command.Parameters.AddWithValue("@id2", relation.DocumentId2);
+                command.Parameters.AddWithValue("@type", relation.RelationType);
+                command.ExecuteNonQuery();
+            }
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
+    private static List<string> AddIdParameters(SqliteCommand command, IReadOnlyList<int> ids)
+    {
+        var names = new List<string>();
+        foreach (var id in ids)
+        {
+            var name = $"@id{names.Count}";
+            names.Add(name);
+            command.Parameters.AddWithValue(name, id);
+        }
+        return names;
+    }
+
     private static bool DocumentRowExists(SqliteConnection connection, SqliteTransaction transaction, int id)
     {
         using var command = connection.CreateCommand();
@@ -454,6 +786,7 @@ public class DatabaseHelper
 
                 MergeCollectionMemberships(connection, transaction, survivorId, duplicateId);
                 MergePersonalNotes(connection, transaction, survivorId, duplicateId);
+                MergeTags(connection, transaction, survivorId, duplicateId);
                 MergeRecentFile(connection, transaction, survivorId, duplicateId);
                 MergeRelations(connection, transaction, survivorId, duplicateId);
                 SoftDeleteDocument(connection, transaction, duplicateId);
@@ -494,38 +827,41 @@ public class DatabaseHelper
 
     private static void MergePersonalNotes(SqliteConnection connection, SqliteTransaction transaction, int survivorId, int duplicateId)
     {
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = "UPDATE personal_notes SET document_id = @survivorId WHERE document_id = @duplicateId";
+        command.Parameters.AddWithValue("@survivorId", survivorId);
+        command.Parameters.AddWithValue("@duplicateId", duplicateId);
+        command.ExecuteNonQuery();
+    }
+
+    private static void MergeTags(SqliteConnection connection, SqliteTransaction transaction, int survivorId, int duplicateId)
+    {
         using var read = connection.CreateCommand();
         read.Transaction = transaction;
-        read.CommandText = "SELECT content FROM personal_notes WHERE document_id IN (@survivorId, @duplicateId) ORDER BY document_id";
+        read.CommandText = "SELECT tags FROM documents WHERE id IN (@survivorId, @duplicateId) ORDER BY id";
         read.Parameters.AddWithValue("@survivorId", survivorId);
         read.Parameters.AddWithValue("@duplicateId", duplicateId);
-        var contents = new List<string>();
+        var tags = new List<string>();
         using (var reader = read.ExecuteReader())
         {
-            while (reader.Read())
+            while (reader.Read() && !reader.IsDBNull(0))
             {
-                var content = reader.IsDBNull(0) ? string.Empty : reader.GetString(0).Trim();
-                if (content.Length > 0 && !contents.Contains(content, StringComparer.Ordinal))
-                    contents.Add(content);
+                foreach (var tag in reader.GetString(0).Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                {
+                    if (!tags.Contains(tag, StringComparer.OrdinalIgnoreCase))
+                        tags.Add(tag);
+                }
             }
         }
 
-        using var delete = connection.CreateCommand();
-        delete.Transaction = transaction;
-        delete.CommandText = "DELETE FROM personal_notes WHERE document_id IN (@survivorId, @duplicateId)";
-        delete.Parameters.AddWithValue("@survivorId", survivorId);
-        delete.Parameters.AddWithValue("@duplicateId", duplicateId);
-        delete.ExecuteNonQuery();
-
-        if (contents.Count == 0)
-            return;
-
-        using var insert = connection.CreateCommand();
-        insert.Transaction = transaction;
-        insert.CommandText = "INSERT INTO personal_notes (document_id, content) VALUES (@documentId, @content)";
-        insert.Parameters.AddWithValue("@documentId", survivorId);
-        insert.Parameters.AddWithValue("@content", string.Join(Environment.NewLine + Environment.NewLine, contents));
-        insert.ExecuteNonQuery();
+        using var update = connection.CreateCommand();
+        update.Transaction = transaction;
+        update.CommandText = "UPDATE documents SET tags = @tags WHERE id = @survivorId";
+        update.Parameters.AddWithValue("@survivorId", survivorId);
+        update.Parameters.AddWithValue("@tags", tags.Count == 0 ? DBNull.Value : string.Join(";", tags));
+        if (update.ExecuteNonQuery() != 1)
+            throw new InvalidOperationException("Failed to merge document tags.");
     }
 
     private static void MergeRecentFile(SqliteConnection connection, SqliteTransaction transaction, int survivorId, int duplicateId)
@@ -763,6 +1099,27 @@ public class DatabaseHelper
         const string query = "DELETE FROM documents WHERE id = @id AND is_deleted = 1";
         return ExecuteNonQuery(query, new SqliteParameter("@id", id)) > 0;
     }
+
+    public int PermanentlyDeleteDocuments(IReadOnlyList<int> ids)
+    {
+        if (ids is null || ids.Count == 0)
+            return 0;
+
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        var names = new List<string>();
+        foreach (var id in ids.Distinct())
+        {
+            var name = $"@id{names.Count}";
+            names.Add(name);
+            command.Parameters.AddWithValue(name, id);
+        }
+        command.CommandText = $"DELETE FROM documents WHERE is_deleted = 1 AND id IN ({string.Join(",", names)})";
+        return command.ExecuteNonQuery();
+    }
+
+    public int SoftDeleteDocuments(IReadOnlyList<int> ids)
+        => BulkSoftDelete(ids?.ToList() ?? []);
 
 
 
@@ -1102,10 +1459,10 @@ public class DatabaseHelper
         if (!actualTables.SetEquals(expectedTables))
             throw new InvalidOperationException("Backup database tables are not supported.");
 
-        ValidateRequiredColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["status"]);
+        ValidateRequiredColumns(connection, "documents", ["id", "archive_export_key", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["status", "archive_export_key"]);
         ValidateRequiredColumns(connection, "collections", ["id", "name", "description", "created_at"]);
         ValidateRequiredColumns(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"]);
-        ValidateRequiredColumns(connection, "personal_notes", ["id", "document_id", "content", "created_at", "updated_at"]);
+        ValidateRequiredColumns(connection, "personal_notes", ["id", "document_id", "content", "created_at", "updated_at"], ["note_type", "is_pinned", "is_deleted"]);
         ValidateRequiredColumns(connection, "recent_files", ["id", "document_id", "opened_at"]);
         ValidateRequiredColumns(connection, "document_relations", ["id", "doc_id_1", "doc_id_2", "relation_type", "created_at"]);
         ValidateRequiredColumns(connection, "categories", ["id", "name", "created_at"]);
@@ -1302,6 +1659,17 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         return columns.SequenceEqual(["file_path"], StringComparer.Ordinal);
     }
 
+    private static bool IsArchiveExportKeyUniqueIndex(SqliteConnection connection, string indexName)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA index_info(\"{indexName.Replace("\"", "\"\"")}\")";
+        using var reader = command.ExecuteReader();
+        var columns = new List<string>();
+        while (reader.Read())
+            columns.Add(reader.GetString(2));
+        return columns.SequenceEqual(["archive_export_key"], StringComparer.Ordinal);
+    }
+
     private static void ValidateIndexesAndTriggers(SqliteConnection connection, string tableName, bool allowLegacyDocumentPathIndexes)
     {
         var allowedIndexes = tableName switch
@@ -1337,9 +1705,10 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         foreach (var index in indexes)
         {
             var isLegacyDocumentPathIndex = allowLegacyDocumentPathIndexes && tableName == "documents" && index.IsUnique && IsDocumentPathUniqueIndex(connection, index.Name);
-            if (tableName == "documents" && index.Origin == "u" && !isLegacyDocumentPathIndex)
+            var isArchiveExportKeyIndex = tableName == "documents" && index.IsUnique && IsArchiveExportKeyUniqueIndex(connection, index.Name);
+            if (tableName == "documents" && index.Origin == "u" && !isLegacyDocumentPathIndex && !isArchiveExportKeyIndex)
                 throw new InvalidOperationException($"Backup database unique constraint on '{tableName}' is not supported.");
-            if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isLegacyDocumentPathIndex)
+            if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isLegacyDocumentPathIndex && !isArchiveExportKeyIndex)
                 throw new InvalidOperationException($"Backup database index on '{tableName}' is not supported.");
         }
 
@@ -1409,6 +1778,7 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         return new StudyDocument
         {
             Id = reader.GetInt32(reader.GetOrdinal("id")),
+            ExportKey = DocumentExportKey.TryParse(reader["archive_export_key"]?.ToString(), out var exportKey) ? exportKey : null,
             Name = reader["name"]?.ToString() ?? string.Empty,
             Subject = reader["subject"]?.ToString() ?? string.Empty,
             Type = reader["type"]?.ToString() ?? string.Empty,
@@ -1456,39 +1826,99 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
 
 
 
-    public string? GetPersonalNote(int documentId)
+    public IReadOnlyList<PersonalNote> GetPersonalNotes(int documentId, bool includeDeleted = false)
     {
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = "SELECT content FROM personal_notes WHERE document_id = @documentId";
+        cmd.CommandText = $"""
+            SELECT id, document_id, note_type, content, is_pinned, is_deleted, created_at, updated_at
+            FROM personal_notes
+            WHERE document_id = @documentId {(includeDeleted ? string.Empty : "AND is_deleted = 0")}
+            ORDER BY is_pinned DESC, id
+            """;
         cmd.Parameters.AddWithValue("@documentId", documentId);
-        var result = cmd.ExecuteScalar();
-        return result == null || result == DBNull.Value ? null : result.ToString();
+
+        using var reader = cmd.ExecuteReader();
+        var notes = new List<PersonalNote>();
+        while (reader.Read())
+        {
+            notes.Add(new PersonalNote(
+                reader.GetInt32(0),
+                reader.GetInt32(1),
+                reader.GetString(2),
+                reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                reader.GetInt32(4) != 0)
+            {
+                IsDeleted = reader.GetInt32(5) != 0,
+                CreatedAt = reader.GetDateTime(6),
+                UpdatedAt = reader.GetDateTime(7)
+            });
+        }
+
+        return notes;
+    }
+
+    public string? GetPersonalNote(int documentId)
+        => GetPersonalNotes(documentId).FirstOrDefault(note => note.NoteType == "general")?.Content;
+
+    public bool SavePersonalNote(PersonalNote note)
+    {
+        if (!NoteType.TryParse(note.NoteType, out var noteType))
+            return false;
+
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        if (note.Id == 0)
+        {
+            cmd.CommandText = "INSERT INTO personal_notes (document_id, note_type, content, is_pinned, is_deleted) VALUES (@documentId, @noteType, @content, @isPinned, @isDeleted)";
+        }
+        else
+        {
+            cmd.CommandText = "UPDATE personal_notes SET note_type = @noteType, content = @content, is_pinned = @isPinned, is_deleted = @isDeleted, updated_at = datetime('now', 'localtime') WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", note.Id);
+        }
+
+        cmd.Parameters.AddWithValue("@documentId", note.DocumentId);
+        cmd.Parameters.AddWithValue("@noteType", noteType.Value);
+        cmd.Parameters.AddWithValue("@content", string.IsNullOrEmpty(note.Content) ? DBNull.Value : note.Content);
+        cmd.Parameters.AddWithValue("@isPinned", note.IsPinned ? 1 : 0);
+        cmd.Parameters.AddWithValue("@isDeleted", note.IsDeleted ? 1 : 0);
+        return cmd.ExecuteNonQuery() > 0;
     }
 
     public bool SavePersonalNote(int documentId, string content)
     {
         using var conn = OpenConnection();
+        using var update = conn.CreateCommand();
+        update.CommandText = "UPDATE personal_notes SET content = @content, is_deleted = 0, updated_at = datetime('now', 'localtime') WHERE id = (SELECT id FROM personal_notes WHERE document_id = @documentId AND note_type = 'general' ORDER BY id LIMIT 1)";
+        update.Parameters.AddWithValue("@documentId", documentId);
+        update.Parameters.AddWithValue("@content", string.IsNullOrEmpty(content) ? DBNull.Value : content);
+        if (update.ExecuteNonQuery() > 0)
+            return true;
 
-        using var checkCmd = conn.CreateCommand();
-        checkCmd.CommandText = "SELECT COUNT(*) FROM personal_notes WHERE document_id = @documentId";
-        checkCmd.Parameters.AddWithValue("@documentId", documentId);
-        var count = Convert.ToInt32(checkCmd.ExecuteScalar());
+        using var insert = conn.CreateCommand();
+        insert.CommandText = "INSERT INTO personal_notes (document_id, note_type, content, is_pinned, is_deleted) VALUES (@documentId, 'general', @content, 0, 0)";
+        insert.Parameters.AddWithValue("@documentId", documentId);
+        insert.Parameters.AddWithValue("@content", string.IsNullOrEmpty(content) ? DBNull.Value : content);
+        return insert.ExecuteNonQuery() > 0;
+    }
 
+    public bool DeletePersonalNoteById(int noteId)
+    {
+        using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
-        if (count > 0)
-        {
-            cmd.CommandText = @"UPDATE personal_notes
-                                SET content = @content, updated_at = datetime('now', 'localtime')
-                                WHERE document_id = @documentId";
-        }
-        else
-        {
-            cmd.CommandText = @"INSERT INTO personal_notes (document_id, content)
-                                VALUES (@documentId, @content)";
-        }
-        cmd.Parameters.AddWithValue("@documentId", documentId);
-        cmd.Parameters.AddWithValue("@content", string.IsNullOrEmpty(content) ? DBNull.Value : content);
+        cmd.CommandText = "UPDATE personal_notes SET is_deleted = 1, updated_at = datetime('now', 'localtime') WHERE id = @id AND is_deleted = 0";
+        cmd.Parameters.AddWithValue("@id", noteId);
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    public bool SetPersonalNotePinned(int noteId, bool isPinned)
+    {
+        using var conn = OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "UPDATE personal_notes SET is_pinned = @isPinned, updated_at = datetime('now', 'localtime') WHERE id = @id AND is_deleted = 0";
+        cmd.Parameters.AddWithValue("@id", noteId);
+        cmd.Parameters.AddWithValue("@isPinned", isPinned ? 1 : 0);
         return cmd.ExecuteNonQuery() > 0;
     }
 
@@ -1496,7 +1926,7 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
     {
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = "DELETE FROM personal_notes WHERE document_id = @documentId";
+        cmd.CommandText = "UPDATE personal_notes SET is_deleted = 1, updated_at = datetime('now', 'localtime') WHERE document_id = @documentId AND note_type = 'general' AND is_deleted = 0";
         cmd.Parameters.AddWithValue("@documentId", documentId);
         return cmd.ExecuteNonQuery() > 0;
     }

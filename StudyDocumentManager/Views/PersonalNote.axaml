@@ -68,6 +68,38 @@
                     </StackPanel>
                 </Border>
 
+                <StackPanel Spacing="{StaticResource Space1}">
+                    <DockPanel>
+                        <TextBlock Text="{loc:Localize PersonalNote_Notes}"
+                                   FontSize="{StaticResource FontSizeSm}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondary}"/>
+                        <Button DockPanel.Dock="Right"
+                                Classes="secondary"
+                                Command="{Binding NewNoteCommand}"
+                                MinHeight="36"
+                                Padding="{StaticResource PaddingSm}"
+                                AutomationProperties.AutomationId="PersonalNote_New"
+                                AutomationProperties.Name="{loc:Localize PersonalNote_BtnNew}">
+                            <TextBlock Text="{loc:Localize PersonalNote_BtnNew}"/>
+                        </Button>
+                    </DockPanel>
+                    <ListBox x:Name="lstNotes"
+                             ItemsSource="{Binding Notes}"
+                             SelectedItem="{Binding SelectedNote, Mode=TwoWay}"
+                             MaxHeight="132"
+                             AutomationProperties.AutomationId="PersonalNote_List"
+                             AutomationProperties.Name="{loc:Localize PersonalNote_Notes}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Content}"
+                                           TextTrimming="CharacterEllipsis"
+                                           Margin="{StaticResource PaddingSm}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
                 <Border x:Name="savedNotePreviewCard"
                         Background="{StaticResource StatBlueBg}"
                         CornerRadius="{StaticResource RadiusMd}"
@@ -106,6 +138,23 @@
                                    FontSize="{StaticResource FontSizeMd}"
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource TextPrimary}"/>
+                        <WrapPanel>
+                            <ComboBox x:Name="cmbNoteType"
+                                      ItemsSource="{Binding NoteTypes}"
+                                      SelectedItem="{Binding SelectedNoteType, Mode=TwoWay}"
+                                      MinWidth="140"
+                                      AutomationProperties.AutomationId="PersonalNote_Type"
+                                      AutomationProperties.Name="{loc:Localize PersonalNote_Type}"/>
+                            <Button x:Name="btnNotePinned"
+                                    Classes="secondary"
+                                    Command="{Binding TogglePinnedCommand}"
+                                    MinHeight="44"
+                                    Padding="{StaticResource PaddingMd}"
+                                    AutomationProperties.AutomationId="PersonalNote_Pinned"
+                                    AutomationProperties.Name="{loc:Localize PersonalNote_Pinned}">
+                                <TextBlock Text="{loc:Localize PersonalNote_Pinned}"/>
+                            </Button>
+                        </WrapPanel>
                         <TextBox x:Name="txtNoteContent"
                                  AutomationProperties.AutomationId="PersonalNote_Content"
                                  Text="{Binding NoteContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

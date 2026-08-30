@@ -30,6 +30,8 @@ public partial class MainWindowModel : ModelBase
     public bool CanGoBack => _navigationService.CanGoBack;
     public bool CanAcceptDroppedFiles => CurrentView is DashboardModel or AddEditModel or BatchImportModel;
 
+    public event EventHandler? HelpRequested;
+
     private readonly INavigationService _navigationService;
     private readonly IDialogService _dialogService;
     private readonly ICustomDialogService _customDialogService;
@@ -231,6 +233,12 @@ public partial class MainWindowModel : ModelBase
     {
         if (CurrentView is DashboardModel dashboard)
             dashboard.ExportCsvCommand.Execute(null);
+    }
+
+    [RelayCommand]
+    private void ShowHelp()
+    {
+        HelpRequested?.Invoke(this, EventArgs.Empty);
     }
 
     [RelayCommand]

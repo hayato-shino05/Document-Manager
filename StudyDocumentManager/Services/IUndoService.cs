@@ -25,6 +25,7 @@ public sealed class UndoEntry
     public IReadOnlyList<int> DeletedIds { get; init; } = Array.Empty<int>();
     public IReadOnlyList<CollectionMembership> AddedCollectionMemberships { get; init; } = Array.Empty<CollectionMembership>();
     public CollectionSnapshot? Collection { get; init; }
+    public MergeUndoSnapshot? Merge { get; init; }
     public DateTime CreatedAt { get; init; }
 }
 

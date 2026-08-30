@@ -12,4 +12,7 @@ public interface IRecycleBinRepository
 
     int RestoreDocuments(IReadOnlyList<int> ids)
         => throw new NotSupportedException($"{nameof(RestoreDocuments)} is not implemented by this repository.");
+
+    int PermanentlyDeleteDocuments(IReadOnlyList<int> ids)
+        => throw new NotSupportedException($"{nameof(PermanentlyDeleteDocuments)} is not implemented by this repository.");
 }

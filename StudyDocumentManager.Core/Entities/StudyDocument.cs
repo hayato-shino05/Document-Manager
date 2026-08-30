@@ -9,6 +9,7 @@ public class StudyDocument
     public static string NormalizeName(string? name)
         => (name ?? string.Empty).Trim().ToLowerInvariant();
     public int Id { get; set; }
+    public DocumentExportKey? ExportKey { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Subject { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;

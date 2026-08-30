@@ -17,6 +17,7 @@ public static class DatabaseMigrator
         const string createTablesQuery = """
             CREATE TABLE IF NOT EXISTS documents (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                archive_export_key TEXT UNIQUE,
                 name TEXT NOT NULL,
                 subject TEXT,
                 type TEXT,
@@ -53,7 +54,10 @@ public static class DatabaseMigrator
             CREATE TABLE IF NOT EXISTS personal_notes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 document_id INTEGER NOT NULL,
+                note_type TEXT NOT NULL DEFAULT 'general',
                 content TEXT,
+                is_pinned INTEGER NOT NULL DEFAULT 0,
+                is_deleted INTEGER NOT NULL DEFAULT 0,
                 created_at DATETIME DEFAULT (datetime('now', 'localtime')),
                 updated_at DATETIME DEFAULT (datetime('now', 'localtime')),
                 FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
@@ -195,6 +199,11 @@ public static class DatabaseMigrator
             MigrateAddColumn(conn, transaction, "documents", "is_deleted", "INTEGER DEFAULT 0");
             MigrateAddColumn(conn, transaction, "documents", "deleted_at", "DATETIME");
             MigrateAddColumn(conn, transaction, "documents", "status", "TEXT NOT NULL DEFAULT 'unread'");
+            MigrateAddColumn(conn, transaction, "documents", "archive_export_key", "TEXT");
+            ExecuteSql(conn, transaction, "UPDATE documents SET archive_export_key = lower(hex(randomblob(16))) WHERE archive_export_key IS NULL OR archive_export_key = ''");
+            MigrateAddColumn(conn, transaction, "personal_notes", "note_type", "TEXT NOT NULL DEFAULT 'general'");
+            MigrateAddColumn(conn, transaction, "personal_notes", "is_pinned", "INTEGER NOT NULL DEFAULT 0");
+            MigrateAddColumn(conn, transaction, "personal_notes", "is_deleted", "INTEGER NOT NULL DEFAULT 0");
             MigrateAddColumn(conn, transaction, "import_inbox", "subject", "TEXT");
             MigrateAddColumn(conn, transaction, "import_inbox", "type", "TEXT");
             MigrateImportInboxSourceUniqueness(conn, transaction);
@@ -230,7 +239,7 @@ public static class DatabaseMigrator
     {
         if (TableExists(connection, "documents"))
         {
-            RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["is_deleted", "deleted_at", "status"]);
+            RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["is_deleted", "deleted_at", "status", "archive_export_key"]);
             EnsureNoUnsupportedIndexesOrTriggers(connection, "documents");
         }
 
@@ -417,7 +426,7 @@ public static class DatabaseMigrator
         var (definition, copyQuery) = tableName switch
         {
             "collection_items" => ("CREATE TABLE collection_items_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, collection_id INTEGER NOT NULL, document_id INTEGER NOT NULL, added_at DATETIME DEFAULT (datetime('now', 'localtime')), FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE, FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE, UNIQUE(collection_id, document_id))", "INSERT INTO collection_items_rebuild (id, collection_id, document_id, added_at) SELECT child.id, child.collection_id, map.document_id, child.added_at FROM collection_items child INNER JOIN legacy_document_map map ON map.legacy_id = child.document_id"),
-            "personal_notes" => ("CREATE TABLE personal_notes_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, document_id INTEGER NOT NULL, content TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), updated_at DATETIME DEFAULT (datetime('now', 'localtime')), FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE)", "INSERT INTO personal_notes_rebuild (id, document_id, content, created_at, updated_at) SELECT child.id, map.document_id, child.content, child.created_at, child.updated_at FROM personal_notes child INNER JOIN legacy_document_map map ON map.legacy_id = child.document_id"),
+            "personal_notes" => ("CREATE TABLE personal_notes_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, document_id INTEGER NOT NULL, note_type TEXT NOT NULL DEFAULT 'general', content TEXT, is_pinned INTEGER NOT NULL DEFAULT 0, is_deleted INTEGER NOT NULL DEFAULT 0, created_at DATETIME DEFAULT (datetime('now', 'localtime')), updated_at DATETIME DEFAULT (datetime('now', 'localtime')), FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE)", "INSERT INTO personal_notes_rebuild (id, document_id, note_type, content, is_pinned, is_deleted, created_at, updated_at) SELECT child.id, map.document_id, 'general', child.content, 0, 0, child.created_at, child.updated_at FROM personal_notes child INNER JOIN legacy_document_map map ON map.legacy_id = child.document_id"),
             "recent_files" => ("CREATE TABLE recent_files_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, document_id INTEGER NOT NULL UNIQUE, opened_at DATETIME DEFAULT (datetime('now','localtime')), FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE)", "INSERT INTO recent_files_rebuild (id, document_id, opened_at) SELECT child.id, map.document_id, child.opened_at FROM recent_files child INNER JOIN legacy_document_map map ON map.legacy_id = child.document_id"),
             "document_relations" => ("CREATE TABLE document_relations_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, doc_id_1 INTEGER NOT NULL, doc_id_2 INTEGER NOT NULL, relation_type TEXT DEFAULT 'related', created_at DATETIME DEFAULT (datetime('now','localtime')), FOREIGN KEY (doc_id_1) REFERENCES documents(id) ON DELETE CASCADE, FOREIGN KEY (doc_id_2) REFERENCES documents(id) ON DELETE CASCADE, UNIQUE(doc_id_1, doc_id_2))", "INSERT INTO document_relations_rebuild (id, doc_id_1, doc_id_2, relation_type, created_at) SELECT child.id, first_map.document_id, second_map.document_id, child.relation_type, child.created_at FROM document_relations child INNER JOIN legacy_document_map first_map ON first_map.legacy_id = child.doc_id_1 INNER JOIN legacy_document_map second_map ON second_map.legacy_id = child.doc_id_2"),
             _ => throw new InvalidOperationException($"Unsupported legacy table '{tableName}'.")
@@ -445,7 +454,7 @@ public static class DatabaseMigrator
         if (unsupportedTables.Count > 0)
             throw new InvalidOperationException($"Unsupported database tables: {string.Join(", ", unsupportedTables)}.");
 
-        RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["is_deleted", "deleted_at", "status"]);
+        RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["is_deleted", "deleted_at", "status", "archive_export_key"]);
         var rebuildDocuments = ValidateDocumentIndexesAndTriggers(connection);
         ValidateKnownTable(connection, "collections", ["id", "name", "description", "created_at"]);
         ValidateKnownTable(connection, "categories", ["id", "name", "created_at"]);
@@ -466,7 +475,7 @@ public static class DatabaseMigrator
         ValidateChildTable(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"],
             [("collection_id", "collections", "id"), ("document_id", "documents", "id")], ["collection_id", "document_id"], tablesToRebuild);
         ValidateChildTable(connection, "personal_notes", ["id", "document_id", "content", "created_at", "updated_at"],
-            [("document_id", "documents", "id")], null, tablesToRebuild);
+            [("document_id", "documents", "id")], null, tablesToRebuild, ["note_type", "is_pinned", "is_deleted"]);
         ValidateChildTable(connection, "recent_files", ["id", "document_id", "opened_at"],
             [("document_id", "documents", "id")], ["document_id"], tablesToRebuild);
         ValidateChildTable(connection, "document_relations", ["id", "doc_id_1", "doc_id_2", "relation_type", "created_at"],
@@ -518,12 +527,13 @@ public static class DatabaseMigrator
         string[] expectedColumns,
         (string From, string ParentTable, string ParentColumn)[] expectedForeignKeys,
         string[]? uniqueColumns,
-        List<string> tablesToRebuild)
+        List<string> tablesToRebuild,
+        string[]? optionalColumns = null)
     {
         if (!TableExists(connection, tableName))
             return;
 
-        RequireColumns(connection, tableName, expectedColumns, []);
+        RequireColumns(connection, tableName, expectedColumns, optionalColumns ?? []);
         EnsureNoUnsupportedIndexesOrTriggers(connection, tableName);
         EnsureNoOrphans(connection, tableName, expectedForeignKeys);
 
@@ -631,11 +641,13 @@ public static class DatabaseMigrator
         foreach (var index in indexes)
         {
             var isDocumentPathIndex = index.IsUnique && HasUniqueIndex(connection, "documents", ["file_path"], index.Name);
+            var isArchiveExportKeyIndex = index.IsUnique && HasUniqueIndex(connection, "documents", ["archive_export_key"], index.Name);
             if (index.Origin == "u")
             {
-                if (!isDocumentPathIndex)
+                if (!isDocumentPathIndex && !isArchiveExportKeyIndex)
                     throw new InvalidOperationException($"Unsupported unique constraint '{index.Name}' on 'documents'.");
-                rebuildDocuments = true;
+                if (isDocumentPathIndex)
+                    rebuildDocuments = true;
             }
             else if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isDocumentPathIndex)
             {
@@ -668,8 +680,8 @@ public static class DatabaseMigrator
 
     private static void RebuildDocumentsTable(SqliteConnection connection, SqliteTransaction transaction)
     {
-        ExecuteSql(connection, transaction, "CREATE TABLE documents_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, subject TEXT, type TEXT, file_path TEXT, notes TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), file_size REAL, author TEXT, is_important INTEGER DEFAULT 0, tags TEXT, deadline DATETIME, is_deleted INTEGER DEFAULT 0, deleted_at DATETIME, status TEXT NOT NULL DEFAULT 'unread')");
-        ExecuteSql(connection, transaction, "INSERT INTO documents_rebuild (id, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status) SELECT id, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status FROM documents");
+        ExecuteSql(connection, transaction, "CREATE TABLE documents_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, archive_export_key TEXT UNIQUE, name TEXT NOT NULL, subject TEXT, type TEXT, file_path TEXT, notes TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), file_size REAL, author TEXT, is_important INTEGER DEFAULT 0, tags TEXT, deadline DATETIME, is_deleted INTEGER DEFAULT 0, deleted_at DATETIME, status TEXT NOT NULL DEFAULT 'unread')");
+        ExecuteSql(connection, transaction, "INSERT INTO documents_rebuild (id, archive_export_key, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status) SELECT id, archive_export_key, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status FROM documents");
         ExecuteSql(connection, transaction, "DROP TABLE documents");
         ExecuteSql(connection, transaction, "ALTER TABLE documents_rebuild RENAME TO documents");
     }
@@ -697,9 +709,16 @@ public static class DatabaseMigrator
             var indexName = indexReader.GetString(1);
             var origin = indexReader.GetString(3);
             if (tableName == "documents" && origin == "u")
-                throw new InvalidOperationException($"Unsupported unique constraint '{indexName}' on '{tableName}'.");
-            if (origin == "c" && !allowedIndexes.Contains(indexName))
+            {
+                var isDocumentPathIndex = HasUniqueIndex(connection, "documents", ["file_path"], indexName);
+                var isArchiveExportKeyIndex = HasUniqueIndex(connection, "documents", ["archive_export_key"], indexName);
+                if (!isDocumentPathIndex && !isArchiveExportKeyIndex)
+                    throw new InvalidOperationException($"Unsupported unique constraint '{indexName}' on '{tableName}'.");
+            }
+            else if (origin == "c" && !allowedIndexes.Contains(indexName))
+            {
                 throw new InvalidOperationException($"Unsupported index '{indexName}' on '{tableName}'.");
+            }
         }
 
         using var triggers = connection.CreateCommand();
@@ -728,7 +747,7 @@ public static class DatabaseMigrator
         var (definition, columns) = tableName switch
         {
             "collection_items" => ("CREATE TABLE collection_items_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, collection_id INTEGER NOT NULL, document_id INTEGER NOT NULL, added_at DATETIME DEFAULT (datetime('now', 'localtime')), FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE, FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE, UNIQUE(collection_id, document_id))", "id, collection_id, document_id, added_at"),
-            "personal_notes" => ("CREATE TABLE personal_notes_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, document_id INTEGER NOT NULL, content TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), updated_at DATETIME DEFAULT (datetime('now', 'localtime')), FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE)", "id, document_id, content, created_at, updated_at"),
+            "personal_notes" => ("CREATE TABLE personal_notes_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, document_id INTEGER NOT NULL, note_type TEXT NOT NULL DEFAULT 'general', content TEXT, is_pinned INTEGER NOT NULL DEFAULT 0, is_deleted INTEGER NOT NULL DEFAULT 0, created_at DATETIME DEFAULT (datetime('now', 'localtime')), updated_at DATETIME DEFAULT (datetime('now', 'localtime')), FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE)", "id, document_id, note_type, content, is_pinned, is_deleted, created_at, updated_at"),
             "recent_files" => ("CREATE TABLE recent_files_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, document_id INTEGER NOT NULL UNIQUE, opened_at DATETIME DEFAULT (datetime('now','localtime')), FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE)", "id, document_id, opened_at"),
             "document_relations" => ("CREATE TABLE document_relations_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, doc_id_1 INTEGER NOT NULL, doc_id_2 INTEGER NOT NULL, relation_type TEXT DEFAULT 'related', created_at DATETIME DEFAULT (datetime('now','localtime')), FOREIGN KEY (doc_id_1) REFERENCES documents(id) ON DELETE CASCADE, FOREIGN KEY (doc_id_2) REFERENCES documents(id) ON DELETE CASCADE, UNIQUE(doc_id_1, doc_id_2))", "id, doc_id_1, doc_id_2, relation_type, created_at"),
             _ => throw new InvalidOperationException($"Unsupported legacy table '{tableName}'.")

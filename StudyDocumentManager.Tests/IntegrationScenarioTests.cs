@@ -15,9 +15,10 @@ public class AppVersionSemverTests
 {
     [Theory]
     [InlineData("5.0.0", true)]    // major bump
-    [InlineData("4.1.0", true)]    // minor bump (current 4.0.0)
-    [InlineData("4.0.1", true)]    // patch bump
-    [InlineData("4.0.0", false)]   // equal
+    [InlineData("4.2.0", true)]    // minor bump (current 4.1.0)
+    [InlineData("4.1.1", true)]    // patch bump
+    [InlineData("4.1.0", false)]   // equal
+    [InlineData("4.0.0", false)]   // older minor
     [InlineData("3.99.99", false)] // older major
     [InlineData("0.0.1", false)]   // very old
     public void IsNewer_VariousVersions_ReturnsExpected(string candidateVersion, bool expected)
@@ -26,11 +27,11 @@ public class AppVersionSemverTests
     }
 
     [Theory]
-    [InlineData("4.0.0", "4.0.0", 0)]   // equal
-    [InlineData("3.0.0", "4.0.0", -1)]  // current older
-    [InlineData("5.0.0", "4.0.0", 1)]   // current newer
-    [InlineData("4.0.0", "4.0.1", -1)]  // patch diff
-    [InlineData("4.1.0", "4.0.9", 1)]   // minor beats patch
+    [InlineData("4.1.0", "4.1.0", 0)]   // equal
+    [InlineData("3.0.0", "4.1.0", -1)]  // current older
+    [InlineData("5.0.0", "4.1.0", 1)]   // current newer
+    [InlineData("4.1.0", "4.1.1", -1)]  // patch diff
+    [InlineData("4.2.0", "4.1.9", 1)]   // minor beats patch
     public void Compare_Semver_ReturnsCorrectValue(string current, string latest, int expected)
     {
         Assert.Equal(expected, AppVersion.Compare(current, latest));

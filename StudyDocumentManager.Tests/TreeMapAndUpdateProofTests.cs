@@ -159,8 +159,8 @@ public sealed class UpdateServiceProofTests
     [Fact]
     public void ParseResponse_MapsReleaseAndDetectsCurrentOrNewVersion()
     {
-        var current = Parse("{\"tag_name\":\"v4.0.0\",\"body\":\"notes\",\"html_url\":\"https://example.test/release\",\"assets\":[{\"name\":\"Study_Setup.exe\",\"browser_download_url\":\"https://example.test/setup.exe\"}]}");
-        var newer = Parse("{\"tag_name\":\"v4.1.0\",\"body\":\"notes\",\"html_url\":\"https://example.test/release\",\"assets\":[]}");
+        var current = Parse("{\"tag_name\":\"v4.1.0\",\"body\":\"notes\",\"html_url\":\"https://example.test/release\",\"assets\":[{\"name\":\"Study_Setup.exe\",\"browser_download_url\":\"https://example.test/setup.exe\"}]}");
+        var newer = Parse("{\"tag_name\":\"v4.2.0\",\"body\":\"notes\",\"html_url\":\"https://example.test/release\",\"assets\":[]}");
 
         Assert.NotNull(current);
         Assert.False(current!.HasUpdate);
@@ -275,7 +275,7 @@ public sealed class MainWindowUpdateProofTests
 
         await model.CheckForUpdateCommand.ExecuteAsync(null);
 
-        Assert.Contains("4.0.0", dialog.LastMessage);
+        Assert.Contains("4.1.0", dialog.LastMessage);
         Assert.Equal("Status_UpToDate", model.StatusText);
     }
 
