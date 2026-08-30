@@ -32,6 +32,9 @@
                         Padding="10,5"
                         VerticalAlignment="Center"
                         CornerRadius="4"
+                        AutomationProperties.AutomationId="Toolbar_Language"
+                        AutomationProperties.Name="{loc:Localize Menu_ChangeLanguage}"
+                        AutomationProperties.HelpText="{loc:Localize Menu_ChangeLanguage}"
                         ToolTip.Tip="{loc:Localize Menu_ChangeLanguage}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Image Source="{StaticResource IconLanguage}" Width="16" Height="16" Classes="toolbar-btn-icon"/>
@@ -125,6 +128,8 @@
                 <StackPanel Orientation="Horizontal" Spacing="1">
                     <Button Classes="secondary toolbar-btn" Command="{Binding NavigateCommand}" CommandParameter="add"
                             AutomationProperties.AutomationId="Toolbar_Add"
+                            AutomationProperties.Name="{loc:Localize Toolbar_Add}"
+                            AutomationProperties.HelpText="{loc:Localize Menu_AddNewDocument}"
                             FontWeight="SemiBold">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconAdd}" Classes="toolbar-btn-icon"/>
@@ -135,21 +140,27 @@
                     <Border Classes="toolbar-sep"/>
 
                     <Button Classes="secondary toolbar-btn" Command="{Binding OpenFileCommand}"
-                            AutomationProperties.AutomationId="Toolbar_Open">
+                            AutomationProperties.AutomationId="Toolbar_Open"
+                            AutomationProperties.Name="{loc:Localize Toolbar_OpenFile}"
+                            AutomationProperties.HelpText="{loc:Localize Menu_OpenDocument}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconOpenFile}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Toolbar_OpenFile}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn" Command="{Binding ExportCsvCommand}"
-                            AutomationProperties.AutomationId="Toolbar_Export">
+                            AutomationProperties.AutomationId="Toolbar_Export"
+                            AutomationProperties.Name="{loc:Localize Toolbar_Export}"
+                            AutomationProperties.HelpText="{loc:Localize Menu_ExportCsv}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconExport}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Toolbar_Export}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary toolbar-btn" Command="{Binding RefreshCommand}"
-                            AutomationProperties.AutomationId="Toolbar_Refresh">
+                            AutomationProperties.AutomationId="Toolbar_Refresh"
+                            AutomationProperties.Name="{loc:Localize Action_Refresh}"
+                            AutomationProperties.HelpText="{loc:Localize Menu_RefreshList}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconRefresh}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Action_Refresh}" Classes="toolbar-btn-label"/>
@@ -160,7 +171,9 @@
 
                     <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="batch-import"
-                            AutomationProperties.AutomationId="Toolbar_Import">
+                            AutomationProperties.AutomationId="Toolbar_Import"
+                            AutomationProperties.Name="{loc:Localize Action_Import}"
+                            AutomationProperties.HelpText="{loc:Localize Menu_BatchImport}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconImport}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Action_Import}" Classes="toolbar-btn-label"/>
@@ -171,7 +184,9 @@
 
                     <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="report"
-                            AutomationProperties.AutomationId="Toolbar_Report">
+                            AutomationProperties.AutomationId="Toolbar_Report"
+                            AutomationProperties.Name="{loc:Localize Menu_Statistics}"
+                            AutomationProperties.HelpText="{loc:Localize Menu_Statistics}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconReport}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Menu_Statistics}" Classes="toolbar-btn-label"/>
@@ -179,7 +194,9 @@
                     </Button>
                     <Button Classes="secondary toolbar-btn"
                             Command="{Binding NavigateCommand}" CommandParameter="treemap"
-                            AutomationProperties.AutomationId="Toolbar_TreeMap">
+                            AutomationProperties.AutomationId="Toolbar_TreeMap"
+                            AutomationProperties.Name="{loc:Localize TreeMap_Title}"
+                            AutomationProperties.HelpText="{loc:Localize TreeMap_Title}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconTreeMap}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize TreeMap_Title}" Classes="toolbar-btn-label"/>
@@ -193,6 +210,8 @@
                             HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Button Classes="secondary toolbar-btn" Command="{Binding UndoLastCommand}"
                             AutomationProperties.AutomationId="Toolbar_Undo"
+                            AutomationProperties.Name="{loc:Localize Menu_Undo}"
+                            AutomationProperties.HelpText="{loc:Localize Menu_Undo}"
                             IsVisible="{Binding CanUndo}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconBack}" Classes="toolbar-btn-icon"/>
@@ -201,6 +220,8 @@
                     </Button>
                     <Button Classes="secondary toolbar-btn" Command="{Binding GoBackCommand}"
                             AutomationProperties.AutomationId="Toolbar_Back"
+                            AutomationProperties.Name="{loc:Localize Toolbar_GoBack}"
+                            AutomationProperties.HelpText="{loc:Localize Toolbar_GoBack}"
                             IsVisible="{Binding CanGoBack}">
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{StaticResource IconBack}" Classes="toolbar-btn-icon"/>

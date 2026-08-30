@@ -57,3 +57,25 @@
 - 上記のいずれかのアサーションが失敗したら `set -euo pipefail` で workflow を fail させます。`continue-on-error` は使いません。
 
 この contract は release が versioned `.deb` asset と SHA-256 を公開したあとに手動で起動し、結果を evidence としてこの台帳へ追記する想定です。contract 自体は fixed ですが、現時点では起動できる artifact がなく PASS は取れていません。
+
+### #60 / #64 MainWindow・Dashboard・RelatedDocs・AffectedItemsPreviewDialog の UIA Name 補強
+
+**Status (2026-08-30): XAML 補強と source-level/Avalonia headless test は PASS。screen-reader 実機 spot check は未実施。**
+
+#### 検証済み
+
+- `MainWindow.axaml`: toolbar（Add / Open / Export / Refresh / Import / Report / TreeMap / Undo / Back）と language selector に `AutomationProperties.Name` と `HelpText` を追加。`StackPanel` 型の Name 漏洩を抑止。
+- `Dashboard.axaml`: search ボタン、advanced filter toggle、apply/clear filter、status bar の quick action（Refresh / Upcoming / Overdue / CopyPath / OpenFolder / About）に `Name` と `HelpText` を追加。
+- `RelatedDocuments.axaml`: header back、list の remove、add link に `Name` と `HelpText` を追加。
+- `AffectedItemsPreviewDialog.axaml`: `ConfirmButton` は `Content` が code-behind で差し替わるため XAML 側で `Name=Action_Delete`、`HelpText=BE_ConfirmApply` を固定。`CancelButton` も `Name` と `HelpText` を補強。
+- すべて既存の 4 ResX（`Strings.resx` / `Strings.en.resx` / `Strings.vi.resx` / `Strings.zh.resx`）のキーを再利用。新規キーは追加していません。
+- `StudyDocumentManager.Tests/Issue60ToolbarUiaNameTests.cs`: source-level test 4 件 + Avalonia headless test 1 件 = 5/5 PASS。
+- solution Debug build: 0 warning / 0 error。
+- full Debug test: 1470/1470 PASS（`dotnet test`）。
+- `git diff --check`: clean。
+
+#### 未検証（PASS ではない）
+
+- Windows interactive session の screen-reader（NVDA / Narrator）spot check は未実施です。`MainWindow`、`Dashboard`、主要 dialog の UIA Name / HelpText は XAML 補強後のみ確認しています。
+- 150% / 200% DPI での focus order と key traversal の実機確認は未実施です。
+- 19 画面 matrix のうち、本変更で触れた view のみ source-level 補強と headless render の 2 系統で確認しています。残りの画面は Issue #60 側の既存 focused test 範囲にとどまっています。

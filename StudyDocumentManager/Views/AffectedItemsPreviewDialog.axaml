@@ -46,11 +46,15 @@
                         Spacing="8" Margin="0,8,0,0">
                 <Button x:Name="ConfirmButton"
                         AutomationProperties.AutomationId="AffectedPreview_Confirm"
+                        AutomationProperties.Name="{loc:Localize Action_Delete}"
+                        AutomationProperties.HelpText="{loc:Localize BE_ConfirmApply}"
                         Classes="danger"
                         MinWidth="110"
                         HorizontalContentAlignment="Center"/>
                 <Button x:Name="CancelButton"
                         AutomationProperties.AutomationId="AffectedPreview_Cancel"
+                        AutomationProperties.Name="{loc:Localize BE_Cancel}"
+                        AutomationProperties.HelpText="{loc:Localize BE_Cancel}"
                         Content="{loc:Localize BE_Cancel}"
                         Classes="secondary"
                         IsCancel="True"
