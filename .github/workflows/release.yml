@@ -23,17 +23,17 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v6
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
         with:
           dotnet-version: 9.0.x
 
       - name: Cache NuGet packages
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         with:
           path: ~/.nuget/packages
           key: nuget-release-${{ hashFiles('**/*.csproj') }}
@@ -55,7 +55,7 @@ jobs:
           .\scripts\build-windows-setup.ps1 -Version $version -Configuration $env:BUILD_CONFIGURATION
 
       - name: Upload setup artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: windows-setup-${{ github.run_id }}
           path: artifacts/installer/*.exe
@@ -85,17 +85,17 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v6
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
         with:
           dotnet-version: 9.0.x
 
       - name: Cache NuGet packages
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         with:
           path: ~/.nuget/packages
           key: nuget-release-linux-${{ hashFiles('**/*.csproj') }}
@@ -116,7 +116,7 @@ jobs:
           sha256sum "$package" > "${package}.sha256"
 
       - name: Upload Debian package artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: linux-debian-package-${{ github.sha }}
           path: |
