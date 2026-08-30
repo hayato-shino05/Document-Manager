@@ -1,5 +1,6 @@
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
+using StudyDocumentManager.Data.Helpers;
 
 namespace StudyDocumentManager.Data.Repositories;
 
@@ -11,6 +12,7 @@ public sealed class PersonalDocumentArchiveRepository
     private readonly ICollectionRepository _collections;
     private readonly IRelatedDocumentRepository _relations;
     private readonly IFileIntegrityRepository _fileIntegrity;
+    private readonly DatabaseHelper _database;
 
     public PersonalDocumentArchiveRepository(
         IDocumentRepository documents,
@@ -18,7 +20,8 @@ public sealed class PersonalDocumentArchiveRepository
         IPersonalNoteRepository notes,
         ICollectionRepository collections,
         IRelatedDocumentRepository relations,
-        IFileIntegrityRepository fileIntegrity)
+        IFileIntegrityRepository fileIntegrity,
+        DatabaseHelper database)
     {
         _documents = documents;
         _recycleBin = recycleBin;
@@ -26,7 +29,16 @@ public sealed class PersonalDocumentArchiveRepository
         _collections = collections;
         _relations = relations;
         _fileIntegrity = fileIntegrity;
+        _database = database;
     }
+
+    public IReadOnlyList<StudyDocument> GetExistingDocuments()
+        => _documents.GetAll().Concat(_recycleBin.GetDeletedDocuments()).GroupBy(document => document.Id).Select(group => group.First()).ToArray();
+
+    public IReadOnlyDictionary<string, int> ImportGraph(
+        DocumentArchiveManifest manifest,
+        IReadOnlyList<DocumentArchiveDocument> documents)
+        => _database.ImportArchiveGraph(manifest, documents);
 
     public ArchiveSnapshot ReadSnapshot(IReadOnlyList<int>? documentIds, bool includeDeleted)
     {

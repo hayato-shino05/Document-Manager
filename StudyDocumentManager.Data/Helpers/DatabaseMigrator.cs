@@ -17,6 +17,7 @@ public static class DatabaseMigrator
         const string createTablesQuery = """
             CREATE TABLE IF NOT EXISTS documents (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                archive_export_key TEXT UNIQUE,
                 name TEXT NOT NULL,
                 subject TEXT,
                 type TEXT,
@@ -198,6 +199,8 @@ public static class DatabaseMigrator
             MigrateAddColumn(conn, transaction, "documents", "is_deleted", "INTEGER DEFAULT 0");
             MigrateAddColumn(conn, transaction, "documents", "deleted_at", "DATETIME");
             MigrateAddColumn(conn, transaction, "documents", "status", "TEXT NOT NULL DEFAULT 'unread'");
+            MigrateAddColumn(conn, transaction, "documents", "archive_export_key", "TEXT");
+            ExecuteSql(conn, transaction, "UPDATE documents SET archive_export_key = lower(hex(randomblob(16))) WHERE archive_export_key IS NULL OR archive_export_key = ''");
             MigrateAddColumn(conn, transaction, "personal_notes", "note_type", "TEXT NOT NULL DEFAULT 'general'");
             MigrateAddColumn(conn, transaction, "personal_notes", "is_pinned", "INTEGER NOT NULL DEFAULT 0");
             MigrateAddColumn(conn, transaction, "personal_notes", "is_deleted", "INTEGER NOT NULL DEFAULT 0");
@@ -236,7 +239,7 @@ public static class DatabaseMigrator
     {
         if (TableExists(connection, "documents"))
         {
-            RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["is_deleted", "deleted_at", "status"]);
+            RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["is_deleted", "deleted_at", "status", "archive_export_key"]);
             EnsureNoUnsupportedIndexesOrTriggers(connection, "documents");
         }
 
@@ -451,7 +454,7 @@ public static class DatabaseMigrator
         if (unsupportedTables.Count > 0)
             throw new InvalidOperationException($"Unsupported database tables: {string.Join(", ", unsupportedTables)}.");
 
-        RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["is_deleted", "deleted_at", "status"]);
+        RequireColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["is_deleted", "deleted_at", "status", "archive_export_key"]);
         var rebuildDocuments = ValidateDocumentIndexesAndTriggers(connection);
         ValidateKnownTable(connection, "collections", ["id", "name", "description", "created_at"]);
         ValidateKnownTable(connection, "categories", ["id", "name", "created_at"]);
@@ -675,8 +678,8 @@ public static class DatabaseMigrator
 
     private static void RebuildDocumentsTable(SqliteConnection connection, SqliteTransaction transaction)
     {
-        ExecuteSql(connection, transaction, "CREATE TABLE documents_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, subject TEXT, type TEXT, file_path TEXT, notes TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), file_size REAL, author TEXT, is_important INTEGER DEFAULT 0, tags TEXT, deadline DATETIME, is_deleted INTEGER DEFAULT 0, deleted_at DATETIME, status TEXT NOT NULL DEFAULT 'unread')");
-        ExecuteSql(connection, transaction, "INSERT INTO documents_rebuild (id, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status) SELECT id, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status FROM documents");
+        ExecuteSql(connection, transaction, "CREATE TABLE documents_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, archive_export_key TEXT UNIQUE, name TEXT NOT NULL, subject TEXT, type TEXT, file_path TEXT, notes TEXT, created_at DATETIME DEFAULT (datetime('now', 'localtime')), file_size REAL, author TEXT, is_important INTEGER DEFAULT 0, tags TEXT, deadline DATETIME, is_deleted INTEGER DEFAULT 0, deleted_at DATETIME, status TEXT NOT NULL DEFAULT 'unread')");
+        ExecuteSql(connection, transaction, "INSERT INTO documents_rebuild (id, archive_export_key, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status) SELECT id, archive_export_key, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status FROM documents");
         ExecuteSql(connection, transaction, "DROP TABLE documents");
         ExecuteSql(connection, transaction, "ALTER TABLE documents_rebuild RENAME TO documents");
     }

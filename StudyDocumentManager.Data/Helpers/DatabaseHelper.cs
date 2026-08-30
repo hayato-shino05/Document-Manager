@@ -355,16 +355,18 @@ public class DatabaseHelper
     public bool InsertDocument(StudyDocument doc)
     {
         const string query = """
-            INSERT INTO documents (name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline, status)
-            VALUES (@name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline, @status);
+            INSERT INTO documents (archive_export_key, name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline, status)
+            VALUES (@archive_export_key, @name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline, @status);
             SELECT last_insert_rowid();
             """;
 
         using var conn = OpenConnection();
         using var cmd = new SqliteCommand(query, conn);
 
+        doc.ExportKey ??= DocumentExportKey.Create();
         foreach (var parameter in BuildDocumentParameters(doc))
             cmd.Parameters.Add(parameter);
+        cmd.Parameters.AddWithValue("@archive_export_key", doc.ExportKey.Value);
 
         var result = cmd.ExecuteScalar();
         if (result == null)
@@ -375,11 +377,114 @@ public class DatabaseHelper
     }
 
 
+    public IReadOnlyDictionary<string, int> ImportArchiveGraph(
+        DocumentArchiveManifest manifest,
+        IReadOnlyList<DocumentArchiveDocument> documents)
+    {
+        using var connection = OpenConnection();
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            var ids = new Dictionary<string, int>(StringComparer.Ordinal);
+            foreach (var source in documents)
+            {
+                if (!DocumentExportKey.TryParse(source.ExportKey, out _))
+                    throw new InvalidOperationException("Archive document key is invalid.");
+
+                if (!string.IsNullOrWhiteSpace(source.Subject))
+                    InsertCatalogValue(connection, transaction, "categories", source.Subject);
+                if (!string.IsNullOrWhiteSpace(source.Type))
+                    InsertCatalogValue(connection, transaction, "document_types", source.Type);
+
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = """
+                    INSERT INTO documents (archive_export_key, name, subject, type, file_path, notes, created_at, file_size, author, is_important, tags, deadline, is_deleted, deleted_at, status)
+                    VALUES (@archiveExportKey, @name, @subject, @type, @filePath, @notes, @createdAt, @fileSize, @author, @isImportant, @tags, @deadline, @isDeleted, @deletedAt, @status);
+                    SELECT last_insert_rowid();
+                    """;
+                command.Parameters.AddWithValue("@archiveExportKey", source.ExportKey);
+                command.Parameters.AddWithValue("@name", source.Name ?? string.Empty);
+                command.Parameters.AddWithValue("@subject", (object?)source.Subject ?? DBNull.Value);
+                command.Parameters.AddWithValue("@type", (object?)source.Type ?? DBNull.Value);
+                command.Parameters.AddWithValue("@filePath", (object?)source.FilePath ?? DBNull.Value);
+                command.Parameters.AddWithValue("@notes", (object?)source.Notes ?? DBNull.Value);
+                command.Parameters.AddWithValue("@createdAt", source.CreatedAt);
+                command.Parameters.AddWithValue("@fileSize", (object?)source.FileSize ?? DBNull.Value);
+                command.Parameters.AddWithValue("@author", (object?)source.Author ?? DBNull.Value);
+                command.Parameters.AddWithValue("@isImportant", source.IsImportant ? 1 : 0);
+                command.Parameters.AddWithValue("@tags", (object?)source.Tags ?? DBNull.Value);
+                command.Parameters.AddWithValue("@deadline", (object?)source.Deadline ?? DBNull.Value);
+                command.Parameters.AddWithValue("@isDeleted", source.IsDeleted ? 1 : 0);
+                command.Parameters.AddWithValue("@deletedAt", source.IsDeleted ? DateTime.Now : DBNull.Value);
+                command.Parameters.AddWithValue("@status", string.IsNullOrWhiteSpace(source.Status) ? DocumentStatus.Unread : source.Status);
+                ids[source.ExportKey] = Convert.ToInt32(command.ExecuteScalar());
+            }
+
+            foreach (var note in manifest.Notes.Where(note => ids.ContainsKey(note.DocumentExportKey)))
+            {
+                if (!NoteType.TryParse(note.NoteType, out var noteType))
+                    throw new InvalidOperationException("Archive note type is invalid.");
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "INSERT INTO personal_notes (document_id, note_type, content, is_pinned, is_deleted) VALUES (@documentId, @noteType, @content, @isPinned, @isDeleted)";
+                command.Parameters.AddWithValue("@documentId", ids[note.DocumentExportKey]);
+                command.Parameters.AddWithValue("@noteType", noteType.Value);
+                command.Parameters.AddWithValue("@content", (object?)note.Content ?? DBNull.Value);
+                command.Parameters.AddWithValue("@isPinned", note.IsPinned ? 1 : 0);
+                command.Parameters.AddWithValue("@isDeleted", note.IsDeleted ? 1 : 0);
+                command.ExecuteNonQuery();
+            }
+
+            foreach (var collection in manifest.Collections)
+            {
+                var memberIds = collection.DocumentExportKeys.Where(ids.ContainsKey).Distinct(StringComparer.Ordinal).Select(key => ids[key]).ToArray();
+                if (memberIds.Length == 0)
+                    continue;
+                using var collectionCommand = connection.CreateCommand();
+                collectionCommand.Transaction = transaction;
+                collectionCommand.CommandText = "INSERT INTO collections (name) VALUES (@name); SELECT last_insert_rowid();";
+                collectionCommand.Parameters.AddWithValue("@name", collection.Name ?? string.Empty);
+                var collectionId = Convert.ToInt32(collectionCommand.ExecuteScalar());
+                foreach (var documentId in memberIds)
+                {
+                    using var itemCommand = connection.CreateCommand();
+                    itemCommand.Transaction = transaction;
+                    itemCommand.CommandText = "INSERT OR IGNORE INTO collection_items (collection_id, document_id) VALUES (@collectionId, @documentId)";
+                    itemCommand.Parameters.AddWithValue("@collectionId", collectionId);
+                    itemCommand.Parameters.AddWithValue("@documentId", documentId);
+                    itemCommand.ExecuteNonQuery();
+                }
+            }
+
+            foreach (var relation in manifest.Relations.Where(relation => ids.ContainsKey(relation.SourceDocumentExportKey) && ids.ContainsKey(relation.TargetDocumentExportKey)))
+            {
+                var first = Math.Min(ids[relation.SourceDocumentExportKey], ids[relation.TargetDocumentExportKey]);
+                var second = Math.Max(ids[relation.SourceDocumentExportKey], ids[relation.TargetDocumentExportKey]);
+                using var command = connection.CreateCommand();
+                command.Transaction = transaction;
+                command.CommandText = "INSERT OR IGNORE INTO document_relations (doc_id_1, doc_id_2, relation_type) VALUES (@first, @second, @type)";
+                command.Parameters.AddWithValue("@first", first);
+                command.Parameters.AddWithValue("@second", second);
+                command.Parameters.AddWithValue("@type", string.IsNullOrWhiteSpace(relation.RelationType) ? "related" : relation.RelationType);
+                command.ExecuteNonQuery();
+            }
+
+            transaction.Commit();
+            return ids;
+        }
+        catch
+        {
+            transaction.Rollback();
+            throw;
+        }
+    }
+
     public bool InsertDocumentWithCatalogs(StudyDocument document)
     {
         const string query = """
-            INSERT INTO documents (name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline, status)
-            VALUES (@name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline, @status)
+            INSERT INTO documents (archive_export_key, name, subject, type, file_path, notes, file_size, author, is_important, tags, deadline, status)
+            VALUES (@archive_export_key, @name, @subject, @type, @file_path, @notes, @file_size, @author, @is_important, @tags, @deadline, @status)
             """;
 
         using var connection = OpenConnection();
@@ -396,8 +501,10 @@ public class DatabaseHelper
             using var command = connection.CreateCommand();
             command.Transaction = transaction;
             command.CommandText = query;
+            document.ExportKey ??= DocumentExportKey.Create();
             foreach (var parameter in BuildDocumentParameters(document))
                 command.Parameters.Add(parameter);
+            command.Parameters.AddWithValue("@archive_export_key", document.ExportKey.Value);
 
             if (command.ExecuteNonQuery() == 0)
             {
@@ -1352,7 +1459,7 @@ public class DatabaseHelper
         if (!actualTables.SetEquals(expectedTables))
             throw new InvalidOperationException("Backup database tables are not supported.");
 
-        ValidateRequiredColumns(connection, "documents", ["id", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["status"]);
+        ValidateRequiredColumns(connection, "documents", ["id", "archive_export_key", "name", "subject", "type", "file_path", "notes", "created_at", "file_size", "author", "is_important", "tags", "deadline", "is_deleted", "deleted_at", "status"], ["status", "archive_export_key"]);
         ValidateRequiredColumns(connection, "collections", ["id", "name", "description", "created_at"]);
         ValidateRequiredColumns(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"]);
         ValidateRequiredColumns(connection, "personal_notes", ["id", "document_id", "content", "created_at", "updated_at"], ["note_type", "is_pinned", "is_deleted"]);
@@ -1659,6 +1766,7 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         return new StudyDocument
         {
             Id = reader.GetInt32(reader.GetOrdinal("id")),
+            ExportKey = DocumentExportKey.TryParse(reader["archive_export_key"]?.ToString(), out var exportKey) ? exportKey : null,
             Name = reader["name"]?.ToString() ?? string.Empty,
             Subject = reader["subject"]?.ToString() ?? string.Empty,
             Type = reader["type"]?.ToString() ?? string.Empty,

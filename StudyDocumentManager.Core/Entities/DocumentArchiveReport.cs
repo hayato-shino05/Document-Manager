@@ -40,4 +40,7 @@ public sealed record ArchiveImportReport(
     IReadOnlyList<ArchiveMissingFile> MissingFiles,
     IReadOnlyList<ArchiveConflict> Conflicts,
     IReadOnlyList<ArchiveReportItem> ValidationErrors,
-    ArchiveTransactionOutcome TransactionOutcome);
+    ArchiveTransactionOutcome TransactionOutcome)
+{
+    public bool RolledBack => TransactionOutcome == ArchiveTransactionOutcome.RolledBack;
+}

@@ -36,6 +36,10 @@ public sealed record DocumentArchiveManifest(
         var archivePaths = new HashSet<string>(StringComparer.Ordinal);
         foreach (var file in files)
         {
+            if (!exportKeys.Contains(file.DocumentExportKey))
+                errors.Add(new ArchiveReportItem("invalid-file-document", "File references an unknown document.", file.DocumentExportKey, file.ArchivePath));
+            if (!IsSafeArchivePath(file.ArchivePath))
+                errors.Add(new ArchiveReportItem("invalid-archive-path", "Archive path must be relative and cannot traverse parent directories.", file.DocumentExportKey, file.ArchivePath));
             if (!archivePaths.Add(file.ArchivePath))
                 errors.Add(new ArchiveReportItem("duplicate-archive-path", "Archive file path is duplicated.", file.DocumentExportKey, file.ArchivePath));
         }
@@ -72,6 +76,14 @@ public sealed record DocumentArchiveManifest(
         }
 
         return new ArchiveValidationReport(errors.Count == 0, errors);
+    }
+
+    private static bool IsSafeArchivePath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return false;
+        var normalized = path.Replace('\\', '/');
+        return !normalized.StartsWith('/') && !Path.IsPathFullyQualified(normalized) && !normalized.Contains(':')
+            && normalized.Split('/', StringSplitOptions.RemoveEmptyEntries).All(segment => segment is not "." and not "..");
     }
 
     private static bool IsSha256(string? value)
