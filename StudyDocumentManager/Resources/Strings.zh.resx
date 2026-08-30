@@ -567,6 +567,14 @@
   <data name="Menu_AddNewDocument" xml:space="preserve"><value>添加新文档</value></data>
   <data name="Menu_OpenDocument" xml:space="preserve"><value>打开文档</value></data>
   <data name="Menu_ExportCsv" xml:space="preserve"><value>导出 CSV</value></data>
+  <data name="Menu_ExportArchive" xml:space="preserve"><value>导出归档</value></data>
+  <data name="Menu_ImportArchive" xml:space="preserve"><value>导入归档</value></data>
+  <data name="Archive_ExportTitle" xml:space="preserve"><value>导出归档</value></data>
+  <data name="Archive_ImportTitle" xml:space="preserve"><value>导入归档</value></data>
+  <data name="Archive_ExportSuccess" xml:space="preserve"><value>已导出归档 ({0} 个文档)</value></data>
+  <data name="Archive_ImportSuccess" xml:space="preserve"><value>已导入归档 ({0} 个文档)</value></data>
+  <data name="Archive_FailureMessage" xml:space="preserve"><value>归档操作失败</value></data>
+  <data name="Archive_NoZipSelected" xml:space="preserve"><value>未选择 ZIP 文件</value></data>
   <data name="Menu_BackupDb" xml:space="preserve"><value>备份数据库</value></data>
   <data name="Menu_RestoreDb" xml:space="preserve"><value>恢复数据库</value></data>
   <data name="Menu_Exit" xml:space="preserve"><value>退出</value></data>

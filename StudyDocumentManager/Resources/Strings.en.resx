@@ -294,6 +294,14 @@ Please check your network connection.</value></data>
   <data name="Menu_AddNewDocument" xml:space="preserve"><value>Add New Document</value></data>
   <data name="Menu_OpenDocument" xml:space="preserve"><value>Open Document</value></data>
   <data name="Menu_ExportCsv" xml:space="preserve"><value>Export CSV</value></data>
+  <data name="Menu_ExportArchive" xml:space="preserve"><value>Export archive</value></data>
+  <data name="Menu_ImportArchive" xml:space="preserve"><value>Import archive</value></data>
+  <data name="Archive_ExportTitle" xml:space="preserve"><value>Export archive</value></data>
+  <data name="Archive_ImportTitle" xml:space="preserve"><value>Import archive</value></data>
+  <data name="Archive_ExportSuccess" xml:space="preserve"><value>Archive exported ({0} documents)</value></data>
+  <data name="Archive_ImportSuccess" xml:space="preserve"><value>Archive imported ({0} documents)</value></data>
+  <data name="Archive_FailureMessage" xml:space="preserve"><value>Archive operation failed</value></data>
+  <data name="Archive_NoZipSelected" xml:space="preserve"><value>No ZIP file selected</value></data>
   <data name="Menu_BackupDb" xml:space="preserve"><value>Backup Database</value></data>
   <data name="Menu_RestoreDb" xml:space="preserve"><value>Restore Database</value></data>
   <data name="Menu_Exit" xml:space="preserve"><value>Exit</value></data>

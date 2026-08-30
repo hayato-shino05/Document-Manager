@@ -327,6 +327,14 @@
   <data name="Menu_AddNewDocument" xml:space="preserve"><value>新しい文書を追加</value></data>
   <data name="Menu_OpenDocument" xml:space="preserve"><value>文書を開く</value></data>
   <data name="Menu_ExportCsv" xml:space="preserve"><value>CSV出力</value></data>
+  <data name="Menu_ExportArchive" xml:space="preserve"><value>アーカイブを書き出す</value></data>
+  <data name="Menu_ImportArchive" xml:space="preserve"><value>アーカイブを読み込む</value></data>
+  <data name="Archive_ExportTitle" xml:space="preserve"><value>アーカイブの書き出し</value></data>
+  <data name="Archive_ImportTitle" xml:space="preserve"><value>アーカイブの読み込み</value></data>
+  <data name="Archive_ExportSuccess" xml:space="preserve"><value>アーカイブを書き出しました ({0} 件)</value></data>
+  <data name="Archive_ImportSuccess" xml:space="preserve"><value>アーカイブを読み込みました ({0} 件)</value></data>
+  <data name="Archive_FailureMessage" xml:space="preserve"><value>アーカイブ処理に失敗しました</value></data>
+  <data name="Archive_NoZipSelected" xml:space="preserve"><value>ZIP ファイルが選択されていません</value></data>
   <data name="Menu_BackupDb" xml:space="preserve"><value>DBバックアップ</value></data>
   <data name="Menu_RestoreDb" xml:space="preserve"><value>DB復元</value></data>
   <data name="Menu_Exit" xml:space="preserve"><value>終了</value></data>
