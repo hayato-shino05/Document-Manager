@@ -55,11 +55,9 @@ jobs:
           sudo dpkg --install package.deb || (sudo apt-get --fix-broken install --yes && sudo dpkg --install package.deb)
           test -x "$EXECUTABLE_PATH"
           mkdir --parents "$TEST_HOME"
-          Xvfb :99 -screen 0 1280x720x24 &
-          xvfb_pid=$!
-          trap 'kill "$xvfb_pid" 2>/dev/null || true' EXIT
           set +e
-          HOME="$TEST_HOME" DISPLAY=:99 timeout --signal=TERM 20 "$EXECUTABLE_PATH"
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x720x24" \
+            env HOME="$TEST_HOME" timeout --signal=TERM 20 "$EXECUTABLE_PATH"
           launch_exit=$?
           set -e
           [[ "$launch_exit" -eq 0 || "$launch_exit" -eq 124 ]]
@@ -71,4 +69,6 @@ jobs:
           set -euo pipefail
           sudo dpkg --purge "$PACKAGE_NAME"
           ! dpkg-query --show "$PACKAGE_NAME" >/dev/null 2>&1
+          ! test -e "$EXECUTABLE_PATH"
+          ! test -e /usr/lib/document-manager
           test -f "$TEST_HOME/$USER_DATA_RELATIVE_PATH"

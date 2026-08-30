@@ -22,7 +22,7 @@
 
 ### #65 Linux Debian package lifecycle
 
-**Status (2026-08-30): limitation recorded, install/launch/uninstall は未検証。**
+**Status (2026-08-30): package/release/lifecycle contract fixed, install/launch/uninstall は未検証。**
 
 #### 検証済み
 
@@ -36,7 +36,7 @@
 
 - install、Xvfb 下の launch/database initialization、purge、user-data retention は未実施です。いずれも PASS ではありません。
 - WSL に `dotnet` はありません。既存の Ubuntu distribution は disposable environment として扱えないため、release artifact を投入して lifecycle を確かめる手順が組めません。
-- GitHub Release `v3.1.2` は Windows installer と Portable ZIP だけで、versioned `.deb` release asset は公開されていません。
+- 当時確認した GitHub Release `v3.1.2` は Windows installer と Portable ZIP だけで、versioned `.deb` release asset は公開されていませんでした。現在の Release workflow はタグから versioned `.deb` と対応する `.sha256` を生成し、Release assets としてアップロードします。
 - `admin/**` 配下には Linux 関連の変更を加えていません。
 
 #### 検証のために必要な契約（再起動条件）
@@ -44,19 +44,19 @@
 下記が揃うまで `#65` は未完了として残します。
 
 1. disposable Ubuntu x64 runner を workflow から起動できること。
-2. GitHub Release もしくは同等の信頼ある場所から versioned `.deb` URL と SHA-256 を取得できること。
-3. 上記 URL と SHA-256 を入力に install、launch（Xvfb 下の database initialization 確認）、purge、user-data retention を fail-closed で実行する workflow を `.github/workflows/linux-deb-lifecycle.yml` として固定できること。
+2. Release workflow が versioned `.deb` と対応する `.sha256` を Release assets として公開すること。
+3. 上記 asset URL と SHA-256 を入力に install、launch（`xvfb-run` 下の database initialization 確認）、purge、user-data retention を fail-closed で実行する workflow を `.github/workflows/linux-deb-lifecycle.yml` として固定すること。
 
-#### CI contract（提案）
+#### CI contract（固定）
 
 `.github/workflows/linux-deb-lifecycle.yml` は次の minimum contract で audit 可能な形にします。
 
 - `workflow_dispatch` で `package_url`（release asset の HTTPS URL）と `package_sha256`（64 桁 hex）を受け取り、両方が release prefix と正規表現にマッチしない限り fail。
 - `runs-on: ubuntu-24.04`、disposable、`timeout-minutes: 10`、`permissions: contents: read`。
-- checksum 検証 → `dpkg-deb -f` で `Package=document-manager`、`Architecture=amd64` を assert → install → `xvfb-run` 配下で launch（exit 0 または 124 timeout まで）→ user-data SQLite file 生成を assert → `dpkg --purge` → application files 消失と user-data 存続を assert。
+- checksum 検証 → `dpkg-deb -f` で `Package=document-manager`、`Architecture=amd64` を assert → install → `xvfb-run` 配下で launch（exit 0 または 124 timeout まで）→ user-data SQLite file 生成を assert → `dpkg --purge` → `/usr/bin/document-manager` と `/usr/lib/document-manager` が消失し、user-data が存続することを assert。
 - 上記のいずれかのアサーションが失敗したら `set -euo pipefail` で workflow を fail させます。`continue-on-error` は使いません。
 
-この contract は release が versioned `.deb` asset と SHA-256 を公開したあとに手動で起動し、結果を evidence としてこの台帳へ追記する想定です。contract 自体は fixed ですが、現時点では起動できる artifact がなく PASS は取れていません。
+Release workflow が versioned `.deb` asset と SHA-256 を公開したあと、この workflow を手動起動し、結果を evidence としてこの台帳へ追記します。contract は固定済みですが、現時点では実際の versioned release asset に対する install/launch/purge を実行していないため PASS は取れていません。
 
 ### #60 / #64 MainWindow・Dashboard・RelatedDocs・AffectedItemsPreviewDialog の UIA Name 補強
 

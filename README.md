@@ -87,7 +87,7 @@ dotnet build "StudyDocumentManager.sln" -c Debug
 dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c Debug
 ```
 
-現行のテストスイートは xUnit ベースで、871 件のテストを含みます。データベース、repository、model/service の自動検証を行います。CI は build と test を実行し、Debug/Release の成果物を artifact として保存します。Dashboard の deferred lifecycle、drag/drop の event bridge、native dialog、restore 後の再オープンなど、デスクトップ実行が必要な項目は手動確認の対象です。
+現行のテストスイートは xUnit ベースです。データベース、repository、model/service の自動検証を行います。CI は build と test を実行し、成果物を artifact として保存します。Dashboard の deferred lifecycle、drag/drop の event bridge、native dialog、restore 後の再オープンなど、デスクトップ実行が必要な項目は手動確認の対象です。
 
 ## Windows セットアップの作成
 
@@ -112,13 +112,16 @@ dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c De
 bash ./scripts/build-debian-package.sh
 ```
 
-生成物は `artifacts/installer/` に作成されます。Debian/Ubuntu では生成したパッケージを変数へ取得してインストールします。
+生成物は `artifacts/installer/` に作成されます。Debian/Ubuntu では生成した versioned package と SHA-256 checksum を取得して検証します。
 
 ```bash
 package="$(find artifacts/installer -maxdepth 1 -type f -name 'document-manager_*_amd64.deb' -print -quit)"
 test -n "$package"
+sha256sum "$package"
 sudo apt install "$package"
 ```
+
+タグ付き Release では `document-manager_<version>_amd64.deb` と対応する `.sha256` が release assets として公開されます。インストール後の lifecycle 検証は [DESKTOP_RUNTIME_EVIDENCE.md](./DESKTOP_RUNTIME_EVIDENCE.md) と `.github/workflows/linux-deb-lifecycle.yml` を参照してください。workflow は versioned Release asset の URL と SHA-256 を `workflow_dispatch` で受け取り、checksum と package metadata を検証してから install、`xvfb-run` 下の launch/database initialization、purge、application files の消失、user database の存続を fail-closed で確認します。
 
 アプリケーション本体は `/usr/lib/document-manager/`、起動コマンドは `/usr/bin/document-manager` に配置されます。ユーザーデータはパッケージ領域に書き込みません。データベースは `XDG_DATA_HOME` または `$HOME/.local/share` 配下の `StudyDocumentManager/data/study_documents.db` に保存されます。
 
