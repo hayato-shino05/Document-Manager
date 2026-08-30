@@ -105,7 +105,10 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
             var validation = manifest.Validate();
             validationErrors.AddRange(validation.ValidationErrors);
             if (!validation.IsValid || conflicts.Count > 0)
-                return Task.FromResult(new ArchiveExportReport(false, manifest.Documents.Count, missingFiles, conflicts, validationErrors));
+                return Task.FromResult(new ArchiveExportReport(false, manifest.Documents.Count, missingFiles, conflicts, validationErrors)
+                {
+                    Manifest = manifest
+                });
 
             var manifestBytes = JsonSerializer.SerializeToUtf8Bytes(manifest, ManifestJsonOptions);
             Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
@@ -124,7 +127,10 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                 }
             }
 
-            return Task.FromResult(new ArchiveExportReport(true, manifest.Documents.Count, missingFiles, conflicts, validationErrors));
+            return Task.FromResult(new ArchiveExportReport(true, manifest.Documents.Count, missingFiles, conflicts, validationErrors)
+            {
+                Manifest = manifest
+            });
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
         {

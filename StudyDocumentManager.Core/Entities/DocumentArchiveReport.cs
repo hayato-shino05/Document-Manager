@@ -28,7 +28,10 @@ public sealed record ArchiveExportReport(
     int ExportedDocuments,
     IReadOnlyList<ArchiveMissingFile> MissingFiles,
     IReadOnlyList<ArchiveConflict> Conflicts,
-    IReadOnlyList<ArchiveReportItem> ValidationErrors);
+    IReadOnlyList<ArchiveReportItem> ValidationErrors)
+{
+    public DocumentArchiveManifest? Manifest { get; init; }
+}
 
 public sealed record ArchiveImportReport(
     bool Success,
