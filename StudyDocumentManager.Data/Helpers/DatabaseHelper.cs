@@ -1705,10 +1705,10 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         foreach (var index in indexes)
         {
             var isLegacyDocumentPathIndex = allowLegacyDocumentPathIndexes && tableName == "documents" && index.IsUnique && IsDocumentPathUniqueIndex(connection, index.Name);
-            var isLegacyArchiveExportKeyIndex = allowLegacyDocumentPathIndexes && tableName == "documents" && index.IsUnique && IsArchiveExportKeyUniqueIndex(connection, index.Name);
-            if (tableName == "documents" && index.Origin == "u" && !isLegacyDocumentPathIndex && !isLegacyArchiveExportKeyIndex)
+            var isArchiveExportKeyIndex = tableName == "documents" && index.IsUnique && IsArchiveExportKeyUniqueIndex(connection, index.Name);
+            if (tableName == "documents" && index.Origin == "u" && !isLegacyDocumentPathIndex && !isArchiveExportKeyIndex)
                 throw new InvalidOperationException($"Backup database unique constraint on '{tableName}' is not supported.");
-            if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isLegacyDocumentPathIndex && !isLegacyArchiveExportKeyIndex)
+            if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isLegacyDocumentPathIndex && !isArchiveExportKeyIndex)
                 throw new InvalidOperationException($"Backup database index on '{tableName}' is not supported.");
         }
 
