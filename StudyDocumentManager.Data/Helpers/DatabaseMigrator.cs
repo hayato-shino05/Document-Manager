@@ -12,6 +12,17 @@ public static class DatabaseMigrator
     /// <summary>
     /// Run all schema creation and migrations against the configured database.
     /// </summary>
+    private static void EnsureArchiveExportKeyUniqueness(SqliteConnection connection, SqliteTransaction transaction)
+    {
+        using var duplicateCommand = connection.CreateCommand();
+        duplicateCommand.Transaction = transaction;
+        duplicateCommand.CommandText = "SELECT 1 FROM documents WHERE archive_export_key IS NOT NULL AND archive_export_key <> '' GROUP BY archive_export_key COLLATE NOCASE HAVING COUNT(*) > 1 LIMIT 1";
+        if (duplicateCommand.ExecuteScalar() is not null)
+            throw new InvalidOperationException("Duplicate archive export keys prevent migration.");
+
+        ExecuteSql(connection, transaction, "CREATE UNIQUE INDEX IF NOT EXISTS ux_documents_archive_export_key ON documents(archive_export_key COLLATE BINARY) WHERE archive_export_key IS NOT NULL AND archive_export_key <> ''");
+    }
+
     public static void RunMigrations(string connectionString)
     {
         const string createTablesQuery = """
@@ -201,6 +212,7 @@ public static class DatabaseMigrator
             MigrateAddColumn(conn, transaction, "documents", "status", "TEXT NOT NULL DEFAULT 'unread'");
             MigrateAddColumn(conn, transaction, "documents", "archive_export_key", "TEXT");
             ExecuteSql(conn, transaction, "UPDATE documents SET archive_export_key = lower(hex(randomblob(16))) WHERE archive_export_key IS NULL OR archive_export_key = ''");
+            EnsureArchiveExportKeyUniqueness(conn, transaction);
             MigrateAddColumn(conn, transaction, "personal_notes", "note_type", "TEXT NOT NULL DEFAULT 'general'");
             MigrateAddColumn(conn, transaction, "personal_notes", "is_pinned", "INTEGER NOT NULL DEFAULT 0");
             MigrateAddColumn(conn, transaction, "personal_notes", "is_deleted", "INTEGER NOT NULL DEFAULT 0");
