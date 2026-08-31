@@ -4,6 +4,7 @@
 
 - `ux_documents_archive_export_key` を `ValidateDocumentIndexesAndTriggers` の allow-list に追加。
 - archive key unique index を schema validation で正しく認識し、通常の `InitializeDatabase` 再実行で unsupported index 扱いされないよう修正。
+- `EnsureArchiveExportKeyUniqueness` を document rebuild 後に実行し、legacy rebuild で archive index が失われないよう修正。
 - `DatabaseIntegrityTests` に `InitializeDatabase_WithArchiveKeyIndex_IsIdempotent` を追加し、2回初期化後も index が1件であることを検証。
 
 ## 検証

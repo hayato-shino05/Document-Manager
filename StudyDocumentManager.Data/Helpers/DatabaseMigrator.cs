@@ -212,7 +212,6 @@ public static class DatabaseMigrator
             MigrateAddColumn(conn, transaction, "documents", "status", "TEXT NOT NULL DEFAULT 'unread'");
             MigrateAddColumn(conn, transaction, "documents", "archive_export_key", "TEXT");
             ExecuteSql(conn, transaction, "UPDATE documents SET archive_export_key = lower(hex(randomblob(16))) WHERE archive_export_key IS NULL OR archive_export_key = ''");
-            EnsureArchiveExportKeyUniqueness(conn, transaction);
             MigrateAddColumn(conn, transaction, "personal_notes", "note_type", "TEXT NOT NULL DEFAULT 'general'");
             MigrateAddColumn(conn, transaction, "personal_notes", "is_pinned", "INTEGER NOT NULL DEFAULT 0");
             MigrateAddColumn(conn, transaction, "personal_notes", "is_deleted", "INTEGER NOT NULL DEFAULT 0");
@@ -228,6 +227,7 @@ public static class DatabaseMigrator
                 RebuildChildTable(conn, transaction, tableName);
 
             ExecuteSql(conn, transaction, createTablesQuery);
+            EnsureArchiveExportKeyUniqueness(conn, transaction);
             DropLegacyDocumentPathIndexes(conn, transaction);
             ExecuteSql(conn, transaction, "UPDATE documents AS duplicate SET file_path = NULL WHERE file_path IS NOT NULL AND file_path <> '' AND EXISTS (SELECT 1 FROM documents AS original WHERE original.file_path = duplicate.file_path COLLATE BINARY AND original.id < duplicate.id)");
             ExecuteSql(conn, transaction, "DROP INDEX IF EXISTS idx_documents_file_path_unique");
