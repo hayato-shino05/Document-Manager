@@ -105,7 +105,8 @@ public sealed record DocumentArchiveDocument(
     string Tags,
     DateTime? Deadline,
     string Status,
-    bool IsDeleted);
+    bool IsDeleted,
+    DateTime? DeletedAt = null);
 
 public sealed record DocumentArchiveFile(
     string DocumentExportKey,

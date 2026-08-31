@@ -421,7 +421,7 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
         var document = source.Document;
         return new DocumentArchiveDocument(exportKey, document.Id, document.Name, document.Subject, document.Type,
             document.Notes, document.FilePath, document.CreatedAt, document.FileSize, document.Author,
-            document.IsImportant, document.Tags, document.Deadline, document.Status, source.IsDeleted);
+            document.IsImportant, document.Tags, document.Deadline, document.Status, source.IsDeleted, document.DeletedAt);
     }
 
     private static string GetStableExportKey(StudyDocument document)

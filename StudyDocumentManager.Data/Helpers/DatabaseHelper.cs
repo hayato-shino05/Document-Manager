@@ -427,7 +427,7 @@ public class DatabaseHelper
                 command.Parameters.AddWithValue("@tags", (object?)source.Tags ?? DBNull.Value);
                 command.Parameters.AddWithValue("@deadline", (object?)source.Deadline ?? DBNull.Value);
                 command.Parameters.AddWithValue("@isDeleted", source.IsDeleted ? 1 : 0);
-                command.Parameters.AddWithValue("@deletedAt", source.IsDeleted ? DateTime.Now : DBNull.Value);
+                command.Parameters.AddWithValue("@deletedAt", source.IsDeleted ? source.DeletedAt ?? DateTime.Now : DBNull.Value);
                 command.Parameters.AddWithValue("@status", string.IsNullOrWhiteSpace(source.Status) ? DocumentStatus.Unread : source.Status);
                 ids[parsedKey.Value] = Convert.ToInt32(command.ExecuteScalar());
             }
@@ -1672,13 +1672,38 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
 
     private static bool IsArchiveExportKeyUniqueIndex(SqliteConnection connection, string indexName)
     {
-        using var command = connection.CreateCommand();
-        command.CommandText = $"PRAGMA index_info(\"{indexName.Replace("\"", "\"\"")}\")";
-        using var reader = command.ExecuteReader();
-        var columns = new List<string>();
-        while (reader.Read())
-            columns.Add(reader.GetString(2));
-        return columns.SequenceEqual(["archive_export_key"], StringComparer.Ordinal);
+        using var listCommand = connection.CreateCommand();
+        listCommand.CommandText = "PRAGMA index_list(documents)";
+        using var listReader = listCommand.ExecuteReader();
+        var found = false;
+        while (listReader.Read())
+        {
+            if (string.Equals(listReader.GetString(1), indexName, StringComparison.Ordinal))
+            {
+                found = listReader.GetInt32(2) == 1;
+                break;
+            }
+        }
+        if (!found)
+            return false;
+
+        using var columns = connection.CreateCommand();
+        columns.CommandText = $"PRAGMA index_info(\"{indexName.Replace("\"", "\"\"")}\")";
+        using var columnReader = columns.ExecuteReader();
+        var names = new List<string>();
+        while (columnReader.Read())
+            names.Add(columnReader.GetString(2));
+        if (!names.SequenceEqual(["archive_export_key"], StringComparer.Ordinal))
+            return false;
+
+        using var sqlCommand = connection.CreateCommand();
+        sqlCommand.CommandText = "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = @name";
+        sqlCommand.Parameters.AddWithValue("@name", indexName);
+        var sql = sqlCommand.ExecuteScalar()?.ToString();
+        if (sql is null)
+            return indexName.StartsWith("sqlite_autoindex_documents_", StringComparison.Ordinal);
+        var normalized = string.Concat(sql.Where(character => !char.IsWhiteSpace(character))).ToUpperInvariant();
+        return normalized.Contains("CREATEUNIQUEINDEXUX_DOCUMENTS_ARCHIVE_EXPORT_KEYONDOCUMENTS(ARCHIVE_EXPORT_KEYCOLLATEBINARY)WHEREARCHIVE_EXPORT_KEYISNOTNULLANDARCHIVE_EXPORT_KEY<>''", StringComparison.Ordinal);
     }
 
     private static void ValidateIndexesAndTriggers(SqliteConnection connection, string tableName, bool allowLegacyDocumentPathIndexes)
@@ -1801,7 +1826,9 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
             IsImportant = reader["is_important"] is not DBNull && Convert.ToInt32(reader["is_important"]) == 1,
             Tags = reader["tags"]?.ToString() ?? string.Empty,
             Deadline = reader["deadline"] is DBNull ? null : DateTime.Parse(reader["deadline"].ToString()!),
-            Status = ReadStatus(reader)
+            Status = ReadStatus(reader),
+            IsDeleted = reader["is_deleted"] is not DBNull && Convert.ToInt32(reader["is_deleted"]) == 1,
+            DeletedAt = reader["deleted_at"] is DBNull ? null : DateTime.Parse(reader["deleted_at"].ToString()!)
         };
     }
 
@@ -2117,7 +2144,11 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = @"SELECT c.id, c.name, c.description, c.created_at,
-                            (SELECT COUNT(*) FROM collection_items ci WHERE ci.collection_id = c.id) as item_count
+                            (SELECT COUNT(*)
+                             FROM collection_items ci
+                             INNER JOIN documents d ON d.id = ci.document_id
+                             WHERE ci.collection_id = c.id
+                             AND (d.is_deleted IS NULL OR d.is_deleted = 0)) as item_count
                             FROM collections c
                             ORDER BY c.name";
         using var reader = cmd.ExecuteReader();
