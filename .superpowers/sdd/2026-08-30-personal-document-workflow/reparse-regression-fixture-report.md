@@ -9,7 +9,7 @@
 
 ZIP entry は UTF-8 の `archive-content` bytes を持ち、checksum は実際の SHA-256 値から生成する。これにより archive entry/checksum validation を通過した後、destination reparse-point validation が `invalid-destination-path` を返すことを検証する。
 
-両テストで `ArchiveTransactionOutcome.NotStarted`、空の DB、既存 reparse point の target への未書き込みを確認する。
+両テストで `ArchiveTransactionOutcome.RolledBack`、空の DB、既存 reparse point の target への未書き込みを確認する。
 
 ## 検証
 
