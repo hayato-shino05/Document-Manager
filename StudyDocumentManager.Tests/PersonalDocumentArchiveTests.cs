@@ -485,7 +485,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             {
                 var entry = archive.CreateEntry("manifest.json");
                 using var stream = entry.Open();
-                JsonSerializer.Serialize(stream, duplicateManifest);
+                JsonSerializer.Serialize(stream, duplicateManifest, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
             }
             var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(Path.GetTempPath()));
             Assert.False(report.Success);
@@ -521,6 +521,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             File.WriteAllText(secondPath, "existing");
             var newRoot = Path.GetDirectoryName(Path.GetDirectoryName(firstPath)!)!;
             Directory.Delete(Path.GetDirectoryName(firstPath)!, recursive: true);
+            Directory.Delete(newRoot, recursive: true);
 
             var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(Path.GetTempPath()));
 
@@ -592,7 +593,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             {
                 var entry = archive.CreateEntry("manifest.json");
                 using var stream = new StreamWriter(entry.Open());
-                stream.Write(JsonSerializer.Serialize(manifest));
+                stream.Write(JsonSerializer.Serialize(manifest, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
             }
 
             var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(destinationRoot));
@@ -643,7 +644,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             {
                 var manifestEntry = archive.CreateEntry("manifest.json");
                 using (var stream = new StreamWriter(manifestEntry.Open()))
-                    stream.Write(JsonSerializer.Serialize(manifest));
+                    stream.Write(JsonSerializer.Serialize(manifest, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
 
                 var fileEntry = archive.CreateEntry("linked/document.pdf");
                 using var fileStream = fileEntry.Open();
@@ -700,7 +701,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             {
                 var manifestEntry = archive.CreateEntry("manifest.json");
                 using (var stream = new StreamWriter(manifestEntry.Open()))
-                    stream.Write(JsonSerializer.Serialize(manifest));
+                    stream.Write(JsonSerializer.Serialize(manifest, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
 
                 var fileEntry = archive.CreateEntry("linked/document.pdf");
                 using var fileStream = fileEntry.Open();
