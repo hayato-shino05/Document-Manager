@@ -47,7 +47,7 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
             }
 
             var snapshot = _repository.ReadSnapshot(options.DocumentIds, options.IncludeDeleted);
-            var exportKeys = snapshot.Documents.ToDictionary(item => item.Document.Id, item => GetStableExportKey(item.Document));
+            var exportKeys = snapshot.Documents.ToDictionary(item => item.Document.Id, item => _repository.EnsureStableExportKey(item.Document));
             var archiveFiles = new List<DocumentArchiveFile>();
             var checksums = new List<DocumentArchiveChecksum>();
 
@@ -163,6 +163,7 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
 
             using var archive = ZipFile.OpenRead(Path.GetFullPath(sourceZip));
             var entries = new Dictionary<string, ZipArchiveEntry>(StringComparer.Ordinal);
+            long totalBytes = 0;
             foreach (var entry in archive.Entries)
             {
                 var normalized = NormalizeArchivePath(entry.FullName);
@@ -173,8 +174,14 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                 }
                 if (!entries.TryAdd(normalized, entry))
                     errors.Add(new ArchiveReportItem("duplicate-archive-entry", "ZIP contains duplicate archive names.", null, normalized));
+                if (normalized != "manifest.json")
+                    totalBytes += entry.Length;
             }
 
+            if (entries.Count > MaxImportEntries)
+                errors.Add(new ArchiveReportItem("too-many-entries", "Archive contains too many entries."));
+            if (totalBytes > MaxImportTotalBytes)
+                errors.Add(new ArchiveReportItem("archive-too-large", "Archive exceeds the total import size limit."));
             if (!entries.TryGetValue("manifest.json", out var manifestEntry))
                 errors.Add(new ArchiveReportItem("missing-manifest", "Archive manifest.json is required.", null, "manifest.json"));
             if (errors.Count > 0)
@@ -201,6 +208,7 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                 errors.Add(new ArchiveReportItem("missing-manifest-data", "Manifest content is required."));
             else
             {
+                manifest = CanonicalizeManifest(manifest);
                 errors.AddRange(manifest.Validate().ValidationErrors);
                 ValidateArchiveShape(manifest, entries, errors);
             }
@@ -208,9 +216,9 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
             if (errors.Count > 0 || manifest is null)
                 return Task.FromResult(new ArchiveImportReport(false, 0, 0, missingFiles, conflicts, errors, ArchiveTransactionOutcome.RolledBack));
 
-            var filesByKey = manifest.Files.GroupBy(file => file.DocumentExportKey, StringComparer.Ordinal)
-                .ToDictionary(group => group.Key, group => group.Single(), StringComparer.Ordinal);
+            var filesByKey = manifest.Files.ToDictionary(file => file.DocumentExportKey, StringComparer.Ordinal);
             Directory.CreateDirectory(stagingDirectory);
+            long stagedBytes = 0;
             foreach (var file in manifest.Files)
             {
                 if (file.IsMissing)
@@ -225,6 +233,12 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                     errors.Add(new ArchiveReportItem("entry-too-large", "Archive entry exceeds the import size limit.", file.DocumentExportKey, file.ArchivePath));
                     continue;
                 }
+                stagedBytes += entry.Length;
+                if (stagedBytes > MaxImportTotalBytes)
+                {
+                    errors.Add(new ArchiveReportItem("archive-too-large", "Archive exceeds the total import size limit."));
+                    break;
+                }
                 var stagedPath = Path.Combine(stagingDirectory, file.DocumentExportKey, Path.GetFileName(file.ArchivePath));
                 Directory.CreateDirectory(Path.GetDirectoryName(stagedPath)!);
                 using (var input = entry.Open())
@@ -234,7 +248,7 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                     output.Flush(true);
                 }
                 var bytes = File.ReadAllBytes(stagedPath);
-                var checksum = manifest.Checksums.Single(item => string.Equals(item.ArchivePath, file.ArchivePath, StringComparison.Ordinal));
+                var checksum = manifest.Checksums.Single(item => NormalizeArchivePath(item.ArchivePath) == NormalizeArchivePath(file.ArchivePath));
                 if (!string.Equals(Convert.ToHexString(SHA256.HashData(bytes)), checksum.Sha256, StringComparison.OrdinalIgnoreCase) || bytes.LongLength != entry.Length)
                     errors.Add(new ArchiveReportItem("checksum-mismatch", "Archive entry checksum or length does not match the manifest.", file.DocumentExportKey, file.ArchivePath));
                 staged.Add(new StagedFile(file.ArchivePath, stagedPath));
@@ -260,14 +274,14 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                 importDocuments.Add(document);
             }
 
-            if (options.ValidateOnly || conflicts.Count > 0 && importDocuments.Count == 0)
+            if (options.ValidateOnly || conflicts.Count > 0)
                 return Task.FromResult(new ArchiveImportReport(conflicts.Count == 0, 0, conflicts.Count, missingFiles, conflicts, errors, ArchiveTransactionOutcome.NotStarted));
 
             foreach (var document in importDocuments)
             {
                 if (!filesByKey.TryGetValue(document.ExportKey, out var file) || file.IsMissing)
                     continue;
-                var source = staged.Single(item => string.Equals(item.ArchivePath, file.ArchivePath, StringComparison.Ordinal));
+                var source = staged.Single(item => string.Equals(NormalizeArchivePath(item.ArchivePath), NormalizeArchivePath(file.ArchivePath), StringComparison.Ordinal));
                 if (string.IsNullOrWhiteSpace(document.FilePath))
                     continue;
                 var destination = Path.GetFullPath(document.FilePath);
@@ -282,9 +296,9 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
 
             _repository.ImportGraph(manifest, importDocuments);
             outcome = ArchiveTransactionOutcome.Committed;
-            return Task.FromResult(new ArchiveImportReport(conflicts.Count == 0, importDocuments.Count, conflicts.Count, missingFiles, conflicts, errors, outcome));
+            return Task.FromResult(new ArchiveImportReport(true, importDocuments.Count, 0, missingFiles, conflicts, errors, outcome));
         }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or ArgumentException or NotSupportedException or SqliteException)
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException or InvalidDataException or ArgumentException or NotSupportedException or SqliteException or InvalidOperationException)
         {
             errors.Add(new ArchiveReportItem("import-failed", "Archive import failed and all changes were rolled back."));
             outcome = ArchiveTransactionOutcome.RolledBack;
@@ -306,6 +320,7 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
 
     private const long MaxImportEntryBytes = 64L * 1024 * 1024;
     private const int MaxImportEntries = 5000;
+    private const long MaxImportTotalBytes = 256L * 1024 * 1024;
 
     private static ArchiveImportReport ImportFailure(string code, string message)
         => new(false, 0, 0, [], [], [new ArchiveReportItem(code, message)], ArchiveTransactionOutcome.NotStarted);
@@ -319,15 +334,25 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
         }
         if (entries.Count > MaxImportEntries)
             errors.Add(new ArchiveReportItem("too-many-entries", "Archive contains too many entries."));
-        var archivePaths = manifest.Files.Select(file => NormalizeArchivePath(file.ArchivePath)).ToHashSet(StringComparer.Ordinal);
+
+        var archivePaths = manifest.Files.Select(file => NormalizeArchivePath(file.ArchivePath)).Where(path => path is not null).Cast<string>().ToHashSet(StringComparer.Ordinal);
+        var checksumPaths = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var checksum in manifest.Checksums)
+        {
+            var normalized = NormalizeArchivePath(checksum.ArchivePath);
+            if (normalized is null || !archivePaths.Contains(normalized))
+                errors.Add(new ArchiveReportItem("invalid-checksum-path", "Checksum references an unknown archive path.", null, checksum.ArchivePath));
+            else if (!checksumPaths.Add(normalized))
+                errors.Add(new ArchiveReportItem("duplicate-checksum-path", "Checksum path is duplicated.", null, checksum.ArchivePath));
+        }
         foreach (var file in manifest.Files)
         {
-            if (NormalizeArchivePath(file.ArchivePath) is null || (!file.IsMissing && !entries.ContainsKey(NormalizeArchivePath(file.ArchivePath)!)))
+            var normalized = NormalizeArchivePath(file.ArchivePath);
+            if (normalized is null || (!file.IsMissing && !entries.ContainsKey(normalized)))
                 errors.Add(new ArchiveReportItem("missing-archive-entry", "A required archive file entry is missing.", file.DocumentExportKey, file.ArchivePath));
+            if (!file.IsMissing && !checksumPaths.Contains(normalized ?? string.Empty))
+                errors.Add(new ArchiveReportItem("missing-checksum", "A required archive file checksum is missing.", file.DocumentExportKey, file.ArchivePath));
         }
-        foreach (var checksum in manifest.Checksums)
-            if (!archivePaths.Contains(NormalizeArchivePath(checksum.ArchivePath)))
-                errors.Add(new ArchiveReportItem("invalid-checksum-path", "Checksum references an unknown archive path.", null, checksum.ArchivePath));
     }
 
     private static string? NormalizeArchivePath(string path)
@@ -358,6 +383,37 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
             return scopes.Count == 0;
         }
         catch (JsonException) { return true; }
+    }
+
+    private static DocumentArchiveManifest CanonicalizeManifest(DocumentArchiveManifest manifest)
+    {
+        var sourceDocuments = manifest.Documents ?? [];
+        var sourceFiles = manifest.Files ?? [];
+        var sourceNotes = manifest.Notes ?? [];
+        var sourceCollections = manifest.Collections ?? [];
+        var sourceRelations = manifest.Relations ?? [];
+        var sourceChecksums = manifest.Checksums ?? [];
+        var keyMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var documents = sourceDocuments.Select(document =>
+        {
+            var canonical = DocumentExportKey.TryParse(document.ExportKey, out var key) ? key.Value : document.ExportKey;
+            keyMap[document.ExportKey] = canonical;
+            return document with { ExportKey = canonical };
+        }).ToArray();
+        var files = sourceFiles.Select(file => file with
+        {
+            DocumentExportKey = keyMap.GetValueOrDefault(file.DocumentExportKey, file.DocumentExportKey),
+            ArchivePath = NormalizeArchivePath(file.ArchivePath) ?? file.ArchivePath
+        }).ToArray();
+        var notes = sourceNotes.Select(note => note with { DocumentExportKey = keyMap.GetValueOrDefault(note.DocumentExportKey, note.DocumentExportKey) }).ToArray();
+        var collections = sourceCollections.Select(collection => collection with { DocumentExportKeys = (collection.DocumentExportKeys ?? []).Select(key => keyMap.GetValueOrDefault(key, key)).ToArray() }).ToArray();
+        var relations = sourceRelations.Select(relation => relation with
+        {
+            SourceDocumentExportKey = keyMap.GetValueOrDefault(relation.SourceDocumentExportKey, relation.SourceDocumentExportKey),
+            TargetDocumentExportKey = keyMap.GetValueOrDefault(relation.TargetDocumentExportKey, relation.TargetDocumentExportKey)
+        }).ToArray();
+        var checksums = sourceChecksums.Select(checksum => checksum with { ArchivePath = NormalizeArchivePath(checksum.ArchivePath) ?? checksum.ArchivePath }).ToArray();
+        return manifest with { Documents = documents, Files = files, Notes = notes, Collections = collections, Relations = relations, Checksums = checksums };
     }
 
     private static DocumentArchiveDocument ToManifestDocument(PersonalDocumentArchiveRepository.ArchiveDocumentSource source, string exportKey)

@@ -350,6 +350,99 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
         }
     }
 
+    [Fact]
+    public async Task Export_NullExportKey_PersistsStableKeyAcrossExports()
+    {
+        var documentPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_key_{Guid.NewGuid():N}.txt");
+        var firstArchive = Path.Combine(Path.GetTempPath(), $"sdm_archive_key1_{Guid.NewGuid():N}.zip");
+        var secondArchive = Path.Combine(Path.GetTempPath(), $"sdm_archive_key2_{Guid.NewGuid():N}.zip");
+        try
+        {
+            File.WriteAllText(documentPath, "stable-key");
+            var document = new StudyDocument { Name = "Stable", FilePath = documentPath };
+            Assert.True(Repo.AddWithCatalogs(document));
+            var service = CreateService(Db);
+            var first = await service.ExportAsync(firstArchive, new ArchiveExportOptions());
+            var second = await service.ExportAsync(secondArchive, new ArchiveExportOptions());
+            Assert.True(first.Success);
+            Assert.True(second.Success);
+            Assert.Equal(first.Manifest!.Documents.Single().ExportKey, second.Manifest!.Documents.Single().ExportKey);
+            Assert.NotNull(Repo.GetById(document.Id)!.ExportKey);
+        }
+        finally
+        {
+            Db.CloseAllConnections();
+            TryDelete(documentPath);
+            TryDelete(firstArchive);
+            TryDelete(secondArchive);
+        }
+    }
+
+    [Fact]
+    public async Task Import_MixedConflicts_DoesNotPartiallyCommit()
+    {
+        var sourceDbPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_source_{Guid.NewGuid():N}.db");
+        var archivePath = Path.Combine(Path.GetTempPath(), $"sdm_archive_{Guid.NewGuid():N}.zip");
+        var firstPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_first_{Guid.NewGuid():N}.txt");
+        var secondPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_second_{Guid.NewGuid():N}.txt");
+        try
+        {
+            var sourceDb = new DatabaseHelper();
+            sourceDb.SetDatabasePath(sourceDbPath);
+            sourceDb.InitializeDatabase();
+            File.WriteAllText(firstPath, "first");
+            File.WriteAllText(secondPath, "second");
+            var sourceRepo = new DocumentRepository(sourceDb);
+            Assert.True(sourceRepo.AddWithCatalogs(new StudyDocument { Name = "First", FilePath = firstPath }));
+            Assert.True(sourceRepo.AddWithCatalogs(new StudyDocument { Name = "Second", FilePath = secondPath }));
+            Assert.True((await CreateService(sourceDb).ExportAsync(archivePath, new ArchiveExportOptions())).Success);
+            File.Delete(firstPath);
+            File.Delete(secondPath);
+            var service = CreateService(Db);
+            Assert.True((await service.ImportAsync(archivePath, new ArchiveImportOptions())).Success);
+            var count = Repo.GetAll().Count;
+            var report = await service.ImportAsync(archivePath, new ArchiveImportOptions());
+            Assert.False(report.Success);
+            Assert.NotEmpty(report.Conflicts);
+            Assert.Equal(count, Repo.GetAll().Count);
+        }
+        finally
+        {
+            Db.CloseAllConnections();
+            TryDelete(sourceDbPath);
+            TryDelete(archivePath);
+            TryDelete(firstPath);
+            TryDelete(secondPath);
+        }
+    }
+
+    [Fact]
+    public async Task Import_UppercaseEquivalentKeys_ReportsCanonicalDuplicate()
+    {
+        var archivePath = Path.Combine(Path.GetTempPath(), $"sdm_archive_duplicate_{Guid.NewGuid():N}.zip");
+        try
+        {
+            var manifest = CreateManifest();
+            var first = manifest.Documents[0];
+            var duplicate = first with { ExportKey = first.ExportKey.ToUpperInvariant(), DatabaseId = 43 };
+            var duplicateManifest = manifest with { Documents = [first, duplicate] };
+            using (var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create))
+            {
+                var entry = archive.CreateEntry("manifest.json");
+                using var stream = entry.Open();
+                JsonSerializer.Serialize(stream, duplicateManifest);
+            }
+            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions());
+            Assert.False(report.Success);
+            Assert.Contains(report.ValidationErrors, error => error.Code == "duplicate-export-key");
+        }
+        finally
+        {
+            Db.CloseAllConnections();
+            TryDelete(archivePath);
+        }
+    }
+
     private static PersonalDocumentArchiveService CreateService(DatabaseHelper database)
     {
         var documents = new DocumentRepository(database);

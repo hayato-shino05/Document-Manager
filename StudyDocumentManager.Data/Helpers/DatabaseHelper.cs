@@ -377,6 +377,17 @@ public class DatabaseHelper
     }
 
 
+    public void UpdateArchiveExportKey(int documentId, string exportKey)
+    {
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        command.CommandText = "UPDATE documents SET archive_export_key = @key WHERE id = @id";
+        command.Parameters.AddWithValue("@key", exportKey);
+        command.Parameters.AddWithValue("@id", documentId);
+        if (command.ExecuteNonQuery() != 1)
+            throw new InvalidOperationException("Document archive identity could not be persisted.");
+    }
+
     public IReadOnlyDictionary<string, int> ImportArchiveGraph(
         DocumentArchiveManifest manifest,
         IReadOnlyList<DocumentArchiveDocument> documents)
@@ -388,7 +399,7 @@ public class DatabaseHelper
             var ids = new Dictionary<string, int>(StringComparer.Ordinal);
             foreach (var source in documents)
             {
-                if (!DocumentExportKey.TryParse(source.ExportKey, out _))
+                if (!DocumentExportKey.TryParse(source.ExportKey, out var parsedKey))
                     throw new InvalidOperationException("Archive document key is invalid.");
 
                 if (!string.IsNullOrWhiteSpace(source.Subject))
@@ -403,7 +414,7 @@ public class DatabaseHelper
                     VALUES (@archiveExportKey, @name, @subject, @type, @filePath, @notes, @createdAt, @fileSize, @author, @isImportant, @tags, @deadline, @isDeleted, @deletedAt, @status);
                     SELECT last_insert_rowid();
                     """;
-                command.Parameters.AddWithValue("@archiveExportKey", source.ExportKey);
+                command.Parameters.AddWithValue("@archiveExportKey", parsedKey.Value);
                 command.Parameters.AddWithValue("@name", source.Name ?? string.Empty);
                 command.Parameters.AddWithValue("@subject", (object?)source.Subject ?? DBNull.Value);
                 command.Parameters.AddWithValue("@type", (object?)source.Type ?? DBNull.Value);
@@ -418,7 +429,7 @@ public class DatabaseHelper
                 command.Parameters.AddWithValue("@isDeleted", source.IsDeleted ? 1 : 0);
                 command.Parameters.AddWithValue("@deletedAt", source.IsDeleted ? DateTime.Now : DBNull.Value);
                 command.Parameters.AddWithValue("@status", string.IsNullOrWhiteSpace(source.Status) ? DocumentStatus.Unread : source.Status);
-                ids[source.ExportKey] = Convert.ToInt32(command.ExecuteScalar());
+                ids[parsedKey.Value] = Convert.ToInt32(command.ExecuteScalar());
             }
 
             foreach (var note in manifest.Notes.Where(note => ids.ContainsKey(note.DocumentExportKey)))
