@@ -652,7 +652,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(destinationRoot));
 
             Assert.False(report.Success);
-            Assert.Equal(ArchiveTransactionOutcome.NotStarted, report.TransactionOutcome);
+            Assert.Equal(ArchiveTransactionOutcome.RolledBack, report.TransactionOutcome);
             Assert.Contains(report.ValidationErrors, error => error.Code == "invalid-destination-path");
             Assert.Empty(Repo.GetAll());
             Assert.Empty(Directory.EnumerateFileSystemEntries(targetRoot));
@@ -709,7 +709,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(destinationRoot));
 
             Assert.False(report.Success);
-            Assert.Equal(ArchiveTransactionOutcome.NotStarted, report.TransactionOutcome);
+            Assert.Equal(ArchiveTransactionOutcome.RolledBack, report.TransactionOutcome);
             Assert.Contains(report.ValidationErrors, error => error.Code == "invalid-destination-path");
             Assert.Empty(Repo.GetAll());
             Assert.False(File.Exists(Path.Combine(missingTarget, "document.pdf")));
