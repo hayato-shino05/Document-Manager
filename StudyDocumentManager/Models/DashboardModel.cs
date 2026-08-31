@@ -641,7 +641,7 @@ public partial class DashboardModel : ModelBase, IDisposable
             ? _repository.GetAll()
             : status != null
                 ? _repository.SearchAdvancedWithStatus(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant, status)
-                : _repository.SearchAdvanced(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant);
+                : _repository.SearchAdvancedWithNotes(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant);
 
         OnPropertyChanged(nameof(ActiveFilterCount));
         UpdateVisibleState(results);
