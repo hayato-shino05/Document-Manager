@@ -151,6 +151,7 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
         var errors = new List<ArchiveReportItem>();
         var staged = new List<StagedFile>();
         var createdFiles = new List<string>();
+        var createdDirectories = new List<string>();
         var stagingDirectory = Path.Combine(Path.GetTempPath(), "study-document-archive", Guid.NewGuid().ToString("N"));
         ArchiveTransactionOutcome outcome = ArchiveTransactionOutcome.NotStarted;
 
@@ -174,7 +175,9 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                 }
                 if (!entries.TryAdd(normalized, entry))
                     errors.Add(new ArchiveReportItem("duplicate-archive-entry", "ZIP contains duplicate archive names.", null, normalized));
-                if (normalized != "manifest.json")
+                if (entry.Length > MaxImportTotalBytes || totalBytes > MaxImportTotalBytes - entry.Length)
+                    totalBytes = MaxImportTotalBytes + 1;
+                else
                     totalBytes += entry.Length;
             }
 
@@ -182,15 +185,16 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                 errors.Add(new ArchiveReportItem("too-many-entries", "Archive contains too many entries."));
             if (totalBytes > MaxImportTotalBytes)
                 errors.Add(new ArchiveReportItem("archive-too-large", "Archive exceeds the total import size limit."));
+            if (entries.TryGetValue("manifest.json", out var candidateManifest) && candidateManifest.Length > MaxImportManifestBytes)
+                errors.Add(new ArchiveReportItem("manifest-too-large", "Manifest exceeds the import size limit.", null, "manifest.json"));
             if (!entries.TryGetValue("manifest.json", out var manifestEntry))
                 errors.Add(new ArchiveReportItem("missing-manifest", "Archive manifest.json is required.", null, "manifest.json"));
             if (errors.Count > 0)
                 return Task.FromResult(new ArchiveImportReport(false, 0, 0, missingFiles, conflicts, errors, ArchiveTransactionOutcome.RolledBack));
 
-            using var manifestStream = manifestEntry!.Open();
-            using var manifestMemory = new MemoryStream();
-            manifestStream.CopyTo(manifestMemory);
-            var manifestBytes = manifestMemory.ToArray();
+            var manifestBytes = new byte[checked((int)manifestEntry!.Length)];
+            using (var manifestStream = manifestEntry.Open())
+                manifestStream.ReadExactly(manifestBytes);
             if (!HasUniqueJsonProperties(manifestBytes))
                 errors.Add(new ArchiveReportItem("duplicate-json-key", "Manifest contains duplicate JSON properties."));
 
@@ -289,7 +293,10 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                     throw new IOException("Import destination already exists.");
                 var directory = Path.GetDirectoryName(destination);
                 if (!string.IsNullOrWhiteSpace(directory))
+                {
+                    createdDirectories.AddRange(GetMissingParentDirectories(directory));
                     Directory.CreateDirectory(directory);
+                }
                 File.Copy(source.StagedPath, destination, overwrite: false);
                 createdFiles.Add(destination);
             }
@@ -313,12 +320,23 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                     try { if (File.Exists(path)) File.Delete(path); } catch (IOException) { }
                     catch (UnauthorizedAccessException) { }
                 }
+                foreach (var directory in createdDirectories.OrderByDescending(path => path.Length))
+                {
+                    try
+                    {
+                        if (Directory.Exists(directory) && !Directory.EnumerateFileSystemEntries(directory).Any())
+                            Directory.Delete(directory);
+                    }
+                    catch (IOException) { }
+                    catch (UnauthorizedAccessException) { }
+                }
             }
             TryDeleteDirectory(stagingDirectory);
         }
     }
 
     private const long MaxImportEntryBytes = 64L * 1024 * 1024;
+    private const long MaxImportManifestBytes = 8L * 1024 * 1024;
     private const int MaxImportEntries = 5000;
     private const long MaxImportTotalBytes = 256L * 1024 * 1024;
 
@@ -439,6 +457,18 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
 
     private static ArchiveExportReport Failure(string code, string message)
         => new(false, 0, [], [], [new ArchiveReportItem(code, message)]);
+
+    private static IReadOnlyList<string> GetMissingParentDirectories(string directory)
+    {
+        var missing = new List<string>();
+        var current = directory;
+        while (!string.IsNullOrWhiteSpace(current) && !Directory.Exists(current))
+        {
+            missing.Add(current);
+            current = Path.GetDirectoryName(current) ?? string.Empty;
+        }
+        return missing;
+    }
 
     private static void TryDeleteDirectory(string path)
     {

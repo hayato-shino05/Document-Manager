@@ -496,6 +496,81 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
         }
     }
 
+    [Fact]
+    public async Task Import_FilesystemFailure_RemovesNewDestinationDirectories()
+    {
+        var sourceDbPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_source_{Guid.NewGuid():N}.db");
+        var archivePath = Path.Combine(Path.GetTempPath(), $"sdm_archive_{Guid.NewGuid():N}.zip");
+        var firstPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_new_{Guid.NewGuid():N}", "nested", "first.txt");
+        var secondPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_existing_{Guid.NewGuid():N}.txt");
+        try
+        {
+            var sourceDb = new DatabaseHelper();
+            sourceDb.SetDatabasePath(sourceDbPath);
+            sourceDb.InitializeDatabase();
+            Directory.CreateDirectory(Path.GetDirectoryName(firstPath)!);
+            File.WriteAllText(firstPath, "first");
+            File.WriteAllText(secondPath, "second");
+            var sourceRepo = new DocumentRepository(sourceDb);
+            Assert.True(sourceRepo.AddWithCatalogs(new StudyDocument { Name = "First", FilePath = firstPath }));
+            Assert.True(sourceRepo.AddWithCatalogs(new StudyDocument { Name = "Second", FilePath = secondPath }));
+            Assert.True((await CreateService(sourceDb).ExportAsync(archivePath, new ArchiveExportOptions())).Success);
+            File.Delete(firstPath);
+            File.WriteAllText(secondPath, "existing");
+            var newRoot = Path.GetDirectoryName(Path.GetDirectoryName(firstPath)!)!;
+            Directory.Delete(Path.GetDirectoryName(firstPath)!, recursive: true);
+
+            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions());
+
+            Assert.False(report.Success);
+            Assert.True(report.RolledBack);
+            Assert.Empty(Repo.GetAll());
+            Assert.False(File.Exists(firstPath));
+            Assert.False(Directory.Exists(newRoot));
+            Assert.Equal("existing", File.ReadAllText(secondPath));
+        }
+        finally
+        {
+            Db.CloseAllConnections();
+            TryDelete(sourceDbPath);
+            TryDelete(archivePath);
+            TryDelete(firstPath);
+            TryDelete(secondPath);
+            TryDeleteDirectory(Path.GetDirectoryName(firstPath)!);
+        }
+    }
+
+    [Fact]
+    public async Task Import_OversizedMalformedManifest_FailsBeforeMutation()
+    {
+        var archivePath = Path.Combine(Path.GetTempPath(), $"sdm_archive_{Guid.NewGuid():N}.zip");
+        var destinationPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_destination_{Guid.NewGuid():N}", "document.txt");
+        try
+        {
+            using (var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create))
+            {
+                var entry = archive.CreateEntry("manifest.json");
+                using var stream = entry.Open();
+                stream.Write(new byte[8 * 1024 * 1024 + 1]);
+            }
+
+            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions());
+
+            Assert.False(report.Success);
+            Assert.True(report.RolledBack);
+            Assert.Contains(report.ValidationErrors, error => error.Code == "manifest-too-large");
+            Assert.Empty(Repo.GetAll());
+            Assert.False(File.Exists(destinationPath));
+            Assert.False(Directory.Exists(Path.GetDirectoryName(destinationPath)!));
+        }
+        finally
+        {
+            Db.CloseAllConnections();
+            TryDelete(archivePath);
+            TryDeleteDirectory(Path.GetDirectoryName(destinationPath)!);
+        }
+    }
+
     private static PersonalDocumentArchiveService CreateService(DatabaseHelper database)
     {
         var documents = new DocumentRepository(database);
@@ -508,6 +583,11 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             documents,
             database);
         return new PersonalDocumentArchiveService(repository);
+    }
+
+    private static void TryDeleteDirectory(string path)
+    {
+        try { if (Directory.Exists(path)) Directory.Delete(path, recursive: true); } catch (IOException) { }
     }
 
     private static void TryDelete(string path)
