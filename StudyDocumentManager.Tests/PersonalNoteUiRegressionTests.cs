@@ -248,6 +248,31 @@ public sealed class PersonalNoteUiRegressionTests
     }
 
     [Fact]
+    public async Task PersonalNote_SaveNewDuplicateContent_SelectsInsertedPinnedNote()
+    {
+        var repository = new PersonalNoteRepositoryStub
+        {
+            Notes = [new(1, 7, "summary", "Duplicate", false)]
+        };
+        var model = new PersonalNoteModel(
+            repository,
+            new DialogServiceStub(),
+            new NavigationServiceStub(),
+            new LocalizationServiceStub());
+        model.Load(7, "Algebra");
+
+        model.NewNoteCommand.Execute(null);
+        model.SelectedNoteType = "summary";
+        model.IsPinned = true;
+        model.NoteContent = "Duplicate";
+        await model.SaveNoteCommand.ExecuteAsync(null);
+
+        Assert.Equal(2, model.SelectedNote?.Id);
+        Assert.True(model.SelectedNote?.IsPinned);
+        Assert.Equal(2, repository.Notes.Count);
+    }
+
+    [Fact]
     public async Task PersonalNote_NewNote_PreservesExistingGeneralNote()
     {
         var repository = new PersonalNoteRepositoryStub
@@ -341,7 +366,10 @@ public sealed class PersonalNoteUiRegressionTests
         public List<PersonalNote> Notes { get; set; } = [];
         public string? GetNote(int documentId) => Notes.FirstOrDefault(note => note.NoteType == "general")?.Content ?? SavedContent;
         public IReadOnlyList<PersonalNote> GetNotes(int documentId, bool includeDeleted = false)
-            => Notes.Where(note => note.DocumentId == documentId).ToList();
+            => Notes.Where(note => note.DocumentId == documentId)
+                .OrderByDescending(note => note.IsPinned)
+                .ThenBy(note => note.Id)
+                .ToList();
         public bool SaveNote(PersonalNote note)
         {
             if (note.Id == 0)
