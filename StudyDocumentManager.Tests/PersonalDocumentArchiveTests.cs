@@ -629,20 +629,30 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
                 return;
             }
 
+            const string archiveFileContent = "archive-content";
+            var archiveFileBytes = Encoding.UTF8.GetBytes(archiveFileContent);
+            var archiveFileHash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(archiveFileBytes)).ToLowerInvariant();
             var manifest = CreateManifest() with
             {
-                Documents = [CreateDocument("11111111111111111111111111111111", 42) with { FilePath = "linked/document.pdf" }]
+                Documents = [CreateDocument("11111111111111111111111111111111", 42) with { FilePath = "linked/document.pdf" }],
+                Files = [new DocumentArchiveFile("11111111111111111111111111111111", "linked/document.pdf", "C:/source/document.pdf", false)],
+                Checksums = [new DocumentArchiveChecksum("linked/document.pdf", archiveFileHash)]
             };
             using (var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create))
             {
-                var entry = archive.CreateEntry("manifest.json");
-                using var stream = new StreamWriter(entry.Open());
-                stream.Write(JsonSerializer.Serialize(manifest));
+                var manifestEntry = archive.CreateEntry("manifest.json");
+                using (var stream = new StreamWriter(manifestEntry.Open()))
+                    stream.Write(JsonSerializer.Serialize(manifest));
+
+                var fileEntry = archive.CreateEntry("linked/document.pdf");
+                using var fileStream = fileEntry.Open();
+                fileStream.Write(archiveFileBytes);
             }
 
             var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(destinationRoot));
 
             Assert.False(report.Success);
+            Assert.Equal(ArchiveTransactionOutcome.NotStarted, report.TransactionOutcome);
             Assert.Contains(report.ValidationErrors, error => error.Code == "invalid-destination-path");
             Assert.Empty(Repo.GetAll());
             Assert.Empty(Directory.EnumerateFileSystemEntries(targetRoot));
@@ -676,20 +686,30 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
                 return;
             }
 
+            const string archiveFileContent = "archive-content";
+            var archiveFileBytes = Encoding.UTF8.GetBytes(archiveFileContent);
+            var archiveFileHash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(archiveFileBytes)).ToLowerInvariant();
             var manifest = CreateManifest() with
             {
-                Documents = [CreateDocument("11111111111111111111111111111111", 42) with { FilePath = "linked/document.pdf" }]
+                Documents = [CreateDocument("11111111111111111111111111111111", 42) with { FilePath = "linked/document.pdf" }],
+                Files = [new DocumentArchiveFile("11111111111111111111111111111111", "linked/document.pdf", "C:/source/document.pdf", false)],
+                Checksums = [new DocumentArchiveChecksum("linked/document.pdf", archiveFileHash)]
             };
             using (var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create))
             {
-                var entry = archive.CreateEntry("manifest.json");
-                using var stream = new StreamWriter(entry.Open());
-                stream.Write(JsonSerializer.Serialize(manifest));
+                var manifestEntry = archive.CreateEntry("manifest.json");
+                using (var stream = new StreamWriter(manifestEntry.Open()))
+                    stream.Write(JsonSerializer.Serialize(manifest));
+
+                var fileEntry = archive.CreateEntry("linked/document.pdf");
+                using var fileStream = fileEntry.Open();
+                fileStream.Write(archiveFileBytes);
             }
 
             var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(destinationRoot));
 
             Assert.False(report.Success);
+            Assert.Equal(ArchiveTransactionOutcome.NotStarted, report.TransactionOutcome);
             Assert.Contains(report.ValidationErrors, error => error.Code == "invalid-destination-path");
             Assert.Empty(Repo.GetAll());
             Assert.False(File.Exists(Path.Combine(missingTarget, "document.pdf")));
