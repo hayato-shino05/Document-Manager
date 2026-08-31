@@ -165,10 +165,11 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             Assert.True((await CreateService(sourceDb).ExportAsync(archivePath, new ArchiveExportOptions())).Success);
             File.Delete(documentPath);
 
-            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions());
+            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(Path.GetTempPath()));
 
             Assert.True(report.Success, string.Join("; ", report.ValidationErrors.Select(error => error.Code + ":" + error.Message)));
             Assert.Equal(1, report.ImportedDocuments);
+            Assert.StartsWith(Path.GetFullPath(Path.GetTempPath()), Path.GetFullPath(Repo.GetAll().Single().FilePath), StringComparison.OrdinalIgnoreCase);
             Assert.True(File.Exists(documentPath));
             Assert.Equal("archive-content", File.ReadAllText(documentPath));
             Assert.Single(Repo.GetAll());
@@ -199,10 +200,10 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             Assert.True((await CreateService(sourceDb).ExportAsync(archivePath, new ArchiveExportOptions())).Success);
             File.Delete(documentPath);
             var service = CreateService(Db);
-            Assert.True((await service.ImportAsync(archivePath, new ArchiveImportOptions())).Success);
+            Assert.True((await service.ImportAsync(archivePath, new ArchiveImportOptions(Path.GetTempPath()))).Success);
             var before = File.ReadAllText(documentPath);
 
-            var report = await service.ImportAsync(archivePath, new ArchiveImportOptions());
+            var report = await service.ImportAsync(archivePath, new ArchiveImportOptions(Path.GetTempPath()));
 
             Assert.False(report.Success);
             Assert.NotEmpty(report.Conflicts);
@@ -255,7 +256,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
                 }
             }
 
-            var report = await CreateService(Db).ImportAsync(tamperedPath, new ArchiveImportOptions());
+            var report = await CreateService(Db).ImportAsync(tamperedPath, new ArchiveImportOptions(Path.GetTempPath()));
 
             Assert.False(report.Success);
             Assert.True(report.RolledBack);
@@ -310,7 +311,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             targetDb.InitializeDatabase();
             var targetRepo = new DocumentRepository(targetDb);
 
-            var importReport = await CreateService(targetDb).ImportAsync(archivePath, new ArchiveImportOptions());
+            var importReport = await CreateService(targetDb).ImportAsync(archivePath, new ArchiveImportOptions(Path.GetTempPath()));
             Assert.True(importReport.Success, string.Join("; ", importReport.ValidationErrors.Select(e => e.Code + ":" + e.Message)));
             Assert.Equal(2, importReport.ImportedDocuments);
             Assert.Empty(importReport.Conflicts);
@@ -378,7 +379,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             var targetDb = new DatabaseHelper();
             targetDb.SetDatabasePath(targetDbPath);
             targetDb.InitializeDatabase();
-            var importReport = await CreateService(targetDb).ImportAsync(archivePath, new ArchiveImportOptions());
+            var importReport = await CreateService(targetDb).ImportAsync(archivePath, new ArchiveImportOptions(Path.GetTempPath()));
 
             Assert.True(importReport.Success, string.Join("; ", importReport.ValidationErrors.Select(error => error.Code)));
             Assert.Equal(deletedAt, Assert.Single(new DocumentRepository(targetDb).GetDeletedDocuments()).DeletedAt);
@@ -449,7 +450,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             Assert.True(Repo.Add(new StudyDocument { Name = "Existing first", ExportKey = existingKey, FilePath = firstPath }));
             var service = CreateService(Db);
 
-            var report = await service.ImportAsync(archivePath, new ArchiveImportOptions());
+            var report = await service.ImportAsync(archivePath, new ArchiveImportOptions(Path.GetTempPath()));
 
             Assert.False(report.Success);
             Assert.Single(report.Conflicts);
@@ -485,7 +486,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
                 using var stream = entry.Open();
                 JsonSerializer.Serialize(stream, duplicateManifest);
             }
-            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions());
+            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(Path.GetTempPath()));
             Assert.False(report.Success);
             Assert.Contains(report.ValidationErrors, error => error.Code == "duplicate-export-key");
         }
@@ -520,7 +521,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             var newRoot = Path.GetDirectoryName(Path.GetDirectoryName(firstPath)!)!;
             Directory.Delete(Path.GetDirectoryName(firstPath)!, recursive: true);
 
-            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions());
+            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(Path.GetTempPath()));
 
             Assert.False(report.Success);
             Assert.True(report.RolledBack);
@@ -554,7 +555,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
                 stream.Write(new byte[8 * 1024 * 1024 + 1]);
             }
 
-            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions());
+            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(Path.GetTempPath()));
 
             Assert.False(report.Success);
             Assert.True(report.RolledBack);

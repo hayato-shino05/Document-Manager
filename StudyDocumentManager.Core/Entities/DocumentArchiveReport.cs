@@ -2,7 +2,7 @@ namespace StudyDocumentManager.Core.Entities;
 
 public sealed record ArchiveExportOptions(IReadOnlyList<int>? DocumentIds = null, bool IncludeDeleted = true);
 
-public sealed record ArchiveImportOptions(bool ValidateOnly = false);
+public sealed record ArchiveImportOptions(string DestinationRoot, bool ValidateOnly = false);
 
 public enum ArchiveTransactionOutcome
 {
