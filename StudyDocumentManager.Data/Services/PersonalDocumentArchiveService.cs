@@ -167,6 +167,8 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
             var destinationRoot = Path.GetFullPath(options.DestinationRoot.Trim());
             if (File.Exists(destinationRoot))
                 return Task.FromResult(ImportFailure("invalid-destination-root", "Destination root must be a directory."));
+            if (HasReparsePointInDestinationPath(destinationRoot, destinationRoot))
+                return Task.FromResult(ImportFailure("invalid-destination-root", "Destination root cannot contain reparse points."));
 
             using var archive = ZipFile.OpenRead(Path.GetFullPath(sourceZip));
             var entries = new Dictionary<string, ZipArchiveEntry>(StringComparer.Ordinal);
@@ -226,7 +228,7 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                         continue;
 
                     if (!TryResolveDestinationPath(destinationRoot, document.FilePath, out _))
-                        errors.Add(new ArchiveReportItem("invalid-destination-path", "Document file paths must be relative and remain under the destination root.", document.ExportKey, document.FilePath));
+                        errors.Add(new ArchiveReportItem("invalid-destination-path", "Document file paths must remain under the destination root.", document.ExportKey, document.FilePath));
                 }
                 ValidateArchiveShape(manifest, entries, errors);
             }
@@ -412,22 +414,48 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
         if (string.IsNullOrWhiteSpace(archiveFilePath))
             return false;
 
+        var trimmedPath = archiveFilePath.Trim();
+        if (trimmedPath.EndsWith(Path.DirectorySeparatorChar) || trimmedPath.EndsWith(Path.AltDirectorySeparatorChar))
+            return false;
+
         try
         {
             var root = Path.GetFullPath(destinationRoot.Trim());
-            var candidate = Path.GetFullPath(Path.IsPathRooted(archiveFilePath)
-                ? archiveFilePath.Trim()
-                : Path.Combine(root, archiveFilePath.Trim()));
+            var candidate = Path.GetFullPath(Path.IsPathRooted(trimmedPath)
+                ? trimmedPath
+                : Path.Combine(root, trimmedPath));
             var relative = Path.GetRelativePath(root, candidate);
-            if (relative == ".." || relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal) || Path.IsPathRooted(relative))
+            if (relative == "." || relative == ".." || relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal) || Path.IsPathRooted(relative))
+                return false;
+            if (HasReparsePointInDestinationPath(root, candidate))
                 return false;
             destination = candidate;
             return true;
         }
-        catch (ArgumentException)
+        catch (Exception exception) when (exception is ArgumentException or IOException or UnauthorizedAccessException or NotSupportedException)
         {
             return false;
         }
+    }
+
+    private static bool HasReparsePointInDestinationPath(string root, string candidate)
+    {
+        var current = candidate;
+        while (!string.IsNullOrWhiteSpace(current))
+        {
+            if (File.Exists(current) || Directory.Exists(current))
+            {
+                var attributes = File.GetAttributes(current);
+                if (attributes.HasFlag(FileAttributes.ReparsePoint))
+                    return true;
+            }
+
+            if (string.Equals(current, root, StringComparison.OrdinalIgnoreCase))
+                return false;
+            current = Path.GetDirectoryName(current) ?? string.Empty;
+        }
+
+        return false;
     }
 
     private static string? NormalizeFilePath(string path)
