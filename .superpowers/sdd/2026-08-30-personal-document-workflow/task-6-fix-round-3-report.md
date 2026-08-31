@@ -12,4 +12,5 @@
 - `git diff --check`: 成功。
 - focused tests は既存 `CategoryManagement.axaml` AVLN1001 および test compile の既存重複定義/`PersonalNote` ambiguity により blocked。
 - GitNexus impact/detect_changes は LadybugDB checkpoint 中のため unavailable。CodeGraph と Serena による source fallback を使用し、risk UNKNOWN。
+- `InitializeDatabase_RebuildsDocuments_AndPreservesArchiveKeyIndex` を追加し、document rebuild 後の row 保持と archive index 保持を回帰対象にした。
 - aggregate/per-entry/checksum/path/DB rollback の追加 focused coverage は scope/time のため unresolved として残す。
