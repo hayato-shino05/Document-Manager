@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using StudyDocumentManager.Core.Entities;
+using PersonalNoteEntity = StudyDocumentManager.Core.Entities.PersonalNote;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using StudyDocumentManager.Core.Interfaces;
@@ -363,14 +363,14 @@ public sealed class PersonalNoteUiRegressionTests
     private sealed class PersonalNoteRepositoryStub : IPersonalNoteRepository
     {
         public string? SavedContent { get; private set; }
-        public List<PersonalNote> Notes { get; set; } = [];
+        public List<PersonalNoteEntity> Notes { get; set; } = [];
         public string? GetNote(int documentId) => Notes.FirstOrDefault(note => note.NoteType == "general")?.Content ?? SavedContent;
-        public IReadOnlyList<PersonalNote> GetNotes(int documentId, bool includeDeleted = false)
+        public IReadOnlyList<PersonalNoteEntity> GetNotes(int documentId, bool includeDeleted = false)
             => Notes.Where(note => note.DocumentId == documentId)
                 .OrderByDescending(note => note.IsPinned)
                 .ThenBy(note => note.Id)
                 .ToList();
-        public bool SaveNote(PersonalNote note)
+        public bool SaveNote(PersonalNoteEntity note)
         {
             if (note.Id == 0)
             {
