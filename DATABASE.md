@@ -214,14 +214,28 @@
 個人文書アーカイブのエクスポート/インポートでは、`DocumentArchiveManifest` という
 JSON ファイルを ZIP 内に同梱します。エクスポート時には対象文書数、合計サイズ、
 ファイル単位の `ArchivePath` と SHA-256 `checksum` を保存します。インポート時は
-manifest と実際に ZIP に入っているファイルの checksum を突き合わせ、不一致なら
-そのファイルを skip して残りを処理します。
+manifest と ZIP の構造、参照、各ファイルの長さおよび checksum を書き込み前に検証します。
+checksum が欠落、形式不正、または実体と不一致の場合は、ファイル単位で skip せず、
+インポート全体を拒否します。この preflight 検証で拒否された場合、`ArchiveImportReport`
+は `Success = false` と `TransactionOutcome = RolledBack` を返し、データベースや宛先
+ファイルは変更されません。
 
-stage 領域は `%TEMP%/sdm_archive_<guid>` 配下に文書ごとに
-`<archive_export_key>/<file_name>` の形で展開します。書き込みは transaction を
-分けて commit し、conflict は manifest の `duplicate_candidate` フラグとファイル
-レベルの同一性で判定します。`archive_export_key` は `documents.archive_export_key`
-と一致するため、re-import 後の文書と stable key 経由で照合できます。
+stage 領域は `%TEMP%/study-document-archive/<guid>` 配下に文書ごとに
+`<archive_export_key>/<file_name>` の形で展開します。preflight と staging が成功した後、
+競合がなければ、文書と notes、collections、relations、削除状態を SQLite の 1 transaction
+で書き込みます。書き込みまたはファイル確定に失敗した場合は transaction を rollback し、
+新たに作成した宛先ファイルと空の親ディレクトリを削除します。競合を検出した場合や
+`ValidateOnly` では書き込みを開始せず、`TransactionOutcome = NotStarted` を返します。
+成功時は `TransactionOutcome = Committed` です。`archive_export_key` は
+`documents.archive_export_key` と一致するため、re-import 後の文書を stable key 経由で
+照合できます。
+
+インポート時の `Document.FilePath` は `DestinationRoot` 配下に解決されます。相対パスは
+`DestinationRoot` を基準にし、絶対パスも同じ root 配下の場合だけ受け付けます。親ディレクトリ
+移動、および既存の reparse point（junction や symbolic link）を含む宛先パスは preflight で
+拒否し、拒否時はファイルやデータベースを変更しません。検査とファイル確定の間に別プロセスが
+reparse point を差し替える競合を原子的には防げないため、インポート先ディレクトリへの書き込み
+権限を信頼できる利用者に限定してください。
 
 ## スキーマ変更のルール
 
