@@ -329,6 +329,20 @@ public class DatabaseIntegrityTests : DatabaseTestBase
         Assert.Equal("Legacy content", reader.GetString(3));
     }
 
+    [Fact]
+    public void InitializeDatabase_WithArchiveKeyIndex_IsIdempotent()
+    {
+        Db.InitializeDatabase();
+        Db.InitializeDatabase();
+
+        using var connection = new SqliteConnection(Db.ConnectionString);
+        connection.Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'index' AND name = 'ux_documents_archive_export_key'";
+
+        Assert.Equal(1L, (long)command.ExecuteScalar()!);
+    }
+
     private static long GetNamedCount(SqliteConnection connection, string tableName, string name)
     {
         using var command = connection.CreateCommand();
