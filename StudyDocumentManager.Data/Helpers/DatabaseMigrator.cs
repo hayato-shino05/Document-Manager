@@ -20,6 +20,12 @@ public static class DatabaseMigrator
         if (duplicateCommand.ExecuteScalar() is not null)
             throw new InvalidOperationException("Duplicate archive export keys prevent migration.");
 
+        using var collisionCommand = connection.CreateCommand();
+        collisionCommand.Transaction = transaction;
+        collisionCommand.CommandText = "SELECT 1 FROM sqlite_master WHERE type = 'index' AND name = 'ux_documents_archive_export_key'";
+        if (collisionCommand.ExecuteScalar() is not null && !IsArchiveExportKeyIndex(connection, "ux_documents_archive_export_key"))
+            throw new InvalidOperationException("Existing archive export key index has an unsupported shape.");
+
         ExecuteSql(connection, transaction, "CREATE UNIQUE INDEX IF NOT EXISTS ux_documents_archive_export_key ON documents(archive_export_key COLLATE BINARY) WHERE archive_export_key IS NOT NULL AND archive_export_key <> ''");
     }
 
@@ -633,6 +639,21 @@ public static class DatabaseMigrator
         return names.SequenceEqual(expectedColumns, StringComparer.Ordinal);
     }
 
+    private static bool IsArchiveExportKeyIndex(SqliteConnection connection, string indexName)
+    {
+        if (!HasUniqueIndex(connection, "documents", ["archive_export_key"], indexName))
+            return false;
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = @name";
+        command.Parameters.AddWithValue("@name", indexName);
+        var sql = command.ExecuteScalar()?.ToString();
+        if (sql is null)
+            return indexName.StartsWith("sqlite_autoindex_documents_", StringComparison.Ordinal);
+        var normalized = string.Concat(sql.Where(character => !char.IsWhiteSpace(character))).ToUpperInvariant();
+        return normalized.Contains("CREATEUNIQUEINDEXUX_DOCUMENTS_ARCHIVE_EXPORT_KEYONDOCUMENTS(ARCHIVE_EXPORT_KEYCOLLATEBINARY)WHEREARCHIVE_EXPORT_KEYISNOTNULLANDARCHIVE_EXPORT_KEY<>''", StringComparison.Ordinal);
+    }
+
     private static bool ValidateDocumentIndexesAndTriggers(SqliteConnection connection)
     {
         var allowedIndexes = new HashSet<string>(StringComparer.Ordinal)
@@ -653,15 +674,16 @@ public static class DatabaseMigrator
         foreach (var index in indexes)
         {
             var isDocumentPathIndex = index.IsUnique && HasUniqueIndex(connection, "documents", ["file_path"], index.Name);
-            var isArchiveExportKeyIndex = index.IsUnique && HasUniqueIndex(connection, "documents", ["archive_export_key"], index.Name);
+            var isArchiveExportKeyConstraint = index.IsUnique && HasUniqueIndex(connection, "documents", ["archive_export_key"], index.Name);
+            var isArchiveExportKeyIndex = index.IsUnique && IsArchiveExportKeyIndex(connection, index.Name);
             if (index.Origin == "u")
             {
-                if (!isDocumentPathIndex && !isArchiveExportKeyIndex)
+                if (!isDocumentPathIndex && !isArchiveExportKeyConstraint)
                     throw new InvalidOperationException($"Unsupported unique constraint '{index.Name}' on 'documents'.");
                 if (isDocumentPathIndex)
                     rebuildDocuments = true;
             }
-            else if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isDocumentPathIndex && !isArchiveExportKeyIndex)
+            else if (index.Origin == "c" && (!allowedIndexes.Contains(index.Name) || (index.Name == "ux_documents_archive_export_key" && !isArchiveExportKeyIndex)) && !isDocumentPathIndex)
             {
                 throw new InvalidOperationException($"Unsupported index '{index.Name}' on 'documents'.");
             }
@@ -727,7 +749,8 @@ public static class DatabaseMigrator
                 if (!isDocumentPathIndex && !isArchiveExportKeyIndex)
                     throw new InvalidOperationException($"Unsupported unique constraint '{indexName}' on '{tableName}'.");
             }
-            else if (origin == "c" && !allowedIndexes.Contains(indexName))
+            else if (origin == "c" && (!allowedIndexes.Contains(indexName)
+                || (tableName == "documents" && indexName == "ux_documents_archive_export_key" && !IsArchiveExportKeyIndex(connection, indexName))))
             {
                 throw new InvalidOperationException($"Unsupported index '{indexName}' on '{tableName}'.");
             }

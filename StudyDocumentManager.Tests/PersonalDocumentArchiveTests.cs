@@ -350,6 +350,49 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
         }
     }
 
+
+    [Fact]
+    public async Task Export_Import_PreservesDeletedAt()
+    {
+        var sourceDbPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_deleted_source_{Guid.NewGuid():N}.db");
+        var archivePath = Path.Combine(Path.GetTempPath(), $"sdm_archive_deleted_{Guid.NewGuid():N}.zip");
+        var documentPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_deleted_file_{Guid.NewGuid():N}.txt");
+        var targetDbPath = Path.Combine(Path.GetTempPath(), $"sdm_archive_deleted_target_{Guid.NewGuid():N}.db");
+        try
+        {
+            var sourceDb = new DatabaseHelper();
+            sourceDb.SetDatabasePath(sourceDbPath);
+            sourceDb.InitializeDatabase();
+            File.WriteAllText(documentPath, "deleted-content");
+            var sourceRepo = new DocumentRepository(sourceDb);
+            Assert.True(sourceRepo.AddWithCatalogs(new StudyDocument { Name = "Deleted", FilePath = documentPath }));
+            var sourceDocument = Assert.Single(sourceRepo.GetAll());
+            Assert.True(sourceRepo.Delete(sourceDocument.Id));
+            var deletedAt = Assert.Single(sourceRepo.GetDeletedDocuments()).DeletedAt;
+            Assert.NotNull(deletedAt);
+            var exportReport = await CreateService(sourceDb).ExportAsync(archivePath, new ArchiveExportOptions { IncludeDeleted = true });
+            Assert.True(exportReport.Success);
+            Assert.Equal(deletedAt, exportReport.Manifest!.Documents.Single().DeletedAt);
+            File.Delete(documentPath);
+
+            var targetDb = new DatabaseHelper();
+            targetDb.SetDatabasePath(targetDbPath);
+            targetDb.InitializeDatabase();
+            var importReport = await CreateService(targetDb).ImportAsync(archivePath, new ArchiveImportOptions());
+
+            Assert.True(importReport.Success, string.Join("; ", importReport.ValidationErrors.Select(error => error.Code)));
+            Assert.Equal(deletedAt, Assert.Single(new DocumentRepository(targetDb).GetDeletedDocuments()).DeletedAt);
+        }
+        finally
+        {
+            Db.CloseAllConnections();
+            TryDelete(sourceDbPath);
+            TryDelete(targetDbPath);
+            TryDelete(archivePath);
+            TryDelete(documentPath);
+        }
+    }
+
     [Fact]
     public async Task Export_NullExportKey_PersistsStableKeyAcrossExports()
     {
@@ -395,16 +438,26 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             var sourceRepo = new DocumentRepository(sourceDb);
             Assert.True(sourceRepo.AddWithCatalogs(new StudyDocument { Name = "First", FilePath = firstPath }));
             Assert.True(sourceRepo.AddWithCatalogs(new StudyDocument { Name = "Second", FilePath = secondPath }));
-            Assert.True((await CreateService(sourceDb).ExportAsync(archivePath, new ArchiveExportOptions())).Success);
+            var exportReport = await CreateService(sourceDb).ExportAsync(archivePath, new ArchiveExportOptions());
+            Assert.True(exportReport.Success);
             File.Delete(firstPath);
             File.Delete(secondPath);
+            var manifest = exportReport.Manifest!;
+            var existingKey = DocumentExportKey.TryParse(manifest.Documents.Single(document => document.Name == "First").ExportKey, out var parsedKey)
+                ? parsedKey
+                : throw new InvalidOperationException("Expected archive key.");
+            Assert.True(Repo.Add(new StudyDocument { Name = "Existing first", ExportKey = existingKey, FilePath = firstPath }));
             var service = CreateService(Db);
-            Assert.True((await service.ImportAsync(archivePath, new ArchiveImportOptions())).Success);
-            var count = Repo.GetAll().Count;
+
             var report = await service.ImportAsync(archivePath, new ArchiveImportOptions());
+
             Assert.False(report.Success);
-            Assert.NotEmpty(report.Conflicts);
-            Assert.Equal(count, Repo.GetAll().Count);
+            Assert.Single(report.Conflicts);
+            Assert.Equal("stable-key-conflict", report.Conflicts[0].Code);
+            Assert.Equal(ArchiveTransactionOutcome.NotStarted, report.Outcome);
+            Assert.Single(Repo.GetAll());
+            Assert.Equal("Existing first", Repo.GetAll()[0].Name);
+            Assert.False(File.Exists(secondPath));
         }
         finally
         {

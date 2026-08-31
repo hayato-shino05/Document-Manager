@@ -22,6 +22,8 @@ public class StudyDocument
     public string Tags { get; set; } = string.Empty;
     public DateTime? Deadline { get; set; }
     public string Status { get; set; } = DocumentStatus.Unread;
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
 
     public StudyDocument()
     {
