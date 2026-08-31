@@ -161,6 +161,12 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                 return Task.FromResult(ImportFailure("invalid-source", "Source ZIP path is required and must exist."));
             if (options is null)
                 return Task.FromResult(ImportFailure("invalid-options", "Import options are required."));
+            if (string.IsNullOrWhiteSpace(options.DestinationRoot))
+                return Task.FromResult(ImportFailure("invalid-destination-root", "Destination root is required."));
+
+            var destinationRoot = Path.GetFullPath(options.DestinationRoot.Trim());
+            if (File.Exists(destinationRoot))
+                return Task.FromResult(ImportFailure("invalid-destination-root", "Destination root must be a directory."));
 
             using var archive = ZipFile.OpenRead(Path.GetFullPath(sourceZip));
             var entries = new Dictionary<string, ZipArchiveEntry>(StringComparer.Ordinal);
@@ -214,6 +220,14 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
             {
                 manifest = CanonicalizeManifest(manifest);
                 errors.AddRange(manifest.Validate().ValidationErrors);
+                foreach (var document in manifest.Documents ?? [])
+                {
+                    if (string.IsNullOrWhiteSpace(document.FilePath))
+                        continue;
+
+                    if (!TryResolveDestinationPath(destinationRoot, document.FilePath, out _))
+                        errors.Add(new ArchiveReportItem("invalid-destination-path", "Document file paths must be relative and remain under the destination root.", document.ExportKey, document.FilePath));
+                }
                 ValidateArchiveShape(manifest, entries, errors);
             }
 
@@ -263,10 +277,17 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
 
             var existing = _repository.GetExistingDocuments();
             var importDocuments = new List<DocumentArchiveDocument>();
-            foreach (var document in manifest.Documents)
+            foreach (var document in manifest.Documents!)
             {
-                var existingByKey = existing.FirstOrDefault(item => string.Equals(item.ExportKey?.Value, document.ExportKey, StringComparison.Ordinal));
-                var normalizedPath = NormalizeFilePath(document.FilePath);
+                var sourceFilePath = document.FilePath;
+                var resolvedPath = string.Empty;
+                if (!string.IsNullOrWhiteSpace(sourceFilePath) && !TryResolveDestinationPath(destinationRoot, sourceFilePath, out resolvedPath))
+                    continue;
+                var canonicalDocument = string.IsNullOrWhiteSpace(sourceFilePath)
+                    ? document
+                    : document with { FilePath = resolvedPath };
+                var existingByKey = existing.FirstOrDefault(item => string.Equals(item.ExportKey?.Value, canonicalDocument.ExportKey, StringComparison.Ordinal));
+                var normalizedPath = NormalizeFilePath(canonicalDocument.FilePath);
                 var existingByPath = string.IsNullOrWhiteSpace(normalizedPath)
                     ? null
                     : existing.FirstOrDefault(item => string.Equals(NormalizeFilePath(item.FilePath), normalizedPath, StringComparison.OrdinalIgnoreCase));
@@ -275,7 +296,7 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                     conflicts.Add(new ArchiveConflict(existingByKey is not null ? "stable-key-conflict" : "path-conflict", "An existing document has the same stable key or normalized file path.", document.ExportKey, document.FilePath));
                     continue;
                 }
-                importDocuments.Add(document);
+                importDocuments.Add(canonicalDocument);
             }
 
             if (options.ValidateOnly || conflicts.Count > 0)
@@ -286,9 +307,11 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
                 if (!filesByKey.TryGetValue(document.ExportKey, out var file) || file.IsMissing)
                     continue;
                 var source = staged.Single(item => string.Equals(NormalizeArchivePath(item.ArchivePath), NormalizeArchivePath(file.ArchivePath), StringComparison.Ordinal));
-                if (string.IsNullOrWhiteSpace(document.FilePath))
+                var documentFilePath = document.FilePath;
+                if (string.IsNullOrWhiteSpace(documentFilePath))
                     continue;
-                var destination = Path.GetFullPath(document.FilePath);
+                if (!TryResolveDestinationPath(destinationRoot, documentFilePath, out var destination))
+                    throw new InvalidDataException("Document file path is outside the destination root.");
                 if (File.Exists(destination))
                     throw new IOException("Import destination already exists.");
                 var directory = Path.GetDirectoryName(destination);
@@ -381,6 +404,30 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
         var segments = normalized.Split('/', StringSplitOptions.RemoveEmptyEntries);
         if (segments.Any(segment => segment is "." or "..")) return null;
         return string.Join('/', segments);
+    }
+
+    private static bool TryResolveDestinationPath(string destinationRoot, string archiveFilePath, out string destination)
+    {
+        destination = string.Empty;
+        if (string.IsNullOrWhiteSpace(archiveFilePath))
+            return false;
+
+        try
+        {
+            var root = Path.GetFullPath(destinationRoot.Trim());
+            var candidate = Path.GetFullPath(Path.IsPathRooted(archiveFilePath)
+                ? archiveFilePath.Trim()
+                : Path.Combine(root, archiveFilePath.Trim()));
+            var relative = Path.GetRelativePath(root, candidate);
+            if (relative == ".." || relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal) || Path.IsPathRooted(relative))
+                return false;
+            destination = candidate;
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
     }
 
     private static string? NormalizeFilePath(string path)
