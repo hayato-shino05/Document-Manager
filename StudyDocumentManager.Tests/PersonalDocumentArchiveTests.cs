@@ -454,7 +454,7 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
             Assert.False(report.Success);
             Assert.Single(report.Conflicts);
             Assert.Equal("stable-key-conflict", report.Conflicts[0].Code);
-            Assert.Equal(ArchiveTransactionOutcome.NotStarted, report.Outcome);
+            Assert.Equal(ArchiveTransactionOutcome.NotStarted, report.TransactionOutcome);
             Assert.Single(Repo.GetAll());
             Assert.Equal("Existing first", Repo.GetAll()[0].Name);
             Assert.False(File.Exists(secondPath));
