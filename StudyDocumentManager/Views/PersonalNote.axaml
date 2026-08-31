@@ -154,6 +154,12 @@
                                     AutomationProperties.Name="{loc:Localize PersonalNote_Pinned}">
                                 <TextBlock Text="{loc:Localize PersonalNote_Pinned}"/>
                             </Button>
+                            <TextBlock x:Name="txtNotePinnedState"
+                                       Text="{loc:Localize PersonalNote_Pinned}"
+                                       IsVisible="{Binding IsPinned}"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource TextSecondary}"
+                                       AutomationProperties.Name="{loc:Localize PersonalNote_Pinned}"/>
                         </WrapPanel>
                         <TextBox x:Name="txtNoteContent"
                                  AutomationProperties.AutomationId="PersonalNote_Content"
