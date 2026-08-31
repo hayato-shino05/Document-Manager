@@ -106,6 +106,9 @@ public partial class PersonalNoteModel : ModelBase
         }
 
         NoteContent = content;
+        var existingNoteIds = SelectedNote is null
+            ? _noteRepo.GetNotes(DocumentId).Select(note => note.Id).ToHashSet()
+            : null;
         var note = new PersonalNote(SelectedNote?.Id ?? 0, DocumentId, SelectedNoteType, content, IsPinned);
         if (!_noteRepo.SaveNote(note))
         {
@@ -115,7 +118,17 @@ public partial class PersonalNoteModel : ModelBase
 
         SavedNoteContent = content;
         HasExistingNote = true;
-        ReloadNotes(note.Id, note.NoteType, content);
+        var savedNoteId = note.Id != 0
+            ? note.Id
+            : _noteRepo.GetNotes(DocumentId)
+                .Where(savedNote =>
+                    savedNote.NoteType == note.NoteType &&
+                    savedNote.Content == content &&
+                    (existingNoteIds is null || !existingNoteIds.Contains(savedNote.Id)))
+                .OrderByDescending(savedNote => savedNote.Id)
+                .Select(savedNote => (int?)savedNote.Id)
+                .FirstOrDefault();
+        ReloadNotes(savedNoteId ?? 0, note.NoteType, content);
         if (!string.Equals(SelectedNote?.Content, content, StringComparison.Ordinal))
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
@@ -188,7 +201,9 @@ public partial class PersonalNoteModel : ModelBase
         SelectedNote = noteId != 0
             ? Notes.FirstOrDefault(note => note.Id == noteId)
             : noteType is not null && content is not null
-                ? Notes.LastOrDefault(note => note.NoteType == noteType && note.Content == content)
+                ? Notes.Where(note => note.NoteType == noteType && note.Content == content)
+                    .OrderByDescending(note => note.Id)
+                    .FirstOrDefault()
                 : Notes.FirstOrDefault(note => note.NoteType == "general") ?? Notes.FirstOrDefault();
 
         if (SelectedNote is null)
