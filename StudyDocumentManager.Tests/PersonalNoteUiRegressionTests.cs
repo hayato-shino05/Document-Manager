@@ -268,7 +268,7 @@ public sealed class PersonalNoteUiRegressionTests
         await model.SaveNoteCommand.ExecuteAsync(null);
 
         Assert.Equal(2, model.SelectedNote?.Id);
-        Assert.True(model.SelectedNote?.IsPinned);
+        Assert.True(model.SelectedNote is { IsPinned: true });
         Assert.Equal(2, repository.Notes.Count);
     }
 
