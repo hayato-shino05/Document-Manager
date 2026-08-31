@@ -11,7 +11,9 @@
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
                 <Button Classes="secondary" Command="{Binding GoBackCommand}" Padding="{StaticResource PaddingSm}"
                         VerticalAlignment="Center"
-                        AutomationProperties.AutomationId="RelatedDocs_Back">
+                        AutomationProperties.AutomationId="RelatedDocs_Back"
+                        AutomationProperties.Name="{loc:Localize RelatedDocs_BtnBack}"
+                        AutomationProperties.HelpText="{loc:Localize RelatedDocs_BtnBack}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <Image Source="{StaticResource IconBack}" Width="12" Height="12"/>
                         <TextBlock Text="{loc:Localize RelatedDocs_BtnBack}" FontSize="{StaticResource FontSizeSm}"/>
@@ -59,6 +61,9 @@
                                                     BorderThickness="0,0,0,1">
                                                 <DockPanel>
                                                     <Button DockPanel.Dock="Right" Classes="secondary" Padding="6,2"
+                                                            AutomationProperties.AutomationId="RelatedDocs_RemoveLink"
+                                                            AutomationProperties.Name="{loc:Localize RelatedDocs_BtnRemove}"
+                                                            AutomationProperties.HelpText="{loc:Localize RelatedDocs_BtnRemove}"
                                                             Command="{Binding $parent[ItemsControl].DataContext.RemoveRelationCommand}"
                                                             CommandParameter="{Binding}">
                                                         <Image Source="{StaticResource IconClose}" Width="10" Height="10"/>
@@ -113,7 +118,9 @@
                                               Width="110" Height="26" FontSize="{StaticResource FontSizeSm}"/>
                                     <Button Classes="primary"
                                             Command="{Binding AddRelationCommand}" Padding="{StaticResource PaddingBtnSm}"
-                                            AutomationProperties.AutomationId="RelatedDocs_AddLink">
+                                            AutomationProperties.AutomationId="RelatedDocs_AddLink"
+                                            AutomationProperties.Name="{loc:Localize RelatedDocs_BtnAddLink}"
+                                            AutomationProperties.HelpText="{loc:Localize RelatedDocs_BtnAddLink}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
                                             <TextBlock Text="{loc:Localize RelatedDocs_BtnAddLink}" FontSize="{StaticResource FontSizeSm}"/>

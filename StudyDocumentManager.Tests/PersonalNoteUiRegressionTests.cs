@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using PersonalNoteEntity = StudyDocumentManager.Core.Entities.PersonalNote;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using StudyDocumentManager.Core.Interfaces;
@@ -221,6 +222,107 @@ public sealed class PersonalNoteUiRegressionTests
         }
     }
 
+    [AvaloniaFact]
+    public void PersonalNote_ChangingSelection_DoesNotDiscardDraft()
+    {
+        var repository = new PersonalNoteRepositoryStub
+        {
+            Notes =
+            [
+                new(1, 7, "general", "Saved general", false),
+                new(2, 7, "action", "Saved action", true)
+            ]
+        };
+        var model = new PersonalNoteModel(
+            repository,
+            new DialogServiceStub(),
+            new NavigationServiceStub(),
+            new LocalizationServiceStub());
+        model.Load(7, "Algebra");
+        model.NoteContent = "Unsaved draft";
+
+        model.SelectedNote = repository.Notes[1];
+
+        Assert.Equal(1, model.SelectedNote?.Id);
+        Assert.Equal("Unsaved draft", model.NoteContent);
+    }
+
+    [Fact]
+    public async Task PersonalNote_SaveNewDuplicateContent_SelectsInsertedPinnedNote()
+    {
+        var repository = new PersonalNoteRepositoryStub
+        {
+            Notes = [new(1, 7, "summary", "Duplicate", false)]
+        };
+        var model = new PersonalNoteModel(
+            repository,
+            new DialogServiceStub(),
+            new NavigationServiceStub(),
+            new LocalizationServiceStub());
+        model.Load(7, "Algebra");
+
+        model.NewNoteCommand.Execute(null);
+        model.SelectedNoteType = "summary";
+        model.IsPinned = true;
+        model.NoteContent = "Duplicate";
+        await model.SaveNoteCommand.ExecuteAsync(null);
+
+        Assert.Equal(2, model.SelectedNote?.Id);
+        Assert.True(model.SelectedNote is { IsPinned: true });
+        Assert.Equal(2, repository.Notes.Count);
+    }
+
+    [Fact]
+    public async Task PersonalNote_NewNote_PreservesExistingGeneralNote()
+    {
+        var repository = new PersonalNoteRepositoryStub
+        {
+            Notes = [new(1, 7, "general", "Existing", false)]
+        };
+        var model = new PersonalNoteModel(
+            repository,
+            new DialogServiceStub(),
+            new NavigationServiceStub(),
+            new LocalizationServiceStub());
+        model.Load(7, "Algebra");
+
+        model.NewNoteCommand.Execute(null);
+        model.NoteContent = "Second note";
+        await model.SaveNoteCommand.ExecuteAsync(null);
+
+        Assert.Equal(2, repository.Notes.Count);
+        Assert.Contains(repository.Notes, note => note.Content == "Existing");
+        Assert.Contains(repository.Notes, note => note.Content == "Second note");
+    }
+
+    [AvaloniaFact]
+    public void PersonalNote_ShowsPinnedState()
+    {
+        var model = new PersonalNoteModel(
+            new PersonalNoteRepositoryStub(),
+            new DialogServiceStub(),
+            new NavigationServiceStub(),
+            new LocalizationServiceStub())
+        {
+            IsPinned = true
+        };
+        var view = new PersonalNote { DataContext = model };
+        var window = new Window { Content = view };
+
+        try
+        {
+            window.Show();
+            var pinnedState = view.FindControl<TextBlock>("txtNotePinnedState");
+
+            Assert.NotNull(pinnedState);
+            Assert.True(pinnedState!.IsVisible);
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     [Fact]
     public async Task PersonalNote_DirtyBack_ConfirmsBeforeNavigating()
     {
@@ -261,7 +363,27 @@ public sealed class PersonalNoteUiRegressionTests
     private sealed class PersonalNoteRepositoryStub : IPersonalNoteRepository
     {
         public string? SavedContent { get; private set; }
-        public string? GetNote(int documentId) => SavedContent;
+        public List<PersonalNoteEntity> Notes { get; set; } = [];
+        public string? GetNote(int documentId) => Notes.FirstOrDefault(note => note.NoteType == "general")?.Content ?? SavedContent;
+        public IReadOnlyList<PersonalNoteEntity> GetNotes(int documentId, bool includeDeleted = false)
+            => Notes.Where(note => note.DocumentId == documentId)
+                .OrderByDescending(note => note.IsPinned)
+                .ThenBy(note => note.Id)
+                .ToList();
+        public bool SaveNote(PersonalNoteEntity note)
+        {
+            if (note.Id == 0)
+            {
+                var created = note with { Id = Notes.Count == 0 ? 1 : Notes.Max(item => item.Id) + 1 };
+                Notes.Add(created);
+            }
+            else
+            {
+                Notes[Notes.FindIndex(item => item.Id == note.Id)] = note;
+            }
+            SavedContent = note.Content;
+            return true;
+        }
         public bool SaveNote(int documentId, string content)
         {
             SavedContent = content;

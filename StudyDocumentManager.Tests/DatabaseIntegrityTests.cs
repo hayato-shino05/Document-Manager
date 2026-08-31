@@ -329,6 +329,54 @@ public class DatabaseIntegrityTests : DatabaseTestBase
         Assert.Equal("Legacy content", reader.GetString(3));
     }
 
+    [Fact]
+    public void InitializeDatabase_WithArchiveKeyIndex_IsIdempotent()
+    {
+        Db.InitializeDatabase();
+        Db.InitializeDatabase();
+
+        using var connection = new SqliteConnection(Db.ConnectionString);
+        connection.Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'index' AND name = 'ux_documents_archive_export_key'";
+
+        Assert.Equal(1L, (long)command.ExecuteScalar()!);
+    }
+
+    [Fact]
+    public void InitializeDatabase_RebuildsDocuments_AndPreservesArchiveKeyIndex()
+    {
+        _repository.Add(new StudyDocument { Name = "Archive rebuild", FilePath = string.Empty });
+        var document = Assert.Single(_repository.GetAll());
+        using (var connection = new SqliteConnection(Db.ConnectionString))
+        {
+            connection.Open();
+            Execute(connection, "DROP INDEX idx_documents_file_path_unique");
+            Execute(connection, "CREATE UNIQUE INDEX legacy_file_path_guard ON documents(file_path) WHERE file_path IS NOT NULL AND file_path <> ''");
+        }
+
+        Db.InitializeDatabase();
+
+        Assert.Equal("Archive rebuild", _repository.GetById(document.Id)!.Name);
+        using var verification = new SqliteConnection(Db.ConnectionString);
+        verification.Open();
+        Assert.Equal(1L, GetNamedCount(verification, "sqlite_master", "ux_documents_archive_export_key"));
+    }
+
+
+    [Fact]
+    public void InitializeDatabase_RejectsArchiveKeyIndexNameCollisionWithWrongShape()
+    {
+        using (var connection = new SqliteConnection(Db.ConnectionString))
+        {
+            connection.Open();
+            Execute(connection, "DROP INDEX ux_documents_archive_export_key");
+            Execute(connection, "CREATE INDEX ux_documents_archive_export_key ON documents(name)");
+        }
+
+        Assert.Throws<InvalidOperationException>(() => Db.InitializeDatabase());
+    }
+
     private static long GetNamedCount(SqliteConnection connection, string tableName, string name)
     {
         using var command = connection.CreateCommand();

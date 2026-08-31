@@ -641,7 +641,7 @@ public partial class DashboardModel : ModelBase, IDisposable
             ? _repository.GetAll()
             : status != null
                 ? _repository.SearchAdvancedWithStatus(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant, status)
-                : _repository.SearchAdvanced(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant);
+                : _repository.SearchAdvancedWithNotes(keyword, subject, type, fromDate, toDate, minSize, maxSize, isImportant);
 
         OnPropertyChanged(nameof(ActiveFilterCount));
         UpdateVisibleState(results);
@@ -836,9 +836,12 @@ public partial class DashboardModel : ModelBase, IDisposable
         var zipPath = await _fileDialogService.ShowOpenFileAsync(_loc["Archive_ImportTitle"], "Zip files (*.zip)|*.zip");
         if (string.IsNullOrEmpty(zipPath)) return;
 
+        var destinationRoot = await _fileDialogService.ShowOpenFolderAsync(_loc["Import_SelectFolder"]);
+        if (string.IsNullOrWhiteSpace(destinationRoot)) return;
+
         try
         {
-            var report = await _archiveService.ImportAsync(zipPath, new ArchiveImportOptions());
+            var report = await _archiveService.ImportAsync(zipPath, new ArchiveImportOptions(destinationRoot));
             if (report.Success)
             {
                 await _dialogService.ShowMessageAsync(_loc["Dialog_Success"],

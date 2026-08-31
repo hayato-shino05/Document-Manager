@@ -13,6 +13,8 @@ public partial class PersonalNoteModel : ModelBase
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
+    private PersonalNote? _loadedNote;
+    private bool _isRestoringSelection;
 
     [ObservableProperty] private int _documentId;
     [ObservableProperty] private string _documentName = string.Empty;
@@ -54,6 +56,17 @@ public partial class PersonalNoteModel : ModelBase
 
     partial void OnSelectedNoteChanged(PersonalNote? value)
     {
+        if (_isRestoringSelection)
+            return;
+
+        if (!string.Equals(NoteContent, SavedNoteContent, StringComparison.Ordinal))
+        {
+            _isRestoringSelection = true;
+            SelectedNote = _loadedNote;
+            _isRestoringSelection = false;
+            return;
+        }
+
         if (value is null)
         {
             NoteContent = string.Empty;
@@ -61,6 +74,7 @@ public partial class PersonalNoteModel : ModelBase
             SelectedNoteType = "general";
             IsPinned = false;
             HasExistingNote = false;
+            _loadedNote = null;
             return;
         }
 
@@ -69,11 +83,15 @@ public partial class PersonalNoteModel : ModelBase
         SelectedNoteType = value.NoteType;
         IsPinned = value.IsPinned;
         HasExistingNote = true;
+        _loadedNote = value;
     }
 
     [RelayCommand]
     private void NewNote()
     {
+        if (!string.Equals(NoteContent, SavedNoteContent, StringComparison.Ordinal))
+            return;
+
         SelectedNote = null;
     }
 
@@ -88,6 +106,9 @@ public partial class PersonalNoteModel : ModelBase
         }
 
         NoteContent = content;
+        var existingNoteIds = SelectedNote is null
+            ? _noteRepo.GetNotes(DocumentId).Select(note => note.Id).ToHashSet()
+            : null;
         var note = new PersonalNote(SelectedNote?.Id ?? 0, DocumentId, SelectedNoteType, content, IsPinned);
         if (!_noteRepo.SaveNote(note))
         {
@@ -95,7 +116,19 @@ public partial class PersonalNoteModel : ModelBase
             return;
         }
 
-        ReloadNotes(note.Id, note.NoteType, content);
+        SavedNoteContent = content;
+        HasExistingNote = true;
+        var savedNoteId = note.Id != 0
+            ? note.Id
+            : _noteRepo.GetNotes(DocumentId)
+                .Where(savedNote =>
+                    savedNote.NoteType == note.NoteType &&
+                    savedNote.Content == content &&
+                    (existingNoteIds is null || !existingNoteIds.Contains(savedNote.Id)))
+                .OrderByDescending(savedNote => savedNote.Id)
+                .Select(savedNote => (int?)savedNote.Id)
+                .FirstOrDefault();
+        ReloadNotes(savedNoteId ?? 0, note.NoteType, content);
         if (!string.Equals(SelectedNote?.Content, content, StringComparison.Ordinal))
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
@@ -165,10 +198,13 @@ public partial class PersonalNoteModel : ModelBase
         foreach (var note in _noteRepo.GetNotes(DocumentId))
             Notes.Add(note);
 
-        SelectedNote = noteId == 0
-            ? Notes.FirstOrDefault(note => note.NoteType == "general") ?? Notes.FirstOrDefault()
-            : Notes.FirstOrDefault(note => note.Id == noteId)
-                ?? Notes.FirstOrDefault(note => note.NoteType == noteType && note.Content == content);
+        SelectedNote = noteId != 0
+            ? Notes.FirstOrDefault(note => note.Id == noteId)
+            : noteType is not null && content is not null
+                ? Notes.Where(note => note.NoteType == noteType && note.Content == content)
+                    .OrderByDescending(note => note.Id)
+                    .FirstOrDefault()
+                : Notes.FirstOrDefault(note => note.NoteType == "general") ?? Notes.FirstOrDefault();
 
         if (SelectedNote is null)
             HasExistingNote = false;

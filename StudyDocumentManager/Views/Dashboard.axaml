@@ -35,6 +35,9 @@
                              Text="{Binding SearchKeyword, Mode=TwoWay}"
                              VerticalContentAlignment="Center"/>
                     <Button Classes="primary" Command="{Binding SearchCommand}"
+                            AutomationProperties.AutomationId="Dashboard_Search"
+                            AutomationProperties.Name="{loc:Localize Dashboard_BtnSearch}"
+                            AutomationProperties.HelpText="{loc:Localize Dashboard_TipSearch}"
                             Padding="{StaticResource PaddingBtn}" Height="{StaticResource HeightControl}" VerticalAlignment="Center"
                             ToolTip.Tip="{loc:Localize Dashboard_TipSearch}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
@@ -85,6 +88,9 @@
 
                 <!-- Right: Toggle advanced filter button -->
                 <Button Grid.Column="1" Classes="secondary"
+                        AutomationProperties.AutomationId="Dashboard_ToggleAdvancedFilter"
+                        AutomationProperties.Name="{loc:Localize Dashboard_BtnAdvancedFilter}"
+                        AutomationProperties.HelpText="{loc:Localize Dashboard_TipAdvancedFilter}"
                         Padding="{StaticResource PaddingBtnSm}" Height="{StaticResource HeightControl}" VerticalAlignment="Center"
                         Command="{Binding ToggleAdvancedFilterCommand}"
                         ToolTip.Tip="{loc:Localize Dashboard_TipAdvancedFilter}">
@@ -195,6 +201,9 @@
                     <StackPanel Grid.Column="2" Spacing="6" VerticalAlignment="Center"
                                 MinWidth="110">
                         <Button Classes="primary" Command="{Binding ApplyAdvancedFilterCommand}"
+                                AutomationProperties.AutomationId="Dashboard_ApplyFilter"
+                                AutomationProperties.Name="{loc:Localize Dashboard_BtnApplyFilter}"
+                                AutomationProperties.HelpText="{loc:Localize Dashboard_TipApplyFilter}"
                                 Padding="16,7" HorizontalAlignment="Stretch"
                                 ToolTip.Tip="{loc:Localize Dashboard_TipApplyFilter}">
                             <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
@@ -203,6 +212,9 @@
                             </StackPanel>
                         </Button>
                         <Button Classes="secondary" Command="{Binding ClearAdvancedFilterCommand}"
+                                AutomationProperties.AutomationId="Dashboard_ClearFilter"
+                                AutomationProperties.Name="{loc:Localize Dashboard_BtnClearFilter}"
+                                AutomationProperties.HelpText="{loc:Localize Dashboard_TipClearFilter}"
                                 Padding="16,7" HorizontalAlignment="Stretch"
                                 ToolTip.Tip="{loc:Localize Dashboard_TipClearFilter}">
                             <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
@@ -693,6 +705,9 @@
 
                             <!-- Quick action buttons -->
                             <Button Grid.Column="1" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                                    AutomationProperties.AutomationId="Dashboard_QuickRefresh"
+                                    AutomationProperties.Name="{loc:Localize Dashboard_BtnRefresh}"
+                                    AutomationProperties.HelpText="{loc:Localize Dashboard_TipRefresh}"
                                     Command="{Binding RefreshCommand}"
                                     Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipRefresh}">
@@ -702,6 +717,9 @@
                                 </StackPanel>
                             </Button>
                             <Button Grid.Column="2" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                                    AutomationProperties.AutomationId="Dashboard_QuickUpcoming"
+                                    AutomationProperties.Name="{loc:Localize Dashboard_BtnUpcoming}"
+                                    AutomationProperties.HelpText="{loc:Localize Dashboard_TipUpcoming}"
                                     Command="{Binding ShowUpcomingDeadlinesCommand}"
                                     Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipUpcoming}">
@@ -711,6 +729,9 @@
                                 </StackPanel>
                             </Button>
                             <Button Grid.Column="3" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                                    AutomationProperties.AutomationId="Dashboard_QuickOverdue"
+                                    AutomationProperties.Name="{loc:Localize Dashboard_BtnOverdue}"
+                                    AutomationProperties.HelpText="{loc:Localize Dashboard_TipOverdue}"
                                     Command="{Binding ShowOverdueCommand}"
                                     Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipOverdue}">
@@ -720,6 +741,9 @@
                                 </StackPanel>
                             </Button>
                             <Button x:Name="StatusCopyPathButton" Grid.Column="4" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                                    AutomationProperties.AutomationId="Dashboard_QuickCopyPath"
+                                    AutomationProperties.Name="{loc:Localize Dashboard_CtxCopyPath}"
+                                    AutomationProperties.HelpText="{loc:Localize Dashboard_TipCopyPath}"
                                     Command="{Binding CopyPathCommand}"
                                     IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
                                     Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
@@ -730,6 +754,9 @@
                                 </StackPanel>
                             </Button>
                             <Button x:Name="StatusOpenFolderButton" Grid.Column="5" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                                    AutomationProperties.AutomationId="Dashboard_QuickOpenFolder"
+                                    AutomationProperties.Name="{loc:Localize Dashboard_BtnOpenFolder}"
+                                    AutomationProperties.HelpText="{loc:Localize Dashboard_TipOpenFolder}"
                                     Command="{Binding OpenFolderCommand}"
                                     IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
                                     Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
@@ -740,6 +767,9 @@
                                 </StackPanel>
                             </Button>
                             <Button Grid.Column="6" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                                    AutomationProperties.AutomationId="Dashboard_QuickAbout"
+                                    AutomationProperties.Name="{loc:Localize Menu_About}"
+                                    AutomationProperties.HelpText="{loc:Localize Dashboard_TipAbout}"
                                     Command="{Binding ShowAboutCommand}"
                                     Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipAbout}">

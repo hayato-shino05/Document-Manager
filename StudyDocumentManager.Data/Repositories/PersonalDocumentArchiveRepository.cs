@@ -35,6 +35,14 @@ public sealed class PersonalDocumentArchiveRepository
     public IReadOnlyList<StudyDocument> GetExistingDocuments()
         => _documents.GetAll().Concat(_recycleBin.GetDeletedDocuments()).GroupBy(document => document.Id).Select(group => group.First()).ToArray();
 
+    public string EnsureStableExportKey(StudyDocument document)
+    {
+        if (document.ExportKey is null)
+            document.ExportKey = DocumentExportKey.Create();
+        _database.UpdateArchiveExportKey(document.Id, document.ExportKey.Value);
+        return document.ExportKey.Value;
+    }
+
     public IReadOnlyDictionary<string, int> ImportGraph(
         DocumentArchiveManifest manifest,
         IReadOnlyList<DocumentArchiveDocument> documents)

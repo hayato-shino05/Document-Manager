@@ -65,6 +65,23 @@ public sealed class AssignmentRepositoryTests : DatabaseTestBase
     }
 
     [Fact]
+    public void InitializeDatabase_AcceptsCurrentFeatureTablesOnRepeatedStartup()
+    {
+        Db.InitializeDatabase();
+        Db.InitializeDatabase();
+
+        using var connection = new Microsoft.Data.Sqlite.SqliteConnection(Db.ConnectionString);
+        connection.Open();
+        foreach (var table in new[] { "import_inbox", "watched_folders", "saved_searches", "student_context", "courses", "semesters", "assignments", "assignment_documents" })
+        {
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=@name";
+            command.Parameters.AddWithValue("@name", table);
+            Assert.Equal(1L, Convert.ToInt64(command.ExecuteScalar()));
+        }
+    }
+
+    [Fact]
     public void SaveStudentContext_UpsertsSingleContext()
     {
         var context = new StudentContext
