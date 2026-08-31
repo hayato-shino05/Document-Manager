@@ -277,7 +277,7 @@ public class DatabaseHelper
             parameters.Add(new SqliteParameter("@status", status));
         }
 
-        query += " ORDER BY created_at DESC";
+        query += " ORDER BY created_at DESC, id ASC";
         return ExecuteReader(query, parameters.ToArray());
     }
 
@@ -334,7 +334,7 @@ public class DatabaseHelper
         if (isImportant is true)
             query += " AND is_important = 1";
 
-        query += " ORDER BY created_at DESC";
+        query += " ORDER BY created_at DESC, id ASC";
         return ExecuteReader(query, parameters.ToArray());
     }
 
@@ -1699,10 +1699,10 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         using var sqlCommand = connection.CreateCommand();
         sqlCommand.CommandText = "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = @name";
         sqlCommand.Parameters.AddWithValue("@name", indexName);
-        var sql = sqlCommand.ExecuteScalar()?.ToString();
-        if (sql is null)
+        var rawSql = sqlCommand.ExecuteScalar();
+        if (rawSql is null or DBNull)
             return indexName.StartsWith("sqlite_autoindex_documents_", StringComparison.Ordinal);
-        var normalized = string.Concat(sql.Where(character => !char.IsWhiteSpace(character))).ToUpperInvariant();
+        var normalized = string.Concat(rawSql.ToString()!.Where(character => !char.IsWhiteSpace(character))).ToUpperInvariant();
         return normalized.Contains("CREATEUNIQUEINDEXUX_DOCUMENTS_ARCHIVE_EXPORT_KEYONDOCUMENTS(ARCHIVE_EXPORT_KEYCOLLATEBINARY)WHEREARCHIVE_EXPORT_KEYISNOTNULLANDARCHIVE_EXPORT_KEY<>''", StringComparison.Ordinal);
     }
 
@@ -2146,9 +2146,7 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         cmd.CommandText = @"SELECT c.id, c.name, c.description, c.created_at,
                             (SELECT COUNT(*)
                              FROM collection_items ci
-                             INNER JOIN documents d ON d.id = ci.document_id
-                             WHERE ci.collection_id = c.id
-                             AND (d.is_deleted IS NULL OR d.is_deleted = 0)) as item_count
+                             WHERE ci.collection_id = c.id) as item_count
                             FROM collections c
                             ORDER BY c.name";
         using var reader = cmd.ExecuteReader();
