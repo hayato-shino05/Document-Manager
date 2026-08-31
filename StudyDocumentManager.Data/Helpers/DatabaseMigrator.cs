@@ -637,7 +637,7 @@ public static class DatabaseMigrator
     {
         var allowedIndexes = new HashSet<string>(StringComparer.Ordinal)
         {
-            "idx_documents_subject", "idx_documents_type", "idx_documents_created_at", "idx_documents_deadline", "idx_documents_deleted", "idx_documents_important", "idx_documents_file_path_unique"
+            "idx_documents_subject", "idx_documents_type", "idx_documents_created_at", "idx_documents_deadline", "idx_documents_deleted", "idx_documents_important", "idx_documents_file_path_unique", "ux_documents_archive_export_key"
         };
         var rebuildDocuments = false;
         var indexes = new List<(string Name, bool IsUnique, string Origin)>();
@@ -661,7 +661,7 @@ public static class DatabaseMigrator
                 if (isDocumentPathIndex)
                     rebuildDocuments = true;
             }
-            else if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isDocumentPathIndex)
+            else if (index.Origin == "c" && !allowedIndexes.Contains(index.Name) && !isDocumentPathIndex && !isArchiveExportKeyIndex)
             {
                 throw new InvalidOperationException($"Unsupported index '{index.Name}' on 'documents'.");
             }
