@@ -443,12 +443,22 @@ public sealed class PersonalDocumentArchiveService : IPersonalDocumentArchiveSer
         var current = candidate;
         while (!string.IsNullOrWhiteSpace(current))
         {
-            if (File.Exists(current) || Directory.Exists(current))
+            FileAttributes? attributes = null;
+            try
             {
-                var attributes = File.GetAttributes(current);
-                if (attributes.HasFlag(FileAttributes.ReparsePoint))
-                    return true;
+                attributes = File.GetAttributes(current);
             }
+            catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
+            {
+                attributes = null;
+            }
+            catch (Exception exception) when (exception is ArgumentException or IOException or UnauthorizedAccessException or NotSupportedException)
+            {
+                return true;
+            }
+
+            if (attributes?.HasFlag(FileAttributes.ReparsePoint) == true)
+                return true;
 
             if (string.Equals(current, root, StringComparison.OrdinalIgnoreCase))
                 return false;

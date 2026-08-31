@@ -657,6 +657,53 @@ public sealed class PersonalDocumentArchiveTests : DatabaseTestBase
         }
     }
 
+    [Fact]
+    public async Task Import_RejectsDanglingReparsePointBeforeMutation()
+    {
+        var archivePath = Path.Combine(Path.GetTempPath(), $"sdm_archive_dangling_reparse_{Guid.NewGuid():N}.zip");
+        var destinationRoot = Path.Combine(Path.GetTempPath(), $"sdm_archive_destination_{Guid.NewGuid():N}");
+        var missingTarget = Path.Combine(Path.GetTempPath(), $"sdm_archive_missing_target_{Guid.NewGuid():N}");
+        var linkPath = Path.Combine(destinationRoot, "linked");
+        try
+        {
+            Directory.CreateDirectory(destinationRoot);
+            try
+            {
+                Directory.CreateSymbolicLink(linkPath, missingTarget);
+            }
+            catch (Exception exception) when (exception is UnauthorizedAccessException or IOException or PlatformNotSupportedException)
+            {
+                return;
+            }
+
+            var manifest = CreateManifest() with
+            {
+                Documents = [CreateDocument("11111111111111111111111111111111", 42) with { FilePath = "linked/document.pdf" }]
+            };
+            using (var archive = ZipFile.Open(archivePath, ZipArchiveMode.Create))
+            {
+                var entry = archive.CreateEntry("manifest.json");
+                using var stream = new StreamWriter(entry.Open());
+                stream.Write(JsonSerializer.Serialize(manifest));
+            }
+
+            var report = await CreateService(Db).ImportAsync(archivePath, new ArchiveImportOptions(destinationRoot));
+
+            Assert.False(report.Success);
+            Assert.Contains(report.ValidationErrors, error => error.Code == "invalid-destination-path");
+            Assert.Empty(Repo.GetAll());
+            Assert.False(File.Exists(Path.Combine(missingTarget, "document.pdf")));
+        }
+        finally
+        {
+            Db.CloseAllConnections();
+            TryDelete(archivePath);
+            TryDeleteDirectory(linkPath);
+            TryDeleteDirectory(destinationRoot);
+            TryDeleteDirectory(missingTarget);
+        }
+    }
+
     private static PersonalDocumentArchiveService CreateService(DatabaseHelper database)
     {
         var documents = new DocumentRepository(database);
