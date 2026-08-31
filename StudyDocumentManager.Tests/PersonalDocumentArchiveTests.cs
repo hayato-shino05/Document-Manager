@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Text;
 using System.Text.Json;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Data.Helpers;
