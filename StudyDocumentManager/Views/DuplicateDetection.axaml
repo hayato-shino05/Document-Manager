@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:loc="using:StudyDocumentManager.Markup"
@@ -69,13 +69,30 @@
                     </Border>
 
                     <Panel>
-                        <StackPanel IsVisible="{Binding !HasResults}"
+                        <!-- Initial Prompt State (before scan) -->
+                        <StackPanel IsVisible="{Binding IsInitialState}"
                                     VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="0,40">
                             <Image Source="{StaticResource IconDuplicate}" Width="36" Height="36" Opacity="0.4"/>
                             <TextBlock AutomationProperties.AutomationId="DuplicateDetection_EmptyState"
                                        AutomationProperties.LiveSetting="Polite"
                                        Text="{loc:Localize DuplicateDetection_EmptyState}"
                                        FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
+                                       HorizontalAlignment="Center"/>
+                            <Button Classes="primary" Command="{Binding ScanDuplicatesCommand}"
+                                    Content="{loc:Localize DuplicateDetection_BtnScan}"
+                                    Padding="{StaticResource PaddingBtnSm}" Margin="0,6,0,0"
+                                    AutomationProperties.AutomationId="DuplicateDetection_EmptyState_ScanButton"/>
+                        </StackPanel>
+
+                        <!-- Clean State (scanned, no duplicates found) -->
+                        <StackPanel IsVisible="{Binding IsCleanState}"
+                                    VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="0,40">
+                            <Image Source="{StaticResource IconCheckSuccess}" Width="36" Height="36"/>
+                            <TextBlock AutomationProperties.AutomationId="DuplicateDetection_CleanState"
+                                       AutomationProperties.LiveSetting="Polite"
+                                       Text="{Binding CleanSummaryText}"
+                                       FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource SuccessText}"
+                                       FontWeight="Medium"
                                        HorizontalAlignment="Center"/>
                         </StackPanel>
 

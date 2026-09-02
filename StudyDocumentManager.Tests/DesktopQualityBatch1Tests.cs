@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Xunit;
 
@@ -11,14 +11,21 @@ public class DesktopQualityBatch1Tests
     {
         var colorTokens = File.ReadAllText(
             GetSourceFilePath("StudyDocumentManager", "Themes", "ColorTokens.axaml"));
+        var officeWorkspace = File.ReadAllText(
+            GetSourceFilePath("StudyDocumentManager", "Views", "OfficeWorkspace.axaml"));
 
-        Assert.Contains("x:Key=\"DangerText\"", colorTokens);
-        Assert.Contains("x:Key=\"DangerBorder\"", colorTokens);
-        Assert.Contains("x:Key=\"WarningText\"", colorTokens);
-        Assert.Contains("x:Key=\"WarningBorder\"", colorTokens);
-        Assert.Contains("x:Key=\"SuccessText\"", colorTokens);
-        Assert.Contains("x:Key=\"SuccessBorder\"", colorTokens);
-        Assert.Contains("x:Key=\"Accent\"", colorTokens);
+        var matches = System.Text.RegularExpressions.Regex.Matches(officeWorkspace, @"\{StaticResource\s+([A-Za-z0-9_]+)\}");
+        var colorOrBrushTokens = matches
+            .Select(m => m.Groups[1].Value)
+            .Where(t => t.EndsWith("Text") || t.EndsWith("Border") || t.EndsWith("Brush") || t.EndsWith("Bg") || t.EndsWith("Background") || t == "Accent")
+            .Distinct()
+            .ToList();
+
+        Assert.NotEmpty(colorOrBrushTokens);
+        foreach (var token in colorOrBrushTokens)
+        {
+            Assert.Contains($"x:Key=\"{token}\"", colorTokens);
+        }
     }
 
     [Fact]
@@ -43,8 +50,13 @@ public class DesktopQualityBatch1Tests
         var onboarding = File.ReadAllText(
             GetSourceFilePath("StudyDocumentManager", "Views", "OnboardingDialog.axaml"));
 
-        Assert.Contains("Name=\"SkipButton\"", onboarding);
-        Assert.Contains("IsCancel=\"True\"", onboarding);
+        // Assert that the SkipButton element specifically contains IsCancel="True"
+        var skipButtonStart = onboarding.IndexOf("Name=\"SkipButton\"", StringComparison.Ordinal);
+        Assert.True(skipButtonStart >= 0);
+        var skipButtonEnd = onboarding.IndexOf("/>", skipButtonStart, StringComparison.Ordinal);
+        Assert.True(skipButtonEnd > skipButtonStart);
+        var skipButtonXml = onboarding.Substring(skipButtonStart, skipButtonEnd - skipButtonStart);
+        Assert.Contains("IsCancel=\"True\"", skipButtonXml);
     }
 
     private static string GetSourceFilePath(params string[] pathSegments)

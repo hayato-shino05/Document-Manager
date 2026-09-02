@@ -265,6 +265,15 @@
                 Geometry="M5,12 L10,17 L19,7 L17.5,5.5 L10,14 L6.5,10.5 Z"/>
         </DrawingImage>
 
+        <DrawingImage x:Key="IconCheckSuccess">
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource BrushIconSuccess}"
+                    Geometry="M12,2 A10,10 0 1,0 12,22 A10,10 0 1,0 12,2 Z"/>
+                <GeometryDrawing Brush="White"
+                    Geometry="M9.5,16.2 L5.5,12.2 L6.9,10.8 L9.5,13.4 L17.1,5.8 L18.5,7.2 Z"/>
+            </DrawingGroup>
+        </DrawingImage>
+
         <!-- Close/X -->
         <DrawingImage x:Key="IconClose">
             <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"

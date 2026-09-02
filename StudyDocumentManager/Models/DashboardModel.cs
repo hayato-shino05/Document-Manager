@@ -80,6 +80,7 @@ public partial class DashboardModel : ModelBase, IDisposable
     [ObservableProperty] private string _statusText = string.Empty;
     [ObservableProperty] private bool _isLoading = true;
     [ObservableProperty] private bool _isEmptyState;
+    public bool IsDatabaseEmpty => _allDocuments.Count == 0;
     [ObservableProperty] private bool _hasLoadError;
     [ObservableProperty] private string _stateMessage = string.Empty;
     [ObservableProperty] private string _lastBackupDisplay = string.Empty;
@@ -276,6 +277,7 @@ public partial class DashboardModel : ModelBase, IDisposable
 
             _allDocuments.Clear();
             _allDocuments.AddRange(docs);
+            OnPropertyChanged(nameof(IsDatabaseEmpty));
             _availableSubjects = [..subjects];
             _availableTypes = [..types];
 
