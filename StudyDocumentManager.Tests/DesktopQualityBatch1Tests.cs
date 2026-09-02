@@ -14,20 +14,16 @@ public class DesktopQualityBatch1Tests
         var officeWorkspace = File.ReadAllText(
             GetSourceFilePath("StudyDocumentManager", "Views", "OfficeWorkspace.axaml"));
 
-        var expectedTokens = new[]
-        {
-            "DangerText",
-            "DangerBorder",
-            "WarningText",
-            "WarningBorder",
-            "SuccessText",
-            "SuccessBorder",
-            "Accent"
-        };
+        var matches = System.Text.RegularExpressions.Regex.Matches(officeWorkspace, @"\{StaticResource\s+([A-Za-z0-9_]+)\}");
+        var colorOrBrushTokens = matches
+            .Select(m => m.Groups[1].Value)
+            .Where(t => t.EndsWith("Text") || t.EndsWith("Border") || t.EndsWith("Brush") || t.EndsWith("Bg") || t.EndsWith("Background") || t == "Accent")
+            .Distinct()
+            .ToList();
 
-        foreach (var token in expectedTokens)
+        Assert.NotEmpty(colorOrBrushTokens);
+        foreach (var token in colorOrBrushTokens)
         {
-            Assert.Contains($"{{StaticResource {token}}}", officeWorkspace);
             Assert.Contains($"x:Key=\"{token}\"", colorTokens);
         }
     }

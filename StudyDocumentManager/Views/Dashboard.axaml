@@ -613,6 +613,7 @@
                             <Image Classes="empty-state-icon" Source="{StaticResource IconDocPage}"/>
                             <TextBlock Classes="empty-state-text" Text="{Binding StateMessage}"/>
                             <Button Classes="primary" Command="{Binding AddDocumentCommand}"
+                                    IsVisible="{Binding IsDatabaseEmpty}"
                                     Padding="{StaticResource PaddingBtnSm}" Margin="0,8,0,0"
                                     Content="{loc:Localize Toolbar_Add}"
                                     AutomationProperties.AutomationId="Dashboard_EmptyState_AddButton"/>

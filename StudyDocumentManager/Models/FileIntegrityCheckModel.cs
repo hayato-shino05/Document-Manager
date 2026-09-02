@@ -33,8 +33,8 @@ public partial class FileIntegrityCheckModel : ModelBase
     [ObservableProperty] private string _statusText = string.Empty;
     [ObservableProperty] private string _databaseLocation = string.Empty;
 
-    public bool IsInitialState => !HasScanned && !IsChecking;
-    public bool IsHealthyState => HasScanned && !IsChecking && MissingCount == 0;
+    public bool IsInitialState => !HasScanned && !IsChecking && !IsCheckCancelled && Results.Count == 0;
+    public bool IsHealthyState => HasScanned && !IsChecking && !IsCheckCancelled && MissingCount == 0;
     public string HealthySummaryText => string.Format(_loc["Integrity_AllFilesOk"], TotalChecked);
 
     public FileIntegrityCheckModel(IDocumentRepository repository, IFileIntegrityRepository? fileIntegrityRepo, IDialogService dialogService, IFileDialogService fileDialogService, ILocalizationService loc, Action<int>? scanProgress = null, IClipboardService? clipboardService = null, IProcessLauncherService? processLauncher = null, Func<string, bool>? fileProbe = null, Func<string, bool>? rootReadyProbe = null)
@@ -217,6 +217,8 @@ public partial class FileIntegrityCheckModel : ModelBase
             }
             else
             {
+                HasScanned = true;
+                IsCheckCancelled = false;
                 SetLocalizedStatus("Status_MissingFiles", MissingCount);
             }
         }
@@ -234,6 +236,9 @@ public partial class FileIntegrityCheckModel : ModelBase
         finally
         {
             IsChecking = false;
+            OnPropertyChanged(nameof(IsInitialState));
+            OnPropertyChanged(nameof(IsHealthyState));
+            OnPropertyChanged(nameof(HealthySummaryText));
             if (ReferenceEquals(_checkCancellation, cancellation))
             {
                 _checkCancellation.Dispose();
