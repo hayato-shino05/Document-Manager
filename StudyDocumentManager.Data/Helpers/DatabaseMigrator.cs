@@ -192,6 +192,22 @@ public static class DatabaseMigrator
                 FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
             );
 
+            CREATE TABLE IF NOT EXISTS office_document_metadata (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                document_id INTEGER NOT NULL UNIQUE,
+                document_number TEXT,
+                contact_name TEXT,
+                organization_or_project TEXT,
+                effective_date DATETIME,
+                expiry_date DATETIME,
+                confidentiality_level TEXT NOT NULL DEFAULT 'internal',
+                reminder_enabled INTEGER NOT NULL DEFAULT 1,
+                reminder_days_before INTEGER NOT NULL DEFAULT 3,
+                created_at DATETIME DEFAULT (datetime('now', 'localtime')),
+                updated_at DATETIME DEFAULT (datetime('now', 'localtime')),
+                FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
+            );
+
             CREATE INDEX IF NOT EXISTS idx_documents_subject ON documents(subject);
             CREATE INDEX IF NOT EXISTS idx_documents_type ON documents(type);
             CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at);
@@ -200,6 +216,8 @@ public static class DatabaseMigrator
             CREATE INDEX IF NOT EXISTS idx_collection_items_document ON collection_items(document_id);
             CREATE INDEX IF NOT EXISTS idx_documents_deleted ON documents(is_deleted);
             CREATE INDEX IF NOT EXISTS idx_documents_important ON documents(is_important);
+            CREATE INDEX IF NOT EXISTS idx_office_metadata_doc_id ON office_document_metadata(document_id);
+            CREATE INDEX IF NOT EXISTS idx_office_metadata_expiry ON office_document_metadata(expiry_date);
             """;
 
         using var conn = new SqliteConnection(connectionString);
@@ -466,7 +484,7 @@ public static class DatabaseMigrator
         {
             "documents", "collections", "collection_items", "personal_notes", "recent_files",
             "document_relations", "categories", "document_types", "app_settings", "saved_searches",
-            "student_context", "courses", "semesters", "assignments", "assignment_documents", "import_inbox", "watched_folders"
+            "student_context", "courses", "semesters", "assignments", "assignment_documents", "import_inbox", "watched_folders", "office_document_metadata"
         };
         var unsupportedTables = tables.Where(table => !supportedTables.Contains(table)).ToList();
         if (unsupportedTables.Count > 0)
@@ -488,6 +506,8 @@ public static class DatabaseMigrator
             RequireColumns(connection, "import_inbox", ["id", "document_id", "source_path", "display_name", "failure_code", "duplicate_candidate", "subject", "type", "state", "created_at", "updated_at"], ["subject", "type"]);
         if (TableExists(connection, "watched_folders"))
             RequireColumns(connection, "watched_folders", ["id", "folder_path", "enabled", "include_subdirectories", "last_scan_at", "created_at"], []);
+        if (TableExists(connection, "office_document_metadata"))
+            RequireColumns(connection, "office_document_metadata", ["id", "document_id", "document_number", "contact_name", "organization_or_project", "effective_date", "expiry_date", "confidentiality_level", "reminder_enabled", "reminder_days_before", "created_at", "updated_at"], []);
 
         var tablesToRebuild = new List<string>();
         ValidateChildTable(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"],
@@ -731,6 +751,10 @@ public static class DatabaseMigrator
             "collection_items" => new HashSet<string>(StringComparer.Ordinal)
             {
                 "idx_collection_items_collection", "idx_collection_items_document"
+            },
+            "office_document_metadata" => new HashSet<string>(StringComparer.Ordinal)
+            {
+                "idx_office_metadata_doc_id", "idx_office_metadata_expiry"
             },
             _ => new HashSet<string>(StringComparer.Ordinal)
         };
