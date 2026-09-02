@@ -31,6 +31,11 @@ public class OfficeMetadataRepository : IOfficeMetadataRepository
 
     public bool Save(OfficeDocumentMetadata metadata)
     {
+        if (!OfficeConfidentialityLevel.IsValid(metadata.ConfidentialityLevel))
+        {
+            metadata.ConfidentialityLevel = OfficeConfidentialityLevel.Internal;
+        }
+
         using var conn = _db.OpenConnection();
         using var cmd = conn.CreateCommand();
         cmd.CommandText = """
@@ -88,6 +93,7 @@ public class OfficeMetadataRepository : IOfficeMetadataRepository
             FROM office_document_metadata m
             INNER JOIN documents d ON d.id = m.document_id
             WHERE (d.is_deleted IS NULL OR d.is_deleted = 0)
+              AND m.reminder_enabled = 1
             ORDER BY m.expiry_date ASC, d.name ASC;
             """;
         using var reader = cmd.ExecuteReader();

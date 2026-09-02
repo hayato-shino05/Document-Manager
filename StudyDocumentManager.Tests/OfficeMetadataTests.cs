@@ -1,6 +1,10 @@
 using System.Collections.ObjectModel;
+using System.IO;
+using Microsoft.Data.Sqlite;
+using StudyDocumentManager.Core;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
+using StudyDocumentManager.Data.Helpers;
 using StudyDocumentManager.Data.Repositories;
 using StudyDocumentManager.Models;
 using StudyDocumentManager.Services;
@@ -282,6 +286,188 @@ public sealed class OfficeMetadataTests : DatabaseTestBase
         Assert.Equal("John Doe", reloaded.ContactName);
     }
 
+    [Fact]
+    public void GetUpcomingReminders_ExcludesDisabledReminders()
+    {
+        var today = new DateTime(2026, 9, 2);
+        var doc = new StudyDocument { Name = "Disabled Reminder Doc" };
+        _docRepo.Add(doc);
+        int docId = _docRepo.GetAll().Single(d => d.Name == "Disabled Reminder Doc").Id;
+
+        _officeRepo.Save(new OfficeDocumentMetadata
+        {
+            DocumentId = docId,
+            ExpiryDate = today.AddDays(2),
+            ReminderEnabled = false,
+            ReminderDaysBefore = 5
+        });
+
+        var reminders = _officeRepo.GetUpcomingReminders(today);
+        Assert.DoesNotContain(reminders, r => r.DocumentId == docId);
+    }
+
+    [Fact]
+    public void Save_InvalidConfidentialityLevel_CoercesToInternal()
+    {
+        var doc = new StudyDocument { Name = "Invalid Conf Doc" };
+        _docRepo.Add(doc);
+        int docId = _docRepo.GetAll().Single(d => d.Name == "Invalid Conf Doc").Id;
+
+        var meta = new OfficeDocumentMetadata
+        {
+            DocumentId = docId,
+            ConfidentialityLevel = "invalid_level_xyz"
+        };
+        bool saved = _officeRepo.Save(meta);
+        Assert.True(saved);
+
+        var loaded = _officeRepo.GetByDocumentId(docId);
+        Assert.NotNull(loaded);
+        Assert.Equal(OfficeConfidentialityLevel.Internal, loaded.ConfidentialityLevel);
+    }
+
+    [Fact]
+    public async Task OpenFileAsync_NonExistentFile_ShowsErrorDialog()
+    {
+        var fakePath = Path.Combine(Path.GetTempPath(), $"sdm_non_existent_{Guid.NewGuid():N}.pdf");
+        var doc = new StudyDocument { Name = "Missing File Doc", FilePath = fakePath };
+        _docRepo.Add(doc);
+
+        var dialog = new FakeDialogService();
+        var model = new OfficeWorkspaceModel(
+            _officeRepo, _docRepo, new FakeProcessLauncher(), dialog, new FakeNavigationService(), _loc);
+
+        model.SelectedRow = model.FilteredRows.Single(r => r.Name == "Missing File Doc");
+        await model.OpenFileAsync();
+
+        Assert.NotNull(dialog.LastErrorMessage);
+        Assert.Contains(fakePath, dialog.LastErrorMessage);
+    }
+
+    [Fact]
+    public void OfficeWorkspaceModel_LanguageChanged_RelocalizesFilterOptionsAndRows()
+    {
+        var today = new DateTime(2026, 9, 2);
+        var doc = new StudyDocument { Name = "I18n Doc", Status = DocumentStatus.Completed };
+        _docRepo.Add(doc);
+        int docId = _docRepo.GetAll().Single(d => d.Name == "I18n Doc").Id;
+
+        _officeRepo.Save(new OfficeDocumentMetadata
+        {
+            DocumentId = docId,
+            ConfidentialityLevel = OfficeConfidentialityLevel.Confidential,
+            ExpiryDate = today.AddDays(1),
+            ReminderDaysBefore = 3
+        });
+
+        _loc.SetLanguage(SupportedLanguage.Japanese);
+        var model = new OfficeWorkspaceModel(
+            _officeRepo, _docRepo, new FakeProcessLauncher(), new FakeDialogService(), new FakeNavigationService(), _loc, today);
+
+        var rowJp = model.FilteredRows.Single(r => r.DocumentId == docId);
+        Assert.Equal(_loc["OW_Conf_Confidential"], rowJp.ConfidentialityLabel);
+        Assert.Equal(_loc["DS_Kind_Completed"], rowJp.StatusLabel);
+
+        _loc.SetLanguage(SupportedLanguage.English);
+
+        var confOptionEn = model.ConfidentialityFilterOptions.Single(f => f.Key == OfficeConfidentialityLevel.Confidential);
+        Assert.Equal("Confidential", confOptionEn.Label);
+
+        var expiryOptionEn = model.ExpiryFilterOptions.Single(f => f.Key == "due-soon");
+        Assert.Equal("Due Soon", expiryOptionEn.Label);
+
+        var rowEn = model.FilteredRows.Single(r => r.DocumentId == docId);
+        Assert.Equal("Confidential", rowEn.ConfidentialityLabel);
+        Assert.Equal("Completed", rowEn.StatusLabel);
+
+        _loc.SetLanguage(SupportedLanguage.Japanese);
+    }
+
+    [Fact]
+    public void CanRestoreDatabase_WithOfficeMetadata_ValidatesRowData()
+    {
+        var doc = new StudyDocument { Name = "Office Backup Doc" };
+        _docRepo.Add(doc);
+        int docId = _docRepo.GetAll().Single(d => d.Name == "Office Backup Doc").Id;
+
+        _officeRepo.Save(new OfficeDocumentMetadata
+        {
+            DocumentId = docId,
+            ConfidentialityLevel = OfficeConfidentialityLevel.Confidential,
+            ReminderDaysBefore = 5,
+            EffectiveDate = new DateTime(2026, 1, 1),
+            ExpiryDate = new DateTime(2026, 12, 31)
+        });
+
+        var backupPath = Path.Combine(Path.GetTempPath(), $"office_backup_{Guid.NewGuid():N}.db");
+        try
+        {
+            Assert.True(Db.BackupDatabase(backupPath));
+            Assert.True(Db.CanRestoreDatabase(backupPath));
+
+            using (var conn = new SqliteConnection($"Data Source={backupPath};Pooling=False"))
+            {
+                conn.Open();
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "UPDATE office_document_metadata SET reminder_days_before = -1;";
+                cmd.ExecuteNonQuery();
+            }
+            Assert.False(Db.CanRestoreDatabase(backupPath));
+
+            using (var conn = new SqliteConnection($"Data Source={backupPath};Pooling=False"))
+            {
+                conn.Open();
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = "UPDATE office_document_metadata SET reminder_days_before = 3, confidentiality_level = 'bogus';";
+                cmd.ExecuteNonQuery();
+            }
+            Assert.False(Db.CanRestoreDatabase(backupPath));
+        }
+        finally
+        {
+            SqliteConnection.ClearAllPools();
+            if (File.Exists(backupPath))
+                File.Delete(backupPath);
+        }
+    }
+
+    [Fact]
+    public void Preflight_OfficeMetadata_ValidatesUniqueAndCascadeForeignKey()
+    {
+        var dbPath = Path.Combine(Path.GetTempPath(), $"sdm_preflight_office_{Guid.NewGuid():N}.db");
+        try
+        {
+            Assert.True(Db.BackupDatabase(dbPath));
+            using (var conn = new SqliteConnection($"Data Source={dbPath};Pooling=False"))
+            {
+                conn.Open();
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = """
+                    DROP TABLE office_document_metadata;
+                    CREATE TABLE office_document_metadata (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        document_id INTEGER NOT NULL,
+                        document_number TEXT, contact_name TEXT, organization_or_project TEXT,
+                        effective_date DATETIME, expiry_date DATETIME, confidentiality_level TEXT NOT NULL DEFAULT 'internal',
+                        reminder_enabled INTEGER NOT NULL DEFAULT 1, reminder_days_before INTEGER NOT NULL DEFAULT 3,
+                        created_at DATETIME, updated_at DATETIME,
+                        FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
+                    );
+                    """;
+                cmd.ExecuteNonQuery();
+            }
+
+            var ex = Assert.Throws<InvalidOperationException>(() => DatabaseMigrator.RunMigrations($"Data Source={dbPath};Pooling=False"));
+            Assert.Contains("Missing unique constraint in 'office_document_metadata'", ex.Message);
+        }
+        finally
+        {
+            SqliteConnection.ClearAllPools();
+            if (File.Exists(dbPath))
+                File.Delete(dbPath);
+        }
+    }
+
     private sealed class FakeProcessLauncher : IProcessLauncherService
     {
         public void OpenFile(string filePath) { }
@@ -292,8 +478,16 @@ public sealed class OfficeMetadataTests : DatabaseTestBase
 
     private sealed class FakeDialogService : IDialogService
     {
+        public string? LastErrorTitle { get; private set; }
+        public string? LastErrorMessage { get; private set; }
+
         public Task ShowMessageAsync(string title, string message) => Task.CompletedTask;
-        public Task ShowErrorAsync(string title, string message) => Task.CompletedTask;
+        public Task ShowErrorAsync(string title, string message)
+        {
+            LastErrorTitle = title;
+            LastErrorMessage = message;
+            return Task.CompletedTask;
+        }
         public Task<bool> ShowConfirmAsync(string title, string message) => Task.FromResult(true);
         public Task<bool> ShowConfirmAsync(string title, string message, string confirmText, bool isDanger = false) => Task.FromResult(true);
         public Task<string?> ShowInputAsync(string title, string label, string defaultValue = "", string watermark = "") => Task.FromResult<string?>(defaultValue);

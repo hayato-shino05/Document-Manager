@@ -227,7 +227,6 @@
 - `idx_collection_items_document`: `collection_items(document_id)`
 - `idx_documents_deleted`: `documents(is_deleted)`
 - `idx_documents_important`: `documents(is_important)`
-- `idx_office_metadata_doc_id`: `office_document_metadata(document_id)`
 - `idx_office_metadata_expiry`: `office_document_metadata(expiry_date)`
 - `ux_documents_archive_export_key`: `archive_export_key IS NOT NULL AND archive_export_key <> ''` の行を対象にした、`documents(archive_export_key)` の部分一意インデックス。
 - `ux_watched_folders_path`: `watched_folders(folder_path COLLATE NOCASE)` の一意インデックス。

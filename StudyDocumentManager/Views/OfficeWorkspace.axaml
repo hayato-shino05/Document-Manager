@@ -103,8 +103,13 @@
                                         <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ExpiryStateLabel}" FontWeight="Bold" FontSize="{StaticResource FontSizeXs}"/>
                                         
                                         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
-                                            <TextBlock Text="{Binding DocumentNumber, StringFormat='No: {0}'}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"
-                                                       IsVisible="{Binding DocumentNumber, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                                            <TextBlock Text="{Binding StatusLabel}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"
+                                                       IsVisible="{Binding StatusLabel, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="2"
+                                                        IsVisible="{Binding DocumentNumber, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                                <TextBlock Text="{loc:Localize OW_DocNoPrefix}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"/>
+                                                <TextBlock Text="{Binding DocumentNumber}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"/>
+                                            </StackPanel>
                                             <TextBlock Text="{Binding OrganizationOrProject}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"
                                                        IsVisible="{Binding OrganizationOrProject, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                                             <TextBlock Text="{Binding ConfidentialityLabel, StringFormat='[{0}]'}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource Accent}"/>

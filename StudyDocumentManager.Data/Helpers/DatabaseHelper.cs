@@ -1556,6 +1556,24 @@ public class DatabaseHelper
                 DateTime.Parse(recentFilesReader.GetString(0));
         }
 
+        if (hasOfficeMetadata)
+        {
+            using var officeCommand = connection.CreateCommand();
+            officeCommand.CommandText = "SELECT effective_date, expiry_date, reminder_days_before, confidentiality_level FROM office_document_metadata";
+            using var officeReader = officeCommand.ExecuteReader();
+            while (officeReader.Read())
+            {
+                if (!officeReader.IsDBNull(0))
+                    DateTime.Parse(officeReader.GetString(0));
+                if (!officeReader.IsDBNull(1))
+                    DateTime.Parse(officeReader.GetString(1));
+                if (officeReader.GetInt32(2) < 0)
+                    throw new InvalidOperationException("Backup database contains invalid office metadata reminder days.");
+                if (!OfficeConfidentialityLevel.IsValid(officeReader.GetString(3)))
+                    throw new InvalidOperationException("Backup database contains invalid office metadata confidentiality level.");
+            }
+        }
+
         using var integrityCommand = connection.CreateCommand();
         integrityCommand.CommandText = "PRAGMA integrity_check";
         if (!string.Equals(integrityCommand.ExecuteScalar()?.ToString(), "ok", StringComparison.OrdinalIgnoreCase))
@@ -1737,7 +1755,7 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
             },
             "office_document_metadata" => new HashSet<string>(StringComparer.Ordinal)
             {
-                "idx_office_metadata_doc_id", "idx_office_metadata_expiry"
+                "idx_office_metadata_expiry"
             },
             _ => new HashSet<string>(StringComparer.Ordinal)
         };

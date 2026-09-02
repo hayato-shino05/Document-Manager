@@ -905,4 +905,10 @@ Please check your network connection.</value></data>
   <data name="OW_Confidentiality" xml:space="preserve"><value>Confidentiality</value></data>
   <data name="OW_Reminder" xml:space="preserve"><value>Enable reminder notification</value></data>
   <data name="OW_DaysRemaining" xml:space="preserve"><value>Days in advance for notification</value></data>
+  <data name="OW_DocNoPrefix" xml:space="preserve"><value>No: </value></data>
+  <data name="OW_Conf_Public" xml:space="preserve"><value>Public</value></data>
+  <data name="OW_Conf_Internal" xml:space="preserve"><value>Internal</value></data>
+  <data name="OW_Conf_Confidential" xml:space="preserve"><value>Confidential</value></data>
+  <data name="OW_Conf_Restricted" xml:space="preserve"><value>Restricted</value></data>
+  <data name="OW_Error_FileNotFound" xml:space="preserve"><value>File not found: {0}</value></data>
 </root>

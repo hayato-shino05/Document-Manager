@@ -1013,6 +1013,12 @@
   <data name="OW_Confidentiality" xml:space="preserve"><value>機密区分</value></data>
   <data name="OW_Reminder" xml:space="preserve"><value>リマインダー通知を有効化</value></data>
   <data name="OW_DaysRemaining" xml:space="preserve"><value>何日前に通知するか (日数)</value></data>
+  <data name="OW_DocNoPrefix" xml:space="preserve"><value>番号: </value></data>
+  <data name="OW_Conf_Public" xml:space="preserve"><value>公開</value></data>
+  <data name="OW_Conf_Internal" xml:space="preserve"><value>社内限り</value></data>
+  <data name="OW_Conf_Confidential" xml:space="preserve"><value>機密</value></data>
+  <data name="OW_Conf_Restricted" xml:space="preserve"><value>極秘</value></data>
+  <data name="OW_Error_FileNotFound" xml:space="preserve"><value>ファイルが見つかりません: {0}</value></data>
 </root>
 
 

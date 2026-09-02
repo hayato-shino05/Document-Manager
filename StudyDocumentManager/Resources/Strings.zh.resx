@@ -1114,4 +1114,10 @@
   <data name="OW_Confidentiality" xml:space="preserve"><value>保密级别</value></data>
   <data name="OW_Reminder" xml:space="preserve"><value>启用提醒通知</value></data>
   <data name="OW_DaysRemaining" xml:space="preserve"><value>提前提醒天数 (天)</value></data>
+  <data name="OW_DocNoPrefix" xml:space="preserve"><value>编号: </value></data>
+  <data name="OW_Conf_Public" xml:space="preserve"><value>公开</value></data>
+  <data name="OW_Conf_Internal" xml:space="preserve"><value>内部</value></data>
+  <data name="OW_Conf_Confidential" xml:space="preserve"><value>机密</value></data>
+  <data name="OW_Conf_Restricted" xml:space="preserve"><value>绝密</value></data>
+  <data name="OW_Error_FileNotFound" xml:space="preserve"><value>找不到文件: {0}</value></data>
 </root>

@@ -216,7 +216,6 @@ public static class DatabaseMigrator
             CREATE INDEX IF NOT EXISTS idx_collection_items_document ON collection_items(document_id);
             CREATE INDEX IF NOT EXISTS idx_documents_deleted ON documents(is_deleted);
             CREATE INDEX IF NOT EXISTS idx_documents_important ON documents(is_important);
-            CREATE INDEX IF NOT EXISTS idx_office_metadata_doc_id ON office_document_metadata(document_id);
             CREATE INDEX IF NOT EXISTS idx_office_metadata_expiry ON office_document_metadata(expiry_date);
             """;
 
@@ -225,6 +224,8 @@ public static class DatabaseMigrator
 
         if (HasAnyLegacyVietnameseTable(conn))
             MigrateLegacyVietnameseSchema(conn, createTablesQuery);
+
+        DropRedundantOfficeMetadataIndex(conn);
 
         var preflight = Preflight(conn);
 
@@ -507,7 +508,21 @@ public static class DatabaseMigrator
         if (TableExists(connection, "watched_folders"))
             RequireColumns(connection, "watched_folders", ["id", "folder_path", "enabled", "include_subdirectories", "last_scan_at", "created_at"], []);
         if (TableExists(connection, "office_document_metadata"))
+        {
             RequireColumns(connection, "office_document_metadata", ["id", "document_id", "document_number", "contact_name", "organization_or_project", "effective_date", "expiry_date", "confidentiality_level", "reminder_enabled", "reminder_days_before", "created_at", "updated_at"], []);
+            EnsureNoUnsupportedIndexesOrTriggers(connection, "office_document_metadata");
+            EnsureNoOrphans(connection, "office_document_metadata", [("document_id", "documents", "id")]);
+            if (!HasUniqueIndex(connection, "office_document_metadata", ["document_id"]))
+                throw new InvalidOperationException("Missing unique constraint in 'office_document_metadata'.");
+
+            var actualForeignKeys = GetForeignKeys(connection, "office_document_metadata");
+            if (actualForeignKeys.Count != 1 || !actualForeignKeys.Any(fk =>
+                fk.From == "document_id" && fk.ParentTable == "documents" && fk.ParentColumn == "id" &&
+                string.Equals(fk.OnDelete, "CASCADE", StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new InvalidOperationException("Unsupported foreign key layout in 'office_document_metadata'.");
+            }
+        }
 
         var tablesToRebuild = new List<string>();
         ValidateChildTable(connection, "collection_items", ["id", "collection_id", "document_id", "added_at"],
@@ -754,7 +769,7 @@ public static class DatabaseMigrator
             },
             "office_document_metadata" => new HashSet<string>(StringComparer.Ordinal)
             {
-                "idx_office_metadata_doc_id", "idx_office_metadata_expiry"
+                "idx_office_metadata_expiry"
             },
             _ => new HashSet<string>(StringComparer.Ordinal)
         };
@@ -840,6 +855,16 @@ public static class DatabaseMigrator
             return;
 
         using var cmd = new SqliteCommand($"ALTER TABLE {table} ADD COLUMN {column} {type}", conn, transaction);
+        cmd.ExecuteNonQuery();
+    }
+
+    private static void DropRedundantOfficeMetadataIndex(SqliteConnection conn)
+    {
+        if (!TableExists(conn, "office_document_metadata"))
+            return;
+
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "DROP INDEX IF EXISTS idx_office_metadata_doc_id;";
         cmd.ExecuteNonQuery();
     }
 

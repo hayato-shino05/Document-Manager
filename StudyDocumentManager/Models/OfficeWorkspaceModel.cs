@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StudyDocumentManager.Core.Entities;
@@ -26,6 +27,7 @@ public sealed class OfficeDocumentRow
     public string ExpiryStateLabel { get; init; } = string.Empty;
     public string ConfidentialityLabel { get; init; } = string.Empty;
     public string DocumentStatus => Document.Status;
+    public string StatusLabel { get; init; } = string.Empty;
     public string FilePath => Document.FilePath ?? string.Empty;
 }
 
@@ -110,8 +112,39 @@ public partial class OfficeWorkspaceModel : ModelBase, IDisposable
         Refresh();
     }
 
+    public string GetConfidentialityLabel(string? level) => level switch
+    {
+        OfficeConfidentialityLevel.Public => _loc["OW_Conf_Public"] ?? "公開",
+        OfficeConfidentialityLevel.Internal => _loc["OW_Conf_Internal"] ?? "社内限り",
+        OfficeConfidentialityLevel.Confidential => _loc["OW_Conf_Confidential"] ?? "機密",
+        OfficeConfidentialityLevel.Restricted => _loc["OW_Conf_Restricted"] ?? "極秘",
+        _ => level ?? string.Empty
+    };
+
+    public string GetStatusLabel(string? status) => status switch
+    {
+        DocumentStatus.Unread => _loc["DS_Kind_Unread"] ?? "未読",
+        DocumentStatus.InProgress => _loc["DS_Kind_InProgress"] ?? "対応中",
+        DocumentStatus.Read => _loc["DS_Kind_Read"] ?? "読了",
+        DocumentStatus.NeedsAction => _loc["DS_Kind_NeedsAction"] ?? "要対応",
+        DocumentStatus.Completed => _loc["DS_Kind_Completed"] ?? "完了",
+        DocumentStatus.Archived => _loc["DS_Kind_Archived"] ?? "保管済み",
+        _ => status ?? string.Empty
+    };
+
+    public string GetExpiryStateLabel(OfficeExpiryState state) => state switch
+    {
+        OfficeExpiryState.Overdue => _loc["OW_ExpiryState_Overdue"] ?? "期限超過",
+        OfficeExpiryState.DueSoon => _loc["OW_ExpiryState_DueSoon"] ?? "期限切迫",
+        OfficeExpiryState.Active => _loc["OW_ExpiryState_Active"] ?? "有効",
+        _ => _loc["OW_ExpiryState_None"] ?? "期限なし"
+    };
+
     private void RefreshFilterOptions()
     {
+        var currentExpiryKey = SelectedExpiryFilter?.Key ?? "all";
+        var currentConfKey = SelectedConfidentialityFilter?.Key ?? "all";
+
         ExpiryFilterOptions =
         [
             new FilterOption("all", _loc["Common_All"] ?? "すべて"),
@@ -124,20 +157,47 @@ public partial class OfficeWorkspaceModel : ModelBase, IDisposable
         ConfidentialityFilterOptions =
         [
             new FilterOption("all", _loc["Common_All"] ?? "すべて"),
-            new FilterOption(OfficeConfidentialityLevel.Public, "Public"),
-            new FilterOption(OfficeConfidentialityLevel.Internal, "Internal"),
-            new FilterOption(OfficeConfidentialityLevel.Confidential, "Confidential"),
-            new FilterOption(OfficeConfidentialityLevel.Restricted, "Restricted")
+            new FilterOption(OfficeConfidentialityLevel.Public, GetConfidentialityLabel(OfficeConfidentialityLevel.Public)),
+            new FilterOption(OfficeConfidentialityLevel.Internal, GetConfidentialityLabel(OfficeConfidentialityLevel.Internal)),
+            new FilterOption(OfficeConfidentialityLevel.Confidential, GetConfidentialityLabel(OfficeConfidentialityLevel.Confidential)),
+            new FilterOption(OfficeConfidentialityLevel.Restricted, GetConfidentialityLabel(OfficeConfidentialityLevel.Restricted))
         ];
 
-        SelectedExpiryFilter = ExpiryFilterOptions[0];
-        SelectedConfidentialityFilter = ConfidentialityFilterOptions[0];
+        SelectedExpiryFilter = ExpiryFilterOptions.FirstOrDefault(f => f.Key == currentExpiryKey) ?? ExpiryFilterOptions[0];
+        SelectedConfidentialityFilter = ConfidentialityFilterOptions.FirstOrDefault(f => f.Key == currentConfKey) ?? ConfidentialityFilterOptions[0];
     }
 
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
         RefreshFilterOptions();
+        OnPropertyChanged(nameof(ExpiryFilterOptions));
+        OnPropertyChanged(nameof(ConfidentialityFilterOptions));
+        RelocalizeRows();
+    }
+
+    private void RelocalizeRows()
+    {
+        var selectedId = SelectedRow?.DocumentId;
+        var relocalized = new List<OfficeDocumentRow>(_allRows.Count);
+        foreach (var r in _allRows)
+        {
+            relocalized.Add(new OfficeDocumentRow
+            {
+                Document = r.Document,
+                Metadata = r.Metadata,
+                ExpiryState = r.ExpiryState,
+                DaysRemaining = r.DaysRemaining,
+                ExpiryStateLabel = GetExpiryStateLabel(r.ExpiryState),
+                ConfidentialityLabel = GetConfidentialityLabel(r.ConfidentialityLevel),
+                StatusLabel = GetStatusLabel(r.DocumentStatus)
+            });
+        }
+        _allRows = relocalized;
         ApplyFilter();
+        if (selectedId.HasValue)
+        {
+            SelectedRow = FilteredRows.FirstOrDefault(r => r.DocumentId == selectedId.Value);
+        }
     }
 
     partial void OnSearchTextChanged(string value) => ApplyFilter();
@@ -209,7 +269,7 @@ public partial class OfficeWorkspaceModel : ModelBase, IDisposable
                     state = OfficeExpiryState.Overdue;
                     overdue++;
                 }
-                else if (diff <= (meta.ReminderDaysBefore > 0 ? meta.ReminderDaysBefore : 7))
+                else if (meta.ReminderEnabled && diff <= (meta.ReminderDaysBefore > 0 ? meta.ReminderDaysBefore : 7))
                 {
                     state = OfficeExpiryState.DueSoon;
                     dueSoon++;
@@ -221,22 +281,15 @@ public partial class OfficeWorkspaceModel : ModelBase, IDisposable
                 }
             }
 
-            string stateLabel = state switch
-            {
-                OfficeExpiryState.Overdue => _loc["OW_ExpiryState_Overdue"] ?? "期限超過",
-                OfficeExpiryState.DueSoon => _loc["OW_ExpiryState_DueSoon"] ?? "期限切迫",
-                OfficeExpiryState.Active => _loc["OW_ExpiryState_Active"] ?? "有効",
-                _ => _loc["OW_ExpiryState_None"] ?? "期限なし"
-            };
-
             rows.Add(new OfficeDocumentRow
             {
                 Document = doc,
                 Metadata = meta,
                 ExpiryState = state,
                 DaysRemaining = daysRemaining,
-                ExpiryStateLabel = stateLabel,
-                ConfidentialityLabel = meta.ConfidentialityLevel
+                ExpiryStateLabel = GetExpiryStateLabel(state),
+                ConfidentialityLabel = GetConfidentialityLabel(meta.ConfidentialityLevel),
+                StatusLabel = GetStatusLabel(doc.Status)
             });
         }
 
@@ -319,12 +372,19 @@ public partial class OfficeWorkspaceModel : ModelBase, IDisposable
     }
 
     [RelayCommand]
-    public void OpenFile()
+    public async Task OpenFileAsync()
     {
-        if (SelectedRow != null && !string.IsNullOrWhiteSpace(SelectedRow.FilePath))
+        if (SelectedRow == null || string.IsNullOrWhiteSpace(SelectedRow.FilePath))
+            return;
+
+        if (!File.Exists(SelectedRow.FilePath))
         {
-            _processLauncher.OpenFile(SelectedRow.FilePath);
+            var msg = string.Format(_loc["OW_Error_FileNotFound"] ?? "ファイルが見つかりません: {0}", SelectedRow.FilePath);
+            await _dialogService.ShowErrorAsync(_loc["Common_Error"] ?? "エラー", msg);
+            return;
         }
+
+        _processLauncher.OpenFile(SelectedRow.FilePath);
     }
 
     [RelayCommand]

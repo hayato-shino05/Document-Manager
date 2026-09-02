@@ -1114,4 +1114,10 @@
   <data name="OW_Confidentiality" xml:space="preserve"><value>Mức độ bảo mật</value></data>
   <data name="OW_Reminder" xml:space="preserve"><value>Bật thông báo nhắc nhở</value></data>
   <data name="OW_DaysRemaining" xml:space="preserve"><value>Số ngày nhắc trước hạn (ngày)</value></data>
+  <data name="OW_DocNoPrefix" xml:space="preserve"><value>Số: </value></data>
+  <data name="OW_Conf_Public" xml:space="preserve"><value>Công khai</value></data>
+  <data name="OW_Conf_Internal" xml:space="preserve"><value>Nội bộ</value></data>
+  <data name="OW_Conf_Confidential" xml:space="preserve"><value>Bảo mật</value></data>
+  <data name="OW_Conf_Restricted" xml:space="preserve"><value>Tối mật</value></data>
+  <data name="OW_Error_FileNotFound" xml:space="preserve"><value>Không tìm thấy tệp: {0}</value></data>
 </root>
