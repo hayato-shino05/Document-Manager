@@ -72,7 +72,10 @@
 | --- | --- | --- |
 | `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
 | `document_id` | INTEGER NOT NULL | `documents(id)` への FK |
+| `note_type` | TEXT NOT NULL DEFAULT 'general' | ノートの分類種別 (`general` / `summary` / `action` / `quote` / `lecture` / `meeting` 等) |
 | `content` | TEXT | メモの内容 |
+| `is_pinned` | INTEGER NOT NULL DEFAULT 0 | ピン留めフラグ (1: 固定) |
+| `is_deleted` | INTEGER NOT NULL DEFAULT 0 | soft delete フラグ (1: 削除済み) |
 | `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 作成日時 |
 | `updated_at` | DATETIME DEFAULT `datetime('now','localtime')` | 最終更新日時 |
 
@@ -152,6 +155,43 @@
 
 - `UNIQUE(name COLLATE NOCASE)`
 
+### `import_inbox`
+
+外部または監視フォルダーから取り込んだ処理待ちファイルを管理します。
+
+| カラム | 型 | 説明 |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `document_id` | INTEGER | 取り込み完了後の `documents(id)` への FK (任意) |
+| `source_path` | TEXT NOT NULL | 元のファイルパス |
+| `display_name` | TEXT NOT NULL | 表示名 |
+| `failure_code` | TEXT | エラーコード |
+| `duplicate_candidate` | TEXT | 重複候補の判定情報 |
+| `subject` | TEXT | 科目・カテゴリ候補 |
+| `type` | TEXT | 文書タイプ候補 |
+| `state` | TEXT NOT NULL DEFAULT 'Pending' | 状態 (`Pending` / `Imported` / `Ignored` / `Failed`) |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 作成日時 |
+| `updated_at` | DATETIME DEFAULT `datetime('now','localtime')` | 最終更新日時 |
+
+制約:
+
+- `FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE SET NULL`
+
+### `watched_folders`
+
+自動監視対象のフォルダー一覧です。
+
+| カラム | 型 | 説明 |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `folder_path` | TEXT NOT NULL | 監視フォルダーパス |
+| `enabled` | INTEGER NOT NULL DEFAULT 1 | 有効フラグ (1: 有効, 0: 無効) |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 登録日時 |
+
+制約:
+
+- `UNIQUE(folder_path COLLATE NOCASE)`
+
 ## インデックス
 
 - `idx_documents_subject`: `documents(subject)`
@@ -162,6 +202,8 @@
 - `idx_collection_items_document`: `collection_items(document_id)`
 - `idx_documents_deleted`: `documents(is_deleted)`
 - `idx_documents_important`: `documents(is_important)`
+- `ux_documents_archive_export_key`: `archive_export_key IS NOT NULL AND archive_export_key <> ''` の行を対象にした、`documents(archive_export_key)` の部分一意インデックス。
+- `ux_watched_folders_path`: `watched_folders(folder_path COLLATE NOCASE)` の一意インデックス。
 - `idx_documents_file_path_unique` は、`file_path IS NOT NULL AND file_path <> ''` の行だけを対象に `documents(file_path)` の完全一致を一意にする部分インデックスです。削除済み文書も対象で、SQLite の既定 `BINARY` 比較を使用します。
 
 ## migration の動作
