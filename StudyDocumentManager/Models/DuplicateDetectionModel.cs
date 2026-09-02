@@ -92,14 +92,36 @@ public partial class DuplicateDetectionModel : ModelBase
         if (group is null || group.Documents.Count < 2)
             return;
 
-        var survivor = group.Documents[0];
-        var duplicateIds = group.Documents.Skip(1).Select(document => document.Id).ToArray();
-        var confirmed = await _dialogService.ShowConfirmAsync(
-            _loc["Dialog_Confirm"],
-            string.Format(_loc["Duplicate_ConfirmMerge"], survivor.Name, duplicateIds.Length),
-            _loc["Duplicate_Merge"],
-            isDanger: true);
-        if (!confirmed)
+        int? selectedSurvivorId = null;
+        if (_dialogService is ICustomDialogService customDialog)
+        {
+            selectedSurvivorId = await customDialog.ShowDuplicateMergeReviewAsync(
+                group.GroupName,
+                group.MatchInfo,
+                group.Documents.ToList());
+        }
+        else
+        {
+            var defaultSurvivor = group.Documents[0];
+            var confirmed = await _dialogService.ShowConfirmAsync(
+                _loc["Dialog_Confirm"],
+                string.Format(_loc["Duplicate_ConfirmMerge"], defaultSurvivor.Name, group.Documents.Count - 1),
+                _loc["Duplicate_Merge"],
+                isDanger: true);
+            if (confirmed)
+                selectedSurvivorId = defaultSurvivor.Id;
+        }
+
+        if (!selectedSurvivorId.HasValue)
+            return;
+
+        var survivor = group.Documents.FirstOrDefault(d => d.Id == selectedSurvivorId.Value) ?? group.Documents[0];
+        var duplicateIds = group.Documents
+            .Where(d => d.Id != survivor.Id)
+            .Select(d => d.Id)
+            .ToArray();
+
+        if (duplicateIds.Length == 0)
             return;
 
         try
