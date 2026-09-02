@@ -139,7 +139,10 @@ public partial class DuplicateDetectionModel : ModelBase
         if (!selectedSurvivorId.HasValue)
             return;
 
-        var survivor = group.Documents.FirstOrDefault(d => d.Id == selectedSurvivorId.Value) ?? group.Documents[0];
+        var survivor = group.Documents.FirstOrDefault(d => d.Id == selectedSurvivorId.Value);
+        if (survivor is null)
+            return;
+
         var duplicateIds = group.Documents
             .Where(d => d.Id != survivor.Id)
             .Select(d => d.Id)

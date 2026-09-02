@@ -169,7 +169,7 @@
 | `duplicate_candidate` | TEXT | 重複候補の判定情報 |
 | `subject` | TEXT | 科目・カテゴリ候補 |
 | `type` | TEXT | 文書タイプ候補 |
-| `state` | TEXT NOT NULL DEFAULT 'Pending' | 状態 (`Pending` / `Imported` / `Ignored` / `Failed`) |
+| `state` | TEXT NOT NULL DEFAULT 'Pending' | 状態 (`Pending` / `Held` / `MissingMetadata` / `Ambiguous` / `Failed` / `Processed`) |
 | `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 作成日時 |
 | `updated_at` | DATETIME DEFAULT `datetime('now','localtime')` | 最終更新日時 |
 
@@ -186,6 +186,8 @@
 | `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
 | `folder_path` | TEXT NOT NULL | 監視フォルダーパス |
 | `enabled` | INTEGER NOT NULL DEFAULT 1 | 有効フラグ (1: 有効, 0: 無効) |
+| `include_subdirectories` | INTEGER NOT NULL DEFAULT 1 | サブディレクトリ監視フラグ (1: 有効, 0: 無効) |
+| `last_scan_at` | DATETIME | 最終スキャン日時 |
 | `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 登録日時 |
 
 制約:

@@ -96,13 +96,18 @@ public sealed class DuplicateReviewServiceTests : DatabaseTestBase
     [Fact]
     public async Task MergeDuplicateAsync_UserSelectsSurvivor_MergesIntoSelectedSurvivor()
     {
-        var doc1 = new StudyDocument { Name = "Doc A" };
-        var doc2 = new StudyDocument { Name = "Doc B" };
+        var doc1 = new StudyDocument { Name = "Doc A", Tags = "alpha" };
+        var doc2 = new StudyDocument { Name = "Doc B", Tags = "beta" };
         _repo.Add(doc1);
         _repo.Add(doc2);
         var docs = _repo.GetAll();
         int id1 = docs.Single(d => d.Name == "Doc A").Id;
         int id2 = docs.Single(d => d.Name == "Doc B").Id;
+
+        // doc1 にメモとコレクションを追加
+        Db.SavePersonalNote(new PersonalNote(0, id1, "general", "Note from Doc A", false));
+        int colId = Db.CreateCollection("Test Col");
+        Db.AddDocumentToCollection(colId, id1);
 
         // doc2 を代表レコードとして選択する FakeDialogService
         var fakeDialog = new FakeReviewDialogService(selectedSurvivorId: id2);
@@ -129,6 +134,29 @@ public sealed class DuplicateReviewServiceTests : DatabaseTestBase
 
         var deleted = _repo.GetDeletedDocuments();
         Assert.Contains(deleted, d => d.Id == id1);
+
+        // メタデータ（タグ、メモ、コレクション）が survivor に引き継がれていることを検証
+        var survivorDoc = _repo.GetById(id2)!;
+        Assert.Contains("alpha", survivorDoc.Tags);
+        Assert.Contains("beta", survivorDoc.Tags);
+        var survivorNotes = Db.GetPersonalNotes(id2);
+        Assert.Contains(survivorNotes, n => n.Content == "Note from Doc A");
+        var colMemberships = new CollectionRepository(Db).GetDocuments(colId);
+        Assert.Contains(colMemberships, d => d.Id == id2);
+
+        // Undo 復元の検証
+        Assert.True(undo.CanUndo);
+        var undoEntry = undo.Peek()!;
+        Assert.NotNull(undoEntry.Merge);
+        undoRepo.ApplyMergeUndo(undoEntry.Merge);
+
+        // 復元後: 両ドキュメントが active に復帰し、元通りの状態になることを検証
+        var restoredDocs = _repo.GetAll();
+        Assert.Equal(2, restoredDocs.Count);
+        Assert.Contains(restoredDocs, d => d.Id == id1);
+        Assert.Contains(restoredDocs, d => d.Id == id2);
+        var doc1Notes = Db.GetPersonalNotes(id1);
+        Assert.Contains(doc1Notes, n => n.Content == "Note from Doc A");
     }
 
     [Fact]

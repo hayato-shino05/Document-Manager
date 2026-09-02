@@ -17,11 +17,28 @@ public sealed class DuplicateReviewItemViewModel : INotifyPropertyChanged
         AutomationIdRadio = $"DuplicateReview_Radio_{document.Id}";
         FilePathDisplay = string.IsNullOrWhiteSpace(document.FilePath) ? "(未設定)" : document.FilePath;
         
-        var sizeStr = document.FileSize.HasValue && document.FileSize.Value > 0
-            ? $"{document.FileSize.Value / 1024.0:F1} KB"
+        var sizeStr = document.FileSize.HasValue
+            ? $"{document.FileSize.Value:F1} MB"
             : "(未設定)";
-        var dateStr = document.CreatedAt.ToString("yyyy-MM-dd HH:mm");
-        SizeAndDateDisplay = $"サイズ: {sizeStr} | 登録日: {dateStr}";
+
+        string dateStr;
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(document.FilePath) && System.IO.File.Exists(document.FilePath))
+            {
+                var writeTime = System.IO.File.GetLastWriteTime(document.FilePath);
+                dateStr = $"更新日: {writeTime:yyyy-MM-dd HH:mm}";
+            }
+            else
+            {
+                dateStr = $"登録日: {document.CreatedAt:yyyy-MM-dd HH:mm}";
+            }
+        }
+        catch
+        {
+            dateStr = $"登録日: {document.CreatedAt:yyyy-MM-dd HH:mm}";
+        }
+        SizeAndDateDisplay = $"サイズ: {sizeStr} | {dateStr}";
 
         var subject = string.IsNullOrWhiteSpace(document.Subject) ? "(未設定)" : document.Subject;
         var type = string.IsNullOrWhiteSpace(document.Type) ? "(未設定)" : document.Type;

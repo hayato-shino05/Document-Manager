@@ -46,7 +46,26 @@ public class DuplicateReviewService : IDuplicateReviewService
                 handledIds.Add(doc.Id);
         }
 
-        // 2. 文書名完全一致（大文字小文字を区別しない）
+        // 2. 文書名および正のファイルサイズ一致
+        var nameSizeGroups = activeDocs
+            .Where(d => !handledIds.Contains(d.Id) && !string.IsNullOrWhiteSpace(d.Name) && d.FileSize is > 0)
+            .GroupBy(d => $"{d.Name.Trim()}|||{d.FileSize!.Value:F1}", StringComparer.OrdinalIgnoreCase)
+            .Where(g => g.Count() > 1)
+            .ToList();
+
+        foreach (var g in nameSizeGroups)
+        {
+            var candidates = g.ToList();
+            groups.Add(new DuplicateReviewGroup(
+                GroupKey: $"namesize:{g.Key}",
+                Reason: DuplicateMatchReason.SameNameAndSize,
+                MatchDescription: $"文書名およびファイルサイズ一致 ({candidates.Count} 件)",
+                Candidates: candidates));
+            foreach (var doc in candidates)
+                handledIds.Add(doc.Id);
+        }
+
+        // 3. 文書名完全一致（大文字小文字を区別しない）
         var nameGroups = activeDocs
             .Where(d => !handledIds.Contains(d.Id) && !string.IsNullOrWhiteSpace(d.Name))
             .GroupBy(d => d.Name.Trim(), StringComparer.OrdinalIgnoreCase)
@@ -60,25 +79,6 @@ public class DuplicateReviewService : IDuplicateReviewService
                 GroupKey: $"name:{g.Key}",
                 Reason: DuplicateMatchReason.ExactName,
                 MatchDescription: $"文書名完全一致 ({candidates.Count} 件)",
-                Candidates: candidates));
-            foreach (var doc in candidates)
-                handledIds.Add(doc.Id);
-        }
-
-        // 3. 文書名および文書タイプ一致
-        var nameTypeGroups = activeDocs
-            .Where(d => !handledIds.Contains(d.Id) && !string.IsNullOrWhiteSpace(d.Name) && !string.IsNullOrWhiteSpace(d.Type))
-            .GroupBy(d => $"{d.Name.Trim()}|||{d.Type.Trim()}", StringComparer.OrdinalIgnoreCase)
-            .Where(g => g.Count() > 1)
-            .ToList();
-
-        foreach (var g in nameTypeGroups)
-        {
-            var candidates = g.ToList();
-            groups.Add(new DuplicateReviewGroup(
-                GroupKey: $"nametype:{g.Key}",
-                Reason: DuplicateMatchReason.SameNameAndType,
-                MatchDescription: $"文書名および文書タイプ一致 ({candidates.Count} 件)",
                 Candidates: candidates));
             foreach (var doc in candidates)
                 handledIds.Add(doc.Id);
@@ -104,19 +104,18 @@ public class DuplicateReviewService : IDuplicateReviewService
             .Cast<StudyDocument>()
             .ToList();
 
+        var duplicateIdSet = duplicates.Select(d => d.Id).ToHashSet();
         int transferredNotesCount = 0;
         int transferredCollectionsCount = 0;
         int transferredRelationsCount = 0;
 
-        using (var connection = new SqliteConnection(_db.ConnectionString))
+        using (var connection = _db.OpenConnection())
         {
-            connection.Open();
-
             // Notes count
             foreach (var dup in duplicates)
             {
                 using var cmd = connection.CreateCommand();
-                cmd.CommandText = "SELECT COUNT(*) FROM personal_notes WHERE document_id = @docId AND (is_deleted IS NULL OR is_deleted = 0)";
+                cmd.CommandText = "SELECT COUNT(*) FROM personal_notes WHERE document_id = @docId";
                 cmd.Parameters.AddWithValue("@docId", dup.Id);
                 transferredNotesCount += Convert.ToInt32(cmd.ExecuteScalar());
             }
@@ -169,7 +168,7 @@ public class DuplicateReviewService : IDuplicateReviewService
                 while (reader.Read())
                 {
                     int relId = reader.GetInt32(0);
-                    if (relId != survivor.Id && !survivorRelIds.Contains(relId))
+                    if (relId != survivor.Id && !duplicateIdSet.Contains(relId) && !survivorRelIds.Contains(relId))
                     {
                         transferredRelationsCount++;
                         survivorRelIds.Add(relId);
@@ -179,13 +178,14 @@ public class DuplicateReviewService : IDuplicateReviewService
         }
 
         // Merged tags calculation
+        var tagDelimiters = new[] { ';', ',' };
         var survivorTags = (survivor.Tags ?? string.Empty)
-            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            .Split(tagDelimiters, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var mergedTags = new HashSet<string>(survivorTags, StringComparer.OrdinalIgnoreCase);
         foreach (var dup in duplicates)
         {
             var dupTags = (dup.Tags ?? string.Empty)
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                .Split(tagDelimiters, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             foreach (var t in dupTags)
                 mergedTags.Add(t);
         }

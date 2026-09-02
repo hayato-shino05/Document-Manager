@@ -1301,7 +1301,7 @@ public class DatabaseHelper
         command.ExecuteNonQuery();
     }
 
-    private SqliteConnection OpenConnection()
+    internal SqliteConnection OpenConnection()
         => OpenConnection(DatabasePath);
 
     private static SqliteConnection OpenConnection(
