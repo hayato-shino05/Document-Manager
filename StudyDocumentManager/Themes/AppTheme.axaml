@@ -268,7 +268,9 @@
         <DrawingImage x:Key="IconCheckSuccess">
             <DrawingGroup>
                 <GeometryDrawing Brush="{StaticResource BrushIconSuccess}"
-                    Geometry="M12,2 C6.48,2 2,6.48 2,12 C2,17.52 6.48,22 12,22 C17.52,22 22,17.52 22,12 C22,6.48 17.52,2 12,2 Z M10,17 L5,12 L6.41,10.59 L10,14.17 L17.59,6.58 L19,8 L10,17 Z"/>
+                    Geometry="M12,2 A10,10 0 1,0 12,22 A10,10 0 1,0 12,2 Z"/>
+                <GeometryDrawing Brush="White"
+                    Geometry="M9.5,16.2 L5.5,12.2 L6.9,10.8 L9.5,13.4 L17.1,5.8 L18.5,7.2 Z"/>
             </DrawingGroup>
         </DrawingImage>
 

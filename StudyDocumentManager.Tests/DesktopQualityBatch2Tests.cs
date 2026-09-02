@@ -55,6 +55,21 @@ public class DesktopQualityBatch2Tests
     }
 
     [Fact]
+    public async Task DuplicateDetectionModel_OnException_DoesNotShowCleanState()
+    {
+        var repo = new ThrowingTestDocumentRepository();
+        var loc = new CountingLocalizationService();
+        var dialog = new TestDialogService();
+        var model = new DuplicateDetectionModel(repo, dialog, loc);
+
+        await model.ScanDuplicatesCommand.ExecuteAsync(null);
+
+        Assert.True(model.IsInitialState);
+        Assert.False(model.IsCleanState);
+        Assert.False(model.HasResults);
+    }
+
+    [Fact]
     public void FileIntegrityCheck_View_HasInitialAndHealthyStates()
     {
         var view = File.ReadAllText(
@@ -86,6 +101,46 @@ public class DesktopQualityBatch2Tests
     }
 
     [Fact]
+    public async Task FileIntegrityCheckModel_OnException_DoesNotShowHealthyState()
+    {
+        var repo = new ThrowingTestDocumentRepository();
+        var loc = new CountingLocalizationService();
+        var dialog = new TestDialogService();
+        var fileDialog = new TestFileDialogService();
+        var model = new FileIntegrityCheckModel(repo, null, dialog, fileDialog, loc);
+
+        await model.CheckIntegrityCommand.ExecuteAsync(null);
+
+        Assert.True(model.IsInitialState);
+        Assert.False(model.IsHealthyState);
+    }
+
+    [Fact]
+    public void FileIntegrityCheckModel_TransitionToHealthyState_WhenMissingCountDecrementsToZero()
+    {
+        var repo = new EmptyTestDocumentRepository();
+        var loc = new CountingLocalizationService();
+        var dialog = new TestDialogService();
+        var fileDialog = new TestFileDialogService();
+        var model = new FileIntegrityCheckModel(repo, null, dialog, fileDialog, loc);
+
+        model.HasScanned = true;
+        model.MissingCount = 1;
+        Assert.False(model.IsHealthyState);
+
+        var notified = false;
+        model.PropertyChanged += (sender, args) =>
+        {
+            if (args.PropertyName == nameof(model.IsHealthyState))
+                notified = true;
+        };
+
+        model.MissingCount = 0;
+        Assert.True(notified);
+        Assert.True(model.IsHealthyState);
+    }
+
+    [Fact]
     public void Views_EllipsisColumns_HaveToolTips()
     {
         var recycleBin = File.ReadAllText(
@@ -113,6 +168,26 @@ public class DesktopQualityBatch2Tests
     private sealed class EmptyTestDocumentRepository : IDocumentRepository
     {
         public List<StudyDocument> GetAll() => new();
+        public StudyDocument? GetById(int id) => null;
+        public List<StudyDocument> Search(string keyword) => new();
+        public List<StudyDocument> Filter(string subject, string type) => new();
+        public List<StudyDocument> SearchAdvanced(string keyword, string subject, string type, DateTime? fromDate, DateTime? toDate, double? minSize, double? maxSize, bool? isImportant) => new();
+        public bool Add(StudyDocument document) => true;
+        public bool AddWithCatalogs(StudyDocument document) => true;
+        public bool Update(StudyDocument document) => true;
+        public bool Delete(int id) => true;
+        public List<string> GetDistinctSubjects() => new();
+        public List<string> GetDistinctTypes() => new();
+        public List<string> GetDistinctTags() => new();
+        public List<StudyDocument> GetUpcomingDeadlines(int days) => new();
+        public List<StudyDocument> GetOverdueDocuments() => new();
+        public void EnsureSubjectExists(string subject) { }
+        public void EnsureTypeExists(string type) { }
+    }
+
+    private sealed class ThrowingTestDocumentRepository : IDocumentRepository
+    {
+        public List<StudyDocument> GetAll() => throw new InvalidOperationException("Simulated database failure");
         public StudyDocument? GetById(int id) => null;
         public List<StudyDocument> Search(string keyword) => new();
         public List<StudyDocument> Filter(string subject, string type) => new();

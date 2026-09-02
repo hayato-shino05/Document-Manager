@@ -50,13 +50,12 @@ public partial class DuplicateDetectionModel : ModelBase
     private async Task ScanDuplicatesAsync()
     {
         IsScanning = true;
-        HasScanned = true;
+        HasScanned = false;
         DuplicateGroups.Clear();
         TotalGroups = 0;
         OnPropertyChanged(nameof(HasResults));
         OnPropertyChanged(nameof(IsInitialState));
         OnPropertyChanged(nameof(IsCleanState));
-        OnPropertyChanged(nameof(CleanSummaryText));
 
         try
         {
@@ -99,7 +98,9 @@ public partial class DuplicateDetectionModel : ModelBase
             }
 
             TotalGroups = DuplicateGroups.Count;
+            HasScanned = true;
             OnPropertyChanged(nameof(HasResults));
+            OnPropertyChanged(nameof(CleanSummaryText));
 
             if (TotalGroups == 0)
             {
@@ -108,6 +109,7 @@ public partial class DuplicateDetectionModel : ModelBase
         }
         catch (Exception)
         {
+            HasScanned = false;
             DuplicateGroups.Clear();
             TotalGroups = 0;
             OnPropertyChanged(nameof(HasResults));

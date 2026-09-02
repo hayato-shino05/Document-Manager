@@ -29,7 +29,7 @@ public partial class FileIntegrityCheckModel : ModelBase
     [ObservableProperty] private bool _hasScanned;
     [ObservableProperty] private bool _isCheckCancelled;
     [ObservableProperty] private int _totalChecked;
-    [ObservableProperty] private int _missingCount;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(IsHealthyState))] private int _missingCount;
     [ObservableProperty] private string _statusText = string.Empty;
     [ObservableProperty] private string _databaseLocation = string.Empty;
 
@@ -62,13 +62,12 @@ public partial class FileIntegrityCheckModel : ModelBase
 
         IsChecking = true;
         IsCheckCancelled = false;
-        HasScanned = true;
+        HasScanned = false;
         Results.Clear();
         TotalChecked = 0;
         MissingCount = 0;
         OnPropertyChanged(nameof(IsInitialState));
         OnPropertyChanged(nameof(IsHealthyState));
-        OnPropertyChanged(nameof(HealthySummaryText));
         _checkCancellation?.Dispose();
         _checkCancellation = new CancellationTokenSource();
         var cancellation = _checkCancellation;
@@ -83,11 +82,14 @@ public partial class FileIntegrityCheckModel : ModelBase
 
             if (scan.IsCancelled)
             {
+                HasScanned = false;
                 IsCheckCancelled = true;
                 SetLocalizedStatus("FileIntegrity_Cancelled", TotalChecked, scan.Total);
             }
             else
             {
+                HasScanned = true;
+                OnPropertyChanged(nameof(HealthySummaryText));
                 SetLocalizedStatus("Status_ScanComplete", MissingCount, TotalChecked);
                 if (MissingCount == 0)
                 {
@@ -98,11 +100,13 @@ public partial class FileIntegrityCheckModel : ModelBase
         }
         catch (OperationCanceledException)
         {
+            HasScanned = false;
             IsCheckCancelled = true;
             SetLocalizedStatus("FileIntegrity_Cancelled", TotalChecked, TotalChecked);
         }
         catch (Exception)
         {
+            HasScanned = false;
             Results.Clear();
             TotalChecked = 0;
             MissingCount = 0;
