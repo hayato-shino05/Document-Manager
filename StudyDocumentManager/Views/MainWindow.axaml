@@ -68,15 +68,15 @@
                 <Menu Background="Transparent" Padding="4,0">
                     <MenuItem Header="{loc:Localize Menu_File}"
                               AutomationProperties.AutomationId="Menu_File">
-                        <MenuItem Header="{loc:Localize Menu_AddNewDocument}" Command="{Binding NavigateCommand}" CommandParameter="add" InputGesture="Ctrl+N"/>
-                        <MenuItem Header="{loc:Localize Menu_OpenDocument}" Command="{Binding OpenFileCommand}" InputGesture="Ctrl+O"/>
-                        <MenuItem Header="{loc:Localize Menu_EditDocument}" Command="{Binding EditDocumentCommand}" InputGesture="Ctrl+U"/>
-                        <MenuItem Header="{loc:Localize Menu_DeleteDocument}" Command="{Binding DeleteDocumentCommand}" InputGesture="Delete"/>
+                        <MenuItem Header="{loc:Localize Menu_AddNewDocument}" Command="{Binding NavigateCommand}" CommandParameter="add" InputGesture="Ctrl+N" HotKey="Ctrl+N"/>
+                        <MenuItem Header="{loc:Localize Menu_OpenDocument}" Command="{Binding OpenFileCommand}" InputGesture="Ctrl+O" HotKey="Ctrl+O"/>
+                        <MenuItem Header="{loc:Localize Menu_EditDocument}" Command="{Binding EditDocumentCommand}" InputGesture="Ctrl+U" HotKey="Ctrl+U"/>
+                        <MenuItem Header="{loc:Localize Menu_DeleteDocument}" Command="{Binding DeleteDocumentCommand}" InputGesture="Delete" HotKey="Delete"/>
                         <Separator/>
-                        <MenuItem Header="{loc:Localize Menu_ExportCsv}" Command="{Binding ExportCsvCommand}" InputGesture="Ctrl+E"/>
+                        <MenuItem Header="{loc:Localize Menu_ExportCsv}" Command="{Binding ExportCsvCommand}" InputGesture="Ctrl+E" HotKey="Ctrl+E"/>
                         <MenuItem Header="{loc:Localize Menu_ExportArchive}" Command="{Binding ExportArchiveCommand}" AutomationProperties.AutomationId="Menu_ExportArchive"/>
-                        <MenuItem Header="{loc:Localize Menu_ImportArchive}" Command="{Binding ImportArchiveCommand}" AutomationProperties.AutomationId="Menu_ImportArchive" InputGesture="Ctrl+Shift+I"/>
-                        <MenuItem Header="{loc:Localize Menu_RefreshList}" Command="{Binding RefreshCommand}" InputGesture="F5"/>
+                        <MenuItem Header="{loc:Localize Menu_ImportArchive}" Command="{Binding ImportArchiveCommand}" AutomationProperties.AutomationId="Menu_ImportArchive" InputGesture="Ctrl+Shift+I" HotKey="Ctrl+Shift+I"/>
+                        <MenuItem Header="{loc:Localize Menu_RefreshList}" Command="{Binding RefreshCommand}" InputGesture="F5" HotKey="F5"/>
                         <MenuItem Header="{loc:Localize RecentFiles_Title}" Command="{Binding NavigateCommand}" CommandParameter="recentfiles"/>
                         <MenuItem Header="{loc:Localize Menu_BackupDb}" Command="{Binding BackupDatabaseCommand}"/>
                         <MenuItem Header="{loc:Localize Menu_RestoreDb}" Command="{Binding RestoreDatabaseCommand}"/>
@@ -85,7 +85,7 @@
                     </MenuItem>
                     <MenuItem Header="{loc:Localize Menu_Organize}"
                               AutomationProperties.AutomationId="Menu_Organize">
-                        <MenuItem Header="{loc:Localize Menu_ManageCategories}" Command="{Binding NavigateCommand}" CommandParameter="categories" InputGesture="Ctrl+M"/>
+                        <MenuItem Header="{loc:Localize Menu_ManageCategories}" Command="{Binding NavigateCommand}" CommandParameter="categories" InputGesture="Ctrl+M" HotKey="Ctrl+M"/>
                         <MenuItem Header="{loc:Localize Menu_Collections}" Command="{Binding NavigateCommand}" CommandParameter="collections"/>
                         <MenuItem Header="{loc:Localize Menu_SmartViews}" Command="{Binding NavigateCommand}" CommandParameter="smartviews"/>
                         <MenuItem Header="{loc:Localize SW_Title}" Command="{Binding NavigateCommand}" CommandParameter="student-workspace"/>
