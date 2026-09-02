@@ -219,6 +219,7 @@ services.AddSingleton<IVersionedBackupService, VersionedBackupService>();
         services.AddSingleton<UndoService>();
         services.AddSingleton<IUndoService>(sp => sp.GetRequiredService<UndoService>());
         services.AddSingleton<IUndoApplier, UndoApplier>();
+        services.AddSingleton<IDuplicateReviewService, DuplicateReviewService>();
 
         // Watched Folder / file-system watcher
         services.AddSingleton<ILog, TraceLog>();
