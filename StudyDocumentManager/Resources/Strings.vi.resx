@@ -1101,4 +1101,23 @@
   <data name="Onboarding_Skip" xml:space="preserve"><value>Bỏ qua</value></data>
   <data name="Onboarding_Finish" xml:space="preserve"><value>Bắt đầu</value></data>
   <data name="Onboarding_MenuItem" xml:space="preserve"><value>Hướng dẫn bắt đầu</value></data>
+  <data name="OW_Title" xml:space="preserve"><value>Nghiệp vụ cá nhân &amp; Hợp đồng</value></data>
+  <data name="OW_ExpiryState_Overdue" xml:space="preserve"><value>Quá hạn</value></data>
+  <data name="OW_ExpiryState_DueSoon" xml:space="preserve"><value>Sắp đến hạn</value></data>
+  <data name="OW_ExpiryState_Active" xml:space="preserve"><value>Còn hạn</value></data>
+  <data name="OW_ExpiryState_None" xml:space="preserve"><value>Không có hạn</value></data>
+  <data name="OW_DocumentNumber" xml:space="preserve"><value>Số tài liệu</value></data>
+  <data name="OW_ContactName" xml:space="preserve"><value>Người liên hệ</value></data>
+  <data name="OW_OrganizationOrProject" xml:space="preserve"><value>Công ty / Dự án</value></data>
+  <data name="OW_EffectiveDate" xml:space="preserve"><value>Ngày hiệu lực</value></data>
+  <data name="OW_ExpiryDate" xml:space="preserve"><value>Ngày hết hạn</value></data>
+  <data name="OW_Confidentiality" xml:space="preserve"><value>Mức độ bảo mật</value></data>
+  <data name="OW_Reminder" xml:space="preserve"><value>Bật thông báo nhắc nhở</value></data>
+  <data name="OW_DaysRemaining" xml:space="preserve"><value>Số ngày nhắc trước hạn (ngày)</value></data>
+  <data name="OW_DocNoPrefix" xml:space="preserve"><value>Số: </value></data>
+  <data name="OW_Conf_Public" xml:space="preserve"><value>Công khai</value></data>
+  <data name="OW_Conf_Internal" xml:space="preserve"><value>Nội bộ</value></data>
+  <data name="OW_Conf_Confidential" xml:space="preserve"><value>Bảo mật</value></data>
+  <data name="OW_Conf_Restricted" xml:space="preserve"><value>Tối mật</value></data>
+  <data name="OW_Error_FileNotFound" xml:space="preserve"><value>Không tìm thấy tệp: {0}</value></data>
 </root>

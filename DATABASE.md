@@ -194,6 +194,29 @@
 
 - `UNIQUE(folder_path COLLATE NOCASE)`
 
+### `office_document_metadata`
+
+個人業務向け文書（請求書、契約書、報告書、領収書、申請書など）の拡張メタデータおよびリマインダー設定です。
+
+| カラム | 型 | 説明 |
+| --- | --- | --- |
+| `id` | INTEGER PRIMARY KEY AUTOINCREMENT | 主キー |
+| `document_id` | INTEGER NOT NULL UNIQUE | 対象文書ID (`documents.id` への外部キー) |
+| `document_number` | TEXT | 文書番号 |
+| `contact_name` | TEXT | 担当者・連絡先名 |
+| `organization_or_project` | TEXT | 会社・組織・プロジェクト名 |
+| `effective_date` | DATETIME | 発効日 |
+| `expiry_date` | DATETIME | 満了・期限日 |
+| `confidentiality_level` | TEXT NOT NULL DEFAULT 'internal' | 機密区分 (`public`, `internal`, `confidential`, `restricted`) |
+| `reminder_enabled` | INTEGER NOT NULL DEFAULT 1 | リマインダー有効フラグ (1: 有効, 0: 無効) |
+| `reminder_days_before` | INTEGER NOT NULL DEFAULT 3 | 期限何日前に通知するか |
+| `created_at` | DATETIME DEFAULT `datetime('now','localtime')` | 登録日時 |
+| `updated_at` | DATETIME DEFAULT `datetime('now','localtime')` | 更新日時 |
+
+制約:
+
+- `FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE`
+
 ## インデックス
 
 - `idx_documents_subject`: `documents(subject)`
@@ -204,6 +227,7 @@
 - `idx_collection_items_document`: `collection_items(document_id)`
 - `idx_documents_deleted`: `documents(is_deleted)`
 - `idx_documents_important`: `documents(is_important)`
+- `idx_office_metadata_expiry`: `office_document_metadata(expiry_date)`
 - `ux_documents_archive_export_key`: `archive_export_key IS NOT NULL AND archive_export_key <> ''` の行を対象にした、`documents(archive_export_key)` の部分一意インデックス。
 - `ux_watched_folders_path`: `watched_folders(folder_path COLLATE NOCASE)` の一意インデックス。
 - `idx_documents_file_path_unique` は、`file_path IS NOT NULL AND file_path <> ''` の行だけを対象に `documents(file_path)` の完全一致を一意にする部分インデックスです。削除済み文書も対象で、SQLite の既定 `BINARY` 比較を使用します。

@@ -1451,6 +1451,7 @@ public class DatabaseHelper
         var hasSavedSearches = actualTables.Contains("saved_searches");
         var hasImportInbox = actualTables.Contains("import_inbox");
         var hasWatchedFolders = actualTables.Contains("watched_folders");
+        var hasOfficeMetadata = actualTables.Contains("office_document_metadata");
         var metadataTables = new[] { "student_context", "courses", "semesters", "assignments", "assignment_documents" };
         var metadataTableCount = metadataTables.Count(actualTables.Contains);
         var hasStudentMetadata = metadataTableCount == metadataTables.Length;
@@ -1464,6 +1465,8 @@ public class DatabaseHelper
             expectedTables.Add("saved_searches");
         if (!hasWatchedFolders)
             expectedTables.Remove("watched_folders");
+        if (hasOfficeMetadata)
+            expectedTables.Add("office_document_metadata");
         if (hasStudentMetadata)
             expectedTables.AddRange(metadataTables);
 
@@ -1485,6 +1488,8 @@ public class DatabaseHelper
             ValidateRequiredColumns(connection, "watched_folders", ["id", "folder_path", "enabled", "include_subdirectories", "last_scan_at", "created_at"], []);
         if (hasSavedSearches)
             ValidateRequiredColumns(connection, "saved_searches", ["id", "name", "criteria_json", "created_at"]);
+        if (hasOfficeMetadata)
+            ValidateRequiredColumns(connection, "office_document_metadata", ["id", "document_id", "document_number", "contact_name", "organization_or_project", "effective_date", "expiry_date", "confidentiality_level", "reminder_enabled", "reminder_days_before", "created_at", "updated_at"], []);
         if (hasStudentMetadata)
         {
             ValidateRequiredColumns(connection, "student_context", ["id", "academic_year", "semester", "course", "module", "owner"]);
@@ -1500,6 +1505,8 @@ public class DatabaseHelper
         ValidateCascadeForeignKeys(connection, "personal_notes", [("document_id", "documents", "id")]);
         ValidateCascadeForeignKeys(connection, "recent_files", [("document_id", "documents", "id")]);
         ValidateCascadeForeignKeys(connection, "document_relations", [("doc_id_1", "documents", "id"), ("doc_id_2", "documents", "id")]);
+        if (hasOfficeMetadata)
+            ValidateCascadeForeignKeys(connection, "office_document_metadata", [("document_id", "documents", "id")]);
         if (hasStudentMetadata)
         {
             ValidateForeignKeys(connection, "assignments", [
@@ -1510,6 +1517,8 @@ public class DatabaseHelper
         ValidateUniqueConstraint(connection, "collection_items", ["collection_id", "document_id"]);
         ValidateUniqueConstraint(connection, "recent_files", ["document_id"]);
         ValidateUniqueConstraint(connection, "document_relations", ["doc_id_1", "doc_id_2"]);
+        if (hasOfficeMetadata)
+            ValidateUniqueConstraint(connection, "office_document_metadata", ["document_id"]);
         if (hasStudentMetadata)
             ValidateUniqueConstraint(connection, "assignment_documents", ["assignment_id", "document_id"]);
         ValidateDocumentPathIndex(connection, requireDocumentPathIndex);
@@ -1545,6 +1554,24 @@ public class DatabaseHelper
             using var recentFilesReader = recentFilesCommand.ExecuteReader();
             while (recentFilesReader.Read())
                 DateTime.Parse(recentFilesReader.GetString(0));
+        }
+
+        if (hasOfficeMetadata)
+        {
+            using var officeCommand = connection.CreateCommand();
+            officeCommand.CommandText = "SELECT effective_date, expiry_date, reminder_days_before, confidentiality_level FROM office_document_metadata";
+            using var officeReader = officeCommand.ExecuteReader();
+            while (officeReader.Read())
+            {
+                if (!officeReader.IsDBNull(0))
+                    DateTime.Parse(officeReader.GetString(0));
+                if (!officeReader.IsDBNull(1))
+                    DateTime.Parse(officeReader.GetString(1));
+                if (officeReader.GetInt32(2) < 0)
+                    throw new InvalidOperationException("Backup database contains invalid office metadata reminder days.");
+                if (!OfficeConfidentialityLevel.IsValid(officeReader.GetString(3)))
+                    throw new InvalidOperationException("Backup database contains invalid office metadata confidentiality level.");
+            }
         }
 
         using var integrityCommand = connection.CreateCommand();
@@ -1725,6 +1752,10 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
             "collection_items" => new HashSet<string>(StringComparer.Ordinal)
             {
                 "idx_collection_items_collection", "idx_collection_items_document"
+            },
+            "office_document_metadata" => new HashSet<string>(StringComparer.Ordinal)
+            {
+                "idx_office_metadata_expiry"
             },
             _ => new HashSet<string>(StringComparer.Ordinal)
         };

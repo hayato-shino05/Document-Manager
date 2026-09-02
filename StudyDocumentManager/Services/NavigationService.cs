@@ -1,4 +1,4 @@
-﻿using StudyDocumentManager.Core.Entities;
+using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,6 +50,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
             "related-docs" => CreateRelatedDocsModel(parameter),
             "smartviews" or "smart-views" or "savedsearches" => serviceProvider.GetRequiredService<SmartViewsModel>(),
             "student" or "assignments" or "student-workspace" => serviceProvider.GetRequiredService<StudentWorkspaceModel>(),
+            "office" or "officeworkspace" or "office-workspace" or "reminders" => serviceProvider.GetRequiredService<OfficeWorkspaceModel>(),
             "run-smartview" => CreateDashboardWithSavedSearch(parameter),
             _ => serviceProvider.GetRequiredService<DashboardModel>(),
         };

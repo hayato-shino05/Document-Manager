@@ -89,6 +89,7 @@
                         <MenuItem Header="{loc:Localize Menu_Collections}" Command="{Binding NavigateCommand}" CommandParameter="collections"/>
                         <MenuItem Header="{loc:Localize Menu_SmartViews}" Command="{Binding NavigateCommand}" CommandParameter="smartviews"/>
                         <MenuItem Header="{loc:Localize SW_Title}" Command="{Binding NavigateCommand}" CommandParameter="student-workspace"/>
+                        <MenuItem Header="{loc:Localize OW_Title}" Command="{Binding NavigateCommand}" CommandParameter="office-workspace" AutomationProperties.AutomationId="Menu_OfficeWorkspace"/>
                     </MenuItem>
                     <MenuItem Header="{loc:Localize Menu_Import}"
                               AutomationProperties.AutomationId="Menu_Import">
@@ -309,6 +310,9 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:StudentWorkspaceModel}">
                     <v:StudentWorkspace />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:OfficeWorkspaceModel}">
+                    <v:OfficeWorkspace />
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:RecoveryCenterModel}">
                     <v:RecoveryCenterView />

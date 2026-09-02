@@ -178,6 +178,7 @@ public partial class App : Application
         services.AddSingleton<IAssignmentRepository, AssignmentRepository>();
         services.AddSingleton<ISettingsService, SettingsRepository>();
         services.AddSingleton<PersonalDocumentArchiveRepository>();
+        services.AddSingleton<IOfficeMetadataRepository, OfficeMetadataRepository>();
 
         // Services
         services.AddKeyedSingleton<HttpClient>("Analytics", (_, _) =>
@@ -250,6 +251,7 @@ services.AddTransient<RecoveryCenterModel>();
         services.AddTransient<FileIntegrityCheckModel>();
         services.AddTransient<SmartViewsModel>();
         services.AddTransient<StudentWorkspaceModel>();
+        services.AddTransient<OfficeWorkspaceModel>();
 
         // モデル — レポート
         services.AddTransient<ReportModel>();
