@@ -140,7 +140,12 @@ jobs:
         run: npm run typecheck
         working-directory: admin
 
+      - name: Run unit tests
+        run: npm test
+        working-directory: admin
+
       - name: Build
         run: npm run build
         working-directory: admin
+
 
