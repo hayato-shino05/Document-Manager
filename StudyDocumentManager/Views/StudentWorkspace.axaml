@@ -10,15 +10,15 @@
         <DockPanel>
             <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,12">
                 <TextBlock Text="{loc:Localize SW_Title}" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"/>
-                <Grid ColumnDefinitions="*,*,*,*,Auto" RowDefinitions="Auto,Auto">
-                    <TextBox Grid.Column="0" Text="{Binding StudentContext.AcademicYear, Mode=TwoWay}" Watermark="{loc:Localize SW_AcademicYear}" automation:AutomationProperties.Name="{loc:Localize SW_AcademicYear}"/>
-                    <TextBox Grid.Column="1" Text="{Binding StudentContext.Semester, Mode=TwoWay}" Watermark="{loc:Localize SW_ContextSemester}" automation:AutomationProperties.Name="{loc:Localize SW_ContextSemester}"/>
-                    <TextBox Grid.Column="2" Text="{Binding StudentContext.Course, Mode=TwoWay}" Watermark="{loc:Localize SW_ContextCourse}" automation:AutomationProperties.Name="{loc:Localize SW_ContextCourse}"/>
-                    <TextBox Grid.Column="3" Text="{Binding StudentContext.Module, Mode=TwoWay}" Watermark="{loc:Localize SW_ContextModule}" automation:AutomationProperties.Name="{loc:Localize SW_ContextModule}"/>
-                    <TextBox Grid.Column="4" Text="{Binding StudentContext.Owner, Mode=TwoWay}" Watermark="{loc:Localize SW_ContextOwner}" automation:AutomationProperties.Name="{loc:Localize SW_ContextOwner}"/>
-                    <Button Grid.Row="1" Grid.Column="0" Content="{loc:Localize SW_SaveContext}" Command="{Binding SaveContextCommand}" HorizontalAlignment="Left" automation:AutomationProperties.Name="{loc:Localize SW_SaveContext}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Text="{Binding StatusText}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" automation:AutomationProperties.LiveSetting="Polite"/>
-                </Grid>
+                <WrapPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBox Text="{Binding StudentContext.AcademicYear, Mode=TwoWay}" Watermark="{loc:Localize SW_AcademicYear}" automation:AutomationProperties.Name="{loc:Localize SW_AcademicYear}" MinWidth="110" Margin="0,0,8,6"/>
+                    <TextBox Text="{Binding StudentContext.Semester, Mode=TwoWay}" Watermark="{loc:Localize SW_ContextSemester}" automation:AutomationProperties.Name="{loc:Localize SW_ContextSemester}" MinWidth="110" Margin="0,0,8,6"/>
+                    <TextBox Text="{Binding StudentContext.Course, Mode=TwoWay}" Watermark="{loc:Localize SW_ContextCourse}" automation:AutomationProperties.Name="{loc:Localize SW_ContextCourse}" MinWidth="130" Margin="0,0,8,6"/>
+                    <TextBox Text="{Binding StudentContext.Module, Mode=TwoWay}" Watermark="{loc:Localize SW_ContextModule}" automation:AutomationProperties.Name="{loc:Localize SW_ContextModule}" MinWidth="130" Margin="0,0,8,6"/>
+                    <TextBox Text="{Binding StudentContext.Owner, Mode=TwoWay}" Watermark="{loc:Localize SW_ContextOwner}" automation:AutomationProperties.Name="{loc:Localize SW_ContextOwner}" MinWidth="110" Margin="0,0,8,6"/>
+                    <Button Content="{loc:Localize SW_SaveContext}" Command="{Binding SaveContextCommand}" HorizontalAlignment="Left" automation:AutomationProperties.Name="{loc:Localize SW_SaveContext}" Margin="0,0,8,6"/>
+                    <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" automation:AutomationProperties.LiveSetting="Polite" Margin="0,0,0,6"/>
+                </WrapPanel>
             </StackPanel>
 
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
@@ -49,13 +49,13 @@
 
                 <Border Grid.Column="2" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="6" Padding="10">
                     <DockPanel>
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
-                            <TextBlock Text="{loc:Localize SW_Assignments}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                            <CheckBox Content="{loc:Localize SW_ShowHistory}" IsChecked="{Binding ShowHistory}" automation:AutomationProperties.Name="{loc:Localize SW_ShowHistory}"/>
-                            <Button Content="{loc:Localize SW_NewAssignment}" Command="{Binding NewAssignmentCommand}" automation:AutomationProperties.Name="{loc:Localize SW_NewAssignment}"/>
-                            <Button Content="{loc:Localize Action_Edit}" Command="{Binding EditAssignmentCommand}" IsEnabled="{Binding HasSelection}" automation:AutomationProperties.Name="{loc:Localize Action_Edit}"/>
-                            <Button Content="{loc:Localize Action_Refresh}" Command="{Binding RefreshCommand}" automation:AutomationProperties.Name="{loc:Localize Action_Refresh}"/>
-                        </StackPanel>
+                        <WrapPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="{loc:Localize SW_Assignments}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,6"/>
+                            <CheckBox Content="{loc:Localize SW_ShowHistory}" IsChecked="{Binding ShowHistory}" automation:AutomationProperties.Name="{loc:Localize SW_ShowHistory}" VerticalAlignment="Center" Margin="0,0,8,6"/>
+                            <Button Content="{loc:Localize SW_NewAssignment}" Command="{Binding NewAssignmentCommand}" automation:AutomationProperties.Name="{loc:Localize SW_NewAssignment}" Margin="0,0,8,6"/>
+                            <Button Content="{loc:Localize Action_Edit}" Command="{Binding EditAssignmentCommand}" IsEnabled="{Binding HasSelection}" automation:AutomationProperties.Name="{loc:Localize Action_Edit}" Margin="0,0,8,6"/>
+                            <Button Content="{loc:Localize Action_Refresh}" Command="{Binding RefreshCommand}" automation:AutomationProperties.Name="{loc:Localize Action_Refresh}" Margin="0,0,0,6"/>
+                        </WrapPanel>
                         <Grid ColumnDefinitions="2*,3*">
                             <ListBox Grid.Column="0" ItemsSource="{Binding Assignments}" SelectedItem="{Binding SelectedAssignment, Mode=TwoWay}" automation:AutomationProperties.Name="{loc:Localize SW_Assignments}">
                                 <ListBox.ItemTemplate>

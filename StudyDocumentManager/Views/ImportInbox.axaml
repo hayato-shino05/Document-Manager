@@ -3,7 +3,7 @@
              xmlns:vm="using:StudyDocumentManager.Models"
              xmlns:loc="using:StudyDocumentManager.Markup"
              x:Class="StudyDocumentManager.Views.ImportInbox"
-             AutomationProperties.AutomationId="ImportInbox_Screen"
+             AutomationProperties.AutomationId="Screen_ImportInbox"
              x:DataType="vm:ImportInboxModel">
   <DockPanel Margin="24">
     <StackPanel DockPanel.Dock="Top" Spacing="10">

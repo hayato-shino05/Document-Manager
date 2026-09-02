@@ -135,8 +135,11 @@ public class ChartDataItem
     // Set by parent to the max value in the collection for proportional scaling
     public int MaxValue { get; set; } = 1;
 
+    public double Ratio => MaxValue > 0 ? Math.Clamp((double)Value / MaxValue, 0.0, 1.0) : 0;
+    public double Percentage => Ratio * 100.0;
+
     // For bar chart visualization (proportional width, max ~300px)
-    public double BarWidth => MaxValue > 0 ? (double)Value / MaxValue * 300.0 : 0;
+    public double BarWidth => Ratio * 300.0;
 }
 
 public class StatusCountItem
@@ -146,5 +149,8 @@ public class StatusCountItem
     public int Value { get; set; }
     public int MaxValue { get; set; } = 1;
 
-    public double BarWidth => MaxValue > 0 ? (double)Value / MaxValue * 300.0 : 0;
+    public double Ratio => MaxValue > 0 ? Math.Clamp((double)Value / MaxValue, 0.0, 1.0) : 0;
+    public double Percentage => Ratio * 100.0;
+
+    public double BarWidth => Ratio * 300.0;
 }

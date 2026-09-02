@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:loc="using:StudyDocumentManager.Markup"
@@ -49,7 +49,8 @@
                                         <Grid ColumnDefinitions="140,*,60" Margin="0,2">
                                             <TextBlock Text="{Binding Label}" FontSize="{StaticResource FontSizeSm}"
                                                        Foreground="{StaticResource TextPrimary}"
-                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                       ToolTip.Tip="{Binding Label}"/>
                                             <Border Grid.Column="1" Height="18" CornerRadius="{StaticResource RadiusXs}"
                                                     Background="{StaticResource SidebarBackground}" Margin="8,0">
                                                 <Border Height="18" CornerRadius="{StaticResource RadiusXs}"
@@ -89,7 +90,8 @@
                                         <Grid ColumnDefinitions="140,*,60" Margin="0,2">
                                             <TextBlock Text="{Binding Label}" FontSize="{StaticResource FontSizeSm}"
                                                        Foreground="{StaticResource TextPrimary}"
-                                                       VerticalAlignment="Center"/>
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                       ToolTip.Tip="{Binding Label}"/>
                                             <Border Grid.Column="1" Height="18" CornerRadius="{StaticResource RadiusXs}"
                                                     Background="{StaticResource SidebarBackground}" Margin="8,0">
                                                 <Border Height="18" CornerRadius="{StaticResource RadiusXs}"
@@ -129,7 +131,8 @@
                                         <Grid ColumnDefinitions="140,*,60" Margin="0,2">
                                             <TextBlock Text="{Binding Label}" FontSize="{StaticResource FontSizeSm}"
                                                        Foreground="{StaticResource TextPrimary}"
-                                                       VerticalAlignment="Center"/>
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                       ToolTip.Tip="{Binding Label}"/>
                                             <Border Grid.Column="1" Height="18" CornerRadius="{StaticResource RadiusXs}"
                                                     Background="{StaticResource SidebarBackground}" Margin="8,0">
                                                 <Border Height="18" CornerRadius="{StaticResource RadiusXs}"
@@ -166,7 +169,8 @@
                                         <Grid ColumnDefinitions="100,*,60" Margin="0,2">
                                             <TextBlock Text="{Binding Label}" FontSize="{StaticResource FontSizeSm}"
                                                        Foreground="{StaticResource TextPrimary}"
-                                                       VerticalAlignment="Center"/>
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                       ToolTip.Tip="{Binding Label}"/>
                                             <Border Grid.Column="1" Height="18" CornerRadius="{StaticResource RadiusXs}"
                                                     Background="{StaticResource SidebarBackground}" Margin="8,0">
                                                 <Border Height="18" CornerRadius="{StaticResource RadiusXs}"
@@ -206,7 +210,8 @@
                                         <Grid ColumnDefinitions="100,*,60" Margin="0,2">
                                             <TextBlock Text="{Binding Label}" FontSize="{StaticResource FontSizeSm}"
                                                        Foreground="{StaticResource TextPrimary}"
-                                                       VerticalAlignment="Center"/>
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                       ToolTip.Tip="{Binding Label}"/>
                                             <Border Grid.Column="1" Height="18" CornerRadius="{StaticResource RadiusXs}"
                                                     Background="{StaticResource SidebarBackground}" Margin="8,0">
                                                 <Border Height="18" CornerRadius="{StaticResource RadiusXs}"

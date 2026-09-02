@@ -22,6 +22,7 @@ public partial class WatchedFolderModel : ModelBase, IDisposable
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
     private readonly ILog _log;
+    private readonly IFileDialogService? _fileDialogService;
     private string? _lastErrorKey;
     private bool _disposed;
 
@@ -40,13 +41,36 @@ public partial class WatchedFolderModel : ModelBase, IDisposable
         INavigationService navigationService,
         ILocalizationService loc,
         ILog log)
+        : this(service, navigationService, loc, log, null)
+    {
+    }
+
+    public WatchedFolderModel(
+        IFolderWatchService service,
+        INavigationService navigationService,
+        ILocalizationService loc,
+        ILog log,
+        IFileDialogService? fileDialogService)
     {
         _service = service ?? throw new ArgumentNullException(nameof(service));
         _navigationService = navigationService ?? throw new ArgumentNullException(nameof(navigationService));
         _loc = loc ?? throw new ArgumentNullException(nameof(loc));
         _log = log ?? throw new ArgumentNullException(nameof(log));
+        _fileDialogService = fileDialogService;
         _loc.LanguageChanged += OnLanguageChanged;
         _service.StateChanged += OnServiceStateChanged;
+    }
+
+    [RelayCommand]
+    private async Task BrowseFolderAsync()
+    {
+        if (_fileDialogService is null) return;
+        var title = _loc["WF_FolderPath"];
+        var folder = await _fileDialogService.ShowOpenFolderAsync(string.IsNullOrEmpty(title) ? "Select Folder" : title);
+        if (!string.IsNullOrWhiteSpace(folder))
+        {
+            NewFolderPath = folder;
+        }
     }
 
     private void OnServiceStateChanged(object? sender, EventArgs e)
