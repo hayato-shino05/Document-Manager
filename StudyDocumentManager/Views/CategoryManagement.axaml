@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:loc="using:StudyDocumentManager.Markup"
@@ -70,21 +70,28 @@
                             </DockPanel>
                         </Border>
 
-                        <ListBox ItemsSource="{Binding Subjects}"
-                                 SelectedItem="{Binding SelectedSubject}"
-                                 SelectionMode="Multiple"
-                                 SelectedItems="{Binding SelectedSubjects}"
-                                 Padding="{StaticResource PaddingIcon}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,8">
-                                        <Image Source="{StaticResource IconCategory}" Width="13" Height="13"/>
-                                        <TextBlock Text="{Binding Display}" FontSize="{StaticResource FontSizeMd}"
-                                                   Foreground="{StaticResource TextPrimary}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                        <Panel>
+                            <ListBox ItemsSource="{Binding Subjects}"
+                                     SelectedItem="{Binding SelectedSubject}"
+                                     SelectionMode="Multiple"
+                                     SelectedItems="{Binding SelectedSubjects}"
+                                     Padding="{StaticResource PaddingIcon}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,8">
+                                            <Image Source="{StaticResource IconCategory}" Width="13" Height="13"/>
+                                            <TextBlock Text="{Binding Display}" FontSize="{StaticResource FontSizeMd}"
+                                                       Foreground="{StaticResource TextPrimary}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <StackPanel Classes="empty-state" IsVisible="{Binding !Subjects.Count}" Margin="16">
+                                <Image Classes="empty-state-icon" Source="{StaticResource IconCategory}"/>
+                                <TextBlock Classes="empty-state-text" Text="{loc:Localize Common_NoData}"/>
+                            </StackPanel>
+                        </Panel>
                     </DockPanel>
                 </Border>
 
@@ -125,21 +132,28 @@
                             </DockPanel>
                         </Border>
 
-                        <ListBox ItemsSource="{Binding Types}"
-                                 SelectedItem="{Binding SelectedType}"
-                                 SelectionMode="Multiple"
-                                 SelectedItems="{Binding SelectedTypes}"
-                                 Padding="{StaticResource PaddingIcon}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,8">
-                                        <Image Source="{StaticResource IconDocPage}" Width="13" Height="13"/>
-                                        <TextBlock Text="{Binding Display}" FontSize="{StaticResource FontSizeMd}"
-                                                   Foreground="{StaticResource TextPrimary}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                        <Panel>
+                            <ListBox ItemsSource="{Binding Types}"
+                                     SelectedItem="{Binding SelectedType}"
+                                     SelectionMode="Multiple"
+                                     SelectedItems="{Binding SelectedTypes}"
+                                     Padding="{StaticResource PaddingIcon}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,8">
+                                            <Image Source="{StaticResource IconDocPage}" Width="13" Height="13"/>
+                                            <TextBlock Text="{Binding Display}" FontSize="{StaticResource FontSizeMd}"
+                                                       Foreground="{StaticResource TextPrimary}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <StackPanel Classes="empty-state" IsVisible="{Binding !Types.Count}" Margin="16">
+                                <Image Classes="empty-state-icon" Source="{StaticResource IconDocPage}"/>
+                                <TextBlock Classes="empty-state-text" Text="{loc:Localize Common_NoData}"/>
+                            </StackPanel>
+                        </Panel>
                     </DockPanel>
                 </Border>
                 </Grid>

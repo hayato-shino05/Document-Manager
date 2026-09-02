@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:loc="using:StudyDocumentManager.Markup"
@@ -42,24 +42,31 @@
                             </StackPanel>
                         </Border>
 
-                        <ListBox ItemsSource="{Binding Collections}"
-                                 SelectedItem="{Binding SelectedCollection}"
-                                 Padding="{StaticResource PaddingIcon}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="6,6">
-                                        <Image Source="{StaticResource IconCollection}" Width="14" Height="14"/>
-                                        <StackPanel Spacing="2">
-                                            <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMd}"
-                                                       FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
-                                            <TextBlock Text="{Binding Description}" FontSize="{StaticResource FontSizeXs}"
-                                                       Foreground="{StaticResource TextSecondary}" TextTrimming="CharacterEllipsis"
-                                                       MaxWidth="220"/>
+                        <Panel>
+                            <ListBox ItemsSource="{Binding Collections}"
+                                     SelectedItem="{Binding SelectedCollection}"
+                                     Padding="{StaticResource PaddingIcon}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="6,6">
+                                            <Image Source="{StaticResource IconCollection}" Width="14" Height="14"/>
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMd}"
+                                                           FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
+                                                <TextBlock Text="{Binding Description}" FontSize="{StaticResource FontSizeXs}"
+                                                           Foreground="{StaticResource TextSecondary}" TextTrimming="CharacterEllipsis"
+                                                           MaxWidth="220"/>
+                                            </StackPanel>
                                         </StackPanel>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <StackPanel Classes="empty-state" IsVisible="{Binding !Collections.Count}" Margin="16">
+                                <Image Classes="empty-state-icon" Source="{StaticResource IconCollection}"/>
+                                <TextBlock Classes="empty-state-text" Text="{loc:Localize Common_NoData}"/>
+                            </StackPanel>
+                        </Panel>
                     </DockPanel>
                 </Border>
 
@@ -143,20 +150,27 @@
                                     </StackPanel>
                                 </Border>
 
-                                <ListBox x:Name="DocumentGrid"
-                                         AutomationProperties.AutomationId="CollectionManagement_DocumentGrid"
-                                         AutomationProperties.Name="{loc:Localize CollectionMgmt_DetailHeader}"
-                                         ItemsSource="{Binding DocumentsInCollection}" SelectionMode="Multiple" Padding="{StaticResource PaddingIcon}">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="6,4">
-                                                <Image Source="{StaticResource IconDocPage}" Width="16" Height="16"/>
-                                                <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMd}"
-                                                           Foreground="{StaticResource TextPrimary}"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
+                                <Panel>
+                                    <ListBox x:Name="DocumentGrid"
+                                             AutomationProperties.AutomationId="CollectionManagement_DocumentGrid"
+                                             AutomationProperties.Name="{loc:Localize CollectionMgmt_DetailHeader}"
+                                             ItemsSource="{Binding DocumentsInCollection}" SelectionMode="Multiple" Padding="{StaticResource PaddingIcon}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Spacing="8" Margin="6,4">
+                                                    <Image Source="{StaticResource IconDocPage}" Width="16" Height="16"/>
+                                                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMd}"
+                                                               Foreground="{StaticResource TextPrimary}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+
+                                    <StackPanel Classes="empty-state" IsVisible="{Binding !DocumentsInCollection.Count}" Margin="16">
+                                        <Image Classes="empty-state-icon" Source="{StaticResource IconDocPage}"/>
+                                        <TextBlock Classes="empty-state-text" Text="{loc:Localize Common_NoData}"/>
+                                    </StackPanel>
+                                </Panel>
                             </DockPanel>
                         </Panel>
                     </DockPanel>
