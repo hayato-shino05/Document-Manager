@@ -294,6 +294,16 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         return dialog.Result == true;
     }
 
+    public async Task<int?> ShowDuplicateMergeReviewAsync(string groupName, string matchReason, IReadOnlyList<StudyDocument> candidates)
+    {
+        var owner = GetMainWindow();
+        if (owner == null) return null;
+
+        var dialog = new DuplicateMergeReviewDialog(groupName, matchReason, candidates, _loc);
+        await dialog.ShowDialog(owner);
+        return dialog.SelectedSurvivorId;
+    }
+
     private static List<FilePickerFileType>? BuildFileFilter(string? filter)
     {
         if (string.IsNullOrEmpty(filter)) return null;

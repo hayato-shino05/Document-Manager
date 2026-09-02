@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using Microsoft.Data.Sqlite;
@@ -1301,7 +1301,7 @@ public class DatabaseHelper
         command.ExecuteNonQuery();
     }
 
-    private SqliteConnection OpenConnection()
+    internal SqliteConnection OpenConnection()
         => OpenConnection(DatabasePath);
 
     private static SqliteConnection OpenConnection(
@@ -2143,10 +2143,13 @@ private static void ValidateDocumentPathIndex(SqliteConnection connection, bool 
         var results = new List<(int, string, string?, DateTime, int)>();
         using var conn = OpenConnection();
         using var cmd = conn.CreateCommand();
+        // 表示対象の active document（論理削除されていない文書）のみを件数として集計する
         cmd.CommandText = @"SELECT c.id, c.name, c.description, c.created_at,
                             (SELECT COUNT(*)
                              FROM collection_items ci
-                             WHERE ci.collection_id = c.id) as item_count
+                             INNER JOIN documents d ON ci.document_id = d.id
+                             WHERE ci.collection_id = c.id
+                               AND (d.is_deleted IS NULL OR d.is_deleted = 0)) as item_count
                             FROM collections c
                             ORDER BY c.name";
         using var reader = cmd.ExecuteReader();

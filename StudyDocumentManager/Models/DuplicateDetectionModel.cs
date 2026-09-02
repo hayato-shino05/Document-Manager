@@ -15,6 +15,7 @@ public partial class DuplicateDetectionModel : ModelBase
     private readonly IProcessLauncherService? _processLauncher;
     private readonly IUndoRepository? _undoRepository;
     private readonly IUndoService? _undo;
+    private readonly IDuplicateReviewService? _duplicateReviewService;
 
     [ObservableProperty] private ObservableCollection<DuplicateGroup> _duplicateGroups = new();
     [ObservableProperty] private bool _isScanning;
@@ -26,7 +27,8 @@ public partial class DuplicateDetectionModel : ModelBase
         ILocalizationService loc,
         IProcessLauncherService? processLauncher = null,
         IUndoRepository? undoRepository = null,
-        IUndoService? undo = null)
+        IUndoService? undo = null,
+        IDuplicateReviewService? duplicateReviewService = null)
     {
         _repository = repository;
         _dialogService = dialogService;
@@ -34,6 +36,7 @@ public partial class DuplicateDetectionModel : ModelBase
         _processLauncher = processLauncher;
         _undoRepository = undoRepository;
         _undo = undo;
+        _duplicateReviewService = duplicateReviewService;
     }
 
     public bool HasResults => DuplicateGroups.Count > 0;
@@ -49,20 +52,41 @@ public partial class DuplicateDetectionModel : ModelBase
         try
         {
             var docs = _repository.GetAll();
-            var groups = docs
-                .GroupBy(d => d.Name.Trim(), StringComparer.OrdinalIgnoreCase)
-                .Where(g => g.Count() > 1)
-                .ToList();
-
-            foreach (var group in groups)
+            if (_duplicateReviewService != null)
             {
-                DuplicateGroups.Add(new DuplicateGroup
+                var reviewGroups = _duplicateReviewService.DetectDuplicates(docs);
+                foreach (var group in reviewGroups)
                 {
-                    GroupName = group.First().Name,
-                    Documents = new ObservableCollection<StudyDocument>(group.ToList()),
-                    Count = group.Count(),
-                    MatchInfo = string.Format(_loc["Duplicate_MatchInfo"], group.Count())
-                });
+                    var displayName = !string.IsNullOrWhiteSpace(group.Candidates[0].Name)
+                        ? group.Candidates[0].Name
+                        : System.IO.Path.GetFileName(group.Candidates[0].FilePath);
+
+                    DuplicateGroups.Add(new DuplicateGroup
+                    {
+                        GroupName = displayName,
+                        Documents = new ObservableCollection<StudyDocument>(group.Candidates),
+                        Count = group.Candidates.Count,
+                        MatchInfo = group.MatchDescription
+                    });
+                }
+            }
+            else
+            {
+                var groups = docs
+                    .GroupBy(d => d.Name.Trim(), StringComparer.OrdinalIgnoreCase)
+                    .Where(g => g.Count() > 1)
+                    .ToList();
+
+                foreach (var group in groups)
+                {
+                    DuplicateGroups.Add(new DuplicateGroup
+                    {
+                        GroupName = group.First().Name,
+                        Documents = new ObservableCollection<StudyDocument>(group.ToList()),
+                        Count = group.Count(),
+                        MatchInfo = string.Format(_loc["Duplicate_MatchInfo"], group.Count())
+                    });
+                }
             }
 
             TotalGroups = DuplicateGroups.Count;
@@ -92,14 +116,39 @@ public partial class DuplicateDetectionModel : ModelBase
         if (group is null || group.Documents.Count < 2)
             return;
 
-        var survivor = group.Documents[0];
-        var duplicateIds = group.Documents.Skip(1).Select(document => document.Id).ToArray();
-        var confirmed = await _dialogService.ShowConfirmAsync(
-            _loc["Dialog_Confirm"],
-            string.Format(_loc["Duplicate_ConfirmMerge"], survivor.Name, duplicateIds.Length),
-            _loc["Duplicate_Merge"],
-            isDanger: true);
-        if (!confirmed)
+        int? selectedSurvivorId = null;
+        if (_dialogService is ICustomDialogService customDialog)
+        {
+            selectedSurvivorId = await customDialog.ShowDuplicateMergeReviewAsync(
+                group.GroupName,
+                group.MatchInfo,
+                group.Documents.ToList());
+        }
+        else
+        {
+            var defaultSurvivor = group.Documents[0];
+            var confirmed = await _dialogService.ShowConfirmAsync(
+                _loc["Dialog_Confirm"],
+                string.Format(_loc["Duplicate_ConfirmMerge"], defaultSurvivor.Name, group.Documents.Count - 1),
+                _loc["Duplicate_Merge"],
+                isDanger: true);
+            if (confirmed)
+                selectedSurvivorId = defaultSurvivor.Id;
+        }
+
+        if (!selectedSurvivorId.HasValue)
+            return;
+
+        var survivor = group.Documents.FirstOrDefault(d => d.Id == selectedSurvivorId.Value);
+        if (survivor is null)
+            return;
+
+        var duplicateIds = group.Documents
+            .Where(d => d.Id != survivor.Id)
+            .Select(d => d.Id)
+            .ToArray();
+
+        if (duplicateIds.Length == 0)
             return;
 
         try

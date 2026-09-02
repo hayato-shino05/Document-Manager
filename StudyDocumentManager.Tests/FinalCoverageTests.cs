@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Services;
 using StudyDocumentManager.Data.Helpers;
@@ -449,7 +449,7 @@ public class MultiCollectionMembershipTests : DatabaseTestBase
     }
 
     [Fact]
-    public void GetCollections_ItemCountNotCountsSoftDeletedItems()
+    public void GetCollections_ItemCount_ExcludesSoftDeletedDocuments()
     {
         var repo = new DocumentRepository(Db);
         repo.Add(new StudyDocument { Name = "Active" });
@@ -460,15 +460,19 @@ public class MultiCollectionMembershipTests : DatabaseTestBase
         foreach (var d in docs)
             Db.AddDocumentToCollection(colId, d.Id);
 
-        // Before delete: itemCount counts all rows in collection_items (NOT filtered by is_deleted)
+        // 削除前: 表示対象の active document が 2 件
         var before = Db.GetCollections()[0];
-        Assert.Equal(2, before.ItemCount); // collection_items has 2 rows
+        Assert.Equal(2, before.ItemCount);
 
-        // Soft delete one doc — collection_items still has 2 rows
+        // 1件を論理削除: 表示対象の active document は 1 件に減少
         repo.Delete(docs.First(d => d.Name == "Deleted").Id);
         var after = Db.GetCollections()[0];
-        // ItemCount reflects collection_items rows (independent of soft-delete)
-        Assert.Equal(2, after.ItemCount);
+        Assert.Equal(1, after.ItemCount);
+
+        // 残りの 1 件も論理削除: active document が 0 件のコレクションは ItemCount == 0
+        repo.Delete(docs.First(d => d.Name == "Active").Id);
+        var empty = Db.GetCollections()[0];
+        Assert.Equal(0, empty.ItemCount);
     }
 }
 

@@ -1,0 +1,126 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+        x:Class="StudyDocumentManager.Views.DuplicateMergeReviewDialog"
+        AutomationProperties.AutomationId="Dialog_DuplicateMergeReview"
+        Title="{loc:Localize DuplicateDetection_Title}"
+        Width="640" MaxHeight="680" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="{StaticResource ContentBackground}">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20" Spacing="12">
+            <!-- Header -->
+            <TextBlock x:Name="TitleText"
+                       AutomationProperties.AutomationId="DuplicateReview_Title"
+                       FontSize="{StaticResource FontSizeLg}" FontWeight="Bold"
+                       Foreground="{StaticResource TextPrimary}"
+                       TextWrapping="Wrap"/>
+
+            <!-- Reason Banner -->
+            <Border Background="{StaticResource StatBlueBg}" CornerRadius="{StaticResource RadiusSm}"
+                    Padding="12,10" BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                <StackPanel Spacing="4">
+                    <TextBlock x:Name="MatchReasonText"
+                               AutomationProperties.AutomationId="DuplicateReview_MatchReason"
+                               FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
+                               Foreground="{StaticResource TextPrimary}"
+                               TextWrapping="Wrap"/>
+                    <TextBlock x:Name="InstructionText"
+                               AutomationProperties.AutomationId="DuplicateReview_Instruction"
+                               FontSize="{StaticResource FontSizeXs}"
+                               Foreground="{StaticResource TextSecondary}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Candidates Comparison List -->
+            <ItemsControl x:Name="CandidatesList"
+                          AutomationProperties.AutomationId="DuplicateReview_Candidates">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{StaticResource SidebarBackground}"
+                                CornerRadius="{StaticResource RadiusMd}"
+                                BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                                Padding="12" Margin="0,0,0,8">
+                            <StackPanel Spacing="8">
+                                <DockPanel>
+                                    <RadioButton GroupName="SurvivorGroup"
+                                                 IsChecked="{Binding IsSelectedSurvivor, Mode=TwoWay}"
+                                                 Content="{Binding RadioLabel}"
+                                                 FontWeight="Bold"
+                                                 FontSize="{StaticResource FontSizeSm}"
+                                                 AutomationProperties.AutomationId="{Binding AutomationIdRadio}"
+                                                 AutomationProperties.Name="{Binding RadioLabel}"/>
+                                </DockPanel>
+
+                                <!-- Attributes Comparison Grid -->
+                                <Grid ColumnDefinitions="Auto,8,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="24,0,0,0">
+                                    <!-- Row 0: Path -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Localize DuplicateDetection_ColPath}"
+                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding FilePathDisplay}"
+                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextPrimary}"
+                                               TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Document.FilePath}"/>
+
+                                    <!-- Row 1: Size & Date -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Localize BatchImport_ColFileSize}"
+                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SizeAndDateDisplay}"
+                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextPrimary}"/>
+
+                                    <!-- Row 2: Category & Type -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Localize DuplicateDetection_ColSubject}"
+                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CategoryAndTypeDisplay}"
+                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextPrimary}"/>
+
+                                    <!-- Row 3: Tags -->
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{loc:Localize AddEdit_LblTags}"
+                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding TagsDisplay}"
+                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"
+                                               TextWrapping="Wrap"/>
+
+                                    <!-- Row 4: Status -->
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="{loc:Localize RecentFiles_ColStatus}"
+                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding StatusDisplay}"
+                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Reversibility Note -->
+            <Border Background="{StaticResource SidebarBackground}" CornerRadius="{StaticResource RadiusSm}"
+                    Padding="10,8">
+                <TextBlock x:Name="ReversibilityNote"
+                           AutomationProperties.AutomationId="DuplicateReview_ReversibilityNote"
+                           FontSize="{StaticResource FontSizeXs}"
+                           Foreground="{StaticResource TextMuted}"
+                           TextWrapping="Wrap"/>
+            </Border>
+
+            <!-- Action Buttons -->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8" Margin="0,8,0,0">
+                <Button x:Name="MergeButton"
+                        AutomationProperties.AutomationId="DuplicateReview_ConfirmMerge"
+                        Classes="danger"
+                        MinWidth="120"
+                        HorizontalContentAlignment="Center"/>
+                <Button x:Name="CancelButton"
+                        AutomationProperties.AutomationId="DuplicateReview_Cancel"
+                        Classes="secondary"
+                        IsCancel="True"
+                        MinWidth="80"
+                        HorizontalContentAlignment="Center"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

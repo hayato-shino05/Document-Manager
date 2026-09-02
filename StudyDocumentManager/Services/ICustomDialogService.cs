@@ -24,6 +24,9 @@ public interface ICustomDialogService
 
     Task<bool> ShowAffectedItemsPreviewAsync(int totalCount, IReadOnlyList<string> itemNames, PreviewTextSource title, PreviewTextSource reversibilityNote)
         => throw new NotSupportedException($"{nameof(ShowAffectedItemsPreviewAsync)} is not implemented by this dialog service.");
+
+    Task<int?> ShowDuplicateMergeReviewAsync(string groupName, string matchReason, IReadOnlyList<StudyDocument> candidates)
+        => throw new NotSupportedException($"{nameof(ShowDuplicateMergeReviewAsync)} is not implemented by this dialog service.");
 }
 
 public enum PreviewTextKind

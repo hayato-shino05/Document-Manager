@@ -120,5 +120,4 @@ Issue を作成するときは、次の情報を含めてください。
 
 ## 関連ドキュメント
 
-- [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)
 - [DATABASE.md](./DATABASE.md)

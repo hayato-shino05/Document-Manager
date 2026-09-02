@@ -121,7 +121,7 @@ sha256sum "$package"
 sudo apt install "$package"
 ```
 
-タグ付き Release では `document-manager_<version>_amd64.deb` と対応する `.sha256` が release assets として公開されます。インストール後の lifecycle 検証は [DESKTOP_RUNTIME_EVIDENCE.md](./DESKTOP_RUNTIME_EVIDENCE.md) と `.github/workflows/linux-deb-lifecycle.yml` を参照してください。workflow は versioned Release asset の URL と SHA-256 を `workflow_dispatch` で受け取り、checksum と package metadata を検証してから install、`xvfb-run` 下の launch/database initialization、purge、application files の消失、user database の存続を fail-closed で確認します。
+タグ付き Release では `document-manager_<version>_amd64.deb` と対応する `.sha256` が release assets として公開されます。インストール後の lifecycle 検証は `.github/workflows/linux-deb-lifecycle.yml` を参照してください。workflow は versioned Release asset の URL と SHA-256 を `workflow_dispatch` で受け取り、checksum と package metadata を検証してから install、`xvfb-run` 下の launch/database initialization、purge、application files の消失、user database の存続を fail-closed で確認します。
 
 アプリケーション本体は `/usr/lib/document-manager/`、起動コマンドは `/usr/bin/document-manager` に配置されます。ユーザーデータはパッケージ領域に書き込みません。データベースは `XDG_DATA_HOME` または `$HOME/.local/share` 配下の `StudyDocumentManager/data/study_documents.db` に保存されます。
 
@@ -136,7 +136,7 @@ sudo apt install "$package"
 | `StudyDocumentManager.Data` | SQLite、スキーマ、マイグレーション、リポジトリ |
 | `StudyDocumentManager.Tests` | xUnit テスト |
 
-詳細な構成とデータベース仕様は、[PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)、[DATABASE.md](./DATABASE.md)、[CONTRIBUTING.md](./CONTRIBUTING.md) を参照してください。
+詳細な構成とデータベース仕様は、[DATABASE.md](./DATABASE.md)、[CONTRIBUTING.md](./CONTRIBUTING.md) を参照してください。
 
 ## 貢献
 
