@@ -1000,6 +1000,19 @@
   <data name="Onboarding_Skip" xml:space="preserve"><value>スキップ</value></data>
   <data name="Onboarding_Finish" xml:space="preserve"><value>始める</value></data>
   <data name="Onboarding_MenuItem" xml:space="preserve"><value>使い方ガイド</value></data>
+  <data name="OW_Title" xml:space="preserve"><value>個人業務・契約管理</value></data>
+  <data name="OW_ExpiryState_Overdue" xml:space="preserve"><value>期限超過</value></data>
+  <data name="OW_ExpiryState_DueSoon" xml:space="preserve"><value>期限切迫</value></data>
+  <data name="OW_ExpiryState_Active" xml:space="preserve"><value>有効</value></data>
+  <data name="OW_ExpiryState_None" xml:space="preserve"><value>期限なし</value></data>
+  <data name="OW_DocumentNumber" xml:space="preserve"><value>文書番号</value></data>
+  <data name="OW_ContactName" xml:space="preserve"><value>担当・連絡先</value></data>
+  <data name="OW_OrganizationOrProject" xml:space="preserve"><value>会社 / プロジェクト</value></data>
+  <data name="OW_EffectiveDate" xml:space="preserve"><value>発効日</value></data>
+  <data name="OW_ExpiryDate" xml:space="preserve"><value>満了・期限日</value></data>
+  <data name="OW_Confidentiality" xml:space="preserve"><value>機密区分</value></data>
+  <data name="OW_Reminder" xml:space="preserve"><value>リマインダー通知を有効化</value></data>
+  <data name="OW_DaysRemaining" xml:space="preserve"><value>何日前に通知するか (日数)</value></data>
 </root>
 
 

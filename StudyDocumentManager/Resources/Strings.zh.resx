@@ -1101,4 +1101,17 @@
   <data name="Onboarding_Skip" xml:space="preserve"><value>跳过</value></data>
   <data name="Onboarding_Finish" xml:space="preserve"><value>开始使用</value></data>
   <data name="Onboarding_MenuItem" xml:space="preserve"><value>入门指南</value></data>
+  <data name="OW_Title" xml:space="preserve"><value>个人业务与合同管理</value></data>
+  <data name="OW_ExpiryState_Overdue" xml:space="preserve"><value>已逾期</value></data>
+  <data name="OW_ExpiryState_DueSoon" xml:space="preserve"><value>即将到期</value></data>
+  <data name="OW_ExpiryState_Active" xml:space="preserve"><value>有效</value></data>
+  <data name="OW_ExpiryState_None" xml:space="preserve"><value>无到期日</value></data>
+  <data name="OW_DocumentNumber" xml:space="preserve"><value>文档编号</value></data>
+  <data name="OW_ContactName" xml:space="preserve"><value>联系人</value></data>
+  <data name="OW_OrganizationOrProject" xml:space="preserve"><value>公司 / 项目</value></data>
+  <data name="OW_EffectiveDate" xml:space="preserve"><value>生效日期</value></data>
+  <data name="OW_ExpiryDate" xml:space="preserve"><value>截止/到期日期</value></data>
+  <data name="OW_Confidentiality" xml:space="preserve"><value>保密级别</value></data>
+  <data name="OW_Reminder" xml:space="preserve"><value>启用提醒通知</value></data>
+  <data name="OW_DaysRemaining" xml:space="preserve"><value>提前提醒天数 (天)</value></data>
 </root>

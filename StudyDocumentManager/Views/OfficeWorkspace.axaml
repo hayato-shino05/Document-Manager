@@ -1,0 +1,211 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             xmlns:automation="using:Avalonia.Automation"
+             x:Class="StudyDocumentManager.Views.OfficeWorkspace"
+             x:DataType="vm:OfficeWorkspaceModel"
+             automation:AutomationProperties.AutomationId="Screen_OfficeWorkspace">
+    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+        <DockPanel>
+            <!-- ═══ HEADER & OVERVIEW CARDS ═══ -->
+            <StackPanel DockPanel.Dock="Top" Spacing="10" Margin="0,0,0,12">
+                <DockPanel>
+                    <Button DockPanel.Dock="Left" Classes="secondary" Command="{Binding GoBackCommand}"
+                            Margin="0,0,12,0" Padding="8,4"
+                            automation:AutomationProperties.AutomationId="OfficeWorkspace_Back"
+                            automation:AutomationProperties.Name="{loc:Localize Action_Back}">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="←" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Localize Action_Back}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <TextBlock Text="{loc:Localize OW_Title}" FontSize="{StaticResource FontSizeXl}" FontWeight="Bold" VerticalAlignment="Center"/>
+                </DockPanel>
+
+                <!-- Status Cards -->
+                <Grid ColumnDefinitions="*,*,*,*,*" Margin="0,4,0,0">
+                    <Border Grid.Column="0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="{StaticResource RadiusSm}" Padding="10,8" Margin="0,0,4,0">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Localize Common_All}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"/>
+                            <TextBlock Text="{Binding TotalCount}" FontSize="{StaticResource FontSizeLg}" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource DangerBorder}" BorderThickness="1" CornerRadius="{StaticResource RadiusSm}" Padding="10,8" Margin="4,0,4,0">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Localize OW_ExpiryState_Overdue}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource DangerText}"/>
+                            <TextBlock Text="{Binding OverdueCount}" FontSize="{StaticResource FontSizeLg}" FontWeight="Bold" Foreground="{StaticResource DangerText}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource WarningBorder}" BorderThickness="1" CornerRadius="{StaticResource RadiusSm}" Padding="10,8" Margin="4,0,4,0">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Localize OW_ExpiryState_DueSoon}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource WarningText}"/>
+                            <TextBlock Text="{Binding DueSoonCount}" FontSize="{StaticResource FontSizeLg}" FontWeight="Bold" Foreground="{StaticResource WarningText}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="3" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource SuccessBorder}" BorderThickness="1" CornerRadius="{StaticResource RadiusSm}" Padding="10,8" Margin="4,0,4,0">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Localize OW_ExpiryState_Active}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource SuccessText}"/>
+                            <TextBlock Text="{Binding ActiveCount}" FontSize="{StaticResource FontSizeLg}" FontWeight="Bold" Foreground="{StaticResource SuccessText}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="4" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="{StaticResource RadiusSm}" Padding="10,8" Margin="4,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Localize OW_ExpiryState_None}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}"/>
+                            <TextBlock Text="{Binding NoExpiryCount}" FontSize="{StaticResource FontSizeLg}" FontWeight="Bold" Foreground="{StaticResource TextSecondary}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Filter & Search Bar -->
+                <Grid ColumnDefinitions="2*,*,*,Auto" Margin="0,4,0,0">
+                    <TextBox Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}"
+                             Watermark="{loc:Localize Search_Watermark}"
+                             automation:AutomationProperties.AutomationId="OfficeWorkspace_Search"
+                             Margin="0,0,8,0"/>
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding ExpiryFilterOptions}"
+                              SelectedItem="{Binding SelectedExpiryFilter, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch" Margin="0,0,8,0"
+                              automation:AutomationProperties.AutomationId="OfficeWorkspace_ExpiryFilter">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Label}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <ComboBox Grid.Column="2" ItemsSource="{Binding ConfidentialityFilterOptions}"
+                              SelectedItem="{Binding SelectedConfidentialityFilter, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch" Margin="0,0,8,0"
+                              automation:AutomationProperties.AutomationId="OfficeWorkspace_ConfidentialityFilter">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Label}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button Grid.Column="3" Content="{loc:Localize Action_Refresh}" Command="{Binding RefreshCommand}"
+                            automation:AutomationProperties.AutomationId="OfficeWorkspace_Refresh"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- ═══ MAIN WORKSPACE SPLIT ═══ -->
+            <Grid ColumnDefinitions="3*,2*">
+                <!-- Document List (Left) -->
+                <Border Grid.Column="0" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="{StaticResource RadiusMd}" Padding="8" Margin="0,0,8,0">
+                    <ListBox ItemsSource="{Binding FilteredRows}" SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                             automation:AutomationProperties.AutomationId="OfficeWorkspace_DocumentList"
+                             Background="Transparent">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:OfficeDocumentRow">
+                                <Border Padding="8,6" BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1">
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ExpiryStateLabel}" FontWeight="Bold" FontSize="{StaticResource FontSizeXs}"/>
+                                        
+                                        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+                                            <TextBlock Text="{Binding DocumentNumber, StringFormat='No: {0}'}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"
+                                                       IsVisible="{Binding DocumentNumber, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                                            <TextBlock Text="{Binding OrganizationOrProject}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"
+                                                       IsVisible="{Binding OrganizationOrProject, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                                            <TextBlock Text="{Binding ConfidentialityLabel, StringFormat='[{0}]'}" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource Accent}"/>
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ExpiryDate, StringFormat='{}{0:yyyy-MM-dd}'}"
+                                                   FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+
+                <!-- Metadata Editor Panel (Right) -->
+                <Border Grid.Column="1" Background="{StaticResource CardBackground}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" CornerRadius="{StaticResource RadiusMd}" Padding="16">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="{loc:Localize Details_Title}" FontSize="{StaticResource FontSizeLg}" FontWeight="Bold"/>
+
+                            <!-- Document Number -->
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{loc:Localize OW_DocumentNumber}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBox Text="{Binding EditingDocumentNumber, Mode=TwoWay}"
+                                         IsEnabled="{Binding HasSelection}"
+                                         automation:AutomationProperties.AutomationId="OfficeWorkspace_DocNumber"/>
+                            </StackPanel>
+
+                            <!-- Organization / Project -->
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{loc:Localize OW_OrganizationOrProject}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBox Text="{Binding EditingOrganizationOrProject, Mode=TwoWay}"
+                                         IsEnabled="{Binding HasSelection}"
+                                         automation:AutomationProperties.AutomationId="OfficeWorkspace_Org"/>
+                            </StackPanel>
+
+                            <!-- Contact Name -->
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{loc:Localize OW_ContactName}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBox Text="{Binding EditingContactName, Mode=TwoWay}"
+                                         IsEnabled="{Binding HasSelection}"
+                                         automation:AutomationProperties.AutomationId="OfficeWorkspace_Contact"/>
+                            </StackPanel>
+
+                            <!-- Dates -->
+                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Localize OW_EffectiveDate}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}" Margin="0,0,4,4"/>
+                                <DatePicker Grid.Row="1" Grid.Column="0" SelectedDate="{Binding EditingEffectiveDate, Mode=TwoWay}"
+                                            IsEnabled="{Binding HasSelection}" Margin="0,0,4,0"
+                                            automation:AutomationProperties.AutomationId="OfficeWorkspace_EffectiveDate"/>
+
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize OW_ExpiryDate}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}" Margin="4,0,0,4"/>
+                                <DatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding EditingExpiryDate, Mode=TwoWay}"
+                                            IsEnabled="{Binding HasSelection}" Margin="4,0,0,0"
+                                            automation:AutomationProperties.AutomationId="OfficeWorkspace_ExpiryDate"/>
+                            </Grid>
+
+                            <!-- Confidentiality Level -->
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{loc:Localize OW_Confidentiality}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"/>
+                                <ComboBox ItemsSource="{Binding ConfidentialityLevels}"
+                                          SelectedItem="{Binding EditingConfidentialityLevel, Mode=TwoWay}"
+                                          IsEnabled="{Binding HasSelection}"
+                                          HorizontalAlignment="Stretch"
+                                          automation:AutomationProperties.AutomationId="OfficeWorkspace_Confidentiality"/>
+                            </StackPanel>
+
+                            <!-- Reminder Configuration -->
+                            <Border Background="{StaticResource SidebarBackground}" CornerRadius="{StaticResource RadiusSm}" Padding="10,8" Margin="0,4,0,0">
+                                <StackPanel Spacing="8">
+                                    <CheckBox Content="{loc:Localize OW_Reminder}" IsChecked="{Binding EditingReminderEnabled, Mode=TwoWay}"
+                                              IsEnabled="{Binding HasSelection}"
+                                              automation:AutomationProperties.AutomationId="OfficeWorkspace_ReminderEnabled"/>
+                                    <DockPanel IsEnabled="{Binding EditingReminderEnabled}">
+                                        <TextBlock Text="{loc:Localize OW_DaysRemaining}" VerticalAlignment="Center" FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"/>
+                                        <NumericUpDown Value="{Binding EditingReminderDaysBefore, Mode=TwoWay}" Minimum="1" Maximum="365"
+                                                       HorizontalAlignment="Right" Width="100"
+                                                       IsEnabled="{Binding HasSelection}"
+                                                       automation:AutomationProperties.AutomationId="OfficeWorkspace_ReminderDays"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Action Buttons -->
+                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                                <Button Content="{loc:Localize Action_Save}" Command="{Binding SaveMetadataCommand}"
+                                        Classes="accent" IsEnabled="{Binding HasSelection}"
+                                        automation:AutomationProperties.AutomationId="OfficeWorkspace_Save"/>
+                                <Button Content="{loc:Localize Toolbar_OpenFile}" Command="{Binding OpenFileCommand}"
+                                        Classes="secondary" IsEnabled="{Binding HasSelection}"
+                                        automation:AutomationProperties.AutomationId="OfficeWorkspace_OpenFile"/>
+                            </StackPanel>
+
+                            <!-- Status text -->
+                            <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource SuccessText}"
+                                       FontSize="{StaticResource FontSizeSm}" Margin="0,4,0,0"
+                                       automation:AutomationProperties.LiveSetting="Polite"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </DockPanel>
+    </Border>
+</UserControl>

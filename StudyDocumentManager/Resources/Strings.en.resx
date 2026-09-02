@@ -892,4 +892,17 @@ Please check your network connection.</value></data>
   <data name="Onboarding_Skip" xml:space="preserve"><value>Skip</value></data>
   <data name="Onboarding_Finish" xml:space="preserve"><value>Get started</value></data>
   <data name="Onboarding_MenuItem" xml:space="preserve"><value>Getting Started</value></data>
+  <data name="OW_Title" xml:space="preserve"><value>Business &amp; Contracts</value></data>
+  <data name="OW_ExpiryState_Overdue" xml:space="preserve"><value>Overdue</value></data>
+  <data name="OW_ExpiryState_DueSoon" xml:space="preserve"><value>Due Soon</value></data>
+  <data name="OW_ExpiryState_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="OW_ExpiryState_None" xml:space="preserve"><value>No Expiry</value></data>
+  <data name="OW_DocumentNumber" xml:space="preserve"><value>Document No.</value></data>
+  <data name="OW_ContactName" xml:space="preserve"><value>Contact</value></data>
+  <data name="OW_OrganizationOrProject" xml:space="preserve"><value>Company / Project</value></data>
+  <data name="OW_EffectiveDate" xml:space="preserve"><value>Effective Date</value></data>
+  <data name="OW_ExpiryDate" xml:space="preserve"><value>Expiry Date</value></data>
+  <data name="OW_Confidentiality" xml:space="preserve"><value>Confidentiality</value></data>
+  <data name="OW_Reminder" xml:space="preserve"><value>Enable reminder notification</value></data>
+  <data name="OW_DaysRemaining" xml:space="preserve"><value>Days in advance for notification</value></data>
 </root>
