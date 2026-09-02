@@ -40,6 +40,7 @@
                     Content="{loc:Localize Onboarding_Skip}"
                     AutomationProperties.AutomationId="Onboarding_Skip"
                     Classes="secondary"
+                    IsCancel="True"
                     Command="{Binding SkipCommand}" />
             <Button Name="FinishButton"
                     Content="{loc:Localize Onboarding_Finish}"

@@ -81,6 +81,10 @@
         <SolidColorBrush x:Key="SuccessBrush"        Color="{StaticResource StatusGreen}"/>
         <SolidColorBrush x:Key="WarningBrush"        Color="{StaticResource StatusAmber}"/>
         <SolidColorBrush x:Key="DangerBrush"         Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="DangerText"          Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="WarningText"         Color="{StaticResource StatusAmber}"/>
+        <SolidColorBrush x:Key="SuccessText"         Color="{StaticResource StatusGreen}"/>
+        <SolidColorBrush x:Key="Accent"              Color="{StaticResource AccentBlue}"/>
         <SolidColorBrush x:Key="OnColorPrimaryBrush"  Color="{StaticResource OnColorPrimary}"/>
         <SolidColorBrush x:Key="OnColorSecondaryBrush" Color="{StaticResource OnColorSecondary}"/>
 
@@ -125,6 +129,9 @@
         <SolidColorBrush x:Key="WarningColorHover"   Color="{StaticResource ColorWarningHover}"/>
         <SolidColorBrush x:Key="SuccessColor"        Color="{StaticResource ColorSuccess}"/>
         <SolidColorBrush x:Key="SuccessColorHover"   Color="{StaticResource ColorSuccessHover}"/>
+        <SolidColorBrush x:Key="DangerBorder"        Color="{StaticResource ColorDanger}"/>
+        <SolidColorBrush x:Key="WarningBorder"       Color="{StaticResource ColorWarningBtn}"/>
+        <SolidColorBrush x:Key="SuccessBorder"       Color="{StaticResource ColorSuccess}"/>
 
         <SolidColorBrush x:Key="ChipBgBrush"           Color="{StaticResource ChipBg}"/>
         <SolidColorBrush x:Key="ChipFgBrush"           Color="{StaticResource ChipFg}"/>
