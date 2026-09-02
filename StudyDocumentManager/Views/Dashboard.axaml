@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
              xmlns:items="using:StudyDocumentManager.Models.Items"
@@ -612,6 +612,10 @@
                         <StackPanel Classes="empty-state" IsVisible="{Binding IsEmptyState}">
                             <Image Classes="empty-state-icon" Source="{StaticResource IconDocPage}"/>
                             <TextBlock Classes="empty-state-text" Text="{Binding StateMessage}"/>
+                            <Button Classes="primary" Command="{Binding AddDocumentCommand}"
+                                    Padding="{StaticResource PaddingBtnSm}" Margin="0,8,0,0"
+                                    Content="{loc:Localize Toolbar_Add}"
+                                    AutomationProperties.AutomationId="Dashboard_EmptyState_AddButton"/>
                         </StackPanel>
                         </Panel>
                     </Border>

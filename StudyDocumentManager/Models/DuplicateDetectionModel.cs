@@ -19,6 +19,7 @@ public partial class DuplicateDetectionModel : ModelBase
 
     [ObservableProperty] private ObservableCollection<DuplicateGroup> _duplicateGroups = new();
     [ObservableProperty] private bool _isScanning;
+    [ObservableProperty] private bool _hasScanned;
     [ObservableProperty] private int _totalGroups;
 
     public DuplicateDetectionModel(
@@ -37,17 +38,25 @@ public partial class DuplicateDetectionModel : ModelBase
         _undoRepository = undoRepository;
         _undo = undo;
         _duplicateReviewService = duplicateReviewService;
+        _loc.LanguageChanged += (_, _) => OnPropertyChanged(nameof(CleanSummaryText));
     }
 
     public bool HasResults => DuplicateGroups.Count > 0;
+    public bool IsInitialState => !HasScanned && !IsScanning;
+    public bool IsCleanState => HasScanned && !IsScanning && TotalGroups == 0;
+    public string CleanSummaryText => _loc["Duplicate_NoDuplicates"];
 
     [RelayCommand]
     private async Task ScanDuplicatesAsync()
     {
         IsScanning = true;
+        HasScanned = true;
         DuplicateGroups.Clear();
         TotalGroups = 0;
         OnPropertyChanged(nameof(HasResults));
+        OnPropertyChanged(nameof(IsInitialState));
+        OnPropertyChanged(nameof(IsCleanState));
+        OnPropertyChanged(nameof(CleanSummaryText));
 
         try
         {
@@ -107,6 +116,8 @@ public partial class DuplicateDetectionModel : ModelBase
         finally
         {
             IsScanning = false;
+            OnPropertyChanged(nameof(IsInitialState));
+            OnPropertyChanged(nameof(IsCleanState));
         }
     }
 

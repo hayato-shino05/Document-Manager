@@ -26,11 +26,16 @@ public partial class FileIntegrityCheckModel : ModelBase
 
     [ObservableProperty] private ObservableCollection<IntegrityResult> _results = new();
     [ObservableProperty] private bool _isChecking;
+    [ObservableProperty] private bool _hasScanned;
     [ObservableProperty] private bool _isCheckCancelled;
     [ObservableProperty] private int _totalChecked;
     [ObservableProperty] private int _missingCount;
     [ObservableProperty] private string _statusText = string.Empty;
     [ObservableProperty] private string _databaseLocation = string.Empty;
+
+    public bool IsInitialState => !HasScanned && !IsChecking;
+    public bool IsHealthyState => HasScanned && !IsChecking && MissingCount == 0;
+    public string HealthySummaryText => string.Format(_loc["Integrity_AllFilesOk"], TotalChecked);
 
     public FileIntegrityCheckModel(IDocumentRepository repository, IFileIntegrityRepository? fileIntegrityRepo, IDialogService dialogService, IFileDialogService fileDialogService, ILocalizationService loc, Action<int>? scanProgress = null, IClipboardService? clipboardService = null, IProcessLauncherService? processLauncher = null, Func<string, bool>? fileProbe = null, Func<string, bool>? rootReadyProbe = null)
     {
@@ -57,9 +62,13 @@ public partial class FileIntegrityCheckModel : ModelBase
 
         IsChecking = true;
         IsCheckCancelled = false;
+        HasScanned = true;
         Results.Clear();
         TotalChecked = 0;
         MissingCount = 0;
+        OnPropertyChanged(nameof(IsInitialState));
+        OnPropertyChanged(nameof(IsHealthyState));
+        OnPropertyChanged(nameof(HealthySummaryText));
         _checkCancellation?.Dispose();
         _checkCancellation = new CancellationTokenSource();
         var cancellation = _checkCancellation;
@@ -103,6 +112,9 @@ public partial class FileIntegrityCheckModel : ModelBase
         finally
         {
             IsChecking = false;
+            OnPropertyChanged(nameof(IsInitialState));
+            OnPropertyChanged(nameof(IsHealthyState));
+            OnPropertyChanged(nameof(HealthySummaryText));
             if (ReferenceEquals(_checkCancellation, cancellation))
             {
                 _checkCancellation.Dispose();
@@ -464,6 +476,7 @@ public partial class FileIntegrityCheckModel : ModelBase
         StatusText = FormatLocalized(_statusKey, _statusArguments);
         foreach (var result in Results)
             result.Status = FormatLocalized(result.StatusKey, result.StatusArguments);
+        OnPropertyChanged(nameof(HealthySummaryText));
     }
 
     private void SetLocalizedStatus(string key, params object[] args)

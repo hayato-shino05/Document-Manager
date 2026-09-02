@@ -95,11 +95,28 @@
                         </Border>
 
                         <Panel>
-                            <StackPanel IsVisible="{Binding !Results.Count}"
+                            <!-- Initial Prompt State (before scan) -->
+                            <StackPanel IsVisible="{Binding IsInitialState}"
                                         VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="0,40">
                                 <Image Source="{StaticResource IconIntegrity}" Width="36" Height="36" Opacity="0.4"/>
                                 <TextBlock Text="{loc:Localize FileIntegrity_EmptyState}"
                                            FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
+                                           HorizontalAlignment="Center"/>
+                                <Button Classes="primary" Command="{Binding CheckIntegrityCommand}"
+                                        Content="{loc:Localize FileIntegrity_BtnScan}"
+                                        Padding="{StaticResource PaddingBtnSm}" Margin="0,6,0,0"
+                                        AutomationProperties.AutomationId="FileIntegrity_EmptyState_ScanButton"/>
+                            </StackPanel>
+
+                            <!-- Healthy State (scanned, all files intact) -->
+                            <StackPanel IsVisible="{Binding IsHealthyState}"
+                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="0,40">
+                                <Image Source="{StaticResource IconCheckSuccess}" Width="36" Height="36"/>
+                                <TextBlock AutomationProperties.AutomationId="FileIntegrity_HealthyState"
+                                           AutomationProperties.LiveSetting="Polite"
+                                           Text="{Binding HealthySummaryText}"
+                                           FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource SuccessText}"
+                                           FontWeight="Medium"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
 

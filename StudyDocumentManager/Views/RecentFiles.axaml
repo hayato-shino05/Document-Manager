@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
              xmlns:conv="using:StudyDocumentManager.Converters"
@@ -58,7 +58,8 @@
                                         <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
                                             <Image Source="{Binding FileType, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
                                                    Width="16" Height="16" VerticalAlignment="Center" />
-                                            <TextBlock Text="{Binding DocumentName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding DocumentName}" VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding DocumentName}"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
