@@ -15,10 +15,11 @@
         <Button AutomationProperties.AutomationId="WatchedFolder_Start" Content="{loc:Localize WF_Start}" Command="{Binding StartWatchingCommand}" IsEnabled="{Binding !IsWatching}" Margin="0,0,8,0" />
         <Button AutomationProperties.AutomationId="WatchedFolder_Stop" Content="{loc:Localize WF_Stop}" Command="{Binding StopWatchingCommand}" IsEnabled="{Binding IsWatching}" />
       </WrapPanel>
-        <Grid ColumnDefinitions="*,Auto,Auto">
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto">
           <TextBox Grid.Column="0" AutomationProperties.AutomationId="WatchedFolder_Path" AutomationProperties.Name="{loc:Localize WF_FolderPath}" MinWidth="160" Margin="0,0,8,0" Text="{Binding NewFolderPath}" Watermark="{loc:Localize WF_FolderPath}" />
-          <CheckBox Grid.Column="1" AutomationProperties.AutomationId="WatchedFolder_IncludeSub" Content="{loc:Localize WF_IncludeSub}" IsChecked="{Binding NewFolderIncludeSubdirectories}" VerticalAlignment="Center" Margin="0,0,8,0" />
-          <Button Grid.Column="2" AutomationProperties.AutomationId="WatchedFolder_Add" Content="{loc:Localize WF_Add}" Command="{Binding AddNewFolderCommand}" />
+          <Button Grid.Column="1" AutomationProperties.AutomationId="WatchedFolder_Browse" AutomationProperties.Name="{loc:Localize AddEdit_BtnBrowse}" Content="{loc:Localize AddEdit_BtnBrowse}" Command="{Binding BrowseFolderCommand}" Margin="0,0,8,0" />
+          <CheckBox Grid.Column="2" AutomationProperties.AutomationId="WatchedFolder_IncludeSub" Content="{loc:Localize WF_IncludeSub}" IsChecked="{Binding NewFolderIncludeSubdirectories}" VerticalAlignment="Center" Margin="0,0,8,0" />
+          <Button Grid.Column="3" AutomationProperties.AutomationId="WatchedFolder_Add" Content="{loc:Localize WF_Add}" Command="{Binding AddNewFolderCommand}" />
         </Grid>
       <TextBlock AutomationProperties.AutomationId="WatchedFolder_Status" AutomationProperties.LiveSetting="Polite" Text="{Binding StatusMessage}" IsVisible="{Binding StatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
       <TextBlock AutomationProperties.AutomationId="WatchedFolder_Error" AutomationProperties.LiveSetting="Polite" Text="{Binding LastError}" Foreground="{StaticResource DangerBrush}" IsVisible="{Binding LastError, Converter={x:Static ObjectConverters.IsNotNull}}" />

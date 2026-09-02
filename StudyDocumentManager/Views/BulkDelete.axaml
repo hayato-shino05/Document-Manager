@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
              xmlns:conv="using:StudyDocumentManager.Converters"
@@ -191,7 +191,9 @@
                     <Grid ColumnDefinitions="*,Auto">
                         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Padding="{StaticResource PaddingBtnMd}" Command="{Binding MarkImportantCommand}"
+                                <Button AutomationProperties.AutomationId="BulkDelete_MarkImportant"
+                                        AutomationProperties.Name="{loc:Localize BulkDelete_BtnMarkImportant}"
+                                        Padding="{StaticResource PaddingBtnMd}" Command="{Binding MarkImportantCommand}"
                                         IsEnabled="{Binding HasSelection}" Classes="warning">
                                     <StackPanel Orientation="Horizontal" Spacing="4">
                                         <Image Source="{StaticResource IconStar}" Width="12" Height="12"/>
@@ -200,7 +202,9 @@
                                 </Button>
 
                                 <ComboBox Name="cboNewSubject" Width="130" FontSize="{StaticResource FontSizeSm}" Height="28" VerticalAlignment="Center"/>
-                                <Button Padding="{StaticResource PaddingBtnMd}" Command="{Binding ChangeSubjectCommand}"
+                                <Button AutomationProperties.AutomationId="BulkDelete_ChangeSubject"
+                                        AutomationProperties.Name="{loc:Localize BulkDelete_BtnChangeSubject}"
+                                        Padding="{StaticResource PaddingBtnMd}" Command="{Binding ChangeSubjectCommand}"
                                         IsEnabled="{Binding HasSelection}" Classes="primary">
                                     <StackPanel Orientation="Horizontal" Spacing="4">
                                         <Image Source="{StaticResource IconCategory}" Width="12" Height="12"/>
@@ -220,7 +224,9 @@
                                     <TextBlock Text="{loc:Localize BulkDelete_BtnDelete}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
                                 </StackPanel>
                             </Button>
-                            <Button Classes="secondary" Command="{Binding CancelCommand}" Padding="{StaticResource PaddingMd}">
+                            <Button AutomationProperties.AutomationId="BulkDelete_Cancel"
+                                    AutomationProperties.Name="{loc:Localize Toolbar_GoBack}"
+                                    Classes="secondary" Command="{Binding CancelCommand}" Padding="{StaticResource PaddingMd}">
                                 <TextBlock Text="{loc:Localize Toolbar_GoBack}" FontSize="{StaticResource FontSizeMd}"/>
                             </Button>
                         </StackPanel>

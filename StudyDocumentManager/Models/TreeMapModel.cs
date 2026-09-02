@@ -34,7 +34,17 @@ public partial class TreeMapModel : ModelBase
         LoadData();
     }
 
-    partial void OnSelectedModeChanged(string value) => LoadData();
+    public bool IsAllMode => SelectedMode == "all";
+    public bool IsSubjectMode => SelectedMode == "subject";
+    public bool IsTypeMode => SelectedMode == "type";
+
+    partial void OnSelectedModeChanged(string value)
+    {
+        OnPropertyChanged(nameof(IsAllMode));
+        OnPropertyChanged(nameof(IsSubjectMode));
+        OnPropertyChanged(nameof(IsTypeMode));
+        LoadData();
+    }
 
     [RelayCommand]
     private void LoadData()
