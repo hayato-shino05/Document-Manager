@@ -18,11 +18,33 @@
                                AutomationProperties.AutomationId="Title_RecycleBin"
                                Text="{loc:Localize RecycleBin_Title}"/>
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8"
-                            HorizontalAlignment="Right">
+                <WrapPanel DockPanel.Dock="Right" Orientation="Horizontal"
+                           HorizontalAlignment="Right">
+                    <TextBlock Text="{Binding SelectedCountText}" IsVisible="{Binding HasCheckedItems}"
+                               VerticalAlignment="Center" FontSize="{StaticResource FontSizeSm}"
+                               Foreground="{StaticResource TextSecondary}" Margin="0,0,12,0"/>
+                    <Button Classes="secondary" AutomationProperties.AutomationId="RecycleBin_SelectAll"
+                            AutomationProperties.Name="{loc:Localize Bulk_BtnSelectAll}"
+                            Command="{Binding SelectAllCommand}" IsEnabled="{Binding HasDeletedDocuments}"
+                            Padding="{StaticResource PaddingBtnMd}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconCheck}" Width="14" Height="14"/>
+                            <TextBlock Text="{loc:Localize Bulk_BtnSelectAll}" FontSize="{StaticResource FontSizeSm}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="secondary" AutomationProperties.AutomationId="RecycleBin_DeselectAll"
+                            AutomationProperties.Name="{loc:Localize Bulk_BtnDeselectAll}"
+                            Command="{Binding DeselectAllCommand}" IsEnabled="{Binding HasCheckedItems}"
+                            Padding="{StaticResource PaddingBtnMd}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Image Source="{StaticResource IconClose}" Width="14" Height="14"/>
+                            <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{StaticResource FontSizeSm}"/>
+                        </StackPanel>
+                    </Button>
                     <Button Classes="primary" AutomationProperties.AutomationId="RecycleBin_Restore"
                             AutomationProperties.Name="{loc:Localize RecycleBin_BtnRestore}"
-                            Command="{Binding RestoreCommand}" IsEnabled="{Binding HasSelection}" Padding="{StaticResource PaddingMd}">
+                            Command="{Binding RestoreCommand}" IsEnabled="{Binding HasSelection}"
+                            Padding="{StaticResource PaddingBtnMd}" Margin="0,0,8,0">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconRestore}" Width="16" Height="16"/>
                             <TextBlock Text="{loc:Localize RecycleBin_BtnRestore}" FontSize="{StaticResource FontSizeMd}"/>
@@ -30,7 +52,8 @@
                     </Button>
                     <Button Classes="danger" AutomationProperties.AutomationId="RecycleBin_PermanentDelete"
                             AutomationProperties.Name="{loc:Localize RecycleBin_BtnPermanentDelete}"
-                            Command="{Binding PermanentDeleteCommand}" IsEnabled="{Binding HasSelection}" Padding="{StaticResource PaddingMd}">
+                            Command="{Binding PermanentDeleteCommand}" IsEnabled="{Binding HasSelection}"
+                            Padding="{StaticResource PaddingBtnMd}" Margin="0,0,8,0">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconDelete}" Width="16" Height="16"/>
                             <TextBlock Text="{loc:Localize RecycleBin_BtnPermanentDelete}" FontSize="{StaticResource FontSizeMd}"/>
@@ -38,13 +61,14 @@
                     </Button>
                     <Button Classes="danger" AutomationProperties.AutomationId="RecycleBin_EmptyTrash"
                             AutomationProperties.Name="{loc:Localize RecycleBin_BtnEmptyTrash}"
-                            Command="{Binding EmptyTrashCommand}" IsEnabled="{Binding HasDeletedDocuments}" Padding="{StaticResource PaddingMd}">
+                            Command="{Binding EmptyTrashCommand}" IsEnabled="{Binding HasDeletedDocuments}"
+                            Padding="{StaticResource PaddingBtnMd}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconRecycle}" Width="16" Height="16"/>
                             <TextBlock Text="{loc:Localize RecycleBin_BtnEmptyTrash}" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Button>
-                </StackPanel>
+                </WrapPanel>
             </DockPanel>
 
             <!-- DataGrid -->
@@ -53,29 +77,32 @@
                     <DataGrid Classes="std"
                               AutomationProperties.AutomationId="RecycleBin_DocumentGrid"
                               AutomationProperties.Name="{loc:Localize RecycleBin_Title}"
-                              IsReadOnly="True"
-                              ItemsSource="{Binding DeletedDocuments}"
-                                  SelectedItem="{Binding SelectedDocument, Mode=OneWayToSource}">
+                              AutoGenerateColumns="False"
+                              CanUserSortColumns="True"
+                              GridLinesVisibility="Horizontal" HeadersVisibility="Column"
+                              ItemsSource="{Binding DeletedItems}"
+                              SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="{loc:Localize RecycleBin_ColName}" Width="*" MinWidth="200" SortMemberPath="Name">
+                            <DataGridCheckBoxColumn Header="✓" Binding="{Binding IsSelected, Mode=TwoWay}" Width="40"/>
+                            <DataGridTemplateColumn Header="{loc:Localize RecycleBin_ColName}" Width="*" MinWidth="200" SortMemberPath="Document.Name">
                                 <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate x:DataType="core:StudyDocument">
+                                    <DataTemplate x:DataType="vm:SelectableDocument">
                                         <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
-                                            <Image Source="{Binding Type, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
+                                            <Image Source="{Binding Document.Type, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
                                                    Width="16" Height="16" VerticalAlignment="Center" />
-                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
-                                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Name}"/>
+                                            <TextBlock Text="{Binding Document.Name}" VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Document.Name}"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColSubject}" Binding="{Binding Subject, Mode=OneWay}" Width="120"/>
-                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColType}" Binding="{Binding Type, Mode=OneWay}" Width="80"/>
-                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColDate}" Binding="{Binding CreatedAt, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColSubject}" Binding="{Binding Document.Subject, Mode=OneWay}" Width="120" SortMemberPath="Document.Subject"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColType}" Binding="{Binding Document.Type, Mode=OneWay}" Width="80" SortMemberPath="Document.Type"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColDate}" Binding="{Binding Document.CreatedAt, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
                         </DataGrid.Columns>
                     </DataGrid>
 
-                    <StackPanel Classes="empty-state" IsVisible="{Binding !DeletedDocuments.Count}">
+                    <StackPanel Classes="empty-state" IsVisible="{Binding !DeletedItems.Count}">
                         <Image Classes="empty-state-icon" Source="{StaticResource IconRecycle}"/>
                         <TextBlock Classes="empty-state-text"
                                    AutomationProperties.AutomationId="RecycleBin_EmptyState"

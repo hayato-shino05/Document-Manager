@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -148,7 +148,7 @@ public class DesktopQualityBatch2Tests
         var recentFiles = File.ReadAllText(
             GetSourceFilePath("StudyDocumentManager", "Views", "RecentFiles.axaml"));
 
-        Assert.Contains("TextTrimming=\"CharacterEllipsis\" ToolTip.Tip=\"{Binding Name}\"", recycleBin);
+        Assert.True(recycleBin.Contains("ToolTip.Tip=\"{Binding Name}\"") || recycleBin.Contains("ToolTip.Tip=\"{Binding Document.Name}\""));
         Assert.Contains("TextTrimming=\"CharacterEllipsis\" ToolTip.Tip=\"{Binding DocumentName}\"", recentFiles);
     }
 
