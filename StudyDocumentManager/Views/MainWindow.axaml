@@ -19,6 +19,21 @@
         <conv:LangDisplayConverter x:Key="LangDisplayConverter"/>
     </Window.Resources>
 
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Ctrl+N" Command="{Binding NavigateCommand}" CommandParameter="add"/>
+        <KeyBinding Gesture="Ctrl+Z" Command="{Binding UndoLastCommand}"/>
+        <KeyBinding Gesture="Ctrl+Shift+I" Command="{Binding NavigateCommand}" CommandParameter="batch_import"/>
+        <KeyBinding Gesture="Ctrl+Shift+R" Command="{Binding NavigateCommand}" CommandParameter="recycle_bin"/>
+        <KeyBinding Gesture="Ctrl+D" Command="{Binding NavigateCommand}" CommandParameter="duplicate_detection"/>
+        <KeyBinding Gesture="Ctrl+H" Command="{Binding NavigateCommand}" CommandParameter="file_integrity"/>
+        <KeyBinding Gesture="Ctrl+Shift+C" Command="{Binding NavigateCommand}" CommandParameter="category_management"/>
+        <KeyBinding Gesture="Ctrl+Shift+L" Command="{Binding NavigateCommand}" CommandParameter="collection_management"/>
+        <KeyBinding Gesture="Alt+Left" Command="{Binding GoBackCommand}"/>
+        <KeyBinding Gesture="F1" Command="{Binding ShowHelpCommand}"/>
+        <KeyBinding Gesture="F5" Command="{Binding RefreshCommand}"/>
+        <KeyBinding Gesture="Ctrl+R" Command="{Binding RefreshCommand}"/>
+    </Window.KeyBindings>
+
     <DockPanel>
 
         <!-- ═══ MENU BAR ═══ -->
