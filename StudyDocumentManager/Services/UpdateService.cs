@@ -19,12 +19,14 @@ public class UpdateService : IUpdateService
     private readonly IDialogService _dialogService;
     private readonly ILocalizationService _loc;
     private readonly IToastService _toast;
+    private readonly IProcessLauncherService? _launcher;
 
-    public UpdateService(IDialogService dialogService, ILocalizationService loc, IToastService toast)
+    public UpdateService(IDialogService dialogService, ILocalizationService loc, IToastService toast, IProcessLauncherService? launcher = null)
     {
         _dialogService = dialogService;
         _loc = loc;
         _toast = toast;
+        _launcher = launcher;
     }
 
     private static HttpClient CreateHttpClient()
@@ -88,11 +90,18 @@ public class UpdateService : IUpdateService
 
         try
         {
-            Process.Start(new ProcessStartInfo
+            if (_launcher != null)
             {
-                FileName = url,
-                UseShellExecute = true
-            });
+                _launcher.OpenUrl(url);
+            }
+            else
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            }
         }
         catch
         {

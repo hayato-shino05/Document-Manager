@@ -150,4 +150,82 @@ public sealed class LauncherBehaviorTests : IDisposable
 
         Assert.Empty(started);
     }
+
+    [Fact]
+    public void Linux_OpenFile_ExistingFile_StartsXdgOpenOnFile()
+    {
+        var started = new List<ProcessStartInfo>();
+        var launcher = new ProcessLauncherService(new StubPlatformInfo(isLinux: true), psi => started.Add(psi));
+        var file = MakeFile("doc.pdf");
+
+        launcher.OpenFile(file);
+
+        var psi = Assert.Single(started);
+        Assert.Equal("xdg-open", psi.FileName);
+        Assert.Equal(file, Assert.Single(psi.ArgumentList));
+    }
+
+    [Fact]
+    public void Linux_OpenFile_MissingFile_StartsNothing()
+    {
+        var started = new List<ProcessStartInfo>();
+        var launcher = new ProcessLauncherService(new StubPlatformInfo(isLinux: true), psi => started.Add(psi));
+
+        launcher.OpenFile(Path.Combine(_root, "missing.pdf"));
+
+        Assert.Empty(started);
+    }
+
+    [Fact]
+    public void Windows_OpenFile_ExistingFile_UsesShellExecute()
+    {
+        var started = new List<ProcessStartInfo>();
+        var launcher = new ProcessLauncherService(new StubPlatformInfo(isLinux: false), psi => started.Add(psi));
+        var file = MakeFile("doc.pdf");
+
+        launcher.OpenFile(file);
+
+        var psi = Assert.Single(started);
+        Assert.Equal(file, psi.FileName);
+        Assert.True(psi.UseShellExecute);
+    }
+
+    [Fact]
+    public void Windows_OpenFile_MissingFile_StartsNothing()
+    {
+        var started = new List<ProcessStartInfo>();
+        var launcher = new ProcessLauncherService(new StubPlatformInfo(isLinux: false), psi => started.Add(psi));
+
+        launcher.OpenFile(Path.Combine(_root, "missing.pdf"));
+
+        Assert.Empty(started);
+    }
+
+    [Fact]
+    public void Linux_OpenUrl_StartsXdgOpenOnUrl()
+    {
+        var started = new List<ProcessStartInfo>();
+        var launcher = new ProcessLauncherService(new StubPlatformInfo(isLinux: true), psi => started.Add(psi));
+        const string url = "https://example.com/docs";
+
+        launcher.OpenUrl(url);
+
+        var psi = Assert.Single(started);
+        Assert.Equal("xdg-open", psi.FileName);
+        Assert.Equal(url, Assert.Single(psi.ArgumentList));
+    }
+
+    [Fact]
+    public void Windows_OpenUrl_UsesShellExecute()
+    {
+        var started = new List<ProcessStartInfo>();
+        var launcher = new ProcessLauncherService(new StubPlatformInfo(isLinux: false), psi => started.Add(psi));
+        const string url = "https://example.com/docs";
+
+        launcher.OpenUrl(url);
+
+        var psi = Assert.Single(started);
+        Assert.Equal(url, psi.FileName);
+        Assert.True(psi.UseShellExecute);
+    }
 }
