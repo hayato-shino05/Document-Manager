@@ -40,6 +40,42 @@ public sealed class PlatformSupportTests : IDisposable
         Assert.Equal(_temporaryDirectory, Assert.Single(startedProcess.ArgumentList));
     }
 
+    [Fact]
+    public void LinuxLauncher_OpenFile_UsesXdgOpenForFile()
+    {
+        ProcessStartInfo? startedProcess = null;
+        Directory.CreateDirectory(_temporaryDirectory);
+        var documentPath = Path.Combine(_temporaryDirectory, "document.pdf");
+        File.WriteAllText(documentPath, "content");
+        var service = new ProcessLauncherService(
+            new PlatformInfoStub(isLinux: true),
+            processStartInfo => startedProcess = processStartInfo);
+
+        service.OpenFile(documentPath);
+
+        Assert.NotNull(startedProcess);
+        Assert.Equal("xdg-open", startedProcess!.FileName);
+        Assert.False(startedProcess.UseShellExecute);
+        Assert.Equal(documentPath, Assert.Single(startedProcess.ArgumentList));
+    }
+
+    [Fact]
+    public void LinuxLauncher_OpenUrl_UsesXdgOpenForUrl()
+    {
+        ProcessStartInfo? startedProcess = null;
+        const string url = "https://example.com";
+        var service = new ProcessLauncherService(
+            new PlatformInfoStub(isLinux: true),
+            processStartInfo => startedProcess = processStartInfo);
+
+        service.OpenUrl(url);
+
+        Assert.NotNull(startedProcess);
+        Assert.Equal("xdg-open", startedProcess!.FileName);
+        Assert.False(startedProcess.UseShellExecute);
+        Assert.Equal(url, Assert.Single(startedProcess.ArgumentList));
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_temporaryDirectory))

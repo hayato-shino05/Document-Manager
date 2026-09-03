@@ -21,11 +21,21 @@ public class ProcessLauncherService : IProcessLauncherService
 
     public void OpenFile(string filePath)
     {
-        Process.Start(new ProcessStartInfo
+        if (_platformInfo.IsLinux)
         {
-            FileName = filePath,
-            UseShellExecute = true
-        });
+            if (File.Exists(filePath))
+                StartLinuxTarget(filePath);
+            return;
+        }
+
+        if (File.Exists(filePath))
+        {
+            _startProcess(new ProcessStartInfo
+            {
+                FileName = filePath,
+                UseShellExecute = true
+            });
+        }
     }
 
     public void RevealInExplorer(string filePath)
@@ -85,7 +95,7 @@ public class ProcessLauncherService : IProcessLauncherService
             return;
         }
 
-        Process.Start(new ProcessStartInfo
+        _startProcess(new ProcessStartInfo
         {
             FileName = url,
             UseShellExecute = true
