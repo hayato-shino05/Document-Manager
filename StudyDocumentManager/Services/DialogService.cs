@@ -180,7 +180,7 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         };
 
         var result = await window.StorageProvider.OpenFilePickerAsync(options);
-        return result.Count > 0 ? result[0].Path.LocalPath : null;
+        return result.Count > 0 ? GetLocalPath(result[0]) : null;
     }
 
     public async Task<string?> ShowOpenFolderAsync(string title)
@@ -195,7 +195,7 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         };
 
         var result = await window.StorageProvider.OpenFolderPickerAsync(options);
-        return result.Count > 0 ? result[0].Path.LocalPath : null;
+        return result.Count > 0 ? GetLocalPath(result[0]) : null;
     }
 
     public async Task<string?> ShowSaveFileAsync(string title, string defaultFileName, string? filter = null)
@@ -211,7 +211,33 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
         };
 
         var result = await window.StorageProvider.SaveFilePickerAsync(options);
-        return result?.Path.LocalPath;
+        return GetLocalPath(result);
+    }
+
+    internal static string? DecodeStoragePath(string? rawPath)
+    {
+        if (string.IsNullOrWhiteSpace(rawPath))
+            return null;
+
+        var path = rawPath.Trim();
+        if (path.StartsWith("file://", StringComparison.OrdinalIgnoreCase) &&
+            Uri.TryCreate(path, UriKind.Absolute, out var uri))
+        {
+            path = uri.LocalPath;
+        }
+
+        return string.IsNullOrWhiteSpace(path) ? null : Uri.UnescapeDataString(path);
+    }
+
+    internal static string? GetLocalPath(IStorageItem? item)
+    {
+        if (item == null) return null;
+        var localPath = item.TryGetLocalPath();
+        if (string.IsNullOrEmpty(localPath) && item.Path != null)
+        {
+            localPath = item.Path.IsAbsoluteUri ? item.Path.LocalPath : item.Path.ToString();
+        }
+        return DecodeStoragePath(localPath);
     }
 
     public async Task<string?> ShowChangeCategoryAsync(string documentName, IList<string> existingCategories, string currentCategory)

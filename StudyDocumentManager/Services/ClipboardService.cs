@@ -1,6 +1,7 @@
+using System;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Input.Platform;
 
 namespace StudyDocumentManager.Services;
 
@@ -8,13 +9,20 @@ public class ClipboardService : IClipboardService
 {
     public async Task SetTextAsync(string text)
     {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        try
         {
-            var clipboard = desktop.MainWindow?.Clipboard;
-            if (clipboard != null)
+            if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                await clipboard.SetTextAsync(text);
+                var clipboard = desktop.MainWindow?.Clipboard;
+                if (clipboard != null)
+                {
+                    await clipboard.SetTextAsync(text ?? string.Empty);
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ClipboardService] Failed to set clipboard text: {ex.Message}");
         }
     }
 }

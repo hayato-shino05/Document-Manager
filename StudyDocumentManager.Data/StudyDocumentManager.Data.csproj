@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StudyDocumentManager.Core\StudyDocumentManager.Core.csproj" />
+    <InternalsVisibleTo Include="StudyDocumentManager.Tests" />
   </ItemGroup>
 
 </Project>
