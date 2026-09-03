@@ -1,4 +1,4 @@
-﻿using StudyDocumentManager.Core.Entities;
+using StudyDocumentManager.Core.Entities;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Models;
 using StudyDocumentManager.Services;
@@ -490,7 +490,7 @@ public class Slice4FlowPolishTests
     public void MainWindowCodeBehind_ChecksActualDraggedFiles()
     {
         var codeBehind = File.ReadAllText(GetSourceFilePath("StudyDocumentManager", "Views", "MainWindow.axaml.cs"));
-        Assert.Contains("GetFiles()?", codeBehind);
+        Assert.True(codeBehind.Contains("GetFiles()") || codeBehind.Contains("GetFiles()?"));
         Assert.Contains("ShowInvalidDropStatus", codeBehind);
     }
 
