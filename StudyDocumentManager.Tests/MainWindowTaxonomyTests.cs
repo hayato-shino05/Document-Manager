@@ -108,7 +108,6 @@ public sealed class MainWindowTaxonomyTests
             "Context_CopyPath",
             "Context_OpenFolder",
             "Context_EditTags",
-            "Context_EditNotes",
             "Context_MarkImportant",
             "Context_PersonalNote",
             "Context_AddToCollection",

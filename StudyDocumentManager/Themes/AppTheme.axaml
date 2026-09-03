@@ -526,6 +526,22 @@
             </DrawingGroup>
         </DrawingImage>
 
+        <!-- Pin: pushpin icon -->
+        <DrawingImage x:Key="IconPin">
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"
+                    Geometry="M16,12 L16,4 L17,4 L17,2 L7,2 L7,4 L8,4 L8,12 L6,14 L6,16 L11,16 L11,22 L13,22 L13,16 L18,16 L18,14 L16,12 Z"/>
+            </DrawingGroup>
+        </DrawingImage>
+
+        <!-- Pin Filled: active pinned icon -->
+        <DrawingImage x:Key="IconPinFilled">
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource BrushIconStarFill}"
+                    Geometry="M16,12 L16,4 L17,4 L17,2 L7,2 L7,4 L8,4 L8,12 L6,14 L6,16 L11,16 L11,22 L13,22 L13,16 L18,16 L18,14 L16,12 Z"/>
+            </DrawingGroup>
+        </DrawingImage>
+
     </Styles.Resources>
 
     <!-- ══════════════     COMPONENT STYLES     ══════════════ -->

@@ -234,4 +234,20 @@ public sealed class ViewVisualEvaluationTests
         var view = new RecoveryCenterView { DataContext = model };
         RenderAndAuditView(view, 1280, 800, "Screen_RecoveryCenter");
     }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_DashboardContextMenu_IsUnifiedAndHasNoEditNotes()
+    {
+        var dashboard = new Dashboard();
+        var dataGrid = dashboard.FindControl<DataGrid>("dgvDocuments");
+        Assert.NotNull(dataGrid);
+        Assert.NotNull(dataGrid!.ContextMenu);
+
+        var menuItems = dataGrid.ContextMenu!.Items.OfType<MenuItem>().ToList();
+        var editNotes = menuItems.FirstOrDefault(m => AutomationProperties.GetAutomationId(m) == "Context_EditNotes");
+        var personalNote = menuItems.FirstOrDefault(m => AutomationProperties.GetAutomationId(m) == "Context_PersonalNote");
+
+        Assert.Null(editNotes);
+        Assert.NotNull(personalNote);
+    }
 }
