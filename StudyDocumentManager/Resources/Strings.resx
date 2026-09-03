@@ -633,6 +633,15 @@
   <data name="PersonalNote_Type" xml:space="preserve"><value>種類</value></data>
   <data name="PersonalNote_Pinned" xml:space="preserve"><value>固定</value></data>
   <data name="PersonalNote_BtnNew" xml:space="preserve"><value>新規メモ</value></data>
+  <data name="PersonalNote_SearchPlaceholder" xml:space="preserve"><value>メモを検索...</value></data>
+  <data name="PersonalNote_FilterAll" xml:space="preserve"><value>すべて</value></data>
+  <data name="PersonalNote_Stats" xml:space="preserve"><value>{0} 文字 • {1} 単語</value></data>
+  <data name="PersonalNote_BtnCopy" xml:space="preserve"><value>内容をコピー</value></data>
+  <data name="PersonalNote_CopySuccess" xml:space="preserve"><value>メモの内容をクリップボードにコピーしました。</value></data>
+  <data name="PersonalNote_EmptyTitle" xml:space="preserve"><value>メモがまだありません</value></data>
+  <data name="PersonalNote_EmptyDesc" xml:space="preserve"><value>「新規メモ」をクリックして、この文書に関する重要な記録や要約を追加しましょう。</value></data>
+  <data name="PersonalNote_Unsaved" xml:space="preserve"><value>未保存の変更</value></data>
+  <data name="PersonalNote_Saved" xml:space="preserve"><value>保存済み</value></data>
 
   <!-- RelatedDocuments View -->
   <data name="RelatedDocs_Title" xml:space="preserve"><value>関連文書</value></data>

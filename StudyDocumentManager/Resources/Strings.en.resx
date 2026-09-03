@@ -548,6 +548,15 @@ Please check your network connection.</value></data>
   <data name="PersonalNote_Type" xml:space="preserve"><value>Type</value></data>
   <data name="PersonalNote_Pinned" xml:space="preserve"><value>Pinned</value></data>
   <data name="PersonalNote_BtnNew" xml:space="preserve"><value>New note</value></data>
+  <data name="PersonalNote_SearchPlaceholder" xml:space="preserve"><value>Search notes...</value></data>
+  <data name="PersonalNote_FilterAll" xml:space="preserve"><value>All</value></data>
+  <data name="PersonalNote_Stats" xml:space="preserve"><value>{0} chars • {1} words</value></data>
+  <data name="PersonalNote_BtnCopy" xml:space="preserve"><value>Copy Content</value></data>
+  <data name="PersonalNote_CopySuccess" xml:space="preserve"><value>Note content copied to clipboard.</value></data>
+  <data name="PersonalNote_EmptyTitle" xml:space="preserve"><value>No notes yet</value></data>
+  <data name="PersonalNote_EmptyDesc" xml:space="preserve"><value>Click 'New Note' to add important notes or summaries for this document.</value></data>
+  <data name="PersonalNote_Unsaved" xml:space="preserve"><value>Unsaved changes</value></data>
+  <data name="PersonalNote_Saved" xml:space="preserve"><value>Saved</value></data>
   <data name="RelatedDocs_Title" xml:space="preserve"><value>Related Documents</value></data>
   <data name="RelatedDocs_BtnAdd" xml:space="preserve"><value>Add</value></data>
   <data name="RelatedDocs_BtnRemove" xml:space="preserve"><value>Remove</value></data>

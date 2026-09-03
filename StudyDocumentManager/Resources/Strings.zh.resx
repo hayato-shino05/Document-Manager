@@ -791,6 +791,15 @@
   <data name="PersonalNote_Type" xml:space="preserve"><value>类型</value></data>
   <data name="PersonalNote_Pinned" xml:space="preserve"><value>已固定</value></data>
   <data name="PersonalNote_BtnNew" xml:space="preserve"><value>新建备注</value></data>
+  <data name="PersonalNote_SearchPlaceholder" xml:space="preserve"><value>搜索笔记...</value></data>
+  <data name="PersonalNote_FilterAll" xml:space="preserve"><value>全部</value></data>
+  <data name="PersonalNote_Stats" xml:space="preserve"><value>{0} 字符 • {1} 单词</value></data>
+  <data name="PersonalNote_BtnCopy" xml:space="preserve"><value>复制内容</value></data>
+  <data name="PersonalNote_CopySuccess" xml:space="preserve"><value>已将笔记内容复制到剪贴板。</value></data>
+  <data name="PersonalNote_EmptyTitle" xml:space="preserve"><value>暂无笔记</value></data>
+  <data name="PersonalNote_EmptyDesc" xml:space="preserve"><value>点击“新建笔记”为此文档添加重要记录或摘要。</value></data>
+  <data name="PersonalNote_Unsaved" xml:space="preserve"><value>未保存更改</value></data>
+  <data name="PersonalNote_Saved" xml:space="preserve"><value>已保存</value></data>
   <data name="RelatedDocs_Title" xml:space="preserve"><value>相关文档</value></data>
   <data name="RelatedDocs_BtnAdd" xml:space="preserve"><value>添加</value></data>
   <data name="RelatedDocs_BtnRemove" xml:space="preserve"><value>取消关联</value></data>

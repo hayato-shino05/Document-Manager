@@ -13,8 +13,11 @@ public partial class PersonalNoteModel : ModelBase
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _loc;
+    private readonly IClipboardService? _clipboardService;
+    private readonly IDocumentRepository? _documentRepository;
     private PersonalNote? _loadedNote;
     private bool _isRestoringSelection;
+    private bool _isFiltering;
 
     [ObservableProperty] private int _documentId;
     [ObservableProperty] private string _documentName = string.Empty;
@@ -25,38 +28,77 @@ public partial class PersonalNoteModel : ModelBase
     [ObservableProperty] private string _selectedNoteType = "general";
     [ObservableProperty] private bool _isPinned;
 
+    [ObservableProperty] private string _searchQuery = string.Empty;
+    [ObservableProperty] private string _selectedTypeFilter = "all";
+
     public ObservableCollection<PersonalNote> Notes { get; } = [];
+    public ObservableCollection<PersonalNote> FilteredNotes { get; } = [];
     public IReadOnlyList<string> NoteTypes => NoteType.All;
+    public IReadOnlyList<string> TypeFilters { get; } = ["all", "general", "summary", "action", "quote", "lecture", "meeting"];
+
     public bool CanSaveNote => !string.IsNullOrWhiteSpace(NoteContent);
     public bool HasSavedNotePreview => HasExistingNote && !string.IsNullOrWhiteSpace(SavedNoteContent);
+    public bool HasUnsavedChanges => !string.Equals(NoteContent, SavedNoteContent, StringComparison.Ordinal);
+    public int NotesCount => Notes.Count;
+    public int FilteredNotesCount => FilteredNotes.Count;
+    public int CharCount => NoteContent.Length;
+    public int WordCount => CountWords(NoteContent);
+    public bool IsEditingExistingNote => SelectedNote is not null && SelectedNote.Id != 0;
 
-    public PersonalNoteModel(IPersonalNoteRepository noteRepo, IDialogService dialogService, INavigationService navigationService, ILocalizationService loc)
+    public PersonalNoteModel(
+        IPersonalNoteRepository noteRepo,
+        IDialogService dialogService,
+        INavigationService navigationService,
+        ILocalizationService loc,
+        IClipboardService? clipboardService = null,
+        IDocumentRepository? documentRepository = null)
     {
         _noteRepo = noteRepo;
         _dialogService = dialogService;
         _navigationService = navigationService;
         _loc = loc;
+        _clipboardService = clipboardService;
+        _documentRepository = documentRepository;
     }
 
     public void Load(int docId, string docName)
     {
         DocumentId = docId;
         DocumentName = docName;
+        SearchQuery = string.Empty;
+        SelectedTypeFilter = "all";
         ReloadNotes();
     }
 
     partial void OnNoteContentChanged(string value)
-        => OnPropertyChanged(nameof(CanSaveNote));
+    {
+        OnPropertyChanged(nameof(CanSaveNote));
+        OnPropertyChanged(nameof(HasUnsavedChanges));
+        OnPropertyChanged(nameof(CharCount));
+        OnPropertyChanged(nameof(WordCount));
+    }
 
     partial void OnSavedNoteContentChanged(string value)
-        => OnPropertyChanged(nameof(HasSavedNotePreview));
+    {
+        OnPropertyChanged(nameof(HasSavedNotePreview));
+        OnPropertyChanged(nameof(HasUnsavedChanges));
+    }
 
     partial void OnHasExistingNoteChanged(bool value)
-        => OnPropertyChanged(nameof(HasSavedNotePreview));
+    {
+        OnPropertyChanged(nameof(HasSavedNotePreview));
+        OnPropertyChanged(nameof(IsEditingExistingNote));
+    }
+
+    partial void OnSearchQueryChanged(string value)
+        => ApplyFilter();
+
+    partial void OnSelectedTypeFilterChanged(string value)
+        => ApplyFilter();
 
     partial void OnSelectedNoteChanged(PersonalNote? value)
     {
-        if (_isRestoringSelection)
+        if (_isRestoringSelection || _isFiltering)
             return;
 
         if (!string.Equals(NoteContent, SavedNoteContent, StringComparison.Ordinal))
@@ -75,6 +117,7 @@ public partial class PersonalNoteModel : ModelBase
             IsPinned = false;
             HasExistingNote = false;
             _loadedNote = null;
+            OnPropertyChanged(nameof(IsEditingExistingNote));
             return;
         }
 
@@ -84,6 +127,7 @@ public partial class PersonalNoteModel : ModelBase
         IsPinned = value.IsPinned;
         HasExistingNote = true;
         _loadedNote = value;
+        OnPropertyChanged(nameof(IsEditingExistingNote));
     }
 
     [RelayCommand]
@@ -93,6 +137,19 @@ public partial class PersonalNoteModel : ModelBase
             return;
 
         SelectedNote = null;
+        NoteContent = string.Empty;
+        SavedNoteContent = string.Empty;
+        SelectedNoteType = "general";
+        IsPinned = false;
+        HasExistingNote = false;
+        _loadedNote = null;
+        OnPropertyChanged(nameof(IsEditingExistingNote));
+    }
+
+    [RelayCommand]
+    private void SetFilter(string filter)
+    {
+        SelectedTypeFilter = filter ?? "all";
     }
 
     [RelayCommand]
@@ -107,13 +164,24 @@ public partial class PersonalNoteModel : ModelBase
 
         NoteContent = content;
         var existingNoteIds = SelectedNote is null
-            ? _noteRepo.GetNotes(DocumentId).Select(note => note.Id).ToHashSet()
+            ? _noteRepo.GetNotes(DocumentId).Select(n => n.Id).ToHashSet()
             : null;
         var note = new PersonalNote(SelectedNote?.Id ?? 0, DocumentId, SelectedNoteType, content, IsPinned);
         if (!_noteRepo.SaveNote(note))
         {
             await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], _loc["Note_SaveError"]);
             return;
+        }
+
+        // Bridge: Sync primary note into document repository notes if documentRepository is available
+        if (SelectedNoteType == "general" && _documentRepository != null)
+        {
+            var doc = _documentRepository.GetById(DocumentId);
+            if (doc != null)
+            {
+                doc.Notes = content;
+                _documentRepository.Update(doc);
+            }
         }
 
         SavedNoteContent = content;
@@ -128,6 +196,7 @@ public partial class PersonalNoteModel : ModelBase
                 .OrderByDescending(savedNote => savedNote.Id)
                 .Select(savedNote => (int?)savedNote.Id)
                 .FirstOrDefault();
+
         ReloadNotes(savedNoteId ?? 0, note.NoteType, content);
         if (!string.Equals(SelectedNote?.Content, content, StringComparison.Ordinal))
         {
@@ -152,8 +221,11 @@ public partial class PersonalNoteModel : ModelBase
         if (SelectedNote is not null)
         {
             var updated = SelectedNote with { IsPinned = newValue };
-            Notes[Notes.IndexOf(SelectedNote)] = updated;
+            var idx = Notes.IndexOf(SelectedNote);
+            if (idx >= 0)
+                Notes[idx] = updated;
             SelectedNote = updated;
+            ApplyFilter();
         }
     }
 
@@ -179,6 +251,18 @@ public partial class PersonalNoteModel : ModelBase
     }
 
     [RelayCommand]
+    private async Task CopyContentAsync()
+    {
+        if (string.IsNullOrEmpty(NoteContent)) return;
+
+        if (_clipboardService != null)
+        {
+            await _clipboardService.SetTextAsync(NoteContent);
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Success"], _loc["PersonalNote_CopySuccess"]);
+        }
+    }
+
+    [RelayCommand]
     private async Task GoBackAsync()
     {
         if (string.Equals(NoteContent, SavedNoteContent, StringComparison.Ordinal))
@@ -198,6 +282,8 @@ public partial class PersonalNoteModel : ModelBase
         foreach (var note in _noteRepo.GetNotes(DocumentId))
             Notes.Add(note);
 
+        OnPropertyChanged(nameof(NotesCount));
+
         SelectedNote = noteId != 0
             ? Notes.FirstOrDefault(note => note.Id == noteId)
             : noteType is not null && content is not null
@@ -208,5 +294,51 @@ public partial class PersonalNoteModel : ModelBase
 
         if (SelectedNote is null)
             HasExistingNote = false;
+
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        _isFiltering = true;
+        var currentSelected = SelectedNote;
+        FilteredNotes.Clear();
+
+        var query = SearchQuery.Trim();
+        var typeFilter = SelectedTypeFilter;
+
+        foreach (var note in Notes)
+        {
+            if (typeFilter != "all" && !string.Equals(note.NoteType, typeFilter, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            if (query.Length > 0 && !note.Content.Contains(query, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            FilteredNotes.Add(note);
+        }
+
+        OnPropertyChanged(nameof(FilteredNotesCount));
+        _isFiltering = false;
+    }
+
+    private static int CountWords(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return 0;
+        var words = 0;
+        var inWord = false;
+        foreach (var c in text)
+        {
+            if (char.IsWhiteSpace(c))
+            {
+                inWord = false;
+            }
+            else if (!inWord)
+            {
+                inWord = true;
+                words++;
+            }
+        }
+        return words;
     }
 }
