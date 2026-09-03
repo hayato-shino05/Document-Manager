@@ -163,11 +163,13 @@
                                                        FontWeight="Bold"
                                                        Foreground="{StaticResource StatPurpleFg}"/>
                                         </Border>
-                                        <TextBlock Grid.Column="1"
-                                                   Text="📌 "
-                                                   IsVisible="{Binding IsPinned}"
-                                                   FontSize="{StaticResource FontSizeXs}"
-                                                   VerticalAlignment="Center"/>
+                                        <Image Grid.Column="1"
+                                               Source="{StaticResource IconPinFilled}"
+                                               Width="12"
+                                               Height="12"
+                                               IsVisible="{Binding IsPinned}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,4,0"/>
                                         <TextBlock Grid.Column="2"
                                                    Text="{Binding Content}"
                                                    FontSize="{StaticResource FontSizeSm}"
@@ -238,7 +240,7 @@
                                     AutomationProperties.AutomationId="PersonalNote_Pinned"
                                     AutomationProperties.Name="{loc:Localize PersonalNote_Pinned}">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <TextBlock Text="📌" FontSize="{StaticResource FontSizeXs}"/>
+                                    <Image Source="{StaticResource IconPin}" Width="12" Height="12" VerticalAlignment="Center"/>
                                     <TextBlock Text="{loc:Localize PersonalNote_Pinned}" FontSize="{StaticResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>

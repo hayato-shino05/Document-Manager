@@ -503,12 +503,6 @@
                                               ToolTip.Tip="{loc:Localize Dashboard_TipEditTags}">
                                         <MenuItem.Icon><Image Source="{StaticResource IconTag}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
-                                    <MenuItem AutomationProperties.AutomationId="Context_EditNotes"
-                                              Header="{loc:Localize Dashboard_CtxEditNotes}"
-                                              Command="{Binding $parent[DataGrid].DataContext.QuickEditGhiChuCommand}"
-                                              ToolTip.Tip="{loc:Localize Dashboard_TipEditNotes}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconNote}" Width="14" Height="14"/></MenuItem.Icon>
-                                    </MenuItem>
                                     <Separator/>
                                     <!-- Mark &amp; manage -->
                                     <MenuItem AutomationProperties.AutomationId="Context_MarkImportant"
@@ -520,7 +514,7 @@
                                               Header="{loc:Localize Dashboard_CtxPersonalNote}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenPersonalNoteCommand}"
                                               ToolTip.Tip="{loc:Localize Dashboard_TipPersonalNote}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconBook}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{StaticResource IconNote}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_AddToCollection"
                                               Header="{loc:Localize Dashboard_CtxAddToCollection}"
