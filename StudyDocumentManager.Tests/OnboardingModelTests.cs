@@ -60,4 +60,80 @@ public sealed class OnboardingModelTests
         Assert.Equal(1, completed);
         Assert.False(new OnboardingModel(settings).ShouldShow);
     }
+
+    [Fact]
+    public void Step_navigation_walks_through_all_5_steps_and_completes()
+    {
+        var settings = new InMemorySettingsService();
+        var model = new OnboardingModel(settings);
+        var completed = 0;
+        model.Completed += (_, _) => completed++;
+
+        Assert.Equal(0, model.CurrentStepIndex);
+        Assert.Equal(5, model.TotalSteps);
+        Assert.False(model.CanGoPrevious);
+        Assert.True(model.CanGoNext);
+        Assert.False(model.IsLastStep);
+        Assert.Equal("1 / 5", model.StepNumberText);
+        Assert.Equal(20.0, model.StepProgress);
+        Assert.True(model.IsStep0);
+
+        // Previous on step 0 does nothing
+        model.PreviousStepCommand.Execute(null);
+        Assert.Equal(0, model.CurrentStepIndex);
+
+        // Step 1
+        model.NextStepCommand.Execute(null);
+        Assert.Equal(1, model.CurrentStepIndex);
+        Assert.True(model.CanGoPrevious);
+        Assert.True(model.CanGoNext);
+        Assert.True(model.IsStep1);
+        Assert.Equal("2 / 5", model.StepNumberText);
+        Assert.Equal(40.0, model.StepProgress);
+
+        // Step 2
+        model.NextStepCommand.Execute(null);
+        Assert.Equal(2, model.CurrentStepIndex);
+        Assert.True(model.IsStep2);
+
+        // Step 3
+        model.NextStepCommand.Execute(null);
+        Assert.Equal(3, model.CurrentStepIndex);
+        Assert.True(model.IsStep3);
+
+        // Step 4 (Last Step)
+        model.NextStepCommand.Execute(null);
+        Assert.Equal(4, model.CurrentStepIndex);
+        Assert.True(model.IsStep4);
+        Assert.False(model.CanGoNext);
+        Assert.True(model.IsLastStep);
+        Assert.Equal("5 / 5", model.StepNumberText);
+        Assert.Equal(100.0, model.StepProgress);
+
+        // Next on last step completes
+        model.NextStepCommand.Execute(null);
+        Assert.Equal(1, completed);
+        Assert.Equal("true", settings.GetSetting(OnboardingModel.CompletionKey));
+    }
+
+    [Fact]
+    public void GoToStep_jumps_to_valid_indices()
+    {
+        var settings = new InMemorySettingsService();
+        var model = new OnboardingModel(settings);
+
+        model.GoToStepCommand.Execute(3);
+        Assert.Equal(3, model.CurrentStepIndex);
+        Assert.True(model.IsStep3);
+
+        model.GoToStepCommand.Execute(10); // Out of bounds
+        Assert.Equal(3, model.CurrentStepIndex);
+
+        model.GoToStepCommand.Execute(-1); // Out of bounds
+        Assert.Equal(3, model.CurrentStepIndex);
+
+        model.GoToStepCommand.Execute(0);
+        Assert.Equal(0, model.CurrentStepIndex);
+        Assert.True(model.IsStep0);
+    }
 }

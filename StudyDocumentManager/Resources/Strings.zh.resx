@@ -1120,4 +1120,39 @@
   <data name="OW_Conf_Confidential" xml:space="preserve"><value>机密</value></data>
   <data name="OW_Conf_Restricted" xml:space="preserve"><value>绝密</value></data>
   <data name="OW_Error_FileNotFound" xml:space="preserve"><value>找不到文件: {0}</value></data>
+  <data name="Onboarding_TabTour" xml:space="preserve"><value>快速教程 (5步)</value></data>
+  <data name="Onboarding_TabCatalog" xml:space="preserve"><value>功能指南</value></data>
+  <data name="Onboarding_TabShortcuts" xml:space="preserve"><value>快捷键列表</value></data>
+  <data name="Onboarding_Step1_Title" xml:space="preserve"><value>1. 搜索与快速筛选</value></data>
+  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>在主界面按标题、作者或标签即时搜索文档。使用快速状态筛选（紧急、普通、已完成）轻松跟踪截止日期。</value></data>
+  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>提示：随时按 F5 或 Ctrl+R 刷新视图。</value></data>
+  <data name="Onboarding_Step2_Title" xml:space="preserve"><value>2. 添加文档与拖放文件</value></data>
+  <data name="Onboarding_Step2_Desc" xml:space="preserve"><value>点击“添加文档”（Ctrl+N）或直接将文件（PDF、Word、Excel、图片等）从文件管理器拖放到应用窗口中（Windows 和 Linux 均完美支持）。</value></data>
+  <data name="Onboarding_Step2_Tip" xml:space="preserve"><value>提示：如需一次性导入多个文件，请使用“批量导入”（Ctrl+Shift+I）。</value></data>
+  <data name="Onboarding_Step3_Title" xml:space="preserve"><value>3. 专用工作区（办公与学习）</value></data>
+  <data name="Onboarding_Step3_Desc" xml:space="preserve"><value>根据需求在两个专用工作区之间切换：&#x0a;・办公工作区：管理保密级别（公开、内部、机密、绝密）和到期提醒。&#x0a;・学生工作区：跟踪课程、学期、作业和提交截止日期。</value></data>
+  <data name="Onboarding_Step3_Tip" xml:space="preserve"><value>提示：从工作区菜单一键轻松切换。</value></data>
+  <data name="Onboarding_Step4_Title" xml:space="preserve"><value>4. 重复检测与完整性检查</value></data>
+  <data name="Onboarding_Step4_Desc" xml:space="preserve"><value>使用“重复检测”（Ctrl+D）查找并合并重复文档。使用带有 SHA-256 哈希的“完整性检查”（Ctrl+H）即时发现缺失或损坏的文件。</value></data>
+  <data name="Onboarding_Step4_Tip" xml:space="preserve"><value>提示：保持工作区整洁并安全节省磁盘空间。</value></data>
+  <data name="Onboarding_Step5_Title" xml:space="preserve"><value>5. 回收站、恢复中心与ZIP归档</value></data>
+  <data name="Onboarding_Step5_Desc" xml:space="preserve"><value>删除的文档保存在“回收站”（Ctrl+Shift+R）中，支持多选批量恢复。“恢复中心”提供数据库备份与恢复，并支持个人文档 ZIP 导出/导入。</value></data>
+  <data name="Onboarding_Step5_Tip" xml:space="preserve"><value>提示：定期在恢复中心创建数据库快照以确保数据安全。</value></data>
+  <data name="Onboarding_Next" xml:space="preserve"><value>下一步 ➔</value></data>
+  <data name="Onboarding_Prev" xml:space="preserve"><value>⬅ 返回</value></data>
+  <data name="Onboarding_Start" xml:space="preserve"><value>🎉 开始使用</value></data>
+  <data name="Onboarding_Cat_WatchedFolder_Title" xml:space="preserve"><value>文件夹自动监控 (Watched Folder)</value></data>
+  <data name="Onboarding_Cat_WatchedFolder_Desc" xml:space="preserve"><value>在后台持续监控指定文件夹，发现新文件时自动将其列入导入候选。</value></data>
+  <data name="Onboarding_Cat_Inbox_Title" xml:space="preserve"><value>导入收件箱 (Import Inbox)</value></data>
+  <data name="Onboarding_Cat_Inbox_Desc" xml:space="preserve"><value>用于在正式归档前检查并编辑新导入文档的分类与标签。</value></data>
+  <data name="Onboarding_Cat_Reports_Title" xml:space="preserve"><value>报表与树状图统计 (Reports &amp; TreeMap)</value></data>
+  <data name="Onboarding_Cat_Reports_Desc" xml:space="preserve"><value>通过直观的图表和色彩树状图分析各分类与格式文档的存储占用及分布。</value></data>
+  <data name="Onboarding_Cat_Notes_Title" xml:space="preserve"><value>个人笔记与关联文档</value></data>
+  <data name="Onboarding_Cat_Notes_Desc" xml:space="preserve"><value>为每份文档添加私密笔记，并建立关联文档的双向跳转。</value></data>
+  <data name="Onboarding_Cat_Archive_Title" xml:space="preserve"><value>个人文档 ZIP 归档包 (Archive Service)</value></data>
+  <data name="Onboarding_Cat_Archive_Desc" xml:space="preserve"><value>将文档实体与元数据清单打包为单个 ZIP 文件，以便安全备份或迁移。</value></data>
+  <data name="Onboarding_Cat_Lang_Title" xml:space="preserve"><value>多语言实时切换 (Localization)</value></data>
+  <data name="Onboarding_Cat_Lang_Desc" xml:space="preserve"><value>支持日语、英语、越南语、中文，可在右上角菜单即时切换。</value></data>
+  <data name="Onboarding_Shortcuts_Title" xml:space="preserve"><value>全局快捷键</value></data>
+  <data name="Onboarding_Shortcuts_Desc" xml:space="preserve"><value>通过键盘快捷键快速访问核心功能，全面提升日常办公效率。</value></data>
 </root>
