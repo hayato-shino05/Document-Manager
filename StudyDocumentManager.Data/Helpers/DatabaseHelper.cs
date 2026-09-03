@@ -1382,8 +1382,13 @@ public class DatabaseHelper
         }
     }
 
-    private static bool PathsReferToSameFile(string firstPath, string secondPath)
-        => string.Equals(Path.GetFullPath(firstPath), Path.GetFullPath(secondPath), StringComparison.OrdinalIgnoreCase);
+    internal static bool PathsReferToSameFile(string firstPath, string secondPath)
+    {
+        var comparison = OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
+        return string.Equals(Path.GetFullPath(firstPath), Path.GetFullPath(secondPath), comparison);
+    }
 
     private static string CreateStagingPath(string targetPath)
     {
