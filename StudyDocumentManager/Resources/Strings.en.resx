@@ -909,6 +909,40 @@ Please check your network connection.</value></data>
   <data name="OW_Conf_Public" xml:space="preserve"><value>Public</value></data>
   <data name="OW_Conf_Internal" xml:space="preserve"><value>Internal</value></data>
   <data name="OW_Conf_Confidential" xml:space="preserve"><value>Confidential</value></data>
-  <data name="OW_Conf_Restricted" xml:space="preserve"><value>Restricted</value></data>
   <data name="OW_Error_FileNotFound" xml:space="preserve"><value>File not found: {0}</value></data>
+  <data name="Onboarding_TabTour" xml:space="preserve"><value>Quick Tour (5 Steps)</value></data>
+  <data name="Onboarding_TabCatalog" xml:space="preserve"><value>Feature Guide</value></data>
+  <data name="Onboarding_TabShortcuts" xml:space="preserve"><value>Shortcuts</value></data>
+  <data name="Onboarding_Step1_Title" xml:space="preserve"><value>1. Search &amp; Quick Filters</value></data>
+  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>Search documents instantly by title, author, or tags. Use quick status filters (Urgent, Normal, Completed) to track deadlines effortlessly.</value></data>
+  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>Tip: Press F5 or Ctrl+R at any time to refresh the view.</value></data>
+  <data name="Onboarding_Step2_Title" xml:space="preserve"><value>2. Add Documents &amp; Drag &amp; Drop</value></data>
+  <data name="Onboarding_Step2_Desc" xml:space="preserve"><value>Click 'Add Document' (Ctrl+N) or simply drag and drop files (PDF, Word, Excel, images) directly from your file manager onto the app window (supported on both Windows and Linux).</value></data>
+  <data name="Onboarding_Step2_Tip" xml:space="preserve"><value>Tip: To import multiple files at once, use 'Batch Import' (Ctrl+Shift+I).</value></data>
+  <data name="Onboarding_Step3_Title" xml:space="preserve"><value>3. Dedicated Workspaces (Office &amp; Student)</value></data>
+  <data name="Onboarding_Step3_Desc" xml:space="preserve"><value>Switch between two specialized workspaces tailored to your needs:&#x0a;・Office Workspace: Manage confidentiality classifications (Public, Internal, Confidential, Restricted) and expiration reminders.&#x0a;・Student Workspace: Track courses, semesters, assignments, and submission deadlines.</value></data>
+  <data name="Onboarding_Step3_Tip" xml:space="preserve"><value>Tip: Switch easily from the Workspaces menu.</value></data>
+  <data name="Onboarding_Step4_Title" xml:space="preserve"><value>4. Duplicate Detection &amp; File Integrity</value></data>
+  <data name="Onboarding_Step4_Desc" xml:space="preserve"><value>Use 'Duplicate Detection' (Ctrl+D) to find and merge duplicate documents. Use 'File Integrity Check' (Ctrl+H) with SHA-256 hashing to detect missing or altered files instantly.</value></data>
+  <data name="Onboarding_Step4_Tip" xml:space="preserve"><value>Tip: Keep your workspace organized and save storage safely.</value></data>
+  <data name="Onboarding_Step5_Title" xml:space="preserve"><value>5. Recycle Bin, Recovery &amp; ZIP Archive</value></data>
+  <data name="Onboarding_Step5_Desc" xml:space="preserve"><value>Deleted documents are safely kept in the 'Recycle Bin' (Ctrl+Shift+R) with multi-select batch restore. 'Recovery Center' provides SQLite backups, and 'Personal Document Archive' allows full ZIP export/import.</value></data>
+  <data name="Onboarding_Step5_Tip" xml:space="preserve"><value>Tip: Regularly create database snapshots in Recovery Center for peace of mind.</value></data>
+  <data name="Onboarding_Next" xml:space="preserve"><value>Next ➔</value></data>
+  <data name="Onboarding_Prev" xml:space="preserve"><value>⬅ Back</value></data>
+  <data name="Onboarding_Start" xml:space="preserve"><value>🎉 Get Started</value></data>
+  <data name="Onboarding_Cat_WatchedFolder_Title" xml:space="preserve"><value>Folder Watcher (Watched Folder)</value></data>
+  <data name="Onboarding_Cat_WatchedFolder_Desc" xml:space="preserve"><value>Monitors chosen folders in background, detecting and importing new files automatically.</value></data>
+  <data name="Onboarding_Cat_Inbox_Title" xml:space="preserve"><value>Import Inbox (Staging Area)</value></data>
+  <data name="Onboarding_Cat_Inbox_Desc" xml:space="preserve"><value>A dedicated space to review and tag newly ingested documents before organizing them.</value></data>
+  <data name="Onboarding_Cat_Reports_Title" xml:space="preserve"><value>Reports &amp; TreeMap Analytics</value></data>
+  <data name="Onboarding_Cat_Reports_Desc" xml:space="preserve"><value>Visual graphs and color TreeMap displaying storage usage and document distribution.</value></data>
+  <data name="Onboarding_Cat_Notes_Title" xml:space="preserve"><value>Personal Notes &amp; Document Relations</value></data>
+  <data name="Onboarding_Cat_Notes_Desc" xml:space="preserve"><value>Attach private notes to any document and establish direct bidirectional relationships.</value></data>
+  <data name="Onboarding_Cat_Archive_Title" xml:space="preserve"><value>Personal Document ZIP Archive</value></data>
+  <data name="Onboarding_Cat_Archive_Desc" xml:space="preserve"><value>Fully packages documents and JSON manifest into a portable ZIP for backup or transfer.</value></data>
+  <data name="Onboarding_Cat_Lang_Title" xml:space="preserve"><value>Multi-Language Switching</value></data>
+  <data name="Onboarding_Cat_Lang_Desc" xml:space="preserve"><value>Instantly switch between Japanese, English, Vietnamese, and Chinese from the top menu.</value></data>
+  <data name="Onboarding_Shortcuts_Title" xml:space="preserve"><value>Global Keyboard Shortcuts</value></data>
+  <data name="Onboarding_Shortcuts_Desc" xml:space="preserve"><value>Boost your daily productivity with instant keyboard access to all major features.</value></data>
 </root>

@@ -1019,6 +1019,41 @@
   <data name="OW_Conf_Confidential" xml:space="preserve"><value>機密</value></data>
   <data name="OW_Conf_Restricted" xml:space="preserve"><value>極秘</value></data>
   <data name="OW_Error_FileNotFound" xml:space="preserve"><value>ファイルが見つかりません: {0}</value></data>
+  <data name="Onboarding_TabTour" xml:space="preserve"><value>クイックツアー (5ステップ)</value></data>
+  <data name="Onboarding_TabCatalog" xml:space="preserve"><value>機能ガイド</value></data>
+  <data name="Onboarding_TabShortcuts" xml:space="preserve"><value>ショートカット一覧</value></data>
+  <data name="Onboarding_Step1_Title" xml:space="preserve"><value>1. 検索とクイックフィルター</value></data>
+  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>ダッシュボードでは、タイトル・著者・タグで即座に文書を検索できます。緊急・通常・完了などのクイックフィルターで期限管理もスムーズに行えます。</value></data>
+  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>ヒント: F5 または Ctrl+R でいつでも表示を最新状態に更新できます。</value></data>
+  <data name="Onboarding_Step2_Title" xml:space="preserve"><value>2. 文書の追加とドラッグ＆ドロップ</value></data>
+  <data name="Onboarding_Step2_Desc" xml:space="preserve"><value>「文書追加」ボタン（Ctrl+N）のほか、エクスプローラーやLinuxファイルマネージャーからファイルを直接画面にドラッグ＆ドロップして即座に登録できます（PDF、Word、Excel、画像などに対応）。</value></data>
+  <data name="Onboarding_Step2_Tip" xml:space="preserve"><value>ヒント: 複数ファイルを一度に登録したい場合は「一括インポート」（Ctrl+Shift+I）が便利です。</value></data>
+  <data name="Onboarding_Step3_Title" xml:space="preserve"><value>3. 専用ワークスペース（業務・学習）</value></data>
+  <data name="Onboarding_Step3_Desc" xml:space="preserve"><value>用途に合わせて2つの専門ワークスペースを活用できます：&#x0a;・Office Workspace: 機密レベル区分（公開・社内・機密・極秘）や期日リマインダーを管理。&#x0a;・Student Workspace: 科目、学期、課題提出期限と進捗を管理。</value></data>
+  <data name="Onboarding_Step3_Tip" xml:space="preserve"><value>ヒント: ワークスペースメニューからワンクリックで切り替えられます。</value></data>
+  <data name="Onboarding_Step4_Title" xml:space="preserve"><value>4. 重複検出と整合性チェック</value></data>
+  <data name="Onboarding_Step4_Desc" xml:space="preserve"><value>「重複検出」（Ctrl+D）で同一内容のファイルを整理・マージできます。「整合性チェック」（Ctrl+H）ではSHA-256ハッシュを用いてファイルの欠損や破損を素早く発見します。</value></data>
+  <data name="Onboarding_Step4_Tip" xml:space="preserve"><value>ヒント: 整理後は不要なファイルを安全に整理してディスク容量を節約できます。</value></data>
+  <data name="Onboarding_Step5_Title" xml:space="preserve"><value>5. ごみ箱・復元とZIPアーカイブ</value></data>
+  <data name="Onboarding_Step5_Desc" xml:space="preserve"><value>削除した文書は「ごみ箱」（Ctrl+Shift+R）で安全に保持され、複数選択で一括復元できます。「リカバリーセンター」ではデータベースの世代バックアップと復元、さらに個人文書全体のZIPエクスポート／インポートにも対応しています。</value></data>
+  <data name="Onboarding_Step5_Tip" xml:space="preserve"><value>ヒント: 大切なデータは定期的にリカバリーセンターでバックアップを作成しましょう。</value></data>
+  <data name="Onboarding_Next" xml:space="preserve"><value>次へ ➔</value></data>
+  <data name="Onboarding_Prev" xml:space="preserve"><value>⬅ 戻る</value></data>
+  <data name="Onboarding_Start" xml:space="preserve"><value>🎉 始める</value></data>
+  <data name="Onboarding_Cat_WatchedFolder_Title" xml:space="preserve"><value>フォルダ自動監視 (Watched Folder)</value></data>
+  <data name="Onboarding_Cat_WatchedFolder_Desc" xml:space="preserve"><value>指定したフォルダを常時監視し、新しいファイルが追加されると自動的に検知して登録候補とします。</value></data>
+  <data name="Onboarding_Cat_Inbox_Title" xml:space="preserve"><value>インポート受信トレイ (Import Inbox)</value></data>
+  <data name="Onboarding_Cat_Inbox_Desc" xml:space="preserve"><value>自動取り込みされた文書のメタデータ（カテゴリやタグ）を本登録前に確認・編集する専用スペースです。</value></data>
+  <data name="Onboarding_Cat_Reports_Title" xml:space="preserve"><value>レポートとツリーマップ (Reports &amp; TreeMap)</value></data>
+  <data name="Onboarding_Cat_Reports_Desc" xml:space="preserve"><value>文書のカテゴリ別・種類別の容量や件数分布を視覚的なグラフとカラーツリーマップで直感的に把握できます。</value></data>
+  <data name="Onboarding_Cat_Notes_Title" xml:space="preserve"><value>個人メモと関連文書 (Personal Notes &amp; Relations)</value></data>
+  <data name="Onboarding_Cat_Notes_Desc" xml:space="preserve"><value>文書ごとにプライベートなメモを記録したり、関連する文書同士を直接リンクして双方向に行き来できます。</value></data>
+  <data name="Onboarding_Cat_Archive_Title" xml:space="preserve"><value>個人文書ZIPアーカイブ (Archive Service)</value></data>
+  <data name="Onboarding_Cat_Archive_Desc" xml:space="preserve"><value>文書実体とマニフェスト情報を1つのZIPファイルへ完全にエクスポートし、別のPCへ安全に移送・インポートできます。</value></data>
+  <data name="Onboarding_Cat_Lang_Title" xml:space="preserve"><value>4言語リアルタイム切り替え (Localization)</value></data>
+  <data name="Onboarding_Cat_Lang_Desc" xml:space="preserve"><value>日本語、English、Tiếng Việt、中文 の4言語に対応し、右上のメニューからいつでも即時切り替えが可能です。</value></data>
+  <data name="Onboarding_Shortcuts_Title" xml:space="preserve"><value>操作効率を高めるグローバルショートカット</value></data>
+  <data name="Onboarding_Shortcuts_Desc" xml:space="preserve"><value>キーボード操作だけで主要な全画面へ瞬時にアクセスできます。</value></data>
 </root>
 
 

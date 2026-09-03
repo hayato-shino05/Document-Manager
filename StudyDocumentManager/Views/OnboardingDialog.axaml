@@ -6,48 +6,370 @@
         x:DataType="vm:OnboardingModel"
         AutomationProperties.AutomationId="Dialog_Onboarding"
         Title="{loc:Localize Onboarding_Title}"
-        Width="560" Height="520"
-        MinWidth="420" MinHeight="420"
+        Width="740" Height="620"
+        MinWidth="600" MinHeight="500"
         WindowStartupLocation="CenterOwner"
         CanResize="True"
         ShowInTaskbar="False"
         Background="{StaticResource ContentBackground}">
     <Grid RowDefinitions="Auto,*,Auto" Margin="24">
-        <StackPanel Grid.Row="0" Spacing="6">
-            <TextBlock Text="{loc:Localize Onboarding_Welcome}"
-                       AutomationProperties.AutomationId="Onboarding_Welcome"
-                       FontSize="{StaticResource FontSizeXl}"
-                       FontWeight="Bold"
-                       Foreground="{StaticResource TextPrimary}" />
-            <TextBlock Text="{loc:Localize Onboarding_Intro}"
-                       TextWrapping="Wrap"
-                       Foreground="{StaticResource TextSecondary}" />
-        </StackPanel>
-        <ScrollViewer Grid.Row="1" Margin="0,20,0,20"
-                      HorizontalScrollBarVisibility="Disabled"
-                      VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="14">
-                <TextBlock Text="{loc:Localize Onboarding_StepStorage}" TextWrapping="Wrap" />
-                <TextBlock Text="{loc:Localize Onboarding_StepAdd}" TextWrapping="Wrap" />
-                <TextBlock Text="{loc:Localize Onboarding_StepOrganize}" TextWrapping="Wrap" />
-                <TextBlock Text="{loc:Localize Onboarding_StepBackup}" TextWrapping="Wrap" />
-                <TextBlock Text="{loc:Localize Onboarding_StepRecovery}" TextWrapping="Wrap" />
-                <TextBlock Text="{loc:Localize Onboarding_StepLanguage}" TextWrapping="Wrap" />
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+            <StackPanel Grid.Column="0" Spacing="4">
+                <TextBlock Text="{loc:Localize Onboarding_Welcome}"
+                           AutomationProperties.AutomationId="Onboarding_Welcome"
+                           FontSize="{StaticResource FontSizeXl}"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimary}" />
+                <TextBlock Text="{loc:Localize Onboarding_Intro}"
+                           TextWrapping="Wrap"
+                           FontSize="{StaticResource FontSizeSm}"
+                           Foreground="{StaticResource TextSecondary}" />
             </StackPanel>
-        </ScrollViewer>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-            <Button Name="SkipButton"
+        </Grid>
+
+        <!-- Main Tabs -->
+        <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTabIndex}" Margin="0,0,0,16">
+            <!-- TAB 1: Quick Tour (5 Steps) -->
+            <TabItem Header="{loc:Localize Onboarding_TabTour}" AutomationProperties.AutomationId="Onboarding_Tab_Tour">
+                <Grid RowDefinitions="Auto,*,Auto" Margin="0,12,0,0">
+                    <!-- Step Progress Header -->
+                    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,14" VerticalAlignment="Center">
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                            <Border Background="{StaticResource PrimaryColor}" CornerRadius="12" Padding="10,3">
+                                <TextBlock Text="{Binding StepNumberText}"
+                                           Foreground="White"
+                                           FontWeight="SemiBold"
+                                           FontSize="{StaticResource FontSizeXs}" />
+                            </Border>
+                        </StackPanel>
+                        <ProgressBar Grid.Column="1"
+                                     Margin="16,0"
+                                     Value="{Binding StepProgress}"
+                                     Maximum="100"
+                                     Height="6"
+                                     Foreground="{StaticResource PrimaryColor}"
+                                     Background="{StaticResource SurfaceHover}"
+                                     CornerRadius="3" />
+                    </Grid>
+
+                    <!-- Step Cards Container -->
+                    <Border Grid.Row="1" Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="12" Padding="20">
+                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                            <Panel>
+                                <!-- Step 0: Search & Filters -->
+                                <StackPanel Spacing="14" IsVisible="{Binding IsStep0}">
+                                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{StaticResource PrimaryLightBrush}">
+                                            <Image Source="{StaticResource IconSearch}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <TextBlock Text="{loc:Localize Onboarding_Step1_Title}"
+                                                   FontSize="{StaticResource FontSizeLg}"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="{loc:Localize Onboarding_Step1_Desc}"
+                                               FontSize="{StaticResource FontSizeMd}"
+                                               LineHeight="22"
+                                               TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextPrimary}" />
+                                    <Border Background="{StaticResource SurfaceHover}" CornerRadius="8" Padding="12,10" Margin="0,6,0,0">
+                                        <TextBlock Text="{loc:Localize Onboarding_Step1_Tip}"
+                                                   FontSize="{StaticResource FontSizeSm}"
+                                                   Foreground="{StaticResource PrimaryColor}"
+                                                   TextWrapping="Wrap"
+                                                   FontWeight="Medium" />
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Step 1: Add Document & Drag and Drop -->
+                                <StackPanel Spacing="14" IsVisible="{Binding IsStep1}">
+                                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{StaticResource PrimaryLightBrush}">
+                                            <Image Source="{StaticResource IconAdd}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <TextBlock Text="{loc:Localize Onboarding_Step2_Title}"
+                                                   FontSize="{StaticResource FontSizeLg}"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="{loc:Localize Onboarding_Step2_Desc}"
+                                               FontSize="{StaticResource FontSizeMd}"
+                                               LineHeight="22"
+                                               TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextPrimary}" />
+                                    <Border Background="{StaticResource SurfaceHover}" CornerRadius="8" Padding="12,10" Margin="0,6,0,0">
+                                        <TextBlock Text="{loc:Localize Onboarding_Step2_Tip}"
+                                                   FontSize="{StaticResource FontSizeSm}"
+                                                   Foreground="{StaticResource PrimaryColor}"
+                                                   TextWrapping="Wrap"
+                                                   FontWeight="Medium" />
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Step 2: Dedicated Workspaces -->
+                                <StackPanel Spacing="14" IsVisible="{Binding IsStep2}">
+                                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{StaticResource PrimaryLightBrush}">
+                                            <Image Source="{StaticResource IconWorkspaces}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <TextBlock Text="{loc:Localize Onboarding_Step3_Title}"
+                                                   FontSize="{StaticResource FontSizeLg}"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="{loc:Localize Onboarding_Step3_Desc}"
+                                               FontSize="{StaticResource FontSizeMd}"
+                                               LineHeight="22"
+                                               TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextPrimary}" />
+                                    <Border Background="{StaticResource SurfaceHover}" CornerRadius="8" Padding="12,10" Margin="0,6,0,0">
+                                        <TextBlock Text="{loc:Localize Onboarding_Step3_Tip}"
+                                                   FontSize="{StaticResource FontSizeSm}"
+                                                   Foreground="{StaticResource PrimaryColor}"
+                                                   TextWrapping="Wrap"
+                                                   FontWeight="Medium" />
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Step 3: Duplicate & Integrity -->
+                                <StackPanel Spacing="14" IsVisible="{Binding IsStep3}">
+                                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{StaticResource PrimaryLightBrush}">
+                                            <Image Source="{StaticResource IconTools}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <TextBlock Text="{loc:Localize Onboarding_Step4_Title}"
+                                                   FontSize="{StaticResource FontSizeLg}"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="{loc:Localize Onboarding_Step4_Desc}"
+                                               FontSize="{StaticResource FontSizeMd}"
+                                               LineHeight="22"
+                                               TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextPrimary}" />
+                                    <Border Background="{StaticResource SurfaceHover}" CornerRadius="8" Padding="12,10" Margin="0,6,0,0">
+                                        <TextBlock Text="{loc:Localize Onboarding_Step4_Tip}"
+                                                   FontSize="{StaticResource FontSizeSm}"
+                                                   Foreground="{StaticResource PrimaryColor}"
+                                                   TextWrapping="Wrap"
+                                                   FontWeight="Medium" />
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Step 4: Recycle Bin & Recovery -->
+                                <StackPanel Spacing="14" IsVisible="{Binding IsStep4}">
+                                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{StaticResource PrimaryLightBrush}">
+                                            <Image Source="{StaticResource IconRestore}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <TextBlock Text="{loc:Localize Onboarding_Step5_Title}"
+                                                   FontSize="{StaticResource FontSizeLg}"
+                                                   FontWeight="Bold"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <TextBlock Text="{loc:Localize Onboarding_Step5_Desc}"
+                                               FontSize="{StaticResource FontSizeMd}"
+                                               LineHeight="22"
+                                               TextWrapping="Wrap"
+                                               Foreground="{StaticResource TextPrimary}" />
+                                    <Border Background="{StaticResource SurfaceHover}" CornerRadius="8" Padding="12,10" Margin="0,6,0,0">
+                                        <TextBlock Text="{loc:Localize Onboarding_Step5_Tip}"
+                                                   FontSize="{StaticResource FontSizeSm}"
+                                                   Foreground="{StaticResource PrimaryColor}"
+                                                   TextWrapping="Wrap"
+                                                   FontWeight="Medium" />
+                                    </Border>
+                                </StackPanel>
+                            </Panel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- TAB 2: Feature Guide (Catalog) -->
+            <TabItem Header="{loc:Localize Onboarding_TabCatalog}" AutomationProperties.AutomationId="Onboarding_Tab_Catalog">
+                <ScrollViewer Margin="0,12,0,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="12">
+                        <!-- Watched Folder -->
+                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
+                            <StackPanel Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Image Source="{StaticResource IconFolder}" Width="18" Height="18" />
+                                    <TextBlock Text="{loc:Localize Onboarding_Cat_WatchedFolder_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                                </StackPanel>
+                                <TextBlock Text="{loc:Localize Onboarding_Cat_WatchedFolder_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Import Inbox -->
+                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
+                            <StackPanel Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Image Source="{StaticResource IconImport}" Width="18" Height="18" />
+                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Inbox_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                                </StackPanel>
+                                <TextBlock Text="{loc:Localize Onboarding_Cat_Inbox_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Reports & TreeMap -->
+                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
+                            <StackPanel Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Image Source="{StaticResource IconReport}" Width="18" Height="18" />
+                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Reports_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                                </StackPanel>
+                                <TextBlock Text="{loc:Localize Onboarding_Cat_Reports_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Personal Notes & Relations -->
+                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
+                            <StackPanel Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Image Source="{StaticResource IconTag}" Width="18" Height="18" />
+                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Notes_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                                </StackPanel>
+                                <TextBlock Text="{loc:Localize Onboarding_Cat_Notes_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Archive ZIP -->
+                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
+                            <StackPanel Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Image Source="{StaticResource IconExport}" Width="18" Height="18" />
+                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Archive_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                                </StackPanel>
+                                <TextBlock Text="{loc:Localize Onboarding_Cat_Archive_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Localization -->
+                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
+                            <StackPanel Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Image Source="{StaticResource IconSettings}" Width="18" Height="18" />
+                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Lang_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                                </StackPanel>
+                                <TextBlock Text="{loc:Localize Onboarding_Cat_Lang_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- TAB 3: Shortcuts Cheatsheet -->
+            <TabItem Header="{loc:Localize Onboarding_TabShortcuts}" AutomationProperties.AutomationId="Onboarding_Tab_Shortcuts">
+                <ScrollViewer Margin="0,12,0,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="{loc:Localize Onboarding_Shortcuts_Desc}" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" Margin="0,0,0,6" />
+                        
+                        <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="4">
+                            <!-- Row 0: Ctrl+N -->
+                            <Border Grid.Row="0" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                <TextBlock Text="Ctrl + N" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
+                            </Border>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize Onboarding_Step2_Title}" VerticalAlignment="Center" Margin="8,0" />
+
+                            <!-- Row 1: Ctrl+Shift+I -->
+                            <Border Grid.Row="1" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                <TextBlock Text="Ctrl + Shift + I" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
+                            </Border>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{loc:Localize Main_Menu_BatchImport}" VerticalAlignment="Center" Margin="8,0" />
+
+                            <!-- Row 2: Ctrl+Shift+R -->
+                            <Border Grid.Row="2" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                <TextBlock Text="Ctrl + Shift + R" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
+                            </Border>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{loc:Localize Main_Menu_RecycleBin}" VerticalAlignment="Center" Margin="8,0" />
+
+                            <!-- Row 3: Ctrl+D -->
+                            <Border Grid.Row="3" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                <TextBlock Text="Ctrl + D" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
+                            </Border>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{loc:Localize Main_Menu_DuplicateDetection}" VerticalAlignment="Center" Margin="8,0" />
+
+                            <!-- Row 4: Ctrl+H -->
+                            <Border Grid.Row="4" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                <TextBlock Text="Ctrl + H" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
+                            </Border>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{loc:Localize Main_Menu_FileIntegrityCheck}" VerticalAlignment="Center" Margin="8,0" />
+
+                            <!-- Row 5: Ctrl+Shift+C -->
+                            <Border Grid.Row="5" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                <TextBlock Text="Ctrl + Shift + C" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
+                            </Border>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="{loc:Localize Main_Menu_CategoryManagement}" VerticalAlignment="Center" Margin="8,0" />
+
+                            <!-- Row 6: Ctrl+Shift+L -->
+                            <Border Grid.Row="6" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                <TextBlock Text="Ctrl + Shift + L" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
+                            </Border>
+                            <TextBlock Grid.Row="6" Grid.Column="1" Text="{loc:Localize Main_Menu_CollectionManagement}" VerticalAlignment="Center" Margin="8,0" />
+
+                            <!-- Row 7: Alt+Left -->
+                            <Border Grid.Row="7" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                <TextBlock Text="Alt + Left" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
+                            </Border>
+                            <TextBlock Grid.Row="7" Grid.Column="1" Text="{loc:Localize Main_Menu_BackToDashboard}" VerticalAlignment="Center" Margin="8,0" />
+
+                            <!-- Row 8: F5 / Ctrl+R -->
+                            <Border Grid.Row="8" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                <TextBlock Text="F5 / Ctrl + R" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
+                            </Border>
+                            <TextBlock Grid.Row="8" Grid.Column="1" Text="{loc:Localize Main_Menu_Refresh}" VerticalAlignment="Center" Margin="8,0" />
+
+                            <!-- Row 9: F1 -->
+                            <Border Grid.Row="9" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                <TextBlock Text="F1" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
+                            </Border>
+                            <TextBlock Grid.Row="9" Grid.Column="1" Text="{loc:Localize Onboarding_MenuItem}" VerticalAlignment="Center" Margin="8,0" />
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+        <!-- Footer Navigation Controls -->
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+            <!-- Left: Skip -->
+            <Button Grid.Column="0"
+                    Name="SkipButton"
                     Content="{loc:Localize Onboarding_Skip}"
                     AutomationProperties.AutomationId="Onboarding_Skip"
                     Classes="secondary"
                     IsCancel="True"
                     Command="{Binding SkipCommand}" />
-            <Button Name="FinishButton"
-                    Content="{loc:Localize Onboarding_Finish}"
-                    AutomationProperties.AutomationId="Onboarding_Finish"
-                    Classes="primary"
-                    IsDefault="True"
-                    Command="{Binding FinishCommand}" />
-        </StackPanel>
+
+            <!-- Right: Step Navigation & Finish -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
+                <Button Name="PrevButton"
+                        Content="{loc:Localize Onboarding_Prev}"
+                        AutomationProperties.AutomationId="Onboarding_Prev"
+                        Classes="secondary"
+                        IsVisible="{Binding CanGoPrevious}"
+                        Command="{Binding PreviousStepCommand}" />
+                <Button Name="NextButton"
+                        Content="{loc:Localize Onboarding_Next}"
+                        AutomationProperties.AutomationId="Onboarding_Next"
+                        Classes="primary"
+                        IsVisible="{Binding CanGoNext}"
+                        Command="{Binding NextStepCommand}" />
+                <Button Name="FinishButton"
+                        Content="{loc:Localize Onboarding_Start}"
+                        AutomationProperties.AutomationId="Onboarding_Finish"
+                        Classes="primary"
+                        IsDefault="True"
+                        IsVisible="{Binding IsLastStep}"
+                        Command="{Binding FinishCommand}" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

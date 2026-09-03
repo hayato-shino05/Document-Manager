@@ -1117,7 +1117,40 @@
   <data name="OW_DocNoPrefix" xml:space="preserve"><value>Số: </value></data>
   <data name="OW_Conf_Public" xml:space="preserve"><value>Công khai</value></data>
   <data name="OW_Conf_Internal" xml:space="preserve"><value>Nội bộ</value></data>
-  <data name="OW_Conf_Confidential" xml:space="preserve"><value>Bảo mật</value></data>
-  <data name="OW_Conf_Restricted" xml:space="preserve"><value>Tối mật</value></data>
   <data name="OW_Error_FileNotFound" xml:space="preserve"><value>Không tìm thấy tệp: {0}</value></data>
+  <data name="Onboarding_TabTour" xml:space="preserve"><value>Hướng dẫn từng bước (5 Bước)</value></data>
+  <data name="Onboarding_TabCatalog" xml:space="preserve"><value>Cẩm nang tính năng</value></data>
+  <data name="Onboarding_TabShortcuts" xml:space="preserve"><value>Bảng phím tắt</value></data>
+  <data name="Onboarding_Step1_Title" xml:space="preserve"><value>1. Tìm kiếm &amp; Bộ lọc nhanh</value></data>
+  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>Tìm kiếm tài liệu siêu tốc theo tiêu đề, tác giả hoặc tag. Sử dụng các bộ lọc trạng thái nhanh (Gấp, Bình thường, Đã xong) để theo dõi hạn nộp dễ dàng.</value></data>
+  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>Mẹo: Bấm F5 hoặc Ctrl+R bất kỳ lúc nào để làm mới dữ liệu.</value></data>
+  <data name="Onboarding_Step2_Title" xml:space="preserve"><value>2. Thêm tài liệu &amp; Kéo thả tệp</value></data>
+  <data name="Onboarding_Step2_Desc" xml:space="preserve"><value>Bấm nút 'Thêm tài liệu' (Ctrl+N) hoặc chỉ cần kéo và thả trực tiếp tệp (PDF, Word, Excel, hình ảnh...) từ máy tính vào cửa sổ ứng dụng (hỗ trợ mượt mà trên cả Windows và Linux).</value></data>
+  <data name="Onboarding_Step2_Tip" xml:space="preserve"><value>Mẹo: Để nhập hàng loạt nhiều tệp cùng lúc, hãy dùng tính năng 'Nhập hàng loạt' (Ctrl+Shift+I).</value></data>
+  <data name="Onboarding_Step3_Title" xml:space="preserve"><value>3. Không gian làm việc chuyên biệt (Nghiệp vụ &amp; Học tập)</value></data>
+  <data name="Onboarding_Step3_Desc" xml:space="preserve"><value>Chuyển đổi linh hoạt giữa 2 không gian làm việc chuyên biệt theo nhu cầu:&#x0a;・Office Workspace: Quản lý cấp độ bảo mật (Công khai, Nội bộ, Mật, Tối mật) và thông báo nhắc hạn.&#x0a;・Student Workspace: Quản lý môn học, học kỳ, bài tập lớn và tiến độ nộp bài.</value></data>
+  <data name="Onboarding_Step3_Tip" xml:space="preserve"><value>Mẹo: Chuyển đổi nhanh chóng từ menu Workspaces.</value></data>
+  <data name="Onboarding_Step4_Title" xml:space="preserve"><value>4. Phát hiện trùng lặp &amp; Kiểm tra toàn vẹn</value></data>
+  <data name="Onboarding_Step4_Desc" xml:space="preserve"><value>Dùng 'Phát hiện trùng lặp' (Ctrl+D) để tìm và gộp các tệp trùng nhau. Dùng 'Kiểm tra toàn vẹn' (Ctrl+H) với mã băm SHA-256 để phát hiện ngay các tệp bị lỗi hoặc bị đổi vị trí.</value></data>
+  <data name="Onboarding_Step4_Tip" xml:space="preserve"><value>Mẹo: Giữ cho kho tài liệu luôn gọn gàng và tiết kiệm dung lượng ổ đĩa.</value></data>
+  <data name="Onboarding_Step5_Title" xml:space="preserve"><value>5. Thùng rác, Phục hồi &amp; Gói lưu trữ ZIP</value></data>
+  <data name="Onboarding_Step5_Desc" xml:space="preserve"><value>Tài liệu khi xóa được giữ an toàn trong 'Thùng rác' (Ctrl+Shift+R) với tính năng khôi phục hàng loạt. 'Trung tâm Phục hồi' giúp sao lưu CSDL, cùng tính năng xuất/nhập gói ZIP lưu trữ cá nhân tiện lợi.</value></data>
+  <data name="Onboarding_Step5_Tip" xml:space="preserve"><value>Mẹo: Thường xuyên tạo bản sao lưu trong Trung tâm Phục hồi để an tâm tuyệt đối.</value></data>
+  <data name="Onboarding_Next" xml:space="preserve"><value>Tiếp theo ➔</value></data>
+  <data name="Onboarding_Prev" xml:space="preserve"><value>⬅ Quay lại</value></data>
+  <data name="Onboarding_Start" xml:space="preserve"><value>🎉 Bắt đầu sử dụng</value></data>
+  <data name="Onboarding_Cat_WatchedFolder_Title" xml:space="preserve"><value>Thư mục tự động quét (Watched Folder)</value></data>
+  <data name="Onboarding_Cat_WatchedFolder_Desc" xml:space="preserve"><value>Tự động giám sát thư mục trên máy, phát hiện khi có tệp mới xuất hiện để đưa vào hệ thống.</value></data>
+  <data name="Onboarding_Cat_Inbox_Title" xml:space="preserve"><value>Hộp thư nhập liệu (Import Inbox)</value></data>
+  <data name="Onboarding_Cat_Inbox_Desc" xml:space="preserve"><value>Nơi tạm giữ các tệp vừa nhập tự động để bạn bổ sung Danh mục, Thẻ tag trước khi lưu kho chính.</value></data>
+  <data name="Onboarding_Cat_Reports_Title" xml:space="preserve"><value>Báo cáo &amp; Biểu đồ TreeMap</value></data>
+  <data name="Onboarding_Cat_Reports_Desc" xml:space="preserve"><value>Trực quan hóa dung lượng, tỉ lệ phân bố tài liệu theo Danh mục và Định dạng tệp bằng biểu đồ màu.</value></data>
+  <data name="Onboarding_Cat_Notes_Title" xml:space="preserve"><value>Ghi chú &amp; Liên kết tài liệu</value></data>
+  <data name="Onboarding_Cat_Notes_Desc" xml:space="preserve"><value>Ghi chú điểm quan trọng cho từng tài liệu và tạo liên kết trực tiếp giữa các tài liệu liên quan.</value></data>
+  <data name="Onboarding_Cat_Archive_Title" xml:space="preserve"><value>Gói lưu trữ ZIP cá nhân (Archive Service)</value></data>
+  <data name="Onboarding_Cat_Archive_Desc" xml:space="preserve"><value>Đóng gói toàn bộ tài liệu và manifest thành file ZIP duy nhất để backup hoặc chuyển máy an toàn.</value></data>
+  <data name="Onboarding_Cat_Lang_Title" xml:space="preserve"><value>Chuyển đổi 4 ngôn ngữ (Localization)</value></data>
+  <data name="Onboarding_Cat_Lang_Desc" xml:space="preserve"><value>Chuyển đổi mượt mà ngay trên menu giữa Tiếng Việt, Tiếng Nhật, Tiếng Anh, Tiếng Trung.</value></data>
+  <data name="Onboarding_Shortcuts_Title" xml:space="preserve"><value>Bảng phím tắt toàn năng</value></data>
+  <data name="Onboarding_Shortcuts_Desc" xml:space="preserve"><value>Tăng tốc thao tác hàng ngày với các phím tắt nhanh đến mọi màn hình chính.</value></data>
 </root>
