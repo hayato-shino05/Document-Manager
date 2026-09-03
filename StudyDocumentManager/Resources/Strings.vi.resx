@@ -1117,6 +1117,8 @@
   <data name="OW_DocNoPrefix" xml:space="preserve"><value>Số: </value></data>
   <data name="OW_Conf_Public" xml:space="preserve"><value>Công khai</value></data>
   <data name="OW_Conf_Internal" xml:space="preserve"><value>Nội bộ</value></data>
+  <data name="OW_Conf_Confidential" xml:space="preserve"><value>Bảo mật</value></data>
+  <data name="OW_Conf_Restricted" xml:space="preserve"><value>Tối mật</value></data>
   <data name="OW_Error_FileNotFound" xml:space="preserve"><value>Không tìm thấy tệp: {0}</value></data>
   <data name="Onboarding_TabTour" xml:space="preserve"><value>Hướng dẫn từng bước (5 Bước)</value></data>
   <data name="Onboarding_TabCatalog" xml:space="preserve"><value>Cẩm nang tính năng</value></data>

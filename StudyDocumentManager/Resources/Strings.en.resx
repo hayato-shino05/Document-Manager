@@ -909,6 +909,7 @@ Please check your network connection.</value></data>
   <data name="OW_Conf_Public" xml:space="preserve"><value>Public</value></data>
   <data name="OW_Conf_Internal" xml:space="preserve"><value>Internal</value></data>
   <data name="OW_Conf_Confidential" xml:space="preserve"><value>Confidential</value></data>
+  <data name="OW_Conf_Restricted" xml:space="preserve"><value>Restricted</value></data>
   <data name="OW_Error_FileNotFound" xml:space="preserve"><value>File not found: {0}</value></data>
   <data name="Onboarding_TabTour" xml:space="preserve"><value>Quick Tour (5 Steps)</value></data>
   <data name="Onboarding_TabCatalog" xml:space="preserve"><value>Feature Guide</value></data>
@@ -920,7 +921,7 @@ Please check your network connection.</value></data>
   <data name="Onboarding_Step2_Desc" xml:space="preserve"><value>Click 'Add Document' (Ctrl+N) or simply drag and drop files (PDF, Word, Excel, images) directly from your file manager onto the app window (supported on both Windows and Linux).</value></data>
   <data name="Onboarding_Step2_Tip" xml:space="preserve"><value>Tip: To import multiple files at once, use 'Batch Import' (Ctrl+Shift+I).</value></data>
   <data name="Onboarding_Step3_Title" xml:space="preserve"><value>3. Dedicated Workspaces (Office &amp; Student)</value></data>
-  <data name="Onboarding_Step3_Desc" xml:space="preserve"><value>Switch between two specialized workspaces tailored to your needs:&#x0a;・Office Workspace: Manage confidentiality classifications (Public, Internal, Confidential, Restricted) and expiration reminders.&#x0a;・Student Workspace: Track courses, semesters, assignments, and submission deadlines.</value></data>
+  <data name="Onboarding_Step3_Desc" xml:space="preserve"><value>Switch between two specialized workspaces tailored to your needs:&#x0a;- Office Workspace: Manage confidentiality classifications (Public, Internal, Confidential, Restricted) and expiration reminders.&#x0a;- Student Workspace: Track courses, semesters, assignments, and submission deadlines.</value></data>
   <data name="Onboarding_Step3_Tip" xml:space="preserve"><value>Tip: Switch easily from the Workspaces menu.</value></data>
   <data name="Onboarding_Step4_Title" xml:space="preserve"><value>4. Duplicate Detection &amp; File Integrity</value></data>
   <data name="Onboarding_Step4_Desc" xml:space="preserve"><value>Use 'Duplicate Detection' (Ctrl+D) to find and merge duplicate documents. Use 'File Integrity Check' (Ctrl+H) with SHA-256 hashing to detect missing or altered files instantly.</value></data>
