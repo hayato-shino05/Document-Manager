@@ -138,7 +138,7 @@ public class DocumentTypeIconConverter : IValueConverter
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+        => Avalonia.Data.BindingOperations.DoNothing;
 
     // ── Loaders ──────────────────────────────────────────────────────────────
 

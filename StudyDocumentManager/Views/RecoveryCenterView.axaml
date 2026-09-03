@@ -111,8 +111,8 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="{loc:Localize RC_ColCreated}" Binding="{Binding CreatedAtLocal, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" Width="170"/>
-                                    <DataGridTextColumn Header="{loc:Localize RC_ColSize}" Binding="{Binding SizeBytes, Converter={x:Static conv:FileSizeConverter.Instance}}" Width="90"/>
+                                    <DataGridTextColumn Header="{loc:Localize RC_ColCreated}" Binding="{Binding CreatedAtLocal, Mode=OneWay, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" IsReadOnly="True" Width="170"/>
+                                    <DataGridTextColumn Header="{loc:Localize RC_ColSize}" Binding="{Binding SizeBytes, Mode=OneWay, Converter={x:Static conv:FileSizeConverter.Instance}}" IsReadOnly="True" Width="90"/>
                                     <DataGridTemplateColumn Header="{loc:Localize RC_ColStatus}" Width="110">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate x:DataType="core:BackupVersionInfo">
