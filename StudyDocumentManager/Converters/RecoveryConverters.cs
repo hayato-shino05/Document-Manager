@@ -1,4 +1,6 @@
+using System;
 using System.Globalization;
+using Avalonia.Data;
 using Avalonia.Data.Converters;
 using StudyDocumentManager.Core.Interfaces;
 
@@ -26,7 +28,7 @@ public sealed class FileSizeConverter : IValueConverter
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotSupportedException();
+        => BindingOperations.DoNothing;
 }
 
 /// <summary>
@@ -45,5 +47,5 @@ public sealed class BackupStatusConverter : IValueConverter
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotSupportedException();
+        => BindingOperations.DoNothing;
 }

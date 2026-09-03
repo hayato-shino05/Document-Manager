@@ -53,9 +53,7 @@ public class DeadlineBrushConverter : IValueConverter
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        throw new NotSupportedException();
-    }
+        => Avalonia.Data.BindingOperations.DoNothing;
 }
 
 /// <summary>
@@ -89,9 +87,7 @@ public class DeadlineTextConverter : IValueConverter
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        throw new NotSupportedException();
-    }
+        => Avalonia.Data.BindingOperations.DoNothing;
 }
 
 public sealed class DeadlineStatusConverter : IValueConverter
@@ -124,5 +120,5 @@ public sealed class DeadlineStatusConverter : IValueConverter
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotSupportedException();
+        => Avalonia.Data.BindingOperations.DoNothing;
 }
