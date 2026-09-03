@@ -9,7 +9,13 @@ public partial class OnboardingDialog : Window
     public OnboardingDialog()
     {
         InitializeComponent();
-        Opened += (_, _) => this.FindControl<Button>("FinishButton")?.Focus();
+        Opened += (_, _) =>
+        {
+            var target = this.FindControl<Button>("NextButton")
+                         ?? this.FindControl<Button>("FinishButton")
+                         ?? this.FindControl<Button>("SkipButton");
+            target?.Focus();
+        };
     }
 
     public OnboardingDialog(OnboardingModel model) : this()

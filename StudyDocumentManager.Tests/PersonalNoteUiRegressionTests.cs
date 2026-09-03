@@ -360,6 +360,70 @@ public sealed class PersonalNoteUiRegressionTests
         Assert.True(navigation.WentBack);
     }
 
+    [Fact]
+    public void PersonalNote_LiveSearchAndTypeFiltering_FiltersNotesCollection()
+    {
+        var repository = new PersonalNoteRepositoryStub
+        {
+            Notes =
+            [
+                new(1, 7, "general", "Calculus lecture summary", false),
+                new(2, 7, "action", "Submit homework assignment", true),
+                new(3, 7, "quote", "Newton calculus quotes", false)
+            ]
+        };
+        var model = new PersonalNoteModel(
+            repository, new DialogServiceStub(), new NavigationServiceStub(), new LocalizationServiceStub());
+        model.Load(7, "Calculus");
+
+        Assert.Equal(3, model.Notes.Count);
+        Assert.Equal(3, model.FilteredNotes.Count);
+
+        // Filter by text search
+        model.SearchQuery = "homework";
+        Assert.Single(model.FilteredNotes);
+        Assert.Equal(2, model.FilteredNotes[0].Id);
+
+        // Filter by note type
+        model.SearchQuery = string.Empty;
+        model.SelectedTypeFilter = "quote";
+        Assert.Single(model.FilteredNotes);
+        Assert.Equal(3, model.FilteredNotes[0].Id);
+
+        // Reset filter
+        model.SelectedTypeFilter = "all";
+        Assert.Equal(3, model.FilteredNotes.Count);
+    }
+
+    [Fact]
+    public void PersonalNote_WordAndCharCountMetrics_UpdateDynamically()
+    {
+        var model = new PersonalNoteModel(
+            new PersonalNoteRepositoryStub(), new DialogServiceStub(), new NavigationServiceStub(), new LocalizationServiceStub());
+
+        model.NoteContent = "Hello world from Avalonia note editor";
+        Assert.Equal(37, model.CharCount);
+        Assert.Equal(6, model.WordCount);
+        Assert.True(model.HasUnsavedChanges);
+    }
+
+    [Fact]
+    public async Task PersonalNote_CopyContent_SetsClipboardAndShowsMessage()
+    {
+        var clipboard = new StudyDocumentManager.Tests.TestDoubles.StubClipboardService();
+        var model = new PersonalNoteModel(
+            new PersonalNoteRepositoryStub(),
+            new DialogServiceStub(),
+            new NavigationServiceStub(),
+            new LocalizationServiceStub(),
+            clipboard);
+
+        model.NoteContent = "Copy this text to clipboard";
+        await model.CopyContentCommand.ExecuteAsync(null);
+
+        Assert.Equal("Copy this text to clipboard", clipboard.Copied.Last());
+    }
+
     private sealed class PersonalNoteRepositoryStub : IPersonalNoteRepository
     {
         public string? SavedContent { get; private set; }

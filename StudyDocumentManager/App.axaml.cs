@@ -80,6 +80,8 @@ public partial class App : Application
             var navService = Services.GetRequiredService<NavigationService>();
             navService.SetMainModel(mainModel);
 
+            desktop.ShutdownMode = Avalonia.Controls.ShutdownMode.OnMainWindowClose;
+
             desktop.Exit += (_, _) => folderWatch.Dispose();
 
             desktop.MainWindow = new MainWindow(
