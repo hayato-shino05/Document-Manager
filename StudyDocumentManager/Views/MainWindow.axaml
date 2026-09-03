@@ -13,6 +13,7 @@
         Width="1280" Height="800"
         MinWidth="960" MinHeight="640"
         WindowStartupLocation="CenterScreen"
+        DragDrop.AllowDrop="True"
         Background="{StaticResource ContentBackground}">
 
     <Window.Resources>
