@@ -27,11 +27,11 @@
                              AutomationProperties.Name="{loc:Localize Search_Label}"
                              Text="{Binding SearchKeyword, Mode=TwoWay}" Width="220" FontSize="{StaticResource FontSizeMd}"
                              Height="28"/>
-                    <Button Classes="primary" AutomationProperties.AutomationId="BulkDelete_SearchButton"
+                    <Button Classes="secondary" AutomationProperties.AutomationId="BulkDelete_SearchButton"
                             AutomationProperties.Name="{loc:Localize Search_BtnSearch}"
                             Command="{Binding SearchCommand}" Padding="12,5">
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16"/>
+                            <Image Source="{StaticResource IconSearch}" Width="16" Height="16"/>
                             <TextBlock Text="{loc:Localize Search_BtnSearch}" FontSize="{StaticResource FontSizeSm}"/>
                         </StackPanel>
                     </Button>
@@ -154,7 +154,7 @@
                                 Margin="0,12,0,0" Padding="{StaticResource PaddingBtnMd}" HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconCheck}" Width="14" Height="14"/>
-                                <TextBlock Text="{loc:Localize BE_ConfirmApply}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{loc:Localize BE_ConfirmApply}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold" Foreground="White"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -194,7 +194,7 @@
                                 <Button AutomationProperties.AutomationId="BulkDelete_MarkImportant"
                                         AutomationProperties.Name="{loc:Localize BulkDelete_BtnMarkImportant}"
                                         Padding="{StaticResource PaddingBtnMd}" Command="{Binding MarkImportantCommand}"
-                                        IsEnabled="{Binding HasSelection}" Classes="warning">
+                                        IsEnabled="{Binding HasSelection}" Classes="secondary">
                                     <StackPanel Orientation="Horizontal" Spacing="4">
                                         <Image Source="{StaticResource IconStar}" Width="12" Height="12"/>
                                         <TextBlock Text="{loc:Localize BulkDelete_BtnMarkImportant}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
@@ -205,7 +205,7 @@
                                 <Button AutomationProperties.AutomationId="BulkDelete_ChangeSubject"
                                         AutomationProperties.Name="{loc:Localize BulkDelete_BtnChangeSubject}"
                                         Padding="{StaticResource PaddingBtnMd}" Command="{Binding ChangeSubjectCommand}"
-                                        IsEnabled="{Binding HasSelection}" Classes="primary">
+                                        IsEnabled="{Binding HasSelection}" Classes="secondary">
                                     <StackPanel Orientation="Horizontal" Spacing="4">
                                         <Image Source="{StaticResource IconCategory}" Width="12" Height="12"/>
                                         <TextBlock Text="{loc:Localize BulkDelete_BtnChangeSubject}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
@@ -220,8 +220,8 @@
                                     Padding="{StaticResource PaddingBtnPrimary}" Command="{Binding DeleteSelectedCommand}"
                                     IsEnabled="{Binding HasSelection}" Classes="danger">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <Image Source="{StaticResource IconDelete}" Width="13" Height="13"/>
-                                    <TextBlock Text="{loc:Localize BulkDelete_BtnDelete}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                                    <Image Source="{StaticResource IconDeleteWhite}" Width="13" Height="13"/>
+                                    <TextBlock Text="{loc:Localize BulkDelete_BtnDelete}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold" Foreground="White"/>
                                 </StackPanel>
                             </Button>
                             <Button AutomationProperties.AutomationId="BulkDelete_Cancel"
@@ -249,7 +249,7 @@
                               CanUserSortColumns="True"
                               GridLinesVisibility="Horizontal" HeadersVisibility="Column">
                         <DataGrid.Columns>
-                            <DataGridCheckBoxColumn Header="✓" Binding="{Binding IsSelected, Mode=TwoWay}" Width="40"/>
+                            <DataGridCheckBoxColumn Header="" Binding="{Binding IsSelected, Mode=TwoWay}" Width="40"/>
                             <DataGridTemplateColumn Header="{loc:Localize AddEdit_LblName}" Width="*" MinWidth="200" SortMemberPath="Document.Name">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="vm:SelectableDocument">
@@ -272,7 +272,16 @@
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="{loc:Localize AddEdit_LblType}" Binding="{Binding Document.Type, Mode=OneWay}" Width="80"/>
                             <DataGridTextColumn Header="{loc:Localize BulkDelete_ColDateAdded}" Binding="{Binding Document.CreatedAt, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
-                            <DataGridCheckBoxColumn Header="★" Binding="{Binding Document.IsImportant, Mode=OneWay}" Width="40" IsReadOnly="True"/>
+                            <DataGridTemplateColumn Width="40">
+                                <DataGridTemplateColumn.Header>
+                                    <Image Source="{StaticResource IconStar}" Width="13" Height="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </DataGridTemplateColumn.Header>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="vm:SelectableDocument">
+                                        <CheckBox IsChecked="{Binding Document.IsImportant, Mode=OneWay}" IsEnabled="False" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>

@@ -61,13 +61,13 @@
                                             <Border Padding="{StaticResource PaddingBtnMd}" BorderBrush="{StaticResource CardBorder}"
                                                     BorderThickness="0,0,0,1">
                                                 <DockPanel>
-                                                    <Button DockPanel.Dock="Right" Classes="secondary" Padding="6,2"
+                                                    <Button DockPanel.Dock="Right" Classes="danger" Padding="6,2"
                                                             AutomationProperties.AutomationId="RelatedDocs_RemoveLink"
                                                             AutomationProperties.Name="{loc:Localize RelatedDocs_BtnRemove}"
                                                             AutomationProperties.HelpText="{loc:Localize RelatedDocs_BtnRemove}"
                                                             Command="{Binding $parent[ItemsControl].DataContext.RemoveRelationCommand}"
                                                             CommandParameter="{Binding}">
-                                                        <Image Source="{StaticResource IconClose}" Width="10" Height="10"/>
+                                                        <Image Source="{StaticResource IconDeleteWhite}" Width="10" Height="10"/>
                                                     </Button>
                                                     <StackPanel>
                                                         <TextBlock Text="{Binding Document.Name}" FontSize="{StaticResource FontSizeMd}"
@@ -123,8 +123,8 @@
                                             AutomationProperties.Name="{loc:Localize RelatedDocs_BtnAddLink}"
                                             AutomationProperties.HelpText="{loc:Localize RelatedDocs_BtnAddLink}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize RelatedDocs_BtnAddLink}" FontSize="{StaticResource FontSizeSm}"/>
+                                            <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
+                                            <TextBlock Text="{loc:Localize RelatedDocs_BtnAddLink}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>

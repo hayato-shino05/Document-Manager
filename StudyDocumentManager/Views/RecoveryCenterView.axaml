@@ -24,11 +24,11 @@
                             AutomationProperties.Name="{loc:Localize RC_CreateBackup}"
                             Command="{Binding CreateBackupCommand}" Padding="{StaticResource PaddingMd}" Margin="0,0,8,0">
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconSave}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize RC_CreateBackup}" FontSize="{StaticResource FontSizeMd}"/>
+                            <Image Source="{StaticResource IconSaveWhite}" Width="16" Height="16"/>
+                            <TextBlock Text="{loc:Localize RC_CreateBackup}" FontSize="{StaticResource FontSizeMd}" Foreground="White"/>
                         </StackPanel>
                     </Button>
-                    <Button Classes="danger" AutomationProperties.AutomationId="Recovery_RestoreSelected"
+                    <Button Classes="secondary" AutomationProperties.AutomationId="Recovery_RestoreSelected"
                             AutomationProperties.Name="{loc:Localize RC_Restore}"
                             Command="{Binding RestoreSelectedCommand}" IsEnabled="{Binding CanRestoreSelected}" Padding="{StaticResource PaddingMd}" Margin="0,0,8,0">
                         <StackPanel Orientation="Horizontal" Spacing="4">

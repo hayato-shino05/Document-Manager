@@ -83,14 +83,18 @@
                                 </StackPanel>
                                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4"
                                             HorizontalAlignment="Right">
-                                    <Button Classes="secondary" Command="{Binding AddDocumentToCollectionCommand}" Padding="{StaticResource PaddingSm}"
+                                    <Button Classes="primary" Command="{Binding AddDocumentToCollectionCommand}" Padding="{StaticResource PaddingSm}"
+                                            AutomationProperties.AutomationId="CollectionManagement_AddDocument"
+                                            AutomationProperties.Name="{loc:Localize CollectionMgmt_BtnAddDoc}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnAddDoc}" FontSize="{StaticResource FontSizeSm}"/>
+                                            <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnAddDoc}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="secondary" Command="{Binding RenameCollectionCommand}" Padding="{StaticResource PaddingSm}"
+                                            AutomationProperties.AutomationId="CollectionManagement_RenameCollection"
+                                            AutomationProperties.Name="{loc:Localize CollectionMgmt_BtnRename}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconEdit}" Width="11" Height="11"/>
@@ -112,17 +116,21 @@
                                         <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{StaticResource FontSizeSm}"/>
                                     </Button>
                                     <Button Classes="danger" Command="{Binding RemoveSelectedDocumentsCommand}" Padding="{StaticResource PaddingSm}"
+                                            AutomationProperties.AutomationId="CollectionManagement_RemoveSelectedDocs"
+                                            AutomationProperties.Name="{loc:Localize CollectionMgmt_BtnRemoveDoc}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnRemoveDoc}" FontSize="{StaticResource FontSizeSm}"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnRemoveDoc}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="danger" Command="{Binding DeleteCollectionCommand}" Padding="{StaticResource PaddingSm}"
+                                            AutomationProperties.AutomationId="CollectionManagement_DeleteCollection"
+                                            AutomationProperties.Name="{loc:Localize CollectionMgmt_BtnDelete}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnDelete}" FontSize="{StaticResource FontSizeSm}"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnDelete}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
