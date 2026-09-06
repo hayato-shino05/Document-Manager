@@ -21,7 +21,7 @@
                             Command="{Binding CreateCollectionCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconAddWhite}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnCreate}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnCreate}" FontSize="{StaticResource FontSizeSm}"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -89,7 +89,7 @@
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnAddDoc}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnAddDoc}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="secondary" Command="{Binding RenameCollectionCommand}" Padding="{StaticResource PaddingSm}"
@@ -121,7 +121,7 @@
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnRemoveDoc}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnRemoveDoc}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="danger" Command="{Binding DeleteCollectionCommand}" Padding="{StaticResource PaddingSm}"
@@ -130,7 +130,7 @@
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnDelete}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnDelete}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>

@@ -124,7 +124,7 @@
                                             AutomationProperties.HelpText="{loc:Localize RelatedDocs_BtnAddLink}">
                                         <StackPanel Orientation="Horizontal" Spacing="3">
                                             <Image Source="{StaticResource IconAddWhite}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize RelatedDocs_BtnAddLink}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                                            <TextBlock Text="{loc:Localize RelatedDocs_BtnAddLink}" FontSize="{StaticResource FontSizeSm}"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>

@@ -22,7 +22,7 @@
                             IsEnabled="{Binding !IsChecking}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                            <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{StaticResource FontSizeSm}"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary"
@@ -168,14 +168,14 @@
                                                                 AutomationProperties.Name="{loc:Localize FileIntegrity_BtnClearPath}"
                                                                 IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 Command="{Binding DataContext.ClearFilePathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
-                                                            <TextBlock Text="{loc:Localize FileIntegrity_BtnClearPath}" FontSize="{StaticResource FontSizeXs}" Foreground="White"/>
+                                                            <TextBlock Text="{loc:Localize FileIntegrity_BtnClearPath}" FontSize="{StaticResource FontSizeXs}"/>
                                                         </Button>
                                                         <Button Classes="danger"
                                                                 AutomationProperties.AutomationId="FileIntegrity_BtnDelete"
                                                                 AutomationProperties.Name="{loc:Localize Action_Delete}"
                                                                 IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 Command="{Binding DataContext.DeleteDocumentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
-                                                            <TextBlock Text="{loc:Localize Action_Delete}" FontSize="{StaticResource FontSizeXs}" Foreground="White"/>
+                                                            <TextBlock Text="{loc:Localize Action_Delete}" FontSize="{StaticResource FontSizeXs}"/>
                                                         </Button>
                                                     </StackPanel>
                                                 </StackPanel>

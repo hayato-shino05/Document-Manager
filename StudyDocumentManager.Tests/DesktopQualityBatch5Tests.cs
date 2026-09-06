@@ -94,8 +94,14 @@ public sealed class DesktopQualityBatch5Tests
         Assert.Contains("IconOpenFile", recentFiles);
 
         // OnboardingDialog
-        Assert.Contains("Classes=\"secondary\"", onboarding); // Skip, Prev
-        Assert.Contains("Classes=\"primary\"", onboarding);   // Next, Finish
+        Assert.Matches(@"(?s)<Button[^>]*Name=""SkipButton""[^>]*Classes=""secondary""", onboarding);
+        Assert.Matches(@"(?s)<Button[^>]*Name=""PrevButton""[^>]*Classes=""secondary""", onboarding);
+        Assert.Matches(@"(?s)<Button[^>]*Name=""NextButton""[^>]*Classes=""primary""", onboarding);
+        Assert.Matches(@"(?s)<Button[^>]*Name=""FinishButton""[^>]*Classes=""primary""", onboarding);
+        Assert.Contains("AutomationProperties.AutomationId=\"Onboarding_Skip\"", onboarding);
+        Assert.Contains("AutomationProperties.AutomationId=\"Onboarding_Prev\"", onboarding);
+        Assert.Contains("AutomationProperties.AutomationId=\"Onboarding_Next\"", onboarding);
+        Assert.Contains("AutomationProperties.AutomationId=\"Onboarding_Finish\"", onboarding);
         Assert.Contains("IconSearch", onboarding);
         Assert.Contains("IconAdd", onboarding);
         Assert.Contains("IconCollection", onboarding);
@@ -103,12 +109,16 @@ public sealed class DesktopQualityBatch5Tests
         Assert.Contains("IconRestore", onboarding);
 
         // AffectedItemsPreviewDialog
-        Assert.Contains("Classes=\"secondary\"", affectedPreview); // Cancel
-        Assert.Contains("Classes=\"danger\"", affectedPreview);    // Confirm (Delete)
+        Assert.Matches(@"(?s)<Button[^>]*x:Name=""CancelButton""[^>]*Classes=""secondary""", affectedPreview);
+        Assert.Matches(@"(?s)<Button[^>]*x:Name=""ConfirmButton""[^>]*Classes=""danger""", affectedPreview);
+        Assert.Contains("AutomationProperties.AutomationId=\"AffectedPreview_Cancel\"", affectedPreview);
+        Assert.Contains("AutomationProperties.AutomationId=\"AffectedPreview_Confirm\"", affectedPreview);
 
         // BulkEditPreviewDialog
-        Assert.Contains("Classes=\"secondary\"", bulkEditPreview); // Cancel
-        Assert.Contains("Classes=\"primary\"", bulkEditPreview);   // Apply
+        Assert.Matches(@"(?s)<Button[^>]*x:Name=""CancelButton""[^>]*Classes=""secondary""", bulkEditPreview);
+        Assert.Matches(@"(?s)<Button[^>]*x:Name=""ConfirmButton""[^>]*Classes=""primary""", bulkEditPreview);
+        Assert.Contains("AutomationProperties.AutomationId=\"BulkEditPreview_Cancel\"", bulkEditPreview);
+        Assert.Contains("AutomationProperties.AutomationId=\"BulkEditPreview_Confirm\"", bulkEditPreview);
     }
 
     private sealed class NavigationStub : INavigationService

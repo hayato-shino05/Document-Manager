@@ -154,7 +154,7 @@
                                 Margin="0,12,0,0" Padding="{StaticResource PaddingBtnMd}" HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <Image Source="{StaticResource IconCheck}" Width="14" Height="14"/>
-                                <TextBlock Text="{loc:Localize BE_ConfirmApply}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold" Foreground="White"/>
+                                <TextBlock Text="{loc:Localize BE_ConfirmApply}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -221,7 +221,7 @@
                                     IsEnabled="{Binding HasSelection}" Classes="danger">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <Image Source="{StaticResource IconDeleteWhite}" Width="13" Height="13"/>
-                                    <TextBlock Text="{loc:Localize BulkDelete_BtnDelete}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold" Foreground="White"/>
+                                    <TextBlock Text="{loc:Localize BulkDelete_BtnDelete}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
                                 </StackPanel>
                             </Button>
                             <Button AutomationProperties.AutomationId="BulkDelete_Cancel"

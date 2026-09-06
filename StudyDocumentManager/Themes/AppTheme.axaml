@@ -396,6 +396,12 @@
                 Geometry="M12,4 A8,8 0 1,1 4.4,8 L2,8 L6,14 L10,8 L7.2,8 A6,6 0 1,0 12,6 Z"/>
         </DrawingImage>
 
+        <!-- Restore (undo arrow, white) -->
+        <DrawingImage x:Key="IconRestoreWhite">
+            <GeometryDrawing Brush="White"
+                Geometry="M12,4 A8,8 0 1,1 4.4,8 L2,8 L6,14 L10,8 L7.2,8 A6,6 0 1,0 12,6 Z"/>
+        </DrawingImage>
+
         <!-- SelectAll (checkbox checked) -->
         <DrawingImage x:Key="IconSelectAll">
             <DrawingGroup>

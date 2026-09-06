@@ -46,8 +46,8 @@
                             Command="{Binding RestoreCommand}" IsEnabled="{Binding HasSelection}"
                             Padding="{StaticResource PaddingBtnMd}" Margin="0,0,8,0">
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconRestore}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize RecycleBin_BtnRestore}" FontSize="{StaticResource FontSizeMd}" Foreground="White"/>
+                            <Image Source="{StaticResource IconRestoreWhite}" Width="16" Height="16"/>
+                            <TextBlock Text="{loc:Localize RecycleBin_BtnRestore}" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="danger" AutomationProperties.AutomationId="RecycleBin_PermanentDelete"
@@ -56,7 +56,7 @@
                             Padding="{StaticResource PaddingBtnMd}" Margin="0,0,8,0">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconDeleteWhite}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize RecycleBin_BtnPermanentDelete}" FontSize="{StaticResource FontSizeMd}" Foreground="White"/>
+                            <TextBlock Text="{loc:Localize RecycleBin_BtnPermanentDelete}" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="danger" AutomationProperties.AutomationId="RecycleBin_EmptyTrash"
@@ -65,7 +65,7 @@
                             Padding="{StaticResource PaddingBtnMd}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconDeleteWhite}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize RecycleBin_BtnEmptyTrash}" FontSize="{StaticResource FontSizeMd}" Foreground="White"/>
+                            <TextBlock Text="{loc:Localize RecycleBin_BtnEmptyTrash}" FontSize="{StaticResource FontSizeMd}"/>
                         </StackPanel>
                     </Button>
                 </WrapPanel>

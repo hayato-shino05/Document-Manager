@@ -21,7 +21,7 @@
                             Command="{Binding ScanDuplicatesCommand}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
                             <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize DuplicateDetection_BtnScan}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                            <TextBlock Text="{loc:Localize DuplicateDetection_BtnScan}" FontSize="{StaticResource FontSizeSm}"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -114,7 +114,7 @@
                                                 <Button DockPanel.Dock="Right" Classes="primary" AutomationProperties.AutomationId="DuplicateDetection_Merge" AutomationProperties.Name="{loc:Localize DuplicateDetection_Merge}"
                                                         Command="{Binding DataContext.MergeDuplicateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                         CommandParameter="{Binding}" Padding="{StaticResource PaddingSm}">
-                                                    <TextBlock Text="{loc:Localize DuplicateDetection_Merge}" FontSize="{StaticResource FontSizeXs}" Foreground="White"/>
+                                                    <TextBlock Text="{loc:Localize DuplicateDetection_Merge}" FontSize="{StaticResource FontSizeXs}"/>
                                                 </Button>
                                             </DockPanel>
                                             <ItemsControl ItemsSource="{Binding Documents}" Margin="0,2,0,0">
@@ -131,7 +131,7 @@
                                                                 <Button Classes="danger" AutomationProperties.AutomationId="DuplicateDetection_Delete" AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnDelete}"
                                                                         Command="{Binding DataContext.DeleteDuplicateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}" Padding="{StaticResource PaddingSm}">
-                                                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnDelete}" FontSize="{StaticResource FontSizeXs}" Foreground="White"/>
+                                                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnDelete}" FontSize="{StaticResource FontSizeXs}"/>
                                                                 </Button>
                                                             </StackPanel>
                                                             <StackPanel Spacing="1" VerticalAlignment="Center">
