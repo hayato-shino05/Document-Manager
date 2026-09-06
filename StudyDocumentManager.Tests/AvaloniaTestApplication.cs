@@ -11,9 +11,10 @@ public static class AvaloniaTestApplication
     public static AppBuilder BuildAvaloniaApp()
     {
         return AppBuilder.Configure<StudyDocumentManager.App>()
+            .UseSkia()
             .UseHeadless(new AvaloniaHeadlessPlatformOptions
             {
-                UseHeadlessDrawing = true
+                UseHeadlessDrawing = false
             });
     }
 }

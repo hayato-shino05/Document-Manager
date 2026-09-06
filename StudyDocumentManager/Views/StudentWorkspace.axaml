@@ -250,106 +250,114 @@
 
                             <!-- Assignment Editor Form -->
                             <Border Grid.Column="1" Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusSm}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1" Padding="12">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                    <StackPanel Spacing="8">
-                                        <TextBlock Text="{loc:Localize SW_AssignmentEditor}" FontWeight="Bold" FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,2"/>
+                                <DockPanel>
+                                    <!-- Header Title -->
+                                    <TextBlock DockPanel.Dock="Top" Text="{loc:Localize SW_AssignmentEditor}" FontWeight="Bold" FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,8"/>
 
-                                        <!-- Title -->
-                                        <StackPanel Spacing="2">
-                                            <TextBlock Text="{loc:Localize SW_AssignmentTitle}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
-                                            <TextBox Text="{Binding EditorTitle, Mode=TwoWay}" Watermark="{loc:Localize SW_AssignmentTitle}"
-                                                     automation:AutomationProperties.Name="{loc:Localize SW_AssignmentTitle}"/>
-                                        </StackPanel>
-
-                                        <!-- Course & Semester Grid -->
-                                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
-                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Localize SW_CourseName}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,4,2"/>
-                                            <ComboBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Courses}" SelectedItem="{Binding EditorCourse, Mode=TwoWay}"
-                                                      PlaceholderText="{loc:Localize SW_CourseName}" HorizontalAlignment="Stretch" Margin="0,0,4,0"
-                                                      automation:AutomationProperties.Name="{loc:Localize SW_CourseName}">
-                                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Name}"/></DataTemplate></ComboBox.ItemTemplate>
-                                            </ComboBox>
-
-                                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize SW_SemesterName}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="4,0,0,2"/>
-                                            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Semesters}" SelectedItem="{Binding EditorSemester, Mode=TwoWay}"
-                                                      PlaceholderText="{loc:Localize SW_SemesterName}" HorizontalAlignment="Stretch" Margin="4,0,0,0"
-                                                      automation:AutomationProperties.Name="{loc:Localize SW_SemesterName}">
-                                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Name}"/></DataTemplate></ComboBox.ItemTemplate>
-                                            </ComboBox>
-                                        </Grid>
-
-                                        <!-- Official & Personal Deadlines Grid -->
-                                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
-                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Localize SW_OfficialDeadline}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,4,2"/>
-                                            <DatePicker Grid.Row="1" Grid.Column="0" SelectedDate="{Binding EditorOfficialDeadline}" HorizontalAlignment="Stretch" Margin="0,0,4,0"
-                                                        automation:AutomationProperties.Name="{loc:Localize SW_OfficialDeadline}"/>
-
-                                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize SW_PersonalDeadline}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="4,0,0,2"/>
-                                            <DatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding EditorPersonalDeadline}" HorizontalAlignment="Stretch" Margin="4,0,0,0"
-                                                        automation:AutomationProperties.Name="{loc:Localize SW_PersonalDeadline}"/>
-                                        </Grid>
-
-                                        <!-- Status & Priority Grid -->
-                                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
-                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Localize SW_Status}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,4,2"/>
-                                            <ComboBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding SelectedStatusOption, Mode=TwoWay}"
-                                                      HorizontalAlignment="Stretch" Margin="0,0,4,0"
-                                                      automation:AutomationProperties.Name="{loc:Localize SW_Status}">
-                                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate></ComboBox.ItemTemplate>
-                                            </ComboBox>
-
-                                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize SW_Priority}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="4,0,0,2"/>
-                                            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding PriorityOptions}" SelectedItem="{Binding SelectedPriorityOption, Mode=TwoWay}"
-                                                      HorizontalAlignment="Stretch" Margin="4,0,0,0"
-                                                      automation:AutomationProperties.Name="{loc:Localize SW_Priority}">
-                                                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate></ComboBox.ItemTemplate>
-                                            </ComboBox>
-                                        </Grid>
-
-                                        <!-- Milestone -->
-                                        <StackPanel Spacing="2">
-                                            <TextBlock Text="{loc:Localize SW_Milestone}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
-                                            <TextBox Text="{Binding EditorMilestone, Mode=TwoWay}" Watermark="{loc:Localize SW_Milestone}"
-                                                     automation:AutomationProperties.Name="{loc:Localize SW_Milestone}"/>
-                                        </StackPanel>
-
-                                        <!-- Notes -->
-                                        <StackPanel Spacing="2">
-                                            <TextBlock Text="{loc:Localize SW_Notes}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
-                                            <TextBox Text="{Binding EditorNotes, Mode=TwoWay}" Watermark="{loc:Localize SW_Notes}"
-                                                     AcceptsReturn="True" TextWrapping="Wrap" MinHeight="50"
-                                                     automation:AutomationProperties.Name="{loc:Localize SW_Notes}"/>
-                                        </StackPanel>
-
-                                        <!-- Action Buttons -->
-                                        <WrapPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                    <!-- Pinned Action Footer -->
+                                    <Border DockPanel.Dock="Bottom" BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0" Padding="0,8,0,0" Margin="0,8,0,0">
+                                        <WrapPanel Orientation="Horizontal">
                                             <Button Command="{Binding SaveAssignmentCommand}" Classes="primary"
-                                                    automation:AutomationProperties.Name="{loc:Localize Action_Save}" Margin="0,0,6,6">
+                                                    automation:AutomationProperties.Name="{loc:Localize Action_Save}" Margin="0,0,6,4">
                                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                                     <Image Source="{StaticResource IconSaveWhite}" Width="13" Height="13" VerticalAlignment="Center"/>
                                                     <TextBlock Text="{loc:Localize Action_Save}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                             </Button>
                                             <Button Content="{loc:Localize Action_Cancel}" Command="{Binding CancelEditCommand}" Classes="secondary"
-                                                    automation:AutomationProperties.Name="{loc:Localize Action_Cancel}" Margin="0,0,6,6"/>
+                                                    automation:AutomationProperties.Name="{loc:Localize Action_Cancel}" Margin="0,0,6,4"/>
                                             <Button Command="{Binding DeleteAssignmentCommand}" Classes="danger"
                                                     IsEnabled="{Binding HasSelection}"
-                                                    automation:AutomationProperties.Name="{loc:Localize Action_Delete}" Margin="0,0,6,6">
+                                                    automation:AutomationProperties.Name="{loc:Localize Action_Delete}" Margin="0,0,6,4">
                                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                                     <Image Source="{StaticResource IconDeleteWhite}" Width="12" Height="12" VerticalAlignment="Center"/>
                                                     <TextBlock Text="{loc:Localize Action_Delete}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                             </Button>
                                             <Button Command="{Binding OpenRelatedDocumentCommand}" IsEnabled="{Binding HasRelatedDocuments}" Classes="secondary"
-                                                    automation:AutomationProperties.Name="{loc:Localize SW_OpenRelatedDocument}" Margin="0,0,0,6">
+                                                    automation:AutomationProperties.Name="{loc:Localize SW_OpenRelatedDocument}" Margin="0,0,0,4">
                                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                                     <Image Source="{StaticResource IconOpenFile}" Width="13" Height="13" VerticalAlignment="Center"/>
                                                     <TextBlock Text="{loc:Localize SW_OpenRelatedDocument}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                             </Button>
                                         </WrapPanel>
-                                    </StackPanel>
-                                </ScrollViewer>
+                                    </Border>
+
+                                    <!-- Scrollable Form Inputs -->
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <StackPanel Spacing="8" Margin="0,0,4,0">
+                                            <!-- Title -->
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Text="{loc:Localize SW_AssignmentTitle}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
+                                                <TextBox Text="{Binding EditorTitle, Mode=TwoWay}" Watermark="{loc:Localize SW_AssignmentTitle}"
+                                                         automation:AutomationProperties.Name="{loc:Localize SW_AssignmentTitle}"/>
+                                            </StackPanel>
+
+                                            <!-- Course & Semester Grid -->
+                                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Localize SW_CourseName}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,4,2"/>
+                                                <ComboBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Courses}" SelectedItem="{Binding EditorCourse, Mode=TwoWay}"
+                                                          PlaceholderText="{loc:Localize SW_CourseName}" HorizontalAlignment="Stretch" Margin="0,0,4,0"
+                                                          automation:AutomationProperties.Name="{loc:Localize SW_CourseName}">
+                                                    <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Name}"/></DataTemplate></ComboBox.ItemTemplate>
+                                                </ComboBox>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize SW_SemesterName}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="4,0,0,2"/>
+                                                <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Semesters}" SelectedItem="{Binding EditorSemester, Mode=TwoWay}"
+                                                          PlaceholderText="{loc:Localize SW_SemesterName}" HorizontalAlignment="Stretch" Margin="4,0,0,0"
+                                                          automation:AutomationProperties.Name="{loc:Localize SW_SemesterName}">
+                                                    <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Name}"/></DataTemplate></ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </Grid>
+
+                                            <!-- Official & Personal Deadlines Grid -->
+                                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Localize SW_OfficialDeadline}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,4,2"/>
+                                                <DatePicker Grid.Row="1" Grid.Column="0" SelectedDate="{Binding EditorOfficialDeadline}" HorizontalAlignment="Stretch" Margin="0,0,4,0"
+                                                            DayFormat="d" MonthFormat="MM" YearFormat="yy"
+                                                            automation:AutomationProperties.Name="{loc:Localize SW_OfficialDeadline}"/>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize SW_PersonalDeadline}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="4,0,0,2"/>
+                                                <DatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding EditorPersonalDeadline}" HorizontalAlignment="Stretch" Margin="4,0,0,0"
+                                                            DayFormat="d" MonthFormat="MM" YearFormat="yy"
+                                                            automation:AutomationProperties.Name="{loc:Localize SW_PersonalDeadline}"/>
+                                            </Grid>
+
+                                            <!-- Status & Priority Grid -->
+                                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Localize SW_Status}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="0,0,4,2"/>
+                                                <ComboBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding SelectedStatusOption, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch" Margin="0,0,4,0"
+                                                          automation:AutomationProperties.Name="{loc:Localize SW_Status}">
+                                                    <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate></ComboBox.ItemTemplate>
+                                                </ComboBox>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize SW_Priority}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}" Margin="4,0,0,2"/>
+                                                <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding PriorityOptions}" SelectedItem="{Binding SelectedPriorityOption, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch" Margin="4,0,0,0"
+                                                          automation:AutomationProperties.Name="{loc:Localize SW_Priority}">
+                                                    <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate></ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </Grid>
+
+                                            <!-- Milestone -->
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Text="{loc:Localize SW_Milestone}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
+                                                <TextBox Text="{Binding EditorMilestone, Mode=TwoWay}" Watermark="{loc:Localize SW_Milestone}"
+                                                         automation:AutomationProperties.Name="{loc:Localize SW_Milestone}"/>
+                                            </StackPanel>
+
+                                            <!-- Notes -->
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Text="{loc:Localize SW_Notes}" FontSize="{StaticResource FontSizeXs}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
+                                                <TextBox Text="{Binding EditorNotes, Mode=TwoWay}" Watermark="{loc:Localize SW_Notes}"
+                                                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="50"
+                                                         automation:AutomationProperties.Name="{loc:Localize SW_Notes}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </DockPanel>
                             </Border>
                         </Grid>
                     </DockPanel>

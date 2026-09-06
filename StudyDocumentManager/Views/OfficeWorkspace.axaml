@@ -233,12 +233,14 @@
                                     <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Localize OW_EffectiveDate}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}" Margin="0,0,4,4"/>
                                         <DatePicker Grid.Row="1" Grid.Column="0" SelectedDate="{Binding EditingEffectiveDate, Mode=TwoWay}"
+                                                    DayFormat="d" MonthFormat="MM" YearFormat="yy"
                                                     Margin="0,0,4,0" HorizontalAlignment="Stretch"
                                                     automation:AutomationProperties.AutomationId="OfficeWorkspace_EffectiveDate"
                                                     automation:AutomationProperties.Name="{loc:Localize OW_EffectiveDate}"/>
 
                                         <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize OW_ExpiryDate}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}" Margin="4,0,0,4"/>
                                         <DatePicker Grid.Row="1" Grid.Column="1" SelectedDate="{Binding EditingExpiryDate, Mode=TwoWay}"
+                                                    DayFormat="d" MonthFormat="MM" YearFormat="yy"
                                                     Margin="4,0,0,0" HorizontalAlignment="Stretch"
                                                     automation:AutomationProperties.AutomationId="OfficeWorkspace_ExpiryDate"
                                                     automation:AutomationProperties.Name="{loc:Localize OW_ExpiryDate}"/>
