@@ -3,54 +3,62 @@
         xmlns:loc="using:StudyDocumentManager.Markup"
         x:Class="StudyDocumentManager.Views.AffectedItemsPreviewDialog"
         AutomationProperties.AutomationId="Dialog_AffectedItemsPreview"
-        Width="420" MaxHeight="520" SizeToContent="Height"
+        AutomationProperties.AccessibilityView="Control"
+        Width="440" MaxHeight="540" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="True"
         ShowInTaskbar="False"
-        Background="{StaticResource ContentBackground}">
+        Background="{DynamicResource ContentBackground}">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="24" Spacing="12">
+        <StackPanel Margin="24" Spacing="14">
 
+            <!-- Title Header -->
             <TextBlock x:Name="TitleText"
                        AutomationProperties.AutomationId="AffectedPreview_Title"
-                       FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
-                       Foreground="{StaticResource TextPrimary}"
+                       FontSize="{DynamicResource FontSizeHeading}" FontWeight="Bold"
+                       Foreground="{DynamicResource TextPrimary}"
                        TextWrapping="Wrap"/>
 
-            <Border Background="{StaticResource SidebarBackground}" CornerRadius="{StaticResource RadiusSm}"
-                    Padding="10,8">
-                <TextBlock x:Name="AffectedNote"
-                           AutomationProperties.AutomationId="AffectedPreview_Affected"
-                           FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
-                           Foreground="{StaticResource TextPrimary}"
-                           TextWrapping="Wrap"/>
+            <!-- Affected Count Banner -->
+            <Border Background="{DynamicResource StatAmberBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                    CornerRadius="{DynamicResource RadiusMd}" Padding="12,10">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="{DynamicResource IconWarning}" Width="16" Height="16" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="AffectedNote"
+                               AutomationProperties.AutomationId="AffectedPreview_Affected"
+                               FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource WarningText}"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
             </Border>
 
-            <ListBox x:Name="ItemsList"
-                     AutomationProperties.AutomationId="AffectedPreview_Items"
-                     MaxHeight="240"
-                     FontSize="{StaticResource FontSizeSm}"
-                     Foreground="{StaticResource TextSecondary}"/>
+            <!-- Items List Container -->
+            <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="2">
+                <ListBox x:Name="ItemsList"
+                         AutomationProperties.AutomationId="AffectedPreview_Items"
+                         AutomationProperties.Name="{loc:Localize Main_Menu_DuplicateDetection}"
+                         MaxHeight="220"
+                         Background="Transparent"
+                         FontSize="{DynamicResource FontSizeSm}"
+                         Foreground="{DynamicResource TextPrimary}"/>
+            </Border>
 
-            <Border Background="{StaticResource SidebarBackground}" CornerRadius="{StaticResource RadiusSm}"
-                    Padding="10,8">
+            <!-- Reversibility Note Banner -->
+            <Border Background="{DynamicResource SidebarBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                    CornerRadius="{DynamicResource RadiusSm}" Padding="12,8">
                 <TextBlock x:Name="ReversibilityNote"
                            AutomationProperties.AutomationId="AffectedPreview_Note"
-                           FontSize="{StaticResource FontSizeXs}"
-                           Foreground="{StaticResource TextMuted}"
+                           FontSize="{DynamicResource FontSizeXs}"
+                           Foreground="{DynamicResource TextSecondary}"
                            TextWrapping="Wrap"/>
             </Border>
 
+            <!-- Action Buttons: Confirm & Cancel -->
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right"
-                        Spacing="8" Margin="0,8,0,0">
-                <Button x:Name="ConfirmButton"
-                        AutomationProperties.AutomationId="AffectedPreview_Confirm"
-                        AutomationProperties.Name="{loc:Localize Action_Delete}"
-                        AutomationProperties.HelpText="{loc:Localize BE_ConfirmApply}"
-                        Classes="danger"
-                        MinWidth="110"
-                        HorizontalContentAlignment="Center"/>
+                        Spacing="10" Margin="0,8,0,0">
                 <Button x:Name="CancelButton"
                         AutomationProperties.AutomationId="AffectedPreview_Cancel"
                         AutomationProperties.Name="{loc:Localize BE_Cancel}"
@@ -58,7 +66,16 @@
                         Content="{loc:Localize BE_Cancel}"
                         Classes="secondary"
                         IsCancel="True"
-                        MinWidth="80"
+                        Padding="{DynamicResource PaddingBtnMd}"
+                        MinWidth="90"
+                        HorizontalContentAlignment="Center"/>
+                <Button x:Name="ConfirmButton"
+                        AutomationProperties.AutomationId="AffectedPreview_Confirm"
+                        AutomationProperties.Name="{loc:Localize Action_Delete}"
+                        AutomationProperties.HelpText="{loc:Localize BE_ConfirmApply}"
+                        Classes="danger"
+                        Padding="{DynamicResource PaddingBtnMd}"
+                        MinWidth="110"
                         HorizontalContentAlignment="Center"/>
             </StackPanel>
         </StackPanel>

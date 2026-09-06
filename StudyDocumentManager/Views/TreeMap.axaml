@@ -1,85 +1,113 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-        xmlns:loc="using:StudyDocumentManager.Markup"
-                     x:Class="StudyDocumentManager.Views.TreeMap"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             x:Class="StudyDocumentManager.Views.TreeMap"
              x:DataType="vm:TreeMapModel"
              AutomationProperties.AutomationId="Screen_TreeMap"
              AutomationProperties.AccessibilityView="Control">
 
-    <Border Classes="page-wrapper">
+    <Border Classes="page-wrapper" Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
         <DockPanel>
-            <!-- Header -->
+            <!-- Header Bar -->
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
-                <StackPanel Classes="page-header-stack" Margin="0">
-                    <Image Source="{StaticResource IconTreeMap}" Width="18" Height="18"/>
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="{DynamicResource IconTreeMap}" Width="20" Height="20" VerticalAlignment="Center"/>
                     <TextBlock Classes="page-title"
                                AutomationProperties.AutomationId="Title_TreeMap"
-                               Text="{loc:Localize TreeMap_Title}"/>
+                               Text="{loc:Localize TreeMap_Title}"
+                               FontSize="{DynamicResource FontSizeHeading}" FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimary}"
+                               VerticalAlignment="Center"/>
                 </StackPanel>
             </DockPanel>
 
             <!-- Mode toggle row -->
-            <Border DockPanel.Dock="Top" Classes="card" Padding="{StaticResource PaddingNavItem}" Margin="0,0,0,12">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="{loc:Localize TreeMap_LblGroupBy}" VerticalAlignment="Center"
-                               FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
-                    <Button Classes.primary="{Binding IsAllMode}"
+            <Border DockPanel.Dock="Top" Background="{DynamicResource CardBackground}"
+                    CornerRadius="{DynamicResource RadiusMd}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                    Padding="{DynamicResource PaddingNavItem}" Margin="0,0,0,12">
+                <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto">
+                    <TextBlock Grid.Column="0" Text="{loc:Localize TreeMap_LblGroupBy}" VerticalAlignment="Center"
+                               FontSize="{DynamicResource FontSizeMd}" Foreground="{DynamicResource TextSecondary}"
+                               Margin="0,0,8,0"/>
+                    <Button Grid.Column="1" Classes.primary="{Binding IsAllMode}"
                             Classes.secondary="{Binding !IsAllMode}"
                             AutomationProperties.AutomationId="TreeMap_AllItems"
                             AutomationProperties.Name="{loc:Localize Filter_AllItems}"
                             Content="{loc:Localize Filter_AllItems}"
-                            Command="{Binding ShowAllCommand}" Padding="{StaticResource PaddingBtnSm}" FontSize="{StaticResource FontSizeSm}"/>
-                    <Button Classes.primary="{Binding IsSubjectMode}"
+                            Command="{Binding ShowAllCommand}"
+                            Padding="{DynamicResource PaddingBtnSm}" FontSize="{DynamicResource FontSizeSm}"
+                            Margin="0,0,6,0"/>
+                    <Button Grid.Column="2" Classes.primary="{Binding IsSubjectMode}"
                             Classes.secondary="{Binding !IsSubjectMode}"
                             AutomationProperties.AutomationId="TreeMap_ByCategory"
                             AutomationProperties.Name="{loc:Localize TreeMap_BtnByCategory}"
                             Content="{loc:Localize TreeMap_BtnByCategory}"
-                            Command="{Binding ShowBySubjectCommand}" Padding="{StaticResource PaddingBtnSm}" FontSize="{StaticResource FontSizeSm}"/>
-                    <Button Classes.primary="{Binding IsTypeMode}"
+                            Command="{Binding ShowBySubjectCommand}"
+                            Padding="{DynamicResource PaddingBtnSm}" FontSize="{DynamicResource FontSizeSm}"
+                            Margin="0,0,6,0"/>
+                    <Button Grid.Column="3" Classes.primary="{Binding IsTypeMode}"
                             Classes.secondary="{Binding !IsTypeMode}"
                             AutomationProperties.AutomationId="TreeMap_ByType"
                             AutomationProperties.Name="{loc:Localize TreeMap_BtnByType}"
                             Content="{loc:Localize TreeMap_BtnByType}"
-                            Command="{Binding ShowByTypeCommand}" Padding="{StaticResource PaddingBtnSm}" FontSize="{StaticResource FontSizeSm}"/>
-                    <TextBlock Text="{Binding TotalDocuments, StringFormat={loc:Localize TreeMap_StatTotal}}"
+                            Command="{Binding ShowByTypeCommand}"
+                            Padding="{DynamicResource PaddingBtnSm}" FontSize="{DynamicResource FontSizeSm}"/>
+                    <TextBlock Grid.Column="5" Text="{Binding TotalDocuments, StringFormat={loc:Localize TreeMap_StatTotal}}"
                                VerticalAlignment="Center" Margin="12,0,0,0"
-                               FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold"/>
-                </StackPanel>
+                               FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextSecondary}" FontWeight="SemiBold"/>
+                </Grid>
             </Border>
 
             <!-- TreeMap grid -->
-            <Border Classes="card" Padding="{StaticResource PaddingCard}">
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                              VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding Items}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:TreeMapItem">
-                                <Border MinWidth="120" MaxWidth="240" MinHeight="80"
-                                        AutomationProperties.Name="{Binding DisplayText}"
-                                        Margin="4" Padding="{StaticResource PaddingCard}" CornerRadius="{StaticResource RadiusMd}"
-                                        Background="{Binding Color}">
-                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <TextBlock Text="{Binding Label}"
-                                                   Foreground="White" FontWeight="Bold" FontSize="{StaticResource FontSizeLg}"
-                                                   TextAlignment="Center" TextWrapping="Wrap"/>
-                                        <TextBlock Text="{Binding Count, StringFormat={loc:Localize TreeMap_ItemCount}}"
-                                                   Foreground="{StaticResource OnColorPrimaryBrush}" FontSize="{StaticResource FontSizeMd}"
-                                                   TextAlignment="Center"/>
-                                        <TextBlock Text="{Binding Percentage, StringFormat='{}{0:F1}%'}"
-                                                   Foreground="{StaticResource OnColorSecondaryBrush}" FontSize="{StaticResource FontSizeSm}"
-                                                   TextAlignment="Center"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+            <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                    Padding="{DynamicResource PaddingCard}">
+                <Panel>
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ItemsControl AutomationProperties.AutomationId="TreeMap_ItemsControl"
+                                      ItemsSource="{Binding Items}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:TreeMapItem">
+                                    <Border MinWidth="140" MaxWidth="280" MinHeight="90"
+                                            AutomationProperties.AutomationId="TreeMap_ItemTile"
+                                            AutomationProperties.Name="{Binding DisplayText}"
+                                            Margin="6" Padding="{DynamicResource PaddingCard}"
+                                            CornerRadius="{DynamicResource RadiusMd}"
+                                            Background="{Binding Color}">
+                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="{Binding Label}"
+                                                       Foreground="{DynamicResource OnColorPrimaryBrush}" FontWeight="Bold" FontSize="{DynamicResource FontSizeLg}"
+                                                       TextAlignment="Center" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Count, StringFormat={loc:Localize TreeMap_ItemCount}}"
+                                                       Foreground="{DynamicResource OnColorPrimaryBrush}" FontSize="{DynamicResource FontSizeMd}"
+                                                       TextAlignment="Center"/>
+                                            <TextBlock Text="{Binding Percentage, StringFormat='{}{0:F1}%'}"
+                                                       Foreground="{DynamicResource OnColorSecondaryBrush}" FontSize="{DynamicResource FontSizeSm}"
+                                                       TextAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <StackPanel Classes="empty-state" IsVisible="{Binding !Items.Count}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                        <Image Source="{DynamicResource IconTreeMap}" Width="40" Height="40" Opacity="0.3" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{loc:Localize Report_NoData}"
+                                   AutomationProperties.AutomationId="TreeMap_EmptyState"
+                                   AutomationProperties.LiveSetting="Polite"
+                                   FontSize="{DynamicResource FontSizeLg}" Foreground="{DynamicResource TextMuted}"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Panel>
             </Border>
         </DockPanel>
     </Border>

@@ -2,92 +2,117 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
              xmlns:conv="using:StudyDocumentManager.Converters"
-        xmlns:loc="using:StudyDocumentManager.Markup"
-                     x:Class="StudyDocumentManager.Views.RecentFiles"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             x:Class="StudyDocumentManager.Views.RecentFiles"
              x:DataType="vm:RecentFilesModel"
-             AutomationProperties.AutomationId="Screen_RecentFiles">
+             AutomationProperties.AutomationId="Screen_RecentFiles"
+             AutomationProperties.AccessibilityView="Control">
 
-    <Border Classes="page-wrapper">
+    <Border Classes="page-wrapper" Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
         <DockPanel>
-            <!-- Header -->
+            <!-- Header Bar -->
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
-                <StackPanel Classes="page-header-stack" Margin="0">
-                    <Image Source="{StaticResource IconCalendar}" Width="18" Height="18"/>
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="{DynamicResource IconClock}" Width="20" Height="20" VerticalAlignment="Center"/>
                     <TextBlock Classes="page-title"
                                AutomationProperties.AutomationId="Title_RecentFiles"
-                               Text="{loc:Localize RecentFiles_Title}"/>
+                               Text="{loc:Localize RecentFiles_Title}"
+                               FontSize="{DynamicResource FontSizeHeading}" FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimary}"
+                               VerticalAlignment="Center"/>
                 </StackPanel>
-                <TextBlock DockPanel.Dock="Right" VerticalAlignment="Center"
-                           Text="{Binding RecentFiles.Count, StringFormat={loc:Localize RecentFiles_CountFormat}}"
-                           FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextSecondary}"/>
+                <Border DockPanel.Dock="Right" Background="{DynamicResource StatBlueBg}"
+                        CornerRadius="{DynamicResource RadiusFull}" Padding="{DynamicResource PaddingBadgeMd}"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="{Binding RecentFiles.Count, StringFormat={loc:Localize RecentFiles_CountFormat}}"
+                               FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource AccentBrush}"/>
+                </Border>
             </DockPanel>
 
-            <!-- Bottom actions -->
+            <!-- Bottom Action Buttons: Refresh & Clear History -->
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8"
                         HorizontalAlignment="Right" Margin="0,12,0,0">
                 <Button Classes="secondary" AutomationProperties.AutomationId="RecentFiles_Refresh"
                         AutomationProperties.Name="{loc:Localize RecentFiles_BtnRefresh}"
-                        Command="{Binding RefreshCommand}" Padding="12,5">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <Image Source="{StaticResource IconRefresh}" Width="16" Height="16"/>
-                        <TextBlock Text="{loc:Localize RecentFiles_BtnRefresh}" FontSize="{StaticResource FontSizeSm}"/>
+                        Command="{Binding RefreshCommand}"
+                        Padding="{DynamicResource PaddingBtnMd}">
+                    <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                        <Image Source="{DynamicResource IconRefresh}" Width="15" Height="15" VerticalAlignment="Center"/>
+                        <TextBlock Text="{loc:Localize RecentFiles_BtnRefresh}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
                 <Button Classes="danger" AutomationProperties.AutomationId="RecentFiles_ClearHistory"
                         AutomationProperties.Name="{loc:Localize RecentFiles_BtnClear}"
-                        Command="{Binding ClearHistoryCommand}" IsEnabled="{Binding HasRecentFiles}" Padding="12,5">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <Image Source="{StaticResource IconDelete}" Width="16" Height="16"/>
-                        <TextBlock Text="{loc:Localize RecentFiles_BtnClear}" FontSize="{StaticResource FontSizeSm}"/>
+                        Command="{Binding ClearHistoryCommand}"
+                        IsEnabled="{Binding HasRecentFiles}"
+                        Padding="{DynamicResource PaddingBtnMd}">
+                    <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                        <Image Source="{DynamicResource IconDeleteWhite}" Width="15" Height="15" VerticalAlignment="Center"/>
+                        <TextBlock Text="{loc:Localize RecentFiles_BtnClear}" FontSize="{DynamicResource FontSizeSm}"
+                                   Foreground="{DynamicResource OnColorPrimaryBrush}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
 
-            <!-- File list -->
-            <Border Classes="card" ClipToBounds="True">
+            <!-- File List DataGrid -->
+            <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" ClipToBounds="True">
                 <Panel>
                     <DataGrid Classes="std"
                               AutomationProperties.AutomationId="RecentFiles_DocumentGrid"
                               AutomationProperties.Name="{loc:Localize RecentFiles_Title}"
                               ItemsSource="{Binding RecentFiles}"
-                              CanUserResizeColumns="True">
+                              CanUserResizeColumns="True"
+                              GridLinesVisibility="Horizontal"
+                              BorderThickness="0"
+                              IsReadOnly="True">
                         <DataGrid.Columns>
                             <DataGridTemplateColumn Header="{loc:Localize RecentFiles_ColName}" Width="2*" SortMemberPath="DocumentName">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="vm:RecentFileItem">
-                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0" VerticalAlignment="Center">
                                             <Image Source="{Binding FileType, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
                                                    Width="16" Height="16" VerticalAlignment="Center" />
                                             <TextBlock Text="{Binding DocumentName}" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextPrimary}"
                                                        TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding DocumentName}"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="{loc:Localize RecentFiles_ColSubject}" Binding="{Binding Subject}" Width="*"/>
-                            <DataGridTextColumn Header="{loc:Localize RecentFiles_ColType}" Binding="{Binding FileType}" Width="80"/>
-                            <DataGridTextColumn Header="{loc:Localize RecentFiles_ColOpenedAt}" Binding="{Binding OpenedAtDisplay}" Width="130"/>
-                            <DataGridTextColumn Header="{loc:Localize RecentFiles_ColStatus}" Binding="{Binding StatusDisplay}" Width="100"/>
-                            <DataGridTemplateColumn Header="{loc:Localize RecentFiles_ColAction}" Width="90">
+                            <DataGridTextColumn Header="{loc:Localize RecentFiles_ColType}" Binding="{Binding FileType}" Width="90"/>
+                            <DataGridTextColumn Header="{loc:Localize RecentFiles_ColOpenedAt}" Binding="{Binding OpenedAtDisplay}" Width="140"/>
+                            <DataGridTextColumn Header="{loc:Localize RecentFiles_ColStatus}" Binding="{Binding StatusDisplay}" Width="110"/>
+                            <DataGridTemplateColumn Header="{loc:Localize RecentFiles_ColAction}" Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="vm:RecentFileItem">
                                         <Button Classes="secondary"
                                                 AutomationProperties.Name="{loc:Localize RecentFiles_BtnOpen}"
                                                 Command="{Binding $parent[DataGrid].DataContext.OpenFileCommand}"
-                                                CommandParameter="{Binding}" IsEnabled="{Binding FileExists}">
-                                            <TextBlock Text="{loc:Localize RecentFiles_BtnOpen}"/>
+                                                CommandParameter="{Binding}" IsEnabled="{Binding FileExists}"
+                                                Padding="{DynamicResource PaddingBtnSm}"
+                                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                                <Image Source="{DynamicResource IconOpenFile}" Width="13" Height="13" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{loc:Localize RecentFiles_BtnOpen}" FontSize="{DynamicResource FontSizeXs}" VerticalAlignment="Center"/>
+                                            </StackPanel>
                                         </Button>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <StackPanel Classes="empty-state" IsVisible="{Binding !RecentFiles.Count}">
-                        <Image Classes="empty-state-icon" Source="{StaticResource IconCalendar}"/>
+
+                    <StackPanel Classes="empty-state" IsVisible="{Binding !RecentFiles.Count}"
+                                HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                        <Image Classes="empty-state-icon" Source="{DynamicResource IconClock}" Width="40" Height="40" Opacity="0.35"/>
                         <TextBlock Classes="empty-state-text"
                                    AutomationProperties.AutomationId="RecentFiles_EmptyState"
                                    AutomationProperties.LiveSetting="Polite"
-                                   Text="{loc:Localize RecentFiles_EmptyState}"/>
+                                   Text="{loc:Localize RecentFiles_EmptyState}"
+                                   FontSize="{DynamicResource FontSizeLg}" Foreground="{DynamicResource TextMuted}"/>
                     </StackPanel>
                 </Panel>
             </Border>

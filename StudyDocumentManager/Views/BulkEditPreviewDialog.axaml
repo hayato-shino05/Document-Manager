@@ -3,60 +3,82 @@
         xmlns:loc="using:StudyDocumentManager.Markup"
         x:Class="StudyDocumentManager.Views.BulkEditPreviewDialog"
         AutomationProperties.AutomationId="Dialog_BulkEditPreview"
+        AutomationProperties.AccessibilityView="Control"
         Title="{loc:Localize BE_PreviewTitle}"
-        Width="420" MaxHeight="520" SizeToContent="Height"
+        Width="440" MaxHeight="540" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         CanResize="True"
         ShowInTaskbar="False"
-        Background="{StaticResource ContentBackground}">
+        Background="{DynamicResource ContentBackground}">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="24" Spacing="12">
+        <StackPanel Margin="24" Spacing="14">
 
-            <Border Background="{StaticResource SidebarBackground}" CornerRadius="{StaticResource RadiusSm}"
-                    Padding="10,8">
-                <TextBlock x:Name="AffectedNote"
-                           AutomationProperties.AutomationId="BulkEditPreview_Affected"
-                           FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
-                           Foreground="{StaticResource TextPrimary}"
-                           TextWrapping="Wrap"/>
+            <!-- Title Header -->
+            <TextBlock Text="{loc:Localize BE_PreviewTitle}"
+                       AutomationProperties.AutomationId="BulkEditPreview_Title"
+                       FontSize="{DynamicResource FontSizeHeading}" FontWeight="Bold"
+                       Foreground="{DynamicResource TextPrimary}"
+                       TextWrapping="Wrap"/>
+
+            <!-- Affected Count Banner -->
+            <Border Background="{DynamicResource StatBlueBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                    CornerRadius="{DynamicResource RadiusMd}" Padding="12,10">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="{DynamicResource IconInfo}" Width="16" Height="16" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="AffectedNote"
+                               AutomationProperties.AutomationId="BulkEditPreview_Affected"
+                               FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource AccentBrush}"
+                               TextWrapping="Wrap"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
             </Border>
 
-            <ItemsControl x:Name="ChangesList" AutomationProperties.AutomationId="BulkEditPreview_Changes">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
-                                Padding="4,6" Margin="0,0,0,2">
-                            <Grid ColumnDefinitions="Auto,12,*">
-                                <TextBlock Grid.Column="0" Text="{Binding FieldLabel}"
-                                           FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}"/>
-                                <TextBlock Grid.Column="2" Text="{Binding NewValue}"
-                                           FontSize="{StaticResource FontSizeSm}"
-                                           Foreground="{StaticResource TextSecondary}"
-                                           TextWrapping="Wrap"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <!-- Changes List Container -->
+            <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="12,8">
+                <ItemsControl x:Name="ChangesList" AutomationProperties.AutomationId="BulkEditPreview_Changes">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1"
+                                    Padding="6,8" Margin="0,0,0,2">
+                                <Grid ColumnDefinitions="Auto,12,*">
+                                    <TextBlock Grid.Column="0" Text="{Binding FieldLabel}"
+                                               FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding NewValue}"
+                                               FontSize="{DynamicResource FontSizeSm}"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
 
+            <!-- Action Buttons: Cancel (Secondary) & Apply Changes (Primary) -->
             <StackPanel Orientation="Horizontal"
                         HorizontalAlignment="Right"
-                        Spacing="8" Margin="0,8,0,0">
-                <Button x:Name="ConfirmButton"
-                        AutomationProperties.AutomationId="BulkEditPreview_Confirm"
-                        AutomationProperties.Name="{loc:Localize BE_ConfirmApply}"
-                        Content="{loc:Localize BE_ConfirmApply}"
-                        Classes="danger"
-                        MinWidth="110"
-                        HorizontalContentAlignment="Center"/>
+                        Spacing="10" Margin="0,8,0,0">
                 <Button x:Name="CancelButton"
                         AutomationProperties.AutomationId="BulkEditPreview_Cancel"
                         AutomationProperties.Name="{loc:Localize BE_Cancel}"
+                        AutomationProperties.HelpText="{loc:Localize BE_Cancel}"
                         Content="{loc:Localize BE_Cancel}"
                         Classes="secondary"
                         IsCancel="True"
-                        MinWidth="80"
+                        Padding="{DynamicResource PaddingBtnMd}"
+                        MinWidth="90"
+                        HorizontalContentAlignment="Center"/>
+                <Button x:Name="ConfirmButton"
+                        AutomationProperties.AutomationId="BulkEditPreview_Confirm"
+                        AutomationProperties.Name="{loc:Localize BE_ConfirmApply}"
+                        AutomationProperties.HelpText="{loc:Localize BE_ConfirmApply}"
+                        Content="{loc:Localize BE_ConfirmApply}"
+                        Classes="primary"
+                        Padding="{DynamicResource PaddingBtnMd}"
+                        MinWidth="120"
                         HorizontalContentAlignment="Center"/>
             </StackPanel>
         </StackPanel>
