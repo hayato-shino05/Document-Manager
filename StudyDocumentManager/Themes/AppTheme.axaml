@@ -292,6 +292,12 @@
                 Geometry="M6,9 L12,15 L18,9 L16.5,7.5 L12,12 L7.5,7.5 Z"/>
         </DrawingImage>
 
+        <!-- ChevronRight -->
+        <DrawingImage x:Key="IconChevronRight">
+            <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"
+                Geometry="M9,6 L15,12 L9,18 L7.5,16.5 L12,12 L7.5,7.5 Z"/>
+        </DrawingImage>
+
         <!-- EmptyDoc (placeholder clipboard) -->
         <DrawingImage x:Key="IconEmptyDoc">
             <DrawingGroup>

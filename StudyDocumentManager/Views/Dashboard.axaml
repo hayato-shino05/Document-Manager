@@ -17,18 +17,18 @@
 
     <DockPanel>
 
-        <!-- ═══ SEARCH BAR ═══ -->
-        <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}"
-                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
-                Padding="{StaticResource PaddingRow}">
+        <!-- ═══ SEARCH & FILTER BAR ═══ -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource CardBackground}"
+                BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1"
+                Padding="{DynamicResource PaddingRow}">
             <Grid ColumnDefinitions="*,Auto">
 
                 <!-- Left: Search + Dropdown filters -->
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}" VerticalAlignment="Center">
-                    <Image Source="{StaticResource IconSearch}" Width="16" Height="16"
+                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space2}" VerticalAlignment="Center">
+                    <Image Source="{DynamicResource IconSearch}" Width="16" Height="16"
                            VerticalAlignment="Center"/>
-                    <TextBox Width="260" Height="{StaticResource HeightControl}" FontSize="{StaticResource FontSizeMd}"
+                    <TextBox Width="260" Height="{DynamicResource HeightControl}" FontSize="{DynamicResource FontSizeMd}"
                              AutomationProperties.AutomationId="Dashboard_SearchInput"
                              Watermark="{loc:Localize Dashboard_SearchPlaceholder}"
                              AutomationProperties.Name="{loc:Localize Dashboard_SearchPlaceholder}"
@@ -38,20 +38,21 @@
                             AutomationProperties.AutomationId="Dashboard_Search"
                             AutomationProperties.Name="{loc:Localize Dashboard_BtnSearch}"
                             AutomationProperties.HelpText="{loc:Localize Dashboard_TipSearch}"
-                            Padding="{StaticResource PaddingBtn}" Height="{StaticResource HeightControl}" VerticalAlignment="Center"
+                            Padding="{DynamicResource PaddingBtn}" Height="{DynamicResource HeightControl}" VerticalAlignment="Center"
                             ToolTip.Tip="{loc:Localize Dashboard_TipSearch}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize Dashboard_BtnSearch}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <Image Source="{DynamicResource IconSearchWhite}" Width="15" Height="15"/>
+                            <TextBlock Text="{loc:Localize Dashboard_BtnSearch}" FontSize="{DynamicResource FontSizeMd}" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource OnColorPrimaryBrush}"/>
                         </StackPanel>
                     </Button>
 
-                    <Border Width="1" Height="18" Background="{StaticResource CardBorder}" Margin="4,0"/>
+                    <Border Width="1" Height="18" Background="{DynamicResource CardBorder}" Margin="4,0"/>
 
-                    <TextBlock Text="{loc:Localize Dashboard_LblCategory}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
-                               Foreground="{StaticResource TextSecondary}"/>
-                    <ComboBox Name="cboSubject" Width="140" FontSize="{StaticResource FontSizeMd}"
-                              Height="{StaticResource HeightControl}" VerticalAlignment="Center"
+                    <TextBlock Text="{loc:Localize Dashboard_LblCategory}" FontSize="{DynamicResource FontSizeMd}" VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextSecondary}"/>
+                    <ComboBox Name="cboSubject" Width="140" FontSize="{DynamicResource FontSizeMd}"
+                              Height="{DynamicResource HeightControl}" VerticalAlignment="Center"
                               AutomationProperties.Name="{loc:Localize Dashboard_LblCategory}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -60,10 +61,10 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock Text="{loc:Localize Dashboard_LblType}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
-                               Foreground="{StaticResource TextSecondary}"/>
-                    <ComboBox Name="cboType" Width="120" FontSize="{StaticResource FontSizeMd}"
-                              Height="{StaticResource HeightControl}" VerticalAlignment="Center"
+                    <TextBlock Text="{loc:Localize Dashboard_LblType}" FontSize="{DynamicResource FontSizeMd}" VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextSecondary}"/>
+                    <ComboBox Name="cboType" Width="120" FontSize="{DynamicResource FontSizeMd}"
+                              Height="{DynamicResource HeightControl}" VerticalAlignment="Center"
                               AutomationProperties.Name="{loc:Localize Dashboard_LblType}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -72,10 +73,10 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock Text="{loc:Localize DS_Label_Status}" FontSize="{StaticResource FontSizeMd}" VerticalAlignment="Center"
-                               Foreground="{StaticResource TextSecondary}"/>
-                    <ComboBox Name="cboStatus" Width="130" FontSize="{StaticResource FontSizeMd}"
-                              Height="{StaticResource HeightControl}" VerticalAlignment="Center"
+                    <TextBlock Text="{loc:Localize DS_Label_Status}" FontSize="{DynamicResource FontSizeMd}" VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextSecondary}"/>
+                    <ComboBox Name="cboStatus" Width="130" FontSize="{DynamicResource FontSizeMd}"
+                              Height="{DynamicResource HeightControl}" VerticalAlignment="Center"
                               AutomationProperties.Name="{loc:Localize DS_Label_Status}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -91,19 +92,19 @@
                         AutomationProperties.AutomationId="Dashboard_ToggleAdvancedFilter"
                         AutomationProperties.Name="{loc:Localize Dashboard_BtnAdvancedFilter}"
                         AutomationProperties.HelpText="{loc:Localize Dashboard_TipAdvancedFilter}"
-                        Padding="{StaticResource PaddingBtnSm}" Height="{StaticResource HeightControl}" VerticalAlignment="Center"
+                        Padding="{DynamicResource PaddingBtnSm}" Height="{DynamicResource HeightControl}" VerticalAlignment="Center"
                         Command="{Binding ToggleAdvancedFilterCommand}"
                         ToolTip.Tip="{loc:Localize Dashboard_TipAdvancedFilter}">
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
-                        <Image Source="{StaticResource IconFilter}" Width="14" Height="14"
+                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space1}">
+                        <Image Source="{DynamicResource IconFilter}" Width="14" Height="14"
                                VerticalAlignment="Center"/>
-                        <TextBlock Text="{loc:Localize Dashboard_BtnAdvancedFilter}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{loc:Localize Dashboard_BtnAdvancedFilter}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                         <Image Width="9" Height="9" VerticalAlignment="Center"
                                IsVisible="{Binding IsAdvancedFilterVisible}"
-                               Source="{StaticResource IconChevronUp}"/>
+                               Source="{DynamicResource IconChevronUp}"/>
                         <Image Width="9" Height="9" VerticalAlignment="Center"
                                IsVisible="{Binding !IsAdvancedFilterVisible}"
-                               Source="{StaticResource IconChevronDown}"/>
+                               Source="{DynamicResource IconChevronDown}"/>
                     </StackPanel>
                 </Button>
             </Grid>
@@ -112,85 +113,85 @@
         <!-- ═══ ADVANCED FILTER PANEL (Collapsible) ═══ -->
         <Border DockPanel.Dock="Top"
                 IsVisible="{Binding IsAdvancedFilterVisible}"
-                Background="{StaticResource SidebarBackground}"
-                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
-                Padding="{StaticResource PaddingCard}">
+                Background="{DynamicResource SidebarBackground}"
+                BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1"
+                Padding="{DynamicResource PaddingCard}">
             <StackPanel Spacing="12">
 
                 <!-- Filter Groups Row -->
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                     <Grid ColumnDefinitions="*,*,Auto">
 
-                    <!-- ── グループ 1: 期間 ── -->
-                    <Border CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource CardBackground}"
-                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                            Padding="{StaticResource PaddingStatCard}" Margin="0,0,8,0">
+                    <!-- ── Group 1: Date Range ── -->
+                    <Border CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource CardBackground}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                            Padding="{DynamicResource PaddingStatCard}" Margin="0,0,8,0">
                         <StackPanel Spacing="8">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <CheckBox IsChecked="{Binding IsDateFilterEnabled}"
                                           VerticalAlignment="Center"/>
-                                <Image Source="{StaticResource IconCalendar}" Width="14" Height="14"
+                                <Image Source="{DynamicResource IconCalendar}" Width="14" Height="14"
                                        VerticalAlignment="Center"/>
-                                <TextBlock Text="{loc:Localize Dashboard_LblDateRange}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{loc:Localize Dashboard_LblDateRange}" FontSize="{DynamicResource FontSizeMd}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <Grid ColumnDefinitions="Auto,*,Auto,*" IsEnabled="{Binding IsDateFilterEnabled}">
-                                <TextBlock Text="{loc:Localize Dashboard_LblFrom}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
-                                           Foreground="{StaticResource TextSecondary}" Margin="0,0,6,0"/>
-                                <DatePicker Grid.Column="1" FontSize="{StaticResource FontSizeSm}" Height="30"
+                                <TextBlock Text="{loc:Localize Dashboard_LblFrom}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource TextSecondary}" Margin="0,0,6,0"/>
+                                <DatePicker Grid.Column="1" FontSize="{DynamicResource FontSizeSm}" Height="30"
                                             SelectedDate="{Binding FilterFromDate}"
                                             HorizontalAlignment="Stretch"/>
-                                <TextBlock Grid.Column="2" Text="{loc:Localize Dashboard_LblTo}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
-                                           Foreground="{StaticResource TextSecondary}" Margin="10,0,6,0"/>
-                                <DatePicker Grid.Column="3" FontSize="{StaticResource FontSizeSm}" Height="30"
+                                <TextBlock Grid.Column="2" Text="{loc:Localize Dashboard_LblTo}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource TextSecondary}" Margin="10,0,6,0"/>
+                                <DatePicker Grid.Column="3" FontSize="{DynamicResource FontSizeSm}" Height="30"
                                             SelectedDate="{Binding FilterToDate}"
                                             HorizontalAlignment="Stretch"/>
                             </Grid>
                         </StackPanel>
                     </Border>
 
-                    <!-- ── グループ 2: サイズ + 重要 ── -->
-                    <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource CardBackground}"
-                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                            Padding="{StaticResource PaddingStatCard}" Margin="0,0,8,0">
+                    <!-- ── Group 2: Size + Important ── -->
+                    <Border Grid.Column="1" CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource CardBackground}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                            Padding="{DynamicResource PaddingStatCard}" Margin="0,0,8,0">
                         <StackPanel Spacing="8">
                             <!-- Size Filter -->
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <CheckBox IsChecked="{Binding IsSizeFilterEnabled}"
                                           VerticalAlignment="Center"/>
-                                <Image Source="{StaticResource IconSize}" Width="14" Height="14"
+                                <Image Source="{DynamicResource IconSize}" Width="14" Height="14"
                                        VerticalAlignment="Center"/>
-                                <TextBlock Text="{loc:Localize Dashboard_LblFileSize}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{loc:Localize Dashboard_LblFileSize}" FontSize="{DynamicResource FontSizeMd}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Spacing="6"
                                         IsEnabled="{Binding IsSizeFilterEnabled}">
-                                <TextBlock Text="{loc:Localize Dashboard_LblSizeFrom}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
-                                           Foreground="{StaticResource TextSecondary}"/>
-                                <NumericUpDown Width="80" FontSize="{StaticResource FontSizeSm}" Height="30"
+                                <TextBlock Text="{loc:Localize Dashboard_LblSizeFrom}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource TextSecondary}"/>
+                                <NumericUpDown Width="80" FontSize="{DynamicResource FontSizeSm}" Height="30"
                                                Value="{Binding FilterMinSize}"
                                                Minimum="0" FormatString="F1"/>
-                                <TextBlock Text="→" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
-                                           Foreground="{StaticResource TextMuted}"/>
-                                <NumericUpDown Width="80" FontSize="{StaticResource FontSizeSm}" Height="30"
+                                <Image Source="{DynamicResource IconChevronRight}" Width="10" Height="10"
+                                       VerticalAlignment="Center" Margin="2,0" Opacity="0.6"/>
+                                <NumericUpDown Width="80" FontSize="{DynamicResource FontSizeSm}" Height="30"
                                                Value="{Binding FilterMaxSize}"
                                                Minimum="0" FormatString="F1"/>
-                                <TextBlock Text="MB" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"
-                                           Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold"/>
+                                <TextBlock Text="MB" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource TextSecondary}" FontWeight="SemiBold"/>
                             </StackPanel>
 
                             <!-- Important toggle -->
-                            <Border BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
+                            <Border BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0"
                                     Padding="0,6,0,0">
                                 <CheckBox IsChecked="{Binding IsImportantOnly}"
                                           VerticalAlignment="Center">
                                     <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <Image Source="{StaticResource IconStar}" Width="13" Height="13"
+                                        <Image Source="{DynamicResource IconStar}" Width="13" Height="13"
                                                VerticalAlignment="Center"/>
-                                        <TextBlock Text="{loc:Localize Dashboard_LblImportantOnly}" FontSize="{StaticResource FontSizeSm}"
-                                                   Foreground="{StaticResource TextPrimary}"/>
+                                        <TextBlock Text="{loc:Localize Dashboard_LblImportantOnly}" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
                                     </StackPanel>
                                 </CheckBox>
                             </Border>
@@ -207,8 +208,9 @@
                                 Padding="16,7" HorizontalAlignment="Stretch"
                                 ToolTip.Tip="{loc:Localize Dashboard_TipApplyFilter}">
                             <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
-                                <Image Source="{StaticResource IconCheck}" Width="12" Height="12"/>
-                                <TextBlock Text="{loc:Localize Dashboard_BtnApplyFilter}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold"/>
+                                <Image Source="{DynamicResource IconCheck}" Width="12" Height="12"/>
+                                <TextBlock Text="{loc:Localize Dashboard_BtnApplyFilter}" FontSize="{DynamicResource FontSizeMd}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource OnColorPrimaryBrush}"/>
                             </StackPanel>
                         </Button>
                         <Button Classes="secondary" Command="{Binding ClearAdvancedFilterCommand}"
@@ -218,8 +220,8 @@
                                 Padding="16,7" HorizontalAlignment="Stretch"
                                 ToolTip.Tip="{loc:Localize Dashboard_TipClearFilter}">
                             <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
-                                <Image Source="{StaticResource IconClose}" Width="10" Height="10"/>
-                                <TextBlock Text="{loc:Localize Dashboard_BtnClearFilter}" FontSize="{StaticResource FontSizeSm}"/>
+                                <Image Source="{DynamicResource IconClose}" Width="10" Height="10"/>
+                                <TextBlock Text="{loc:Localize Dashboard_BtnClearFilter}" FontSize="{DynamicResource FontSizeSm}"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -231,74 +233,75 @@
 
         <Border DockPanel.Dock="Top"
                 IsVisible="{Binding IsBackupOperationVisible}"
-                Background="{StaticResource SidebarBackground}"
-                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
-                Padding="{StaticResource PaddingRow}"
+                Background="{DynamicResource SidebarBackground}"
+                BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1"
+                Padding="{DynamicResource PaddingRow}"
                 AutomationProperties.AutomationId="Dashboard_BackupOperation">
-            <StackPanel Spacing="{StaticResource Space1}">
+            <StackPanel Spacing="{DynamicResource Space1}">
                 <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsBackingUp}">
-                    <StackPanel Spacing="{StaticResource Space1}">
+                    <StackPanel Spacing="{DynamicResource Space1}">
                         <TextBlock Text="{loc:Localize Dashboard_BackupTitle}"
-                                   Foreground="{StaticResource TextPrimary}"
+                                   Foreground="{DynamicResource TextPrimary}"
                                    FontWeight="SemiBold"/>
                         <ProgressBar Value="{Binding BackupProgress}" Minimum="0" Maximum="100" Height="4"
                                      AutomationProperties.Name="{loc:Localize Dashboard_BackupTitle}"/>
                         <TextBlock Text="{Binding BackupError}" IsVisible="{Binding BackupError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                   Foreground="{StaticResource DangerBrush}"/>
+                                   Foreground="{DynamicResource DangerBrush}"/>
                     </StackPanel>
-                    <Button Grid.Column="1" Classes="secondary" Command="{Binding CancelBackupCommand}"
+                    <Button Grid.Column="1" Classes="secondary danger" Command="{Binding CancelBackupCommand}"
                             Content="{loc:Localize Action_Cancel}"
                             AutomationProperties.AutomationId="Dashboard_CancelBackup"
-                            Margin="{StaticResource MarginSpace2}"/>
+                            Margin="{DynamicResource MarginSpace2}"/>
                 </Grid>
                 <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsRestoring}">
-                    <StackPanel Spacing="{StaticResource Space1}">
+                    <StackPanel Spacing="{DynamicResource Space1}">
                         <TextBlock Text="{loc:Localize Dashboard_SelectBackup}"
-                                   Foreground="{StaticResource TextPrimary}"
+                                   Foreground="{DynamicResource TextPrimary}"
                                    FontWeight="SemiBold"/>
                         <ProgressBar Value="{Binding RestoreProgress}" Minimum="0" Maximum="100" Height="4"
                                      AutomationProperties.Name="{loc:Localize Dashboard_SelectBackup}"/>
                         <TextBlock Text="{Binding RestoreError}" IsVisible="{Binding RestoreError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                   Foreground="{StaticResource DangerBrush}"/>
+                                   Foreground="{DynamicResource DangerBrush}"/>
                     </StackPanel>
-                    <Button Grid.Column="1" Classes="secondary" Command="{Binding CancelRestoreCommand}"
+                    <Button Grid.Column="1" Classes="secondary danger" Command="{Binding CancelRestoreCommand}"
                             Content="{loc:Localize Action_Cancel}"
                             AutomationProperties.AutomationId="Dashboard_CancelRestore"
-                            Margin="{StaticResource MarginSpace2}"/>
+                            Margin="{DynamicResource MarginSpace2}"/>
                 </Grid>
                 <TextBlock Text="{loc:Localize Dashboard_BackupCancelled}"
                            IsVisible="{Binding BackupCancelled}"
-                           Foreground="{StaticResource TextSecondary}"/>
+                           Foreground="{DynamicResource TextSecondary}"/>
                 <TextBlock Text="{loc:Localize Dashboard_RestoreCancelled}"
                            IsVisible="{Binding RestoreCancelled}"
-                           Foreground="{StaticResource TextSecondary}"/>
+                           Foreground="{DynamicResource TextSecondary}"/>
                 <TextBlock Text="{Binding BackupError}"
                            IsVisible="{Binding BackupError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                           Foreground="{StaticResource DangerBrush}"/>
+                           Foreground="{DynamicResource DangerBrush}"/>
                 <TextBlock Text="{Binding RestoreError}"
                            IsVisible="{Binding RestoreError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                           Foreground="{StaticResource DangerBrush}"/>
+                           Foreground="{DynamicResource DangerBrush}"/>
             </StackPanel>
         </Border>
 
         <!-- ═══ MAIN: TreeView (left) + DataGrid (right) ═══ -->
-        <Grid ColumnDefinitions="190,Auto,*">
+        <Grid ColumnDefinitions="200,Auto,*">
 
             <!-- ── LEFT: Category Tree ── -->
-            <Border Grid.Column="0" Background="{StaticResource CardBackground}"
-                    BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,1,0">
+            <Border Grid.Column="0" Background="{DynamicResource CardBackground}"
+                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,1,0">
                 <DockPanel>
-                    <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
-                            Padding="{StaticResource PaddingNavItem}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <Image Source="{StaticResource IconCategory}" Width="15" Height="15"/>
-                            <TextBlock Text="{loc:Localize Dashboard_LblClassification}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextPrimary}"/>
+                    <Border DockPanel.Dock="Top" Background="{DynamicResource SidebarBackground}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1"
+                            Padding="{DynamicResource PaddingNavItem}">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <Image Source="{DynamicResource IconCategory}" Width="16" Height="16"/>
+                            <TextBlock Text="{loc:Localize Dashboard_LblClassification}" FontSize="{DynamicResource FontSizeMd}" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
 
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <ItemsControl ItemsSource="{Binding CategoryTreeItems}">
+                        <ItemsControl ItemsSource="{Binding CategoryTreeItems}" Margin="4,4">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="items:CategoryTreeItem">
                                     <Panel>
@@ -306,23 +309,25 @@
                                         <Border IsVisible="{Binding IsHeader}"
                                                 Padding="10,10,10,3" Margin="0,6,0,0">
                                             <TextBlock Text="{Binding Name}"
-                                                       FontSize="{StaticResource FontSizeSm}" FontWeight="Bold"
-                                                       Foreground="{StaticResource TextMuted}"
+                                                       FontSize="{DynamicResource FontSizeXs}" FontWeight="Bold"
+                                                       Foreground="{DynamicResource TextMuted}"
                                                        Opacity="0.8"/>
                                         </Border>
-                                        <!-- Normal nav items: clickable buttons -->
+                                        <!-- Normal nav items: clickable buttons with Soft Selection Pill Wash -->
                                         <Button IsVisible="{Binding !IsHeader}"
                                                 Classes="nav-item"
-                                                Padding="{StaticResource PaddingSidebar}"
+                                                Padding="8,6"
                                                 Margin="{Binding IndentMargin}"
+                                                CornerRadius="{DynamicResource RadiusMd}"
                                                 Command="{Binding $parent[ItemsControl].DataContext.FilterByCategoryCommand}"
                                                 CommandParameter="{Binding}"
                                                 ToolTip.Tip="{loc:Localize Dashboard_TipCategoryItem}">
-                                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
                                                 <Image Source="{Binding ResolvedIconSource}" Width="15" Height="15"
                                                        VerticalAlignment="Center"/>
-                                                <TextBlock Text="{Binding DisplayText}" FontSize="{StaticResource FontSizeMd}"
-                                                           Foreground="{StaticResource TextPrimary}"/>
+                                                <TextBlock Text="{Binding DisplayText}" FontSize="{DynamicResource FontSizeMd}"
+                                                           Foreground="{DynamicResource TextPrimary}"
+                                                           VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </Panel>
@@ -342,99 +347,99 @@
                 <Grid RowDefinitions="Auto,*,Auto,Auto">
 
                     <!-- ═══ STAT CARDS ═══ -->
-                    <Border Background="{StaticResource SidebarBackground}"
-                            Padding="{StaticResource PaddingStatCard}"
-                            BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1">
+                    <Border Background="{DynamicResource SidebarBackground}"
+                            Padding="{DynamicResource PaddingStatCard}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1">
                         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
                             <Grid ColumnDefinitions="*,*,*,*,*,*">
 
                             <!-- Card 1: Total -->
-                            <Border CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource StatBlueBg}"
-                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                                    Padding="{StaticResource PaddingNavItem}" Margin="0,0,4,0">
-                                <StackPanel Spacing="{StaticResource Space1}">
-                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
-                                        <Image Source="{StaticResource IconAllDocs}" Width="11" Height="11"/>
-                                        <TextBlock Text="{loc:Localize Dashboard_StatTotal}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextSecondary}"/>
+                            <Border CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource StatBlueBg}"
+                                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                    Padding="{DynamicResource PaddingNavItem}" Margin="0,0,6,0">
+                                <StackPanel Spacing="{DynamicResource Space1}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space1}">
+                                        <Image Source="{DynamicResource IconAllDocs}" Width="12" Height="12"/>
+                                        <TextBlock Text="{loc:Localize Dashboard_StatTotal}" FontSize="{DynamicResource FontSizeXs}"
+                                                   Foreground="{DynamicResource TextSecondary}"/>
                                     </StackPanel>
-                                    <TextBlock Text="{Binding TotalCount}" FontSize="{StaticResource FontSizeXl}"
-                                               FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
+                                    <TextBlock Text="{Binding TotalCount}" FontSize="{DynamicResource FontSizeXl}"
+                                               FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- Card 2: Subjects -->
-                            <Border Grid.Column="1" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource StatGreenBg}"
-                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                                    Padding="{StaticResource PaddingNavItem}" Margin="0,0,4,0">
-                                <StackPanel Spacing="{StaticResource Space1}">
-                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
-                                        <Image Source="{StaticResource IconCategory}" Width="11" Height="11"/>
-                                        <TextBlock Text="{loc:Localize Dashboard_StatCategories}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextSecondary}"/>
+                            <Border Grid.Column="1" CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource StatGreenBg}"
+                                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                    Padding="{DynamicResource PaddingNavItem}" Margin="0,0,6,0">
+                                <StackPanel Spacing="{DynamicResource Space1}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space1}">
+                                        <Image Source="{DynamicResource IconCategory}" Width="12" Height="12"/>
+                                        <TextBlock Text="{loc:Localize Dashboard_StatCategories}" FontSize="{DynamicResource FontSizeXs}"
+                                                   Foreground="{DynamicResource TextSecondary}"/>
                                     </StackPanel>
-                                    <TextBlock Text="{Binding SubjectCount}" FontSize="{StaticResource FontSizeXl}"
-                                               FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"/>
+                                    <TextBlock Text="{Binding SubjectCount}" FontSize="{DynamicResource FontSizeXl}"
+                                               FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- Card 3: Important -->
-                            <Border Grid.Column="2" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource StatAmberBg}"
-                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                                    Padding="{StaticResource PaddingNavItem}" Margin="0,0,4,0">
-                                <StackPanel Spacing="{StaticResource Space1}">
-                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
-                                        <Image Source="{StaticResource IconStar}" Width="11" Height="11"/>
-                                        <TextBlock Text="{loc:Localize Dashboard_StatImportant}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextSecondary}"/>
+                            <Border Grid.Column="2" CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource StatAmberBg}"
+                                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                    Padding="{DynamicResource PaddingNavItem}" Margin="0,0,6,0">
+                                <StackPanel Spacing="{DynamicResource Space1}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space1}">
+                                        <Image Source="{DynamicResource IconStar}" Width="12" Height="12"/>
+                                        <TextBlock Text="{loc:Localize Dashboard_StatImportant}" FontSize="{DynamicResource FontSizeXs}"
+                                                   Foreground="{DynamicResource TextSecondary}"/>
                                     </StackPanel>
-                                    <TextBlock Text="{Binding ImportantCount}" FontSize="{StaticResource FontSizeXl}"
-                                               FontWeight="Bold" Foreground="{StaticResource WarningBrush}"/>
+                                    <TextBlock Text="{Binding ImportantCount}" FontSize="{DynamicResource FontSizeXl}"
+                                               FontWeight="Bold" Foreground="{DynamicResource WarningBrush}"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- Card 4: Overdue -->
-                            <Border Grid.Column="3" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource StatRedBg}"
-                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                                    Padding="{StaticResource PaddingNavItem}" Margin="0,0,4,0">
-                                <StackPanel Spacing="{StaticResource Space1}">
-                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
-                                        <Image Source="{StaticResource IconClock}" Width="11" Height="11"/>
-                                        <TextBlock Text="{loc:Localize Dashboard_StatOverdue}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextSecondary}"/>
+                            <Border Grid.Column="3" CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource StatRedBg}"
+                                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                    Padding="{DynamicResource PaddingNavItem}" Margin="0,0,6,0">
+                                <StackPanel Spacing="{DynamicResource Space1}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space1}">
+                                        <Image Source="{DynamicResource IconClock}" Width="12" Height="12"/>
+                                        <TextBlock Text="{loc:Localize Dashboard_StatOverdue}" FontSize="{DynamicResource FontSizeXs}"
+                                                   Foreground="{DynamicResource TextSecondary}"/>
                                     </StackPanel>
-                                    <TextBlock Text="{Binding OverdueCount}" FontSize="{StaticResource FontSizeXl}"
-                                               FontWeight="Bold" Foreground="{StaticResource DangerBrush}"/>
+                                    <TextBlock Text="{Binding OverdueCount}" FontSize="{DynamicResource FontSizeXl}"
+                                               FontWeight="Bold" Foreground="{DynamicResource DangerBrush}"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- Card 5: No File -->
-                            <Border Grid.Column="4" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource CardBackground}"
-                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                                    Padding="{StaticResource PaddingNavItem}" Margin="0,0,4,0">
-                                <StackPanel Spacing="{StaticResource Space1}">
-                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
-                                        <Image Source="{StaticResource IconWarning}" Width="11" Height="11"/>
-                                        <TextBlock Text="{loc:Localize Dashboard_StatNoFile}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextSecondary}"/>
+                            <Border Grid.Column="4" CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource CardBackground}"
+                                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                    Padding="{DynamicResource PaddingNavItem}" Margin="0,0,6,0">
+                                <StackPanel Spacing="{DynamicResource Space1}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space1}">
+                                        <Image Source="{DynamicResource IconWarning}" Width="12" Height="12"/>
+                                        <TextBlock Text="{loc:Localize Dashboard_StatNoFile}" FontSize="{DynamicResource FontSizeXs}"
+                                                   Foreground="{DynamicResource TextSecondary}"/>
                                     </StackPanel>
-                                    <TextBlock Text="{Binding NoFileCount}" FontSize="{StaticResource FontSizeXl}"
-                                               FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
+                                    <TextBlock Text="{Binding NoFileCount}" FontSize="{DynamicResource FontSizeXl}"
+                                               FontWeight="Bold" Foreground="{DynamicResource TextMuted}"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- Card 6: Recycle Bin -->
-                            <Border Grid.Column="5" CornerRadius="{StaticResource RadiusMd}" Background="{StaticResource CardBackground}"
-                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                                    Padding="{StaticResource PaddingNavItem}">
-                                <StackPanel Spacing="{StaticResource Space1}">
-                                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
-                                        <Image Source="{StaticResource IconRecycle}" Width="11" Height="11"/>
-                                        <TextBlock Text="{loc:Localize Dashboard_StatRecycleBin}" FontSize="{StaticResource FontSizeXs}"
-                                                   Foreground="{StaticResource TextSecondary}"/>
+                            <Border Grid.Column="5" CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource CardBackground}"
+                                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                    Padding="{DynamicResource PaddingNavItem}">
+                                <StackPanel Spacing="{DynamicResource Space1}">
+                                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space1}">
+                                        <Image Source="{DynamicResource IconRecycle}" Width="12" Height="12"/>
+                                        <TextBlock Text="{loc:Localize Dashboard_StatRecycleBin}" FontSize="{DynamicResource FontSizeXs}"
+                                                   Foreground="{DynamicResource TextSecondary}"/>
                                     </StackPanel>
-                                    <TextBlock Text="{Binding RecycleBinCount}" FontSize="{StaticResource FontSizeXl}"
-                                               FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
+                                    <TextBlock Text="{Binding RecycleBinCount}" FontSize="{DynamicResource FontSizeXl}"
+                                               FontWeight="Bold" Foreground="{DynamicResource TextMuted}"/>
                                 </StackPanel>
                             </Border>
                             </Grid>
@@ -461,39 +466,39 @@
                                     <MenuItem AutomationProperties.AutomationId="Context_OpenFile"
                                               Header="{loc:Localize Dashboard_CtxOpenFile}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenFileCommand}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconDocPage}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconDocPage}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_EditDocument"
                                               Header="{loc:Localize Dashboard_CtxEditDoc}"
                                               Command="{Binding $parent[DataGrid].DataContext.EditDocumentCommand}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconEdit}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconEdit}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_ChangeCategory"
                                               Header="{loc:Localize Dashboard_CtxChangeCategory}"
                                               Command="{Binding $parent[DataGrid].DataContext.ChangeCategoryCommand}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconCategory}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconCategory}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_DeleteToTrash"
                                               Header="{loc:Localize Dashboard_CtxDeleteToTrash}"
                                               Command="{Binding $parent[DataGrid].DataContext.DeleteDocumentCommand}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconDelete}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconDelete}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
-                                    <!-- Copy &amp; Open -->
+                                    <!-- Copy & Open -->
                                     <MenuItem AutomationProperties.AutomationId="Context_CopyName"
                                               Header="{loc:Localize Dashboard_CtxCopyName}"
                                               Command="{Binding $parent[DataGrid].DataContext.CopyNameCommand}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconClipboard}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconClipboard}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_CopyPath"
                                               Header="{loc:Localize Dashboard_CtxCopyPath}"
                                               Command="{Binding $parent[DataGrid].DataContext.CopyPathCommand}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconExport}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconExport}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_OpenFolder"
                                               Header="{loc:Localize Dashboard_CtxOpenFolder}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenFolderCommand}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconOpenFile}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconOpenFile}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
                                     <!-- Quick-edit hidden fields -->
@@ -501,31 +506,31 @@
                                               Header="{loc:Localize Dashboard_CtxEditTags}"
                                               Command="{Binding $parent[DataGrid].DataContext.QuickEditTagsCommand}"
                                               ToolTip.Tip="{loc:Localize Dashboard_TipEditTags}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconTag}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconTag}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
-                                    <!-- Mark &amp; manage -->
+                                    <!-- Mark & manage -->
                                     <MenuItem AutomationProperties.AutomationId="Context_MarkImportant"
                                               Header="{loc:Localize Dashboard_CtxMarkImportant}"
                                               Command="{Binding $parent[DataGrid].DataContext.ToggleImportantCommand}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconStar}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconStar}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_PersonalNote"
                                               Header="{loc:Localize Dashboard_CtxPersonalNote}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenPersonalNoteCommand}"
                                               ToolTip.Tip="{loc:Localize Dashboard_TipPersonalNote}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconNote}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconNote}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_AddToCollection"
                                               Header="{loc:Localize Dashboard_CtxAddToCollection}"
                                               Command="{Binding $parent[DataGrid].DataContext.AddToCollectionCommand}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconAdd}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconAdd}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
                                     <MenuItem AutomationProperties.AutomationId="Context_RelatedDocuments"
                                               Header="{loc:Localize Dashboard_CtxRelatedDocs}"
                                               Command="{Binding $parent[DataGrid].DataContext.OpenRelatedDocumentsCommand}">
-                                        <MenuItem.Icon><Image Source="{StaticResource IconRelatedDocs}" Width="14" Height="14"/></MenuItem.Icon>
+                                        <MenuItem.Icon><Image Source="{DynamicResource IconRelatedDocs}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                 </ContextMenu>
                             </DataGrid.ContextMenu>
@@ -537,6 +542,8 @@
                                                 <Image Source="{Binding Type, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}"
                                                        Width="16" Height="16" VerticalAlignment="Center" />
                                                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                                           Foreground="{DynamicResource TextPrimary}"
+                                                           TextDecorations="{Binding Status, Converter={x:Static conv:CompletedTextDecorationConverter.Instance}}"
                                                            ToolTip.Tip="{Binding Name}"/>
                                             </StackPanel>
                                         </DataTemplate>
@@ -546,6 +553,8 @@
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate x:DataType="core:StudyDocument">
                                             <TextBlock Text="{Binding Subject}" VerticalAlignment="Center" Margin="8,0"
+                                                       Foreground="{DynamicResource TextPrimary}"
+                                                       TextDecorations="{Binding Status, Converter={x:Static conv:CompletedTextDecorationConverter.Instance}}"
                                                        TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Subject}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
@@ -555,7 +564,10 @@
                                     Binding="{Binding CreatedAt, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="100"/>
                                 <DataGridTextColumn Header="{loc:Localize Dashboard_ColSize}"
                                     Binding="{Binding FileSize, Mode=OneWay, StringFormat=\{0:F2\}}" Width="80"/>
-                                <DataGridTemplateColumn Header="★" Width="40">
+                                <DataGridTemplateColumn Width="40">
+                                    <DataGridTemplateColumn.Header>
+                                        <Image Source="{DynamicResource IconStar}" Width="13" Height="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate DataType="{x:Type core:StudyDocument}">
                                             <Button Background="Transparent" BorderThickness="0" Cursor="Hand"
@@ -566,11 +578,12 @@
                                                     Command="{Binding $parent[DataGrid].DataContext.ToggleImportantInlineCommand}"
                                                     CommandParameter="{Binding}">
                                                 <Panel>
-                                                    <Image Source="{StaticResource IconStar}" Width="14" Height="14"
+                                                    <Image Source="{DynamicResource IconStar}" Width="14" Height="14"
                                                            IsVisible="{Binding IsImportant}"/>
-                                                    <TextBlock Text="☆" FontSize="{StaticResource FontSizeLg}" Foreground="{StaticResource TextMuted}"
-                                                               IsVisible="{Binding !IsImportant}"
-                                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Image Source="{DynamicResource IconStarOutline}" Width="14" Height="14"
+                                                           IsVisible="{Binding !IsImportant}"
+                                                           Opacity="0.4"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Panel>
                                             </Button>
                                         </DataTemplate>
@@ -581,112 +594,112 @@
                                         <DataTemplate DataType="{x:Type core:StudyDocument}">
                                             <Border Background="{Binding Deadline, Converter={StaticResource DeadlineBrushConverter}}"
                                                     ToolTip.Tip="{Binding Deadline, Converter={x:Static conv:DeadlineStatusConverter.Instance}}"
-                                                    CornerRadius="{StaticResource RadiusXs}" Padding="{StaticResource PaddingXs}" Margin="1">
+                                                    CornerRadius="{DynamicResource RadiusXs}" Padding="{DynamicResource PaddingXs}" Margin="1">
                                                 <TextBlock Text="{Binding Deadline, StringFormat=\{0:dd/MM/yyyy\}}"
                                                            Foreground="{Binding Deadline, Converter={StaticResource DeadlineTextConverter}}"
                                                            VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                           FontSize="{StaticResource FontSizeSm}"/>
+                                                           FontSize="{DynamicResource FontSizeSm}"/>
                                             </Border>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <StackPanel Classes="empty-state" IsVisible="{Binding IsLoading}">
+                        <StackPanel Classes="empty-state" IsVisible="{Binding IsLoading}" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <ProgressBar IsIndeterminate="True" Width="180" Height="4"/>
                             <TextBlock Classes="empty-state-text" Text="{loc:Localize Status_Loading}"/>
                         </StackPanel>
-                        <StackPanel Classes="empty-state" IsVisible="{Binding HasLoadError}">
-                            <Image Classes="empty-state-icon" Source="{StaticResource IconWarning}"/>
+                        <StackPanel Classes="empty-state" IsVisible="{Binding HasLoadError}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Image Classes="empty-state-icon" Source="{DynamicResource IconWarning}"/>
                             <TextBlock Classes="empty-state-text" Text="{Binding StateMessage}"/>
                             <Button Classes="secondary" Command="{Binding RefreshCommand}"
-                                    Padding="{StaticResource PaddingBtnSm}"
+                                    Padding="{DynamicResource PaddingBtnSm}"
                                     Content="{loc:Localize Dashboard_BtnRetry}"/>
                         </StackPanel>
-                        <StackPanel Classes="empty-state" IsVisible="{Binding IsEmptyState}">
-                            <Image Classes="empty-state-icon" Source="{StaticResource IconDocPage}"/>
+                        <StackPanel Classes="empty-state" IsVisible="{Binding IsEmptyState}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Image Classes="empty-state-icon" Source="{DynamicResource IconDocPage}"/>
                             <TextBlock Classes="empty-state-text" Text="{Binding StateMessage}"/>
                             <Button Classes="primary" Command="{Binding AddDocumentCommand}"
                                     IsVisible="{Binding IsDatabaseEmpty}"
-                                    Padding="{StaticResource PaddingBtnSm}" Margin="0,8,0,0"
+                                    Padding="{DynamicResource PaddingBtnSm}" Margin="0,8,0,0"
                                     Content="{loc:Localize Toolbar_Add}"
                                     AutomationProperties.AutomationId="Dashboard_EmptyState_AddButton"/>
                         </StackPanel>
                         </Panel>
                     </Border>
 
-                    <!-- ═══ DOCUMENT PREVIEW PANEL (collapsible, like WinForms) ═══ -->
+                    <!-- ═══ DOCUMENT PREVIEW PANEL (Collapsible metadata card) ═══ -->
                     <Border Grid.Row="2"
                             IsVisible="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
-                            Background="{StaticResource SidebarBackground}"
-                            BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
-                            Padding="{StaticResource PaddingCardLg}" MaxHeight="140">
+                            Background="{DynamicResource SidebarBackground}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0"
+                            Padding="{DynamicResource PaddingCardLg}" MaxHeight="140">
                         <Grid ColumnDefinitions="Auto,*">
 
                             <!-- Image preview (show for image files) -->
-                            <Border CornerRadius="{StaticResource RadiusMd}" ClipToBounds="True"
+                            <Border CornerRadius="{DynamicResource RadiusMd}" ClipToBounds="True"
                                     Width="100" Height="100" Margin="0,0,16,0"
-                                    Background="{StaticResource CardBackground}"
-                                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                                    Background="{DynamicResource CardBackground}"
+                                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1">
                                 <Panel>
                                     <!-- Document type icon -->
-                                    <Image Source="{StaticResource IconDocPage}" Width="40" Height="40"
+                                    <Image Source="{DynamicResource IconDocPage}" Width="40" Height="40"
                                            HorizontalAlignment="Center" VerticalAlignment="Center"
                                            Opacity="0.6"/>
                                 </Panel>
                             </Border>
 
                             <!-- Metadata -->
-                            <StackPanel Grid.Column="1" Spacing="3" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding SelectedDocument.Name}" FontSize="{StaticResource FontSizeLg}" FontWeight="Bold"
-                                            Foreground="{StaticResource TextPrimary}"
+                            <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding SelectedDocument.Name}" FontSize="{DynamicResource FontSizeLg}" FontWeight="Bold"
+                                            Foreground="{DynamicResource TextPrimary}"
                                             TextTrimming="CharacterEllipsis"
                                             ToolTip.Tip="{Binding SelectedDocument.Name}"/>
                                 <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <StackPanel Orientation="Horizontal" Spacing="3">
-                                        <Image Source="{StaticResource IconCategory}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding SelectedDocument.Subject}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <Image Source="{DynamicResource IconCategory}" Width="12" Height="12"/>
+                                        <TextBlock Text="{Binding SelectedDocument.Subject}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextSecondary}"/>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="3">
-                                        <Image Source="{StaticResource IconDocPage}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding SelectedDocument.Type}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <Image Source="{DynamicResource IconDocPage}" Width="12" Height="12"/>
+                                        <TextBlock Text="{Binding SelectedDocument.Type}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextSecondary}"/>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="3"
+                                    <StackPanel Orientation="Horizontal" Spacing="4"
                                                 IsVisible="{Binding SelectedDocument.IsImportant}">
-                                        <Image Source="{StaticResource IconStar}" Width="11" Height="11"/>
-                                        <TextBlock Text="{loc:Localize Dashboard_PreviewImportant}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource WarningBrush}"/>
+                                        <Image Source="{DynamicResource IconStar}" Width="12" Height="12"/>
+                                        <TextBlock Text="{loc:Localize Dashboard_PreviewImportant}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource WarningBrush}"/>
                                     </StackPanel>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconOpenFile}" Width="10" Height="10"/>
-                                    <TextBlock Text="{Binding SelectedDocument.FilePath}" FontSize="{StaticResource FontSizeXs}"
-                                                Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="{DynamicResource IconOpenFile}" Width="11" Height="11"/>
+                                    <TextBlock Text="{Binding SelectedDocument.FilePath}" FontSize="{DynamicResource FontSizeXs}"
+                                                Foreground="{DynamicResource TextMuted}" TextTrimming="CharacterEllipsis"
                                                 ToolTip.Tip="{Binding SelectedDocument.FilePath}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <StackPanel Orientation="Horizontal" Spacing="3">
-                                        <Image Source="{StaticResource IconCalendar}" Width="10" Height="10"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <Image Source="{DynamicResource IconCalendar}" Width="11" Height="11"/>
                                         <TextBlock Text="{Binding SelectedDocument.CreatedAt, StringFormat=\{0:dd/MM/yyyy HH:mm\}}"
-                                                   FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}"/>
+                                                   FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource TextMuted}"/>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="3"
+                                    <StackPanel Orientation="Horizontal" Spacing="4"
                                                 IsVisible="{Binding SelectedDocument.FileSize, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <Image Source="{StaticResource IconHDD}" Width="10" Height="10"/>
+                                        <Image Source="{DynamicResource IconHDD}" Width="11" Height="11"/>
                                         <TextBlock Text="{Binding SelectedDocument.FileSize, StringFormat=\{0:F2\} MB}"
-                                                   FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}"/>
+                                                   FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource TextMuted}"/>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="3"
+                                    <StackPanel Orientation="Horizontal" Spacing="4"
                                                 IsVisible="{Binding SelectedDocument.Deadline, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <Image Source="{StaticResource IconClock}" Width="14" Height="14"/>
+                                        <Image Source="{DynamicResource IconClock}" Width="14" Height="14"/>
                                         <TextBlock Text="{Binding SelectedDocument.Deadline, StringFormat={loc:Localize Dashboard_PreviewDeadline}}"
-                                                   FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource DangerBrush}"/>
+                                                   FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource DangerBrush}"/>
                                     </StackPanel>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="3"
+                                <StackPanel Orientation="Horizontal" Spacing="4"
                                             IsVisible="{Binding SelectedDocument.Tags, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                                    <Image Source="{StaticResource IconTag}" Width="10" Height="10"/>
-                                    <TextBlock Text="{Binding SelectedDocument.Tags}" FontSize="{StaticResource FontSizeXs}"
-                                                Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"
+                                    <Image Source="{DynamicResource IconTag}" Width="11" Height="11"/>
+                                    <TextBlock Text="{Binding SelectedDocument.Tags}" FontSize="{DynamicResource FontSizeXs}"
+                                                Foreground="{DynamicResource TextMuted}" TextTrimming="CharacterEllipsis"
                                                 ToolTip.Tip="{Binding SelectedDocument.Tags}"/>
                                 </StackPanel>
                             </StackPanel>
@@ -694,87 +707,87 @@
                     </Border>
 
                     <!-- Status Bar -->
-                    <Border Grid.Row="3" Background="{StaticResource CardBackground}"
-                            BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
-                            Padding="{StaticResource PaddingMd}">
+                    <Border Grid.Row="3" Background="{DynamicResource CardBackground}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0"
+                            Padding="{DynamicResource PaddingMd}">
                         <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
-                            <TextBlock Text="{Binding StatusText}" FontSize="{StaticResource FontSizeSm}"
-                                       Foreground="{StaticResource TextSecondary}"
+                            <TextBlock Text="{Binding StatusText}" FontSize="{DynamicResource FontSizeSm}"
+                                       Foreground="{DynamicResource TextSecondary}"
                                        VerticalAlignment="Center"/>
 
                             <!-- Quick action buttons -->
-                            <Button Grid.Column="1" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                            <Button Grid.Column="1" Classes="secondary" Padding="{DynamicResource PaddingBtnSm}"
                                     AutomationProperties.AutomationId="Dashboard_QuickRefresh"
                                     AutomationProperties.Name="{loc:Localize Dashboard_BtnRefresh}"
                                     AutomationProperties.HelpText="{loc:Localize Dashboard_TipRefresh}"
                                     Command="{Binding RefreshCommand}"
-                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
+                                    Margin="4,0" Height="{DynamicResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipRefresh}">
-                                <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconRefresh}" Width="12" Height="12"/>
-                                    <TextBlock Text="{loc:Localize Dashboard_BtnRefresh}" FontSize="{StaticResource FontSizeXs}"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="{DynamicResource IconRefresh}" Width="12" Height="12"/>
+                                    <TextBlock Text="{loc:Localize Dashboard_BtnRefresh}" FontSize="{DynamicResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="2" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                            <Button Grid.Column="2" Classes="secondary" Padding="{DynamicResource PaddingBtnSm}"
                                     AutomationProperties.AutomationId="Dashboard_QuickUpcoming"
                                     AutomationProperties.Name="{loc:Localize Dashboard_BtnUpcoming}"
                                     AutomationProperties.HelpText="{loc:Localize Dashboard_TipUpcoming}"
                                     Command="{Binding ShowUpcomingDeadlinesCommand}"
-                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
+                                    Margin="4,0" Height="{DynamicResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipUpcoming}">
-                                <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconClock}" Width="14" Height="14"/>
-                                    <TextBlock Text="{loc:Localize Dashboard_BtnUpcoming}" FontSize="{StaticResource FontSizeXs}"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="{DynamicResource IconClock}" Width="14" Height="14"/>
+                                    <TextBlock Text="{loc:Localize Dashboard_BtnUpcoming}" FontSize="{DynamicResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="3" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                            <Button Grid.Column="3" Classes="secondary" Padding="{DynamicResource PaddingBtnSm}"
                                     AutomationProperties.AutomationId="Dashboard_QuickOverdue"
                                     AutomationProperties.Name="{loc:Localize Dashboard_BtnOverdue}"
                                     AutomationProperties.HelpText="{loc:Localize Dashboard_TipOverdue}"
                                     Command="{Binding ShowOverdueCommand}"
-                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
+                                    Margin="4,0" Height="{DynamicResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipOverdue}">
-                                <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconWarning}" Width="12" Height="12"/>
-                                    <TextBlock Text="{loc:Localize Dashboard_BtnOverdue}" FontSize="{StaticResource FontSizeXs}"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="{DynamicResource IconWarning}" Width="12" Height="12"/>
+                                    <TextBlock Text="{loc:Localize Dashboard_BtnOverdue}" FontSize="{DynamicResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="StatusCopyPathButton" Grid.Column="4" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                            <Button x:Name="StatusCopyPathButton" Grid.Column="4" Classes="secondary" Padding="{DynamicResource PaddingBtnSm}"
                                     AutomationProperties.AutomationId="Dashboard_QuickCopyPath"
                                     AutomationProperties.Name="{loc:Localize Dashboard_CtxCopyPath}"
                                     AutomationProperties.HelpText="{loc:Localize Dashboard_TipCopyPath}"
                                     Command="{Binding CopyPathCommand}"
                                     IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
+                                    Margin="4,0" Height="{DynamicResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipCopyPath}">
-                                <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconClipboard}" Width="12" Height="12"/>
-                                    <TextBlock Text="{loc:Localize Dashboard_CtxCopyPath}" FontSize="{StaticResource FontSizeXs}"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="{DynamicResource IconClipboard}" Width="12" Height="12"/>
+                                    <TextBlock Text="{loc:Localize Dashboard_CtxCopyPath}" FontSize="{DynamicResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="StatusOpenFolderButton" Grid.Column="5" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                            <Button x:Name="StatusOpenFolderButton" Grid.Column="5" Classes="secondary" Padding="{DynamicResource PaddingBtnSm}"
                                     AutomationProperties.AutomationId="Dashboard_QuickOpenFolder"
                                     AutomationProperties.Name="{loc:Localize Dashboard_BtnOpenFolder}"
                                     AutomationProperties.HelpText="{loc:Localize Dashboard_TipOpenFolder}"
                                     Command="{Binding OpenFolderCommand}"
                                     IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
+                                    Margin="4,0" Height="{DynamicResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipOpenFolder}">
-                                <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconCategory}" Width="12" Height="12"/>
-                                    <TextBlock Text="{loc:Localize Dashboard_BtnOpenFolder}" FontSize="{StaticResource FontSizeXs}"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="{DynamicResource IconCategory}" Width="12" Height="12"/>
+                                    <TextBlock Text="{loc:Localize Dashboard_BtnOpenFolder}" FontSize="{DynamicResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
-                            <Button Grid.Column="6" Classes="secondary" Padding="{StaticResource PaddingBtnSm}"
+                            <Button Grid.Column="6" Classes="secondary" Padding="{DynamicResource PaddingBtnSm}"
                                     AutomationProperties.AutomationId="Dashboard_QuickAbout"
                                     AutomationProperties.Name="{loc:Localize Menu_About}"
                                     AutomationProperties.HelpText="{loc:Localize Dashboard_TipAbout}"
                                     Command="{Binding ShowAboutCommand}"
-                                    Margin="4,0" Height="{StaticResource HeightButton}" VerticalAlignment="Center"
-                                    ToolTip.Tip="{loc:Localize Dashboard_TipAbout}">
-                                <StackPanel Orientation="Horizontal" Spacing="3">
-                                    <Image Source="{StaticResource IconInfo}" Width="12" Height="12"/>
-                                    <TextBlock Text="{loc:Localize Menu_About}" FontSize="{StaticResource FontSizeXs}"/>
+                                    Margin="4,0" Height="{DynamicResource HeightButton}" VerticalAlignment="Center"
+                                    ToolTip.Tip="{loc:Localize Menu_About}">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Image Source="{DynamicResource IconInfo}" Width="12" Height="12"/>
+                                    <TextBlock Text="{loc:Localize Menu_About}" FontSize="{DynamicResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
                         </Grid>

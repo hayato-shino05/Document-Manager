@@ -38,30 +38,31 @@
     <DockPanel>
 
         <!-- ═══ MENU BAR ═══ -->
-        <Border DockPanel.Dock="Top" Background="{StaticResource CardBackground}"
-                Padding="0" Height="30">
+        <Border DockPanel.Dock="Top" Background="{DynamicResource CardBackground}"
+                BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1"
+                Padding="2,0" Height="32">
             <DockPanel>
                 <!-- Language selector (right side) — Button+Flyout -->
                 <Button DockPanel.Dock="Right"
                         Classes="secondary"
                         Margin="4,0,8,0"
-                        Padding="10,5"
+                        Padding="10,4"
                         VerticalAlignment="Center"
-                        CornerRadius="4"
+                        CornerRadius="{DynamicResource RadiusSm}"
                         AutomationProperties.AutomationId="Toolbar_Language"
                         AutomationProperties.Name="{loc:Localize Menu_ChangeLanguage}"
                         AutomationProperties.HelpText="{loc:Localize Menu_ChangeLanguage}"
                         ToolTip.Tip="{loc:Localize Menu_ChangeLanguage}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <Image Source="{StaticResource IconLanguage}" Width="16" Height="16" Classes="toolbar-btn-icon"/>
+                        <Image Source="{DynamicResource IconLanguage}" Width="15" Height="15" Classes="toolbar-btn-icon"/>
                         <TextBlock Text="{Binding SelectedLanguage, Converter={StaticResource LangDisplayConverter}}" 
                                    VerticalAlignment="Center" 
-                                   FontSize="{StaticResource FontSizeSm}"/>
-                        <TextBlock Text="▼" 
-                                   VerticalAlignment="Center" 
-                                   FontSize="9" 
-                                   Opacity="0.5"
-                                   Margin="2,1,0,0"/>
+                                   FontSize="{DynamicResource FontSizeSm}"/>
+                        <Image Source="{DynamicResource IconChevronDown}" 
+                               Width="9" Height="9" 
+                               VerticalAlignment="Center" 
+                               Opacity="0.6"
+                               Margin="2,1,0,0"/>
                     </StackPanel>
                     <Button.Flyout>
                         <MenuFlyout Placement="BottomEdgeAlignedRight">
@@ -81,7 +82,7 @@
                     </Button.Flyout>
                 </Button>
 
-                <Menu Background="Transparent" Padding="4,0">
+                <Menu Background="Transparent" Padding="4,0" VerticalAlignment="Center">
                     <MenuItem Header="{loc:Localize Menu_File}"
                               AutomationProperties.AutomationId="Menu_File">
                         <MenuItem Header="{loc:Localize Menu_AddNewDocument}" Command="{Binding NavigateCommand}" CommandParameter="add" InputGesture="Ctrl+N" HotKey="Ctrl+N"/>
@@ -113,10 +114,10 @@
                         <MenuItem Header="{loc:Localize ImportInbox_Title}" Command="{Binding NavigateCommand}" CommandParameter="import-inbox"/>
                         <MenuItem Header="{loc:Localize WF_Title}" Command="{Binding NavigateCommand}" CommandParameter="watchedfolder"/>
                     </MenuItem>
-            <MenuItem Header="{loc:Localize Menu_Maintenance}"
-                      AutomationProperties.AutomationId="Menu_Maintenance">
-                <MenuItem Header="{loc:Localize RC_Title}" Command="{Binding NavigateCommand}" CommandParameter="recovery"/>
-                <MenuItem Header="{loc:Localize Menu_BulkDelete}" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
+                    <MenuItem Header="{loc:Localize Menu_Maintenance}"
+                              AutomationProperties.AutomationId="Menu_Maintenance">
+                        <MenuItem Header="{loc:Localize RC_Title}" Command="{Binding NavigateCommand}" CommandParameter="recovery"/>
+                        <MenuItem Header="{loc:Localize Menu_BulkDelete}" Command="{Binding NavigateCommand}" CommandParameter="bulk-delete"/>
                         <MenuItem Header="{loc:Localize Menu_FindDuplicates}" Command="{Binding NavigateCommand}" CommandParameter="duplicates"/>
                         <MenuItem Header="{loc:Localize Menu_FileCheck}" Command="{Binding NavigateCommand}" CommandParameter="integrity"/>
                         <MenuItem Header="{loc:Localize Menu_RecycleBin}" Command="{Binding NavigateCommand}" CommandParameter="recycle"/>
@@ -137,20 +138,21 @@
             </DockPanel>
         </Border>
 
-        <!-- ═══ TOOLBAR (like WinForms ToolStrip with many icon buttons) ═══ -->
-        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
-                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,0,0,1"
-                Padding="6,3">
+        <!-- ═══ TOOLBAR (Fluent 2 Action Bar with solid accent primary button) ═══ -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource SidebarBackground}"
+                BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1"
+                Padding="8,4">
             <DockPanel>
-                <StackPanel Orientation="Horizontal" Spacing="1">
-                    <Button Classes="secondary toolbar-btn" Command="{Binding NavigateCommand}" CommandParameter="add"
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <!-- Primary Accent Action: Add Document -->
+                    <Button Classes="primary toolbar-btn" Command="{Binding NavigateCommand}" CommandParameter="add"
                             AutomationProperties.AutomationId="Toolbar_Add"
                             AutomationProperties.Name="{loc:Localize Toolbar_Add}"
                             AutomationProperties.HelpText="{loc:Localize Menu_AddNewDocument}"
                             FontWeight="SemiBold">
                         <StackPanel Classes="toolbar-btn-stack">
-                            <Image Source="{StaticResource IconAdd}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{loc:Localize Toolbar_Add}" Classes="toolbar-btn-label"/>
+                            <Image Source="{DynamicResource IconAddWhite}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="{loc:Localize Toolbar_Add}" Classes="toolbar-btn-label" Foreground="{DynamicResource OnColorPrimaryBrush}"/>
                         </StackPanel>
                     </Button>
 
@@ -161,7 +163,7 @@
                             AutomationProperties.Name="{loc:Localize Toolbar_OpenFile}"
                             AutomationProperties.HelpText="{loc:Localize Menu_OpenDocument}">
                         <StackPanel Classes="toolbar-btn-stack">
-                            <Image Source="{StaticResource IconOpenFile}" Classes="toolbar-btn-icon"/>
+                            <Image Source="{DynamicResource IconOpenFile}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Toolbar_OpenFile}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
@@ -170,7 +172,7 @@
                             AutomationProperties.Name="{loc:Localize Toolbar_Export}"
                             AutomationProperties.HelpText="{loc:Localize Menu_ExportCsv}">
                         <StackPanel Classes="toolbar-btn-stack">
-                            <Image Source="{StaticResource IconExport}" Classes="toolbar-btn-icon"/>
+                            <Image Source="{DynamicResource IconExport}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Toolbar_Export}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
@@ -179,7 +181,7 @@
                             AutomationProperties.Name="{loc:Localize Action_Refresh}"
                             AutomationProperties.HelpText="{loc:Localize Menu_RefreshList}">
                         <StackPanel Classes="toolbar-btn-stack">
-                            <Image Source="{StaticResource IconRefresh}" Classes="toolbar-btn-icon"/>
+                            <Image Source="{DynamicResource IconRefresh}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Action_Refresh}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
@@ -192,7 +194,7 @@
                             AutomationProperties.Name="{loc:Localize Action_Import}"
                             AutomationProperties.HelpText="{loc:Localize Menu_BatchImport}">
                         <StackPanel Classes="toolbar-btn-stack">
-                            <Image Source="{StaticResource IconImport}" Classes="toolbar-btn-icon"/>
+                            <Image Source="{DynamicResource IconImport}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Action_Import}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
@@ -205,7 +207,7 @@
                             AutomationProperties.Name="{loc:Localize Menu_Statistics}"
                             AutomationProperties.HelpText="{loc:Localize Menu_Statistics}">
                         <StackPanel Classes="toolbar-btn-stack">
-                            <Image Source="{StaticResource IconReport}" Classes="toolbar-btn-icon"/>
+                            <Image Source="{DynamicResource IconReport}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Menu_Statistics}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
@@ -215,7 +217,7 @@
                             AutomationProperties.Name="{loc:Localize TreeMap_Title}"
                             AutomationProperties.HelpText="{loc:Localize TreeMap_Title}">
                         <StackPanel Classes="toolbar-btn-stack">
-                            <Image Source="{StaticResource IconTreeMap}" Classes="toolbar-btn-icon"/>
+                            <Image Source="{DynamicResource IconTreeMap}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize TreeMap_Title}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
@@ -231,7 +233,7 @@
                             AutomationProperties.HelpText="{loc:Localize Menu_Undo}"
                             IsVisible="{Binding CanUndo}">
                         <StackPanel Classes="toolbar-btn-stack">
-                            <Image Source="{StaticResource IconBack}" Classes="toolbar-btn-icon"/>
+                            <Image Source="{DynamicResource IconBack}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Menu_Undo}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
@@ -241,7 +243,7 @@
                             AutomationProperties.HelpText="{loc:Localize Toolbar_GoBack}"
                             IsVisible="{Binding CanGoBack}">
                         <StackPanel Classes="toolbar-btn-stack">
-                            <Image Source="{StaticResource IconBack}" Classes="toolbar-btn-icon"/>
+                            <Image Source="{DynamicResource IconBack}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Toolbar_GoBack}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
@@ -250,20 +252,20 @@
         </Border>
 
         <!-- ═══ STATUS BAR (bottom) ═══ -->
-        <Border DockPanel.Dock="Bottom" Background="{StaticResource CardBackground}"
-                BorderBrush="{StaticResource CardBorder}" BorderThickness="0,1,0,0"
-                Padding="12,3" Height="26">
+        <Border DockPanel.Dock="Bottom" Background="{DynamicResource CardBackground}"
+                BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0"
+                Padding="12,4" Height="28">
             <DockPanel>
                 <!-- Version label (right) -->
                 <TextBlock DockPanel.Dock="Right"
                            Text="{Binding AppVersion, StringFormat='v{0}'}"
-                           FontSize="{StaticResource FontSizeXs}"
-                           Foreground="{StaticResource TextMuted}"
+                           FontSize="{DynamicResource FontSizeXs}"
+                           Foreground="{DynamicResource TextMuted}"
                            VerticalAlignment="Center" Margin="0,0,4,0"/>
 
                 <!-- Status text (fills left) -->
-                <TextBlock FontSize="{StaticResource FontSizeSm}"
-                           Foreground="{StaticResource TextSecondary}"
+                <TextBlock FontSize="{DynamicResource FontSizeSm}"
+                           Foreground="{DynamicResource TextSecondary}"
                            VerticalAlignment="Center"
                            Text="{Binding StatusText}"/>
             </DockPanel>
