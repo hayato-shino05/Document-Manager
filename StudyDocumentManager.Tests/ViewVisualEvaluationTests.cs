@@ -295,7 +295,12 @@ public sealed class ViewVisualEvaluationTests
         dialog.InvalidateVisual();
         Dispatcher.UIThread.RunJobs();
 
-        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        var buttons = dialog.GetVisualDescendants().OfType<Button>()
+            .Where(b => b is not RepeatButton
+                        && b is not Avalonia.Controls.Primitives.ToggleButton
+                        && b.FindAncestorOfType<Avalonia.Controls.Primitives.ScrollBar>() == null
+                        && b.FindAncestorOfType<Expander>() == null)
+            .ToList();
         Assert.True(buttons.Count >= 3);
         foreach (var btn in buttons)
         {

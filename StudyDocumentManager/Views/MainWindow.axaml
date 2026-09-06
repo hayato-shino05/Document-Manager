@@ -230,7 +230,7 @@
                             AutomationProperties.Name="{loc:Localize SW_Title}"
                             AutomationProperties.HelpText="{loc:Localize SW_Title}">
                         <StackPanel Classes="toolbar-btn-stack">
-                            <Image Source="{DynamicResource IconBook}" Classes="toolbar-btn-icon"/>
+                            <Image Source="{DynamicResource IconSchool}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize SW_Title}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>
@@ -240,7 +240,7 @@
                             AutomationProperties.Name="{loc:Localize OW_Title}"
                             AutomationProperties.HelpText="{loc:Localize OW_Title}">
                         <StackPanel Classes="toolbar-btn-stack">
-                            <Image Source="{DynamicResource IconClipboard}" Classes="toolbar-btn-icon"/>
+                            <Image Source="{DynamicResource IconBriefcase}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize OW_Title}" Classes="toolbar-btn-label"/>
                         </StackPanel>
                     </Button>

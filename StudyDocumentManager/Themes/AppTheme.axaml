@@ -554,6 +554,39 @@
             </DrawingGroup>
         </DrawingImage>
 
+        <!-- Student / Education: graduation mortarboard cap with gold tassel -->
+        <DrawingImage x:Key="IconSchool">
+            <DrawingGroup>
+                <!-- Cap diamond board -->
+                <GeometryDrawing Brush="{StaticResource BrushIconIndigo}"
+                    Geometry="M12,3 L1,8.5 L12,14 L21,9.5 L21,15 L23,15 L23,8.5 Z"/>
+                <!-- Cap skull cap base -->
+                <GeometryDrawing Brush="{StaticResource BrushIconAccent}"
+                    Geometry="M5,12.5 L5,16.5 C5,18.8 8.1,20.5 12,20.5 C15.9,20.5 19,18.8 19,16.5 L19,12.5 L12,16 Z"/>
+                <!-- Gold tassel -->
+                <GeometryDrawing Brush="{StaticResource BrushIconStarFill}"
+                    Geometry="M21.5,9.5 L21.5,15.5 L20,15.5 L23,15.5 Z"/>
+            </DrawingGroup>
+        </DrawingImage>
+
+        <!-- Briefcase / Business: professional executive briefcase -->
+        <DrawingImage x:Key="IconBriefcase">
+            <DrawingGroup>
+                <!-- Handle -->
+                <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"
+                    Geometry="M9,3 C9,1.9 9.9,1 11,1 L13,1 C14.1,1 15,1.9 15,3 L15,5 L9,5 Z M10.5,3 L13.5,3 L13.5,5 L10.5,5 Z"/>
+                <!-- Briefcase main body -->
+                <GeometryDrawing Brush="{StaticResource BrushIconAmberDark}"
+                    Geometry="M3,5 L21,5 C22.1,5 23,5.9 23,7 L23,19 C23,20.1 22.1,21 21,21 L3,21 C1.9,21 1,20.1 1,19 L1,7 C1,5.9 1.9,5 3,5 Z"/>
+                <!-- Flap -->
+                <GeometryDrawing Brush="{StaticResource BrushIconFolderBase}"
+                    Geometry="M1,7 L23,7 L23,13 L15,13 L15,15 L9,15 L9,13 L1,13 Z"/>
+                <!-- Lock clasp -->
+                <GeometryDrawing Brush="{StaticResource BrushIconStarFill}"
+                    Geometry="M10,12 L14,12 L14,15 L10,15 Z"/>
+            </DrawingGroup>
+        </DrawingImage>
+
     </Styles.Resources>
 
     <!-- ══════════════     COMPONENT STYLES     ══════════════ -->
