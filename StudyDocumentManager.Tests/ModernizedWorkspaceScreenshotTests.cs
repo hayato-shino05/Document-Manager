@@ -20,7 +20,8 @@ public class ModernizedWorkspaceScreenshotTests
     private static readonly string[] ScreenshotDirs =
     [
         @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\52f12f8f-7bf7-4eb1-87ac-d5a0904b69e0\screenshots",
-        @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\f4eaec18-0c78-44ee-93e6-52f0f00e920d\screenshots"
+        @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\f4eaec18-0c78-44ee-93e6-52f0f00e920d\screenshots",
+        @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\bf017a99-cde4-41f6-81af-b868e39262af\screenshots"
     ];
 
     [AvaloniaFact]
