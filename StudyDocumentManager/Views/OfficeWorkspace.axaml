@@ -84,6 +84,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                     <Button Grid.Column="3" Content="{loc:Localize Action_Refresh}" Command="{Binding RefreshCommand}"
+                            Classes="secondary"
                             automation:AutomationProperties.AutomationId="OfficeWorkspace_Refresh"/>
                 </Grid>
             </StackPanel>
@@ -196,7 +197,7 @@
                             <!-- Action Buttons -->
                             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
                                 <Button Content="{loc:Localize Action_Save}" Command="{Binding SaveMetadataCommand}"
-                                        Classes="accent" IsEnabled="{Binding HasSelection}"
+                                        Classes="primary" IsEnabled="{Binding HasSelection}"
                                         automation:AutomationProperties.AutomationId="OfficeWorkspace_Save"/>
                                 <Button Content="{loc:Localize Toolbar_OpenFile}" Command="{Binding OpenFileCommand}"
                                         Classes="secondary" IsEnabled="{Binding HasSelection}"

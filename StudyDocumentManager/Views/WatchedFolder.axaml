@@ -10,16 +10,16 @@
   <DockPanel Margin="24">
       <StackPanel DockPanel.Dock="Top" Spacing="10">
         <WrapPanel Orientation="Horizontal">
-          <Button AutomationProperties.AutomationId="WatchedFolder_Back" Content="{loc:Localize Btn_Back}" Command="{Binding GoBackCommand}" Margin="0,0,8,0" />
+          <Button AutomationProperties.AutomationId="WatchedFolder_Back" Classes="secondary" Content="{loc:Localize Btn_Back}" Command="{Binding GoBackCommand}" Margin="0,0,8,0" />
         <TextBlock Text="{loc:Localize WF_Title}" FontSize="24" Margin="0,0,8,0" />
-        <Button AutomationProperties.AutomationId="WatchedFolder_Start" Content="{loc:Localize WF_Start}" Command="{Binding StartWatchingCommand}" IsEnabled="{Binding !IsWatching}" Margin="0,0,8,0" />
-        <Button AutomationProperties.AutomationId="WatchedFolder_Stop" Content="{loc:Localize WF_Stop}" Command="{Binding StopWatchingCommand}" IsEnabled="{Binding IsWatching}" />
+        <Button AutomationProperties.AutomationId="WatchedFolder_Start" Classes="primary" Content="{loc:Localize WF_Start}" Command="{Binding StartWatchingCommand}" IsEnabled="{Binding !IsWatching}" Margin="0,0,8,0" />
+        <Button AutomationProperties.AutomationId="WatchedFolder_Stop" Classes="danger" Content="{loc:Localize WF_Stop}" Command="{Binding StopWatchingCommand}" IsEnabled="{Binding IsWatching}" />
       </WrapPanel>
         <Grid ColumnDefinitions="*,Auto,Auto,Auto">
           <TextBox Grid.Column="0" AutomationProperties.AutomationId="WatchedFolder_Path" AutomationProperties.Name="{loc:Localize WF_FolderPath}" MinWidth="160" Margin="0,0,8,0" Text="{Binding NewFolderPath}" Watermark="{loc:Localize WF_FolderPath}" />
-          <Button Grid.Column="1" AutomationProperties.AutomationId="WatchedFolder_Browse" AutomationProperties.Name="{loc:Localize AddEdit_BtnBrowse}" Content="{loc:Localize AddEdit_BtnBrowse}" Command="{Binding BrowseFolderCommand}" Margin="0,0,8,0" />
+          <Button Grid.Column="1" AutomationProperties.AutomationId="WatchedFolder_Browse" AutomationProperties.Name="{loc:Localize AddEdit_BtnBrowse}" Classes="secondary" Content="{loc:Localize AddEdit_BtnBrowse}" Command="{Binding BrowseFolderCommand}" Margin="0,0,8,0" />
           <CheckBox Grid.Column="2" AutomationProperties.AutomationId="WatchedFolder_IncludeSub" Content="{loc:Localize WF_IncludeSub}" IsChecked="{Binding NewFolderIncludeSubdirectories}" VerticalAlignment="Center" Margin="0,0,8,0" />
-          <Button Grid.Column="3" AutomationProperties.AutomationId="WatchedFolder_Add" Content="{loc:Localize WF_Add}" Command="{Binding AddNewFolderCommand}" />
+          <Button Grid.Column="3" AutomationProperties.AutomationId="WatchedFolder_Add" Classes="primary" Content="{loc:Localize WF_Add}" Command="{Binding AddNewFolderCommand}" />
         </Grid>
       <TextBlock AutomationProperties.AutomationId="WatchedFolder_Status" AutomationProperties.LiveSetting="Polite" Text="{Binding StatusMessage}" IsVisible="{Binding StatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
       <TextBlock AutomationProperties.AutomationId="WatchedFolder_Error" AutomationProperties.LiveSetting="Polite" Text="{Binding LastError}" Foreground="{StaticResource DangerBrush}" IsVisible="{Binding LastError, Converter={x:Static ObjectConverters.IsNotNull}}" />
@@ -38,8 +38,8 @@
               <TextBlock AutomationProperties.AutomationId="WatchedFolder_ItemError" AutomationProperties.LiveSetting="Polite" Text="{Binding WatcherError}" FontSize="11" Foreground="{StaticResource DangerBrush}" IsVisible="{Binding WatcherError, Converter={x:Static ObjectConverters.IsNotNull}}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding WatcherError}" />
             </StackPanel>
             <CheckBox Grid.Column="1" Content="{loc:Localize WF_Enable}" IsChecked="{Binding Enabled}" Command="{Binding DataContext.ToggleEnabledCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding .}" />
-            <Button Grid.Column="2" AutomationProperties.AutomationId="WatchedFolder_Retry" AutomationProperties.Name="{loc:Localize ImportInbox_Retry}" Content="{loc:Localize ImportInbox_Retry}" Command="{Binding DataContext.RetryFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}" />
-            <Button Grid.Column="3" Content="{loc:Localize WF_Remove}" Command="{Binding DataContext.RemoveFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}" />
+            <Button Grid.Column="2" AutomationProperties.AutomationId="WatchedFolder_Retry" AutomationProperties.Name="{loc:Localize ImportInbox_Retry}" Classes="secondary" Content="{loc:Localize ImportInbox_Retry}" Command="{Binding DataContext.RetryFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}" />
+            <Button Grid.Column="3" Classes="danger" Content="{loc:Localize WF_Remove}" Command="{Binding DataContext.RemoveFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}" />
           </Grid>
         </DataTemplate>
       </ListBox.ItemTemplate>

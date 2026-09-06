@@ -736,7 +736,7 @@
                                     Margin="4,0" Height="{DynamicResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipUpcoming}">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <Image Source="{DynamicResource IconClock}" Width="14" Height="14"/>
+                                    <Image Source="{DynamicResource IconCalendar}" Width="14" Height="14"/>
                                     <TextBlock Text="{loc:Localize Dashboard_BtnUpcoming}" FontSize="{DynamicResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>
@@ -774,7 +774,7 @@
                                     Margin="4,0" Height="{DynamicResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipOpenFolder}">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <Image Source="{DynamicResource IconCategory}" Width="12" Height="12"/>
+                                    <Image Source="{DynamicResource IconFolder}" Width="12" Height="12"/>
                                     <TextBlock Text="{loc:Localize Dashboard_BtnOpenFolder}" FontSize="{DynamicResource FontSizeXs}"/>
                                 </StackPanel>
                             </Button>

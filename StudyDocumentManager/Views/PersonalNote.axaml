@@ -126,7 +126,7 @@
 
                             <Button DockPanel.Dock="Right"
                                     x:Name="btnNoteNew"
-                                    Classes="secondary"
+                                    Classes="primary"
                                     Command="{Binding NewNoteCommand}"
                                     MinHeight="28"
                                     Padding="8,2"

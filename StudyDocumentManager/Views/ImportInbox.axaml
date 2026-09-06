@@ -8,9 +8,9 @@
   <DockPanel Margin="24">
     <StackPanel DockPanel.Dock="Top" Spacing="10">
       <StackPanel Orientation="Horizontal" Spacing="8">
-        <Button AutomationProperties.AutomationId="ImportInbox_Back" Content="{loc:Localize Btn_Back}" Command="{Binding GoBackCommand}" />
+        <Button AutomationProperties.AutomationId="ImportInbox_Back" Classes="secondary" Content="{loc:Localize Btn_Back}" Command="{Binding GoBackCommand}" />
         <TextBlock Text="{loc:Localize ImportInbox_Title}" FontSize="24" />
-        <Button AutomationProperties.AutomationId="ImportInbox_Refresh" Content="{loc:Localize Btn_Refresh}" Command="{Binding RefreshCommand}" />
+        <Button AutomationProperties.AutomationId="ImportInbox_Refresh" Classes="secondary" Content="{loc:Localize Btn_Refresh}" Command="{Binding RefreshCommand}" />
       </StackPanel>
       <StackPanel Orientation="Horizontal" Spacing="8">
         <CheckBox AutomationProperties.AutomationId="ImportInbox_ShowProcessed" Content="{loc:Localize ImportInbox_ShowProcessed}" IsChecked="{Binding IncludeProcessed}" />
@@ -32,11 +32,11 @@
     <TextBlock DockPanel.Dock="Bottom" AutomationProperties.AutomationId="ImportInbox_Status" AutomationProperties.LiveSetting="Polite" Text="{Binding StatusText}" TextWrapping="Wrap" IsVisible="{Binding StatusText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Margin="0,6,0,0" />
     <TextBlock DockPanel.Dock="Bottom" AutomationProperties.AutomationId="ImportInbox_Error" AutomationProperties.LiveSetting="Assertive" Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Margin="0,6,0,0" />
     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" Margin="0,10,0,0" AutomationProperties.AutomationId="ImportInbox_ActionPanel" IsVisible="{Binding HasItems}">
-      <Button AutomationProperties.AutomationId="ImportInbox_Retry" Content="{loc:Localize ImportInbox_Retry}" Command="{Binding RetrySelectedCommand}" />
-      <Button AutomationProperties.AutomationId="ImportInbox_Reveal" Content="{loc:Localize ImportInbox_Reveal}" Command="{Binding RevealSelectedCommand}" />
+      <Button AutomationProperties.AutomationId="ImportInbox_Retry" Classes="secondary" Content="{loc:Localize ImportInbox_Retry}" Command="{Binding RetrySelectedCommand}" />
+      <Button AutomationProperties.AutomationId="ImportInbox_Reveal" Classes="secondary" Content="{loc:Localize ImportInbox_Reveal}" Command="{Binding RevealSelectedCommand}" />
       <TextBox AutomationProperties.AutomationId="ImportInbox_Subject" Width="180" Text="{Binding BulkSubject}" Watermark="{loc:Localize ImportInbox_Subject}" />
       <TextBox AutomationProperties.AutomationId="ImportInbox_Type" Width="180" Text="{Binding BulkType}" Watermark="{loc:Localize ImportInbox_Type}" />
-      <Button AutomationProperties.AutomationId="ImportInbox_ApplyMetadata" Content="{loc:Localize ImportInbox_ApplyMetadata}" Command="{Binding ApplyBulkMetadataCommand}" IsEnabled="{Binding CanBulkEdit}" />
+      <Button AutomationProperties.AutomationId="ImportInbox_ApplyMetadata" Classes="primary" Content="{loc:Localize ImportInbox_ApplyMetadata}" Command="{Binding ApplyBulkMetadataCommand}" IsEnabled="{Binding CanBulkEdit}" />
     </StackPanel>
   </DockPanel>
 </UserControl>
