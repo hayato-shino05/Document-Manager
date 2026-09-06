@@ -1027,6 +1027,17 @@
   <data name="OW_Conf_Internal" xml:space="preserve"><value>社内限り</value></data>
   <data name="OW_Conf_Confidential" xml:space="preserve"><value>機密</value></data>
   <data name="OW_Conf_Restricted" xml:space="preserve"><value>極秘</value></data>
+  <data name="Common_All" xml:space="preserve"><value>すべて</value></data>
+  <data name="Action_Back" xml:space="preserve"><value>戻る</value></data>
+  <data name="Search_Watermark" xml:space="preserve"><value>名前、番号、会社名などで検索...</value></data>
+  <data name="Details_Title" xml:space="preserve"><value>業務詳細メタデータ</value></data>
+  <data name="OW_EmptySelection" xml:space="preserve"><value>業務文書を選択してください</value></data>
+  <data name="OW_EmptySelectionDesc" xml:space="preserve"><value>左のリストから文書を選択すると、文書番号・契約期日・機密区分の詳細を編集できます。</value></data>
+  <data name="SW_AcademicContext" xml:space="preserve"><value>学習コンテキスト (Academic Context)</value></data>
+  <data name="SW_EmptyCourses" xml:space="preserve"><value>コースが登録されていません</value></data>
+  <data name="SW_EmptySemesters" xml:space="preserve"><value>学期が登録されていません</value></data>
+  <data name="SW_EmptyAssignments" xml:space="preserve"><value>課題がありません</value></data>
+  <data name="SW_EmptyAssignmentSelect" xml:space="preserve"><value>課題を選択するか「課題追加」で作成してください</value></data>
   <data name="OW_Error_FileNotFound" xml:space="preserve"><value>ファイルが見つかりません: {0}</value></data>
   <data name="Onboarding_TabTour" xml:space="preserve"><value>クイックツアー (5ステップ)</value></data>
   <data name="Onboarding_TabCatalog" xml:space="preserve"><value>機能ガイド</value></data>

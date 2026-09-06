@@ -919,6 +919,17 @@ Please check your network connection.</value></data>
   <data name="OW_Conf_Internal" xml:space="preserve"><value>Internal</value></data>
   <data name="OW_Conf_Confidential" xml:space="preserve"><value>Confidential</value></data>
   <data name="OW_Conf_Restricted" xml:space="preserve"><value>Restricted</value></data>
+  <data name="Common_All" xml:space="preserve"><value>All</value></data>
+  <data name="Action_Back" xml:space="preserve"><value>Back</value></data>
+  <data name="Search_Watermark" xml:space="preserve"><value>Search by name, doc number, organization...</value></data>
+  <data name="Details_Title" xml:space="preserve"><value>Office Metadata</value></data>
+  <data name="OW_EmptySelection" xml:space="preserve"><value>Select a document</value></data>
+  <data name="OW_EmptySelectionDesc" xml:space="preserve"><value>Select a document from the list to edit its details.</value></data>
+  <data name="SW_AcademicContext" xml:space="preserve"><value>Academic Context</value></data>
+  <data name="SW_EmptyCourses" xml:space="preserve"><value>No courses registered</value></data>
+  <data name="SW_EmptySemesters" xml:space="preserve"><value>No semesters registered</value></data>
+  <data name="SW_EmptyAssignments" xml:space="preserve"><value>No assignments found</value></data>
+  <data name="SW_EmptyAssignmentSelect" xml:space="preserve"><value>Select an assignment or create one with 'New Assignment'</value></data>
   <data name="OW_Error_FileNotFound" xml:space="preserve"><value>File not found: {0}</value></data>
   <data name="Onboarding_TabTour" xml:space="preserve"><value>Quick Tour (5 Steps)</value></data>
   <data name="Onboarding_TabCatalog" xml:space="preserve"><value>Feature Guide</value></data>

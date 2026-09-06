@@ -1128,6 +1128,17 @@
   <data name="OW_Conf_Internal" xml:space="preserve"><value>Nội bộ</value></data>
   <data name="OW_Conf_Confidential" xml:space="preserve"><value>Bảo mật</value></data>
   <data name="OW_Conf_Restricted" xml:space="preserve"><value>Tối mật</value></data>
+  <data name="Common_All" xml:space="preserve"><value>Tất cả</value></data>
+  <data name="Action_Back" xml:space="preserve"><value>Quay lại</value></data>
+  <data name="Search_Watermark" xml:space="preserve"><value>Tìm theo tên, số hiệu, công ty...</value></data>
+  <data name="Details_Title" xml:space="preserve"><value>Chi tiết nghiệp vụ</value></data>
+  <data name="OW_EmptySelection" xml:space="preserve"><value>Vui lòng chọn tài liệu</value></data>
+  <data name="OW_EmptySelectionDesc" xml:space="preserve"><value>Chọn tài liệu từ danh sách để chỉnh sửa chi tiết.</value></data>
+  <data name="SW_AcademicContext" xml:space="preserve"><value>Ngữ cảnh học tập (Academic Context)</value></data>
+  <data name="SW_EmptyCourses" xml:space="preserve"><value>Chưa có môn học nào</value></data>
+  <data name="SW_EmptySemesters" xml:space="preserve"><value>Chưa có học kỳ nào</value></data>
+  <data name="SW_EmptyAssignments" xml:space="preserve"><value>Không có bài tập nào</value></data>
+  <data name="SW_EmptyAssignmentSelect" xml:space="preserve"><value>Chọn một bài tập hoặc nhấn 'Thêm bài tập' để tạo mới</value></data>
   <data name="OW_Error_FileNotFound" xml:space="preserve"><value>Không tìm thấy tệp: {0}</value></data>
   <data name="Onboarding_TabTour" xml:space="preserve"><value>Hướng dẫn từng bước (5 Bước)</value></data>
   <data name="Onboarding_TabCatalog" xml:space="preserve"><value>Cẩm nang tính năng</value></data>
