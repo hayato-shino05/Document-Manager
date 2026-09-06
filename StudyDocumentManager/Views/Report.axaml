@@ -7,7 +7,7 @@
              AutomationProperties.AutomationId="Screen_Report"
              AutomationProperties.AccessibilityView="Control">
 
-    <Border Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
+    <Border Classes="page-wrapper" Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
         <DockPanel>
             <!-- Header Bar -->
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
@@ -22,6 +22,7 @@
                 <Button DockPanel.Dock="Right" Classes="secondary"
                         AutomationProperties.AutomationId="Report_Refresh"
                         AutomationProperties.Name="{loc:Localize Report_BtnRefresh}"
+                        AutomationProperties.HelpText="{loc:Localize Report_BtnRefresh}"
                         Command="{Binding LoadAllDataCommand}"
                         Padding="{DynamicResource PaddingBtnMd}"
                         HorizontalAlignment="Right"
@@ -127,7 +128,7 @@
                             Padding="{DynamicResource PaddingSection}">
                         <StackPanel Spacing="12">
                             <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                <Image Source="{DynamicResource IconCheck}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <Image Source="{DynamicResource IconCheckSuccess}" Width="16" Height="16" VerticalAlignment="Center"/>
                                 <TextBlock Text="{loc:Localize RS_StatusCounts_Title}" FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>

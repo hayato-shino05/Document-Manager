@@ -7,7 +7,7 @@
              AutomationProperties.AutomationId="Screen_SmartViews"
              AutomationProperties.AccessibilityView="Control">
 
-    <Border Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
+    <Border Classes="page-wrapper" Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
         <DockPanel>
             <!-- Header Bar -->
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
@@ -45,6 +45,7 @@
                                 <Button Classes="primary" x:Name="btnNew"
                                         AutomationProperties.AutomationId="SmartViews_New"
                                         AutomationProperties.Name="{loc:Localize SV_New}"
+                                        AutomationProperties.HelpText="{loc:Localize SV_New}"
                                         Command="{Binding NewCommand}"
                                         Padding="{DynamicResource PaddingBtnMd}">
                                     <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
@@ -56,6 +57,7 @@
                                 <Button Classes="secondary" x:Name="btnRefresh"
                                         AutomationProperties.AutomationId="SmartViews_Refresh"
                                         AutomationProperties.Name="{loc:Localize Action_Refresh}"
+                                        AutomationProperties.HelpText="{loc:Localize Action_Refresh}"
                                         Command="{Binding RefreshCommand}"
                                         Padding="{DynamicResource PaddingBtnMd}">
                                     <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
@@ -127,6 +129,7 @@
                                 <Button Classes="primary" x:Name="btnOpen"
                                         AutomationProperties.AutomationId="SmartViews_Open"
                                         AutomationProperties.Name="{loc:Localize SV_Open}"
+                                        AutomationProperties.HelpText="{loc:Localize SV_Open}"
                                         Command="{Binding OpenCommand}"
                                         Padding="{DynamicResource PaddingBtnMd}"
                                         IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -139,6 +142,7 @@
                                 <Button Classes="secondary" x:Name="btnEdit"
                                         AutomationProperties.AutomationId="SmartViews_Edit"
                                         AutomationProperties.Name="{loc:Localize SV_Edit}"
+                                        AutomationProperties.HelpText="{loc:Localize SV_Edit}"
                                         Command="{Binding EditCommand}"
                                         Padding="{DynamicResource PaddingBtnMd}"
                                         IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -150,6 +154,7 @@
                                 <Button Classes="secondary" x:Name="btnDuplicate"
                                         AutomationProperties.AutomationId="SmartViews_Duplicate"
                                         AutomationProperties.Name="{loc:Localize SV_Duplicate}"
+                                        AutomationProperties.HelpText="{loc:Localize SV_Duplicate}"
                                         Command="{Binding DuplicateCommand}"
                                         Padding="{DynamicResource PaddingBtnMd}"
                                         IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -161,6 +166,7 @@
                                 <Button Classes="danger" x:Name="btnDelete"
                                         AutomationProperties.AutomationId="SmartViews_Delete"
                                         AutomationProperties.Name="{loc:Localize SV_Delete}"
+                                        AutomationProperties.HelpText="{loc:Localize SV_Delete}"
                                         Command="{Binding DeleteCommand}"
                                         Padding="{DynamicResource PaddingBtnMd}"
                                         IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -318,10 +324,11 @@
                                         <Button Classes="primary" x:Name="btnSave"
                                                 AutomationProperties.AutomationId="SmartViews_Save"
                                                 AutomationProperties.Name="{loc:Localize Action_Save}"
+                                                AutomationProperties.HelpText="{loc:Localize Action_Save}"
                                                 Command="{Binding SaveCommand}"
                                                 Padding="{DynamicResource PaddingBtnMd}">
                                             <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                                                <Image Source="{DynamicResource IconCheck}" Width="14" Height="14" VerticalAlignment="Center"/>
+                                                <Image Source="{DynamicResource IconSaveWhite}" Width="14" Height="14" VerticalAlignment="Center"/>
                                                 <TextBlock Text="{loc:Localize Action_Save}" FontSize="{DynamicResource FontSizeSm}"
                                                            Foreground="{DynamicResource OnColorPrimaryBrush}" VerticalAlignment="Center"/>
                                             </StackPanel>
@@ -329,6 +336,7 @@
                                         <Button Classes="secondary" x:Name="btnCancelEdit"
                                                 AutomationProperties.AutomationId="SmartViews_CancelEdit"
                                                 AutomationProperties.Name="{loc:Localize Action_Cancel}"
+                                                AutomationProperties.HelpText="{loc:Localize Action_Cancel}"
                                                 Command="{Binding CancelEditCommand}"
                                                 Content="{loc:Localize Action_Cancel}"
                                                 Padding="{DynamicResource PaddingBtnMd}"/>

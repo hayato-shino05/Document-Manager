@@ -37,7 +37,9 @@
             <!-- Changes List Container -->
             <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
                     BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="12,8">
-                <ItemsControl x:Name="ChangesList" AutomationProperties.AutomationId="BulkEditPreview_Changes">
+                <ItemsControl x:Name="ChangesList"
+                              AutomationProperties.AutomationId="BulkEditPreview_Changes"
+                              AutomationProperties.Name="{loc:Localize BE_PreviewTitle}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1"

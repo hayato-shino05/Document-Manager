@@ -34,6 +34,7 @@
                             Classes.secondary="{Binding !IsAllMode}"
                             AutomationProperties.AutomationId="TreeMap_AllItems"
                             AutomationProperties.Name="{loc:Localize Filter_AllItems}"
+                            AutomationProperties.HelpText="{loc:Localize Filter_AllItems}"
                             Content="{loc:Localize Filter_AllItems}"
                             Command="{Binding ShowAllCommand}"
                             Padding="{DynamicResource PaddingBtnSm}" FontSize="{DynamicResource FontSizeSm}"
@@ -42,6 +43,7 @@
                             Classes.secondary="{Binding !IsSubjectMode}"
                             AutomationProperties.AutomationId="TreeMap_ByCategory"
                             AutomationProperties.Name="{loc:Localize TreeMap_BtnByCategory}"
+                            AutomationProperties.HelpText="{loc:Localize TreeMap_BtnByCategory}"
                             Content="{loc:Localize TreeMap_BtnByCategory}"
                             Command="{Binding ShowBySubjectCommand}"
                             Padding="{DynamicResource PaddingBtnSm}" FontSize="{DynamicResource FontSizeSm}"
@@ -50,6 +52,7 @@
                             Classes.secondary="{Binding !IsTypeMode}"
                             AutomationProperties.AutomationId="TreeMap_ByType"
                             AutomationProperties.Name="{loc:Localize TreeMap_BtnByType}"
+                            AutomationProperties.HelpText="{loc:Localize TreeMap_BtnByType}"
                             Content="{loc:Localize TreeMap_BtnByType}"
                             Command="{Binding ShowByTypeCommand}"
                             Padding="{DynamicResource PaddingBtnSm}" FontSize="{DynamicResource FontSizeSm}"/>
@@ -67,6 +70,7 @@
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                                   VerticalScrollBarVisibility="Auto">
                         <ItemsControl AutomationProperties.AutomationId="TreeMap_ItemsControl"
+                                      AutomationProperties.Name="{loc:Localize TreeMap_Title}"
                                       ItemsSource="{Binding Items}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>

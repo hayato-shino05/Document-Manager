@@ -49,6 +49,68 @@ public sealed class DesktopQualityBatch5Tests
         Assert.True(model.CanAcceptDroppedFiles);
     }
 
+    [Fact]
+    public void Group5Views_ActionHierarchyAndTokens_AreConsistent()
+    {
+        var report = File.ReadAllText(Path.Combine("..", "..", "..", "..", "StudyDocumentManager", "Views", "Report.axaml"));
+        var treeMap = File.ReadAllText(Path.Combine("..", "..", "..", "..", "StudyDocumentManager", "Views", "TreeMap.axaml"));
+        var smartViews = File.ReadAllText(Path.Combine("..", "..", "..", "..", "StudyDocumentManager", "Views", "SmartViews.axaml"));
+        var recentFiles = File.ReadAllText(Path.Combine("..", "..", "..", "..", "StudyDocumentManager", "Views", "RecentFiles.axaml"));
+        var onboarding = File.ReadAllText(Path.Combine("..", "..", "..", "..", "StudyDocumentManager", "Views", "OnboardingDialog.axaml"));
+        var affectedPreview = File.ReadAllText(Path.Combine("..", "..", "..", "..", "StudyDocumentManager", "Views", "AffectedItemsPreviewDialog.axaml"));
+        var bulkEditPreview = File.ReadAllText(Path.Combine("..", "..", "..", "..", "StudyDocumentManager", "Views", "BulkEditPreviewDialog.axaml"));
+
+        // Report
+        Assert.Contains("Classes=\"page-wrapper\"", report);
+        Assert.Contains("Classes=\"secondary\"", report);
+        Assert.Contains("IconReport", report);
+        Assert.Contains("IconRefresh", report);
+
+        // TreeMap
+        Assert.Contains("Classes=\"page-wrapper\"", treeMap);
+        Assert.Contains("Classes.primary=\"{Binding IsAllMode}\"", treeMap);
+        Assert.Contains("Classes.secondary=\"{Binding !IsAllMode}\"", treeMap);
+        Assert.Contains("IconTreeMap", treeMap);
+
+        // SmartViews
+        Assert.Contains("Classes=\"page-wrapper\"", smartViews);
+        Assert.Contains("Classes=\"primary\" x:Name=\"btnNew\"", smartViews);
+        Assert.Contains("Classes=\"primary\" x:Name=\"btnOpen\"", smartViews);
+        Assert.Contains("Classes=\"primary\" x:Name=\"btnSave\"", smartViews);
+        Assert.Contains("Classes=\"danger\" x:Name=\"btnDelete\"", smartViews);
+        Assert.Contains("Classes=\"secondary\" x:Name=\"btnEdit\"", smartViews);
+        Assert.Contains("Classes=\"secondary\" x:Name=\"btnDuplicate\"", smartViews);
+        Assert.Contains("Classes=\"secondary\" x:Name=\"btnCancelEdit\"", smartViews);
+        Assert.Contains("IconSaveWhite", smartViews);
+        Assert.Contains("IconDeleteWhite", smartViews);
+        Assert.Contains("IconAddWhite", smartViews);
+
+        // RecentFiles
+        Assert.Contains("Classes=\"page-wrapper\"", recentFiles);
+        Assert.Contains("Classes=\"secondary\" AutomationProperties.AutomationId=\"RecentFiles_Refresh\"", recentFiles);
+        Assert.Contains("Classes=\"danger\" AutomationProperties.AutomationId=\"RecentFiles_ClearHistory\"", recentFiles);
+        Assert.Contains("IconDeleteWhite", recentFiles);
+        Assert.Contains("IconRefresh", recentFiles);
+        Assert.Contains("IconOpenFile", recentFiles);
+
+        // OnboardingDialog
+        Assert.Contains("Classes=\"secondary\"", onboarding); // Skip, Prev
+        Assert.Contains("Classes=\"primary\"", onboarding);   // Next, Finish
+        Assert.Contains("IconSearch", onboarding);
+        Assert.Contains("IconAdd", onboarding);
+        Assert.Contains("IconCollection", onboarding);
+        Assert.Contains("IconIntegrity", onboarding);
+        Assert.Contains("IconRestore", onboarding);
+
+        // AffectedItemsPreviewDialog
+        Assert.Contains("Classes=\"secondary\"", affectedPreview); // Cancel
+        Assert.Contains("Classes=\"danger\"", affectedPreview);    // Confirm (Delete)
+
+        // BulkEditPreviewDialog
+        Assert.Contains("Classes=\"secondary\"", bulkEditPreview); // Cancel
+        Assert.Contains("Classes=\"primary\"", bulkEditPreview);   // Apply
+    }
+
     private sealed class NavigationStub : INavigationService
     {
         public bool CanGoBack => true;
