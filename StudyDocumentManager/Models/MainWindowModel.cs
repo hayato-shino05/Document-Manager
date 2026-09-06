@@ -1,4 +1,5 @@
 using StudyDocumentManager.Core;
+using StudyDocumentManager.Core.DTOs;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -24,6 +25,15 @@ public partial class MainWindowModel : ModelBase
 
     [ObservableProperty]
     private bool _canUndo;
+
+    [ObservableProperty]
+    private bool _hasUpdateAvailable;
+
+    [ObservableProperty]
+    private string _updateVersionText = string.Empty;
+
+    [ObservableProperty]
+    private UpdateInfo? _latestUpdateInfo;
 
     public IReadOnlyList<SupportedLanguage> AvailableLanguages => _loc.AvailableLanguages;
 
@@ -90,7 +100,20 @@ public partial class MainWindowModel : ModelBase
         _ = Task.Run(async () =>
         {
             await Task.Delay(3000);
-            await _updateService.CheckSilentlyAsync();
+            try
+            {
+                var info = await _updateService.CheckForUpdateAsync();
+                if (info is { HasUpdate: true })
+                {
+                    HasUpdateAvailable = true;
+                    UpdateVersionText = info.NewVersion;
+                    LatestUpdateInfo = info;
+                }
+                await _updateService.CheckSilentlyAsync();
+            }
+            catch
+            {
+            }
         });
     }
 
@@ -111,6 +134,19 @@ public partial class MainWindowModel : ModelBase
     }
 
     [RelayCommand]
+    private async Task OpenUpdateDialogAsync()
+    {
+        if (LatestUpdateInfo is { HasUpdate: true })
+        {
+            await _updateService.HandleUpdateAsync(LatestUpdateInfo);
+        }
+        else
+        {
+            await CheckForUpdateAsync();
+        }
+    }
+
+    [RelayCommand]
     private async Task CheckForUpdateAsync()
     {
         SetLocalizedStatus("Status_CheckingUpdate");
@@ -122,12 +158,18 @@ public partial class MainWindowModel : ModelBase
         }
         else if (!info.HasUpdate)
         {
+            HasUpdateAvailable = false;
+            UpdateVersionText = string.Empty;
+            LatestUpdateInfo = null;
             await _dialogService.ShowMessageAsync(_loc["Main_UpdateTitle"],
                 string.Format(_loc["Main_AlreadyLatest"], Core.Services.AppVersion.Current));
             SetLocalizedStatus("Status_UpToDate");
         }
         else
         {
+            HasUpdateAvailable = true;
+            UpdateVersionText = info.NewVersion;
+            LatestUpdateInfo = info;
             await _updateService.HandleUpdateAsync(info);
             SetLocalizedStatus("Status_NewVersionAvailable", info.NewVersion);
         }

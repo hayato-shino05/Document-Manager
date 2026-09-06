@@ -282,13 +282,45 @@ public sealed class MainWindowUpdateProofTests
     [Fact]
     public async Task CheckForUpdate_NewRelease_DelegatesAndUpdatesStatus()
     {
-        var update = new FakeUpdateService { Result = new UpdateInfo { HasUpdate = true, NewVersion = "v4.1.0" } };
+        var update = new FakeUpdateService { Result = new UpdateInfo { HasUpdate = true, NewVersion = "v4.2.0" } };
         var model = CreateModel(new WindowDialogStub(), update);
 
         await model.CheckForUpdateCommand.ExecuteAsync(null);
 
-        Assert.Equal("v4.1.0", update.Handled?.NewVersion);
-        Assert.Contains("v4.1.0", model.StatusText);
+        Assert.Equal("v4.2.0", update.Handled?.NewVersion);
+        Assert.Contains("v4.2.0", model.StatusText);
+        Assert.True(model.HasUpdateAvailable);
+        Assert.Equal("v4.2.0", model.UpdateVersionText);
+        Assert.NotNull(model.LatestUpdateInfo);
+        Assert.Equal("v4.2.0", model.LatestUpdateInfo!.NewVersion);
+    }
+
+    [Fact]
+    public async Task OpenUpdateDialog_WhenUpdateAvailable_HandlesLatestUpdateDirectly()
+    {
+        var info = new UpdateInfo { HasUpdate = true, NewVersion = "v4.2.0" };
+        var update = new FakeUpdateService { Result = info };
+        var model = CreateModel(new WindowDialogStub(), update);
+        model.HasUpdateAvailable = true;
+        model.UpdateVersionText = "v4.2.0";
+        model.LatestUpdateInfo = info;
+
+        await model.OpenUpdateDialogCommand.ExecuteAsync(null);
+
+        Assert.Equal("v4.2.0", update.Handled?.NewVersion);
+    }
+
+    [Fact]
+    public async Task OpenUpdateDialog_WhenNoCachedUpdate_ExecutesCheckForUpdate()
+    {
+        var update = new FakeUpdateService { Result = new UpdateInfo { HasUpdate = true, NewVersion = "v4.2.0" } };
+        var model = CreateModel(new WindowDialogStub(), update);
+
+        await model.OpenUpdateDialogCommand.ExecuteAsync(null);
+
+        Assert.True(model.HasUpdateAvailable);
+        Assert.Equal("v4.2.0", model.UpdateVersionText);
+        Assert.Equal("v4.2.0", update.Handled?.NewVersion);
     }
 
     private static MainWindowModel CreateModel(WindowDialogStub dialog, FakeUpdateService update)

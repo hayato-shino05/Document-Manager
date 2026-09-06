@@ -11,22 +11,11 @@
             <!-- ═══ HEADER & ACADEMIC CONTEXT CARD ═══ -->
             <Border DockPanel.Dock="Top" Classes="card" Padding="{StaticResource PaddingCard}" Margin="0,0,0,12">
                 <StackPanel Spacing="10">
-                    <!-- Title & Navigation Bar -->
-                    <DockPanel>
-                        <Button DockPanel.Dock="Left" Classes="secondary" Command="{Binding GoBackCommand}"
-                                Margin="0,0,12,0" Padding="8,4"
-                                automation:AutomationProperties.AutomationId="StudentWorkspace_Back"
-                                automation:AutomationProperties.Name="{loc:Localize Action_Back}">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Image Source="{StaticResource IconBack}" Width="12" Height="12" VerticalAlignment="Center"/>
-                                <TextBlock Text="{loc:Localize Action_Back}" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                            <Image Source="{StaticResource IconSchool}" Width="20" Height="20" VerticalAlignment="Center"/>
-                            <TextBlock Text="{loc:Localize SW_Title}" FontSize="{StaticResource FontSizeHeading}" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </DockPanel>
+                    <!-- Title Bar -->
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Image Source="{StaticResource IconSchool}" Width="20" Height="20" VerticalAlignment="Center"/>
+                        <TextBlock Text="{loc:Localize SW_Title}" FontSize="{StaticResource FontSizeHeading}" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                    </StackPanel>
 
                     <!-- Academic Context Subheading -->
                     <TextBlock Text="{loc:Localize SW_AcademicContext}" FontSize="{StaticResource FontSizeMd}" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
