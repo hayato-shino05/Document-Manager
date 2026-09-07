@@ -1158,9 +1158,9 @@
   <data name="Onboarding_Step5_Title" xml:space="preserve"><value>5. 回收站、恢复中心与ZIP归档</value></data>
   <data name="Onboarding_Step5_Desc" xml:space="preserve"><value>删除的文档保存在“回收站”（Ctrl+Shift+R）中，支持多选批量恢复。“恢复中心”提供数据库备份与恢复，并支持个人文档 ZIP 导出/导入。</value></data>
   <data name="Onboarding_Step5_Tip" xml:space="preserve"><value>提示：定期在恢复中心创建数据库快照以确保数据安全。</value></data>
-  <data name="Onboarding_Next" xml:space="preserve"><value>下一步 ➔</value></data>
-  <data name="Onboarding_Prev" xml:space="preserve"><value>⬅ 返回</value></data>
-  <data name="Onboarding_Start" xml:space="preserve"><value>🎉 开始使用</value></data>
+  <data name="Onboarding_Next" xml:space="preserve"><value>下一步</value></data>
+  <data name="Onboarding_Prev" xml:space="preserve"><value>返回</value></data>
+  <data name="Onboarding_Start" xml:space="preserve"><value>开始使用</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Title" xml:space="preserve"><value>文件夹自动监控 (Watched Folder)</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Desc" xml:space="preserve"><value>在后台持续监控指定文件夹，发现新文件时自动将其列入导入候选。</value></data>
   <data name="Onboarding_Cat_Inbox_Title" xml:space="preserve"><value>导入收件箱 (Import Inbox)</value></data>
@@ -1175,4 +1175,8 @@
   <data name="Onboarding_Cat_Lang_Desc" xml:space="preserve"><value>支持日语、英语、越南语、中文，可在右上角菜单即时切换。</value></data>
   <data name="Onboarding_Shortcuts_Title" xml:space="preserve"><value>全局快捷键</value></data>
   <data name="Onboarding_Shortcuts_Desc" xml:space="preserve"><value>通过键盘快捷键快速访问核心功能，全面提升日常办公效率。</value></data>
+  <data name="Onboarding_Shortcuts_Nav" xml:space="preserve"><value>导航与常规</value></data>
+  <data name="Onboarding_Shortcuts_Doc" xml:space="preserve"><value>文档操作与工作区</value></data>
+  <data name="Onboarding_Shortcuts_Tools" xml:space="preserve"><value>搜索与维护</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>显示语言</value></data>
 </root>

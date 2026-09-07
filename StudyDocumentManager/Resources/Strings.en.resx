@@ -949,9 +949,9 @@ Please check your network connection.</value></data>
   <data name="Onboarding_Step5_Title" xml:space="preserve"><value>5. Recycle Bin, Recovery &amp; ZIP Archive</value></data>
   <data name="Onboarding_Step5_Desc" xml:space="preserve"><value>Deleted documents are safely kept in the 'Recycle Bin' (Ctrl+Shift+R) with multi-select batch restore. 'Recovery Center' provides SQLite backups, and 'Personal Document Archive' allows full ZIP export/import.</value></data>
   <data name="Onboarding_Step5_Tip" xml:space="preserve"><value>Tip: Regularly create database snapshots in Recovery Center for peace of mind.</value></data>
-  <data name="Onboarding_Next" xml:space="preserve"><value>Next ➔</value></data>
-  <data name="Onboarding_Prev" xml:space="preserve"><value>⬅ Back</value></data>
-  <data name="Onboarding_Start" xml:space="preserve"><value>🎉 Get Started</value></data>
+  <data name="Onboarding_Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Onboarding_Prev" xml:space="preserve"><value>Back</value></data>
+  <data name="Onboarding_Start" xml:space="preserve"><value>Get Started</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Title" xml:space="preserve"><value>Folder Watcher (Watched Folder)</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Desc" xml:space="preserve"><value>Monitors chosen folders in background, detecting and importing new files automatically.</value></data>
   <data name="Onboarding_Cat_Inbox_Title" xml:space="preserve"><value>Import Inbox (Staging Area)</value></data>
@@ -966,4 +966,8 @@ Please check your network connection.</value></data>
   <data name="Onboarding_Cat_Lang_Desc" xml:space="preserve"><value>Instantly switch between Japanese, English, Vietnamese, and Chinese from the top menu.</value></data>
   <data name="Onboarding_Shortcuts_Title" xml:space="preserve"><value>Global Keyboard Shortcuts</value></data>
   <data name="Onboarding_Shortcuts_Desc" xml:space="preserve"><value>Boost your daily productivity with instant keyboard access to all major features.</value></data>
+  <data name="Onboarding_Shortcuts_Nav" xml:space="preserve"><value>Navigation &amp; System</value></data>
+  <data name="Onboarding_Shortcuts_Doc" xml:space="preserve"><value>Document &amp; Workspaces</value></data>
+  <data name="Onboarding_Shortcuts_Tools" xml:space="preserve"><value>Search &amp; Maintenance</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Display Language</value></data>
 </root>

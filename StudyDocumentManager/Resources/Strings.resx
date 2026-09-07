@@ -1057,9 +1057,9 @@
   <data name="Onboarding_Step5_Title" xml:space="preserve"><value>5. ごみ箱・復元とZIPアーカイブ</value></data>
   <data name="Onboarding_Step5_Desc" xml:space="preserve"><value>削除した文書は「ごみ箱」（Ctrl+Shift+R）で安全に保持され、複数選択で一括復元できます。「リカバリーセンター」ではデータベースの世代バックアップと復元、さらに個人文書全体のZIPエクスポート／インポートにも対応しています。</value></data>
   <data name="Onboarding_Step5_Tip" xml:space="preserve"><value>ヒント: 大切なデータは定期的にリカバリーセンターでバックアップを作成しましょう。</value></data>
-  <data name="Onboarding_Next" xml:space="preserve"><value>次へ ➔</value></data>
-  <data name="Onboarding_Prev" xml:space="preserve"><value>⬅ 戻る</value></data>
-  <data name="Onboarding_Start" xml:space="preserve"><value>🎉 始める</value></data>
+  <data name="Onboarding_Next" xml:space="preserve"><value>次へ</value></data>
+  <data name="Onboarding_Prev" xml:space="preserve"><value>戻る</value></data>
+  <data name="Onboarding_Start" xml:space="preserve"><value>始める</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Title" xml:space="preserve"><value>フォルダ自動監視 (Watched Folder)</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Desc" xml:space="preserve"><value>指定したフォルダを常時監視し、新しいファイルが追加されると自動的に検知して登録候補とします。</value></data>
   <data name="Onboarding_Cat_Inbox_Title" xml:space="preserve"><value>インポート受信トレイ (Import Inbox)</value></data>
@@ -1074,6 +1074,10 @@
   <data name="Onboarding_Cat_Lang_Desc" xml:space="preserve"><value>日本語、English、Tiếng Việt、中文 の4言語に対応し、右上のメニューからいつでも即時切り替えが可能です。</value></data>
   <data name="Onboarding_Shortcuts_Title" xml:space="preserve"><value>操作効率を高めるグローバルショートカット</value></data>
   <data name="Onboarding_Shortcuts_Desc" xml:space="preserve"><value>キーボード操作だけで主要な全画面へ瞬時にアクセスできます。</value></data>
+  <data name="Onboarding_Shortcuts_Nav" xml:space="preserve"><value>ナビゲーション・一般</value></data>
+  <data name="Onboarding_Shortcuts_Doc" xml:space="preserve"><value>文書操作・ワークスペース</value></data>
+  <data name="Onboarding_Shortcuts_Tools" xml:space="preserve"><value>検索・保守ツール</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>表示言語</value></data>
 </root>
 
 

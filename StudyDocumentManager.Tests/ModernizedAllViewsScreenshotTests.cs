@@ -1,9 +1,12 @@
+using System;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
+using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Models;
 using StudyDocumentManager.Views;
 using Xunit;
@@ -14,6 +17,9 @@ public class ModernizedAllViewsScreenshotTests
 {
     private static readonly string[] ScreenshotDirs =
     [
+        Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "screenshots"),
+        Path.Combine(Directory.GetCurrentDirectory(), "screenshots"),
+        @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\c4c022e8-7b3f-4664-ba3f-f2151f7b7645\screenshots",
         @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\52f12f8f-7bf7-4eb1-87ac-d5a0904b69e0\screenshots"
     ];
 
@@ -35,9 +41,15 @@ public class ModernizedAllViewsScreenshotTests
 
         foreach (var dir in ScreenshotDirs)
         {
-            Directory.CreateDirectory(dir);
-            var filePath = Path.Combine(dir, filename);
-            bitmap.Save(filePath);
+            try
+            {
+                Directory.CreateDirectory(dir);
+                var filePath = Path.Combine(dir, filename);
+                bitmap.Save(filePath);
+            }
+            catch
+            {
+            }
         }
 
         window.Close();
@@ -96,5 +108,59 @@ public class ModernizedAllViewsScreenshotTests
             model.SelectedNote = model.Notes[0];
         }
         SaveRenderedView(new PersonalNote { DataContext = model }, 1280, 800, "personal_note_current.png");
+    }
+
+    [AvaloniaFact]
+    public void Capture_OnboardingDialog()
+    {
+        var services = App.Services!;
+        var settings = services.GetRequiredService<ISettingsService>();
+        var loc = services.GetService<StudyDocumentManager.Core.Interfaces.ILocalizationService>();
+        var model = new OnboardingModel(settings, loc);
+
+        var dialog = new OnboardingDialog { DataContext = model, Width = 860, Height = 640 };
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var pixelSize = new PixelSize(860, 640);
+        var dpi = new Vector(96, 96);
+        using var bitmap = new RenderTargetBitmap(pixelSize, dpi);
+        bitmap.Render(dialog);
+
+        foreach (var dir in ScreenshotDirs)
+        {
+            try
+            {
+                Directory.CreateDirectory(dir);
+                var filePath = Path.Combine(dir, "fresh_onboarding.png");
+                bitmap.Save(filePath);
+            }
+            catch
+            {
+            }
+        }
+
+        // Tab 2: Catalog
+        model.SelectedTabIndex = 1;
+        Dispatcher.UIThread.RunJobs();
+        using var bitmapTab2 = new RenderTargetBitmap(pixelSize, dpi);
+        bitmapTab2.Render(dialog);
+        foreach (var dir in ScreenshotDirs)
+        {
+            try { bitmapTab2.Save(Path.Combine(dir, "fresh_onboarding_tab2.png")); } catch { }
+        }
+
+        // Tab 3: Shortcuts
+        model.SelectedTabIndex = 2;
+        Dispatcher.UIThread.RunJobs();
+        using var bitmapTab3 = new RenderTargetBitmap(pixelSize, dpi);
+        bitmapTab3.Render(dialog);
+        foreach (var dir in ScreenshotDirs)
+        {
+            try { bitmapTab3.Save(Path.Combine(dir, "fresh_onboarding_tab3.png")); } catch { }
+        }
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
     }
 }

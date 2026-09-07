@@ -1158,9 +1158,9 @@
   <data name="Onboarding_Step5_Title" xml:space="preserve"><value>5. Thùng rác, Phục hồi &amp; Gói lưu trữ ZIP</value></data>
   <data name="Onboarding_Step5_Desc" xml:space="preserve"><value>Tài liệu khi xóa được giữ an toàn trong 'Thùng rác' (Ctrl+Shift+R) với tính năng khôi phục hàng loạt. 'Trung tâm Phục hồi' giúp sao lưu CSDL, cùng tính năng xuất/nhập gói ZIP lưu trữ cá nhân tiện lợi.</value></data>
   <data name="Onboarding_Step5_Tip" xml:space="preserve"><value>Mẹo: Thường xuyên tạo bản sao lưu trong Trung tâm Phục hồi để an tâm tuyệt đối.</value></data>
-  <data name="Onboarding_Next" xml:space="preserve"><value>Tiếp theo ➔</value></data>
-  <data name="Onboarding_Prev" xml:space="preserve"><value>⬅ Quay lại</value></data>
-  <data name="Onboarding_Start" xml:space="preserve"><value>🎉 Bắt đầu sử dụng</value></data>
+  <data name="Onboarding_Next" xml:space="preserve"><value>Tiếp theo</value></data>
+  <data name="Onboarding_Prev" xml:space="preserve"><value>Quay lại</value></data>
+  <data name="Onboarding_Start" xml:space="preserve"><value>Bắt đầu sử dụng</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Title" xml:space="preserve"><value>Thư mục tự động quét (Watched Folder)</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Desc" xml:space="preserve"><value>Tự động giám sát thư mục trên máy, phát hiện khi có tệp mới xuất hiện để đưa vào hệ thống.</value></data>
   <data name="Onboarding_Cat_Inbox_Title" xml:space="preserve"><value>Hộp thư nhập liệu (Import Inbox)</value></data>
@@ -1175,4 +1175,8 @@
   <data name="Onboarding_Cat_Lang_Desc" xml:space="preserve"><value>Chuyển đổi mượt mà ngay trên menu giữa Tiếng Việt, Tiếng Nhật, Tiếng Anh, Tiếng Trung.</value></data>
   <data name="Onboarding_Shortcuts_Title" xml:space="preserve"><value>Bảng phím tắt toàn năng</value></data>
   <data name="Onboarding_Shortcuts_Desc" xml:space="preserve"><value>Tăng tốc thao tác hàng ngày với các phím tắt nhanh đến mọi màn hình chính.</value></data>
+  <data name="Onboarding_Shortcuts_Nav" xml:space="preserve"><value>Điều hướng &amp; Hệ thống</value></data>
+  <data name="Onboarding_Shortcuts_Doc" xml:space="preserve"><value>Thao tác tài liệu &amp; Không gian làm việc</value></data>
+  <data name="Onboarding_Shortcuts_Tools" xml:space="preserve"><value>Tìm kiếm &amp; Bảo trì</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Ngôn ngữ hiển thị</value></data>
 </root>
