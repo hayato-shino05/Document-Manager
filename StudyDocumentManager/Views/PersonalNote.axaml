@@ -198,14 +198,16 @@
                                         <DockPanel LastChildFill="True">
                                             <!-- Top Row: Note Type Badge & Pinned Icon -->
                                             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
-                                                <Border Background="{DynamicResource StatPurpleBg}"
+                                                <Border Background="{DynamicResource SidebarBackground}"
+                                                        BorderBrush="{DynamicResource CardBorder}"
+                                                        BorderThickness="1"
                                                         CornerRadius="{DynamicResource RadiusSm}"
                                                         Padding="6,2"
                                                         HorizontalAlignment="Left">
                                                     <TextBlock Text="{Binding NoteType}"
                                                                FontSize="{DynamicResource FontSizeXs}"
-                                                               FontWeight="Bold"
-                                                               Foreground="{DynamicResource StatPurpleFg}"/>
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource TextSecondary}"/>
                                                 </Border>
                                                 <Image DockPanel.Dock="Right"
                                                        Source="{DynamicResource IconPinFilled}"
