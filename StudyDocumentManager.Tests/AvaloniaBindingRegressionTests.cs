@@ -989,7 +989,7 @@ public class AvaloniaBindingRegressionTests
         var cases = new (Control View, string[] AutomationIds)[]
         {
             (new BatchImport(), ["BatchImport_BrowseFolder", "BatchImport_ScanFolder", "BatchImport_Import"]),
-            (new StudyDocumentManager.Views.WatchedFolder(), ["WatchedFolder_Back", "WatchedFolder_Start", "WatchedFolder_Stop"]),
+            (new StudyDocumentManager.Views.WatchedFolder(), ["WatchedFolder_Browse", "WatchedFolder_Start", "WatchedFolder_Stop"]),
             (new RecoveryCenterView(), ["Recovery_CreateBackup", "Recovery_RestoreSelected", "Recovery_OpenFolder"]),
             (new DuplicateDetection(), ["DuplicateDetection_Scan"])
         };

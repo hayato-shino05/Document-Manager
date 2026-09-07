@@ -247,26 +247,9 @@
 
                 </StackPanel>
 
-                <!-- Right side -->
+                <!-- Right side (Buttons pinned from right to left) -->
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
                             HorizontalAlignment="Right" VerticalAlignment="Center">
-                    <Button Classes="toolbar-btn"
-                            Command="{Binding OpenUpdateDialogCommand}"
-                            AutomationProperties.AutomationId="Toolbar_UpdateAvailable"
-                            AutomationProperties.Name="{Binding UpdateVersionText, StringFormat='Update {0}'}"
-                            AutomationProperties.HelpText="{loc:Localize Menu_CheckUpdate}"
-                            Background="{DynamicResource StatGreenBg}"
-                            BorderBrush="{DynamicResource SuccessText}"
-                            BorderThickness="1"
-                            CornerRadius="{DynamicResource RadiusPill}"
-                            Padding="10,4"
-                            Cursor="Hand"
-                            IsVisible="{Binding HasUpdateAvailable}">
-                        <StackPanel Classes="toolbar-btn-stack" Spacing="6">
-                            <Image Source="{DynamicResource IconRefresh}" Classes="toolbar-btn-icon"/>
-                            <TextBlock Text="{Binding UpdateVersionText}" Classes="toolbar-btn-label" FontWeight="Bold" Foreground="{DynamicResource SuccessText}"/>
-                        </StackPanel>
-                    </Button>
                     <Button Classes="secondary toolbar-btn" Command="{Binding UndoLastCommand}"
                             AutomationProperties.AutomationId="Toolbar_Undo"
                             AutomationProperties.Name="{loc:Localize Menu_Undo}"
@@ -285,6 +268,23 @@
                         <StackPanel Classes="toolbar-btn-stack">
                             <Image Source="{DynamicResource IconBack}" Classes="toolbar-btn-icon"/>
                             <TextBlock Text="{loc:Localize Toolbar_GoBack}" Classes="toolbar-btn-label"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="toolbar-btn"
+                            Command="{Binding OpenUpdateDialogCommand}"
+                            AutomationProperties.AutomationId="Toolbar_UpdateAvailable"
+                            AutomationProperties.Name="{Binding UpdateVersionText, StringFormat='Update {0}'}"
+                            AutomationProperties.HelpText="{loc:Localize Menu_CheckUpdate}"
+                            Background="{DynamicResource StatGreenBg}"
+                            BorderBrush="{DynamicResource SuccessText}"
+                            BorderThickness="1"
+                            CornerRadius="{DynamicResource RadiusPill}"
+                            Padding="10,4"
+                            Cursor="Hand"
+                            IsVisible="{Binding HasUpdateAvailable}">
+                        <StackPanel Classes="toolbar-btn-stack" Spacing="6">
+                            <Image Source="{DynamicResource IconRefresh}" Classes="toolbar-btn-icon"/>
+                            <TextBlock Text="{Binding UpdateVersionText}" Classes="toolbar-btn-label" FontWeight="Bold" Foreground="{DynamicResource SuccessText}"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>

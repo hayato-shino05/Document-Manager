@@ -34,9 +34,9 @@
                 </Button>
             </DockPanel>
 
-            <!-- Scrollable Report Cards Container with Symmetrical Centering -->
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <StackPanel MaxWidth="1040" HorizontalAlignment="Center" Spacing="16" Margin="0,0,0,24">
+            <!-- Scrollable Report Cards Container with Symmetrical Centering & generous bottom margin -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,32">
+                <StackPanel MaxWidth="1040" HorizontalAlignment="Center" Spacing="16" Margin="0,0,0,32">
 
                     <!-- By Subject Card -->
                     <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
@@ -53,7 +53,7 @@
                                           ItemsSource="{Binding BySubjectData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
-                                        <Grid ColumnDefinitions="160,*,70" Margin="0,3">
+                                        <Grid ColumnDefinitions="160,*,70" Margin="0,4">
                                             <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeSm}"
                                                        Foreground="{DynamicResource TextPrimary}"
                                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
@@ -95,7 +95,7 @@
                                           ItemsSource="{Binding ByTypeData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
-                                        <Grid ColumnDefinitions="160,*,70" Margin="0,3">
+                                        <Grid ColumnDefinitions="160,*,70" Margin="0,4">
                                             <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeSm}"
                                                        Foreground="{DynamicResource TextPrimary}"
                                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
@@ -137,7 +137,7 @@
                                           ItemsSource="{Binding ByStatusData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:StatusCountItem}">
-                                        <Grid ColumnDefinitions="160,*,70" Margin="0,3">
+                                        <Grid ColumnDefinitions="160,*,70" Margin="0,4">
                                             <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeSm}"
                                                        Foreground="{DynamicResource TextPrimary}"
                                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
@@ -176,7 +176,7 @@
                                           ItemsSource="{Binding ByDayData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
-                                        <Grid ColumnDefinitions="120,*,70" Margin="0,3">
+                                        <Grid ColumnDefinitions="120,*,70" Margin="0,4">
                                             <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeSm}"
                                                        Foreground="{DynamicResource TextPrimary}"
                                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
@@ -218,7 +218,7 @@
                                           ItemsSource="{Binding ByMonthData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
-                                        <Grid ColumnDefinitions="120,*,70" Margin="0,3">
+                                        <Grid ColumnDefinitions="120,*,70" Margin="0,4">
                                             <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeSm}"
                                                        Foreground="{DynamicResource TextPrimary}"
                                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"

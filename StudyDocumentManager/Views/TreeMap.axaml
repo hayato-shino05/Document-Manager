@@ -62,9 +62,12 @@
                 </Grid>
             </Border>
 
-            <!-- TreeMap grid -->
-            <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
-                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+            <!-- TreeMap grid card container -->
+            <Border Classes="card"
+                    Background="{DynamicResource CardBackground}"
+                    CornerRadius="{DynamicResource RadiusMd}"
+                    BorderBrush="{DynamicResource CardBorder}"
+                    BorderThickness="1"
                     Padding="{DynamicResource PaddingCard}">
                 <Panel>
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled"
@@ -79,13 +82,13 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:TreeMapItem">
-                                    <Border MinWidth="140" MaxWidth="280" MinHeight="90"
+                                    <Border MinWidth="160" MaxWidth="280" MinHeight="96"
                                             AutomationProperties.AutomationId="TreeMap_ItemTile"
                                             AutomationProperties.Name="{Binding DisplayText}"
                                             Margin="6" Padding="{DynamicResource PaddingCard}"
                                             CornerRadius="{DynamicResource RadiusMd}"
                                             Background="{Binding Color}">
-                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="2">
+                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="4">
                                             <TextBlock Text="{Binding Label}"
                                                        Foreground="{DynamicResource OnColorPrimaryBrush}" FontWeight="Bold" FontSize="{DynamicResource FontSizeLg}"
                                                        TextAlignment="Center" TextWrapping="Wrap"/>
@@ -102,13 +105,16 @@
                         </ItemsControl>
                     </ScrollViewer>
 
+                    <!-- Empty state -->
                     <StackPanel Classes="empty-state" IsVisible="{Binding !Items.Count}"
-                                HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
-                        <Image Source="{DynamicResource IconTreeMap}" Width="40" Height="40" Opacity="0.3" HorizontalAlignment="Center"/>
+                                HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" Margin="24">
+                        <Image Source="{DynamicResource IconTreeMap}" Width="44" Height="44" Opacity="0.35" HorizontalAlignment="Center"/>
                         <TextBlock Text="{loc:Localize Report_NoData}"
                                    AutomationProperties.AutomationId="TreeMap_EmptyState"
                                    AutomationProperties.LiveSetting="Polite"
-                                   FontSize="{DynamicResource FontSizeLg}" Foreground="{DynamicResource TextMuted}"
+                                   FontSize="{DynamicResource FontSizeLg}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextMuted}"
                                    HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Panel>

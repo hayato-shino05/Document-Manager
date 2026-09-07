@@ -5,38 +5,184 @@
              x:Class="StudyDocumentManager.Views.ImportInbox"
              AutomationProperties.AutomationId="Screen_ImportInbox"
              x:DataType="vm:ImportInboxModel">
-  <DockPanel Margin="24">
-    <StackPanel DockPanel.Dock="Top" Spacing="10">
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <Button AutomationProperties.AutomationId="ImportInbox_Back" Classes="secondary" Content="{loc:Localize Btn_Back}" Command="{Binding GoBackCommand}" />
-        <TextBlock Text="{loc:Localize ImportInbox_Title}" FontSize="24" />
-        <Button AutomationProperties.AutomationId="ImportInbox_Refresh" Classes="secondary" Content="{loc:Localize Btn_Refresh}" Command="{Binding RefreshCommand}" />
+
+  <Border Classes="page-wrapper" Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
+    <DockPanel>
+      <!-- Header -->
+      <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <Image Source="{DynamicResource IconImport}" Width="20" Height="20" VerticalAlignment="Center"/>
+          <TextBlock AutomationProperties.AutomationId="Title_ImportInbox"
+                     Text="{loc:Localize ImportInbox_Title}"
+                     FontSize="{DynamicResource FontSizeHeading}"
+                     FontWeight="Bold"
+                     Foreground="{DynamicResource TextPrimary}"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
+      </DockPanel>
+
+      <!-- Filter Toolbar Card -->
+      <Border DockPanel.Dock="Top"
+              Background="{DynamicResource CardBackground}"
+              CornerRadius="{DynamicResource RadiusMd}"
+              BorderBrush="{DynamicResource CardBorder}"
+              BorderThickness="1"
+              Padding="{DynamicResource PaddingCard}"
+              Margin="0,0,0,12">
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+          <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <TextBlock Text="{loc:Localize ImportInbox_State}"
+                       FontSize="{DynamicResource FontSizeSm}"
+                       Foreground="{DynamicResource TextSecondary}"
+                       VerticalAlignment="Center"/>
+            <ComboBox AutomationProperties.AutomationId="ImportInbox_StateFilter"
+                      AutomationProperties.Name="{loc:Localize ImportInbox_State}"
+                      Width="160"
+                      Height="30"
+                      SelectedItem="{Binding SelectedStateOption}"
+                      ItemsSource="{Binding StateOptions}"
+                      FontSize="{DynamicResource FontSizeSm}"
+                      VerticalAlignment="Center"/>
+          </StackPanel>
+          <CheckBox Grid.Column="1"
+                    AutomationProperties.AutomationId="ImportInbox_ShowProcessed"
+                    Content="{loc:Localize ImportInbox_ShowProcessed}"
+                    IsChecked="{Binding IncludeProcessed}"
+                    VerticalAlignment="Center"
+                    Margin="16,0,0,0"/>
+          <Button Grid.Column="3"
+                  Classes="secondary"
+                  AutomationProperties.AutomationId="ImportInbox_Refresh"
+                  AutomationProperties.Name="{loc:Localize Btn_Refresh}"
+                  Content="{loc:Localize Btn_Refresh}"
+                  Command="{Binding RefreshCommand}"
+                  Padding="{DynamicResource PaddingBtnMd}"
+                  VerticalAlignment="Center"/>
+        </Grid>
+      </Border>
+
+      <!-- Bottom Status & Actions -->
+      <StackPanel DockPanel.Dock="Bottom" Spacing="8" Margin="0,12,0,0">
+        <TextBlock AutomationProperties.AutomationId="ImportInbox_Status"
+                   AutomationProperties.LiveSetting="Polite"
+                   Text="{Binding StatusText}"
+                   Foreground="{DynamicResource TextSecondary}"
+                   FontSize="{DynamicResource FontSizeSm}"
+                   TextWrapping="Wrap"
+                   IsVisible="{Binding StatusText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+        <TextBlock AutomationProperties.AutomationId="ImportInbox_Error"
+                   AutomationProperties.LiveSetting="Assertive"
+                   Text="{Binding ErrorMessage}"
+                   Foreground="{DynamicResource DangerBrush}"
+                   FontSize="{DynamicResource FontSizeSm}"
+                   FontWeight="SemiBold"
+                   TextWrapping="Wrap"
+                   IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+        <Border Background="{DynamicResource CardBackground}"
+                CornerRadius="{DynamicResource RadiusMd}"
+                BorderBrush="{DynamicResource CardBorder}"
+                BorderThickness="1"
+                Padding="{DynamicResource PaddingCard}"
+                IsVisible="{Binding HasItems}">
+          <StackPanel AutomationProperties.AutomationId="ImportInbox_ActionPanel"
+                      Orientation="Horizontal"
+                      Spacing="8"
+                      IsVisible="{Binding HasItems}">
+            <Button AutomationProperties.AutomationId="ImportInbox_Retry"
+                    AutomationProperties.Name="{loc:Localize ImportInbox_Retry}"
+                    Classes="secondary"
+                    Command="{Binding RetrySelectedCommand}"
+                    Padding="{DynamicResource PaddingBtnMd}">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Image Source="{DynamicResource IconRefresh}" Width="14" Height="14" VerticalAlignment="Center"/>
+                <TextBlock Text="{loc:Localize ImportInbox_Retry}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+            <Button AutomationProperties.AutomationId="ImportInbox_Reveal"
+                    AutomationProperties.Name="{loc:Localize ImportInbox_Reveal}"
+                    Classes="secondary"
+                    Command="{Binding RevealSelectedCommand}"
+                    Padding="{DynamicResource PaddingBtnMd}">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Image Source="{DynamicResource IconOpenFile}" Width="14" Height="14" VerticalAlignment="Center"/>
+                <TextBlock Text="{loc:Localize ImportInbox_Reveal}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+            <TextBox AutomationProperties.AutomationId="ImportInbox_Subject"
+                     Width="180"
+                     Text="{Binding BulkSubject}"
+                     Watermark="{loc:Localize ImportInbox_Subject}"
+                     FontSize="{DynamicResource FontSizeSm}"
+                     Height="30"
+                     VerticalAlignment="Center"/>
+            <TextBox AutomationProperties.AutomationId="ImportInbox_Type"
+                     Width="180"
+                     Text="{Binding BulkType}"
+                     Watermark="{loc:Localize ImportInbox_Type}"
+                     FontSize="{DynamicResource FontSizeSm}"
+                     Height="30"
+                     VerticalAlignment="Center"/>
+            <Button AutomationProperties.AutomationId="ImportInbox_ApplyMetadata"
+                    AutomationProperties.Name="{loc:Localize ImportInbox_ApplyMetadata}"
+                    Classes="primary"
+                    Command="{Binding ApplyBulkMetadataCommand}"
+                    IsEnabled="{Binding CanBulkEdit}"
+                    Padding="{DynamicResource PaddingBtnMd}">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Image Source="{DynamicResource IconCheck}" Width="14" Height="14" VerticalAlignment="Center"/>
+                <TextBlock Text="{loc:Localize ImportInbox_ApplyMetadata}" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </Border>
       </StackPanel>
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <CheckBox AutomationProperties.AutomationId="ImportInbox_ShowProcessed" Content="{loc:Localize ImportInbox_ShowProcessed}" IsChecked="{Binding IncludeProcessed}" />
-        <ComboBox AutomationProperties.AutomationId="ImportInbox_StateFilter" AutomationProperties.Name="{loc:Localize ImportInbox_State}" Width="160" SelectedItem="{Binding SelectedStateOption}" ItemsSource="{Binding StateOptions}" />
-      </StackPanel>
-    </StackPanel>
-    <TextBlock Text="{loc:Localize ImportInbox_Empty}" IsVisible="{Binding IsEmpty}" Margin="0,24" />
-    <DataGrid AutomationProperties.AutomationId="ImportInbox_DataGrid" AutomationProperties.Name="{loc:Localize ImportInbox_Title}" IsVisible="{Binding HasItems}" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedItem}" SelectionMode="Extended" SelectionChanged="OnSelectionChanged" AutoGenerateColumns="False" IsReadOnly="True">
-      <DataGrid.Columns>
-        <DataGridTextColumn Header="{loc:Localize ImportInbox_Name}" Binding="{Binding DisplayName}" Width="2*" />
-        <DataGridTextColumn Header="{loc:Localize ImportInbox_State}" Binding="{Binding StateLabel}" Width="*" />
-        <DataGridTextColumn Header="{loc:Localize ImportInbox_Subject}" Binding="{Binding Subject}" Width="*" />
-        <DataGridTextColumn Header="{loc:Localize ImportInbox_Type}" Binding="{Binding Type}" Width="*" />
-        <DataGridTextColumn Header="{loc:Localize ImportInbox_Failure}" Binding="{Binding FailureLabel}" Width="*" />
-        <DataGridTextColumn Header="{loc:Localize ImportInbox_Duplicate}" Binding="{Binding DuplicateCandidate}" Width="*" />
-        <DataGridTextColumn Header="{loc:Localize ImportInbox_Source}" Binding="{Binding SourcePath}" Width="3*" />
-      </DataGrid.Columns>
-    </DataGrid>
-    <TextBlock DockPanel.Dock="Bottom" AutomationProperties.AutomationId="ImportInbox_Status" AutomationProperties.LiveSetting="Polite" Text="{Binding StatusText}" TextWrapping="Wrap" IsVisible="{Binding StatusText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Margin="0,6,0,0" />
-    <TextBlock DockPanel.Dock="Bottom" AutomationProperties.AutomationId="ImportInbox_Error" AutomationProperties.LiveSetting="Assertive" Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Margin="0,6,0,0" />
-    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" Margin="0,10,0,0" AutomationProperties.AutomationId="ImportInbox_ActionPanel" IsVisible="{Binding HasItems}">
-      <Button AutomationProperties.AutomationId="ImportInbox_Retry" Classes="secondary" Content="{loc:Localize ImportInbox_Retry}" Command="{Binding RetrySelectedCommand}" />
-      <Button AutomationProperties.AutomationId="ImportInbox_Reveal" Classes="secondary" Content="{loc:Localize ImportInbox_Reveal}" Command="{Binding RevealSelectedCommand}" />
-      <TextBox AutomationProperties.AutomationId="ImportInbox_Subject" Width="180" Text="{Binding BulkSubject}" Watermark="{loc:Localize ImportInbox_Subject}" />
-      <TextBox AutomationProperties.AutomationId="ImportInbox_Type" Width="180" Text="{Binding BulkType}" Watermark="{loc:Localize ImportInbox_Type}" />
-      <Button AutomationProperties.AutomationId="ImportInbox_ApplyMetadata" Classes="primary" Content="{loc:Localize ImportInbox_ApplyMetadata}" Command="{Binding ApplyBulkMetadataCommand}" IsEnabled="{Binding CanBulkEdit}" />
-    </StackPanel>
-  </DockPanel>
+
+      <!-- DataGrid Card & Empty State -->
+      <Border Background="{DynamicResource CardBackground}"
+              CornerRadius="{DynamicResource RadiusMd}"
+              BorderBrush="{DynamicResource CardBorder}"
+              BorderThickness="1"
+              ClipToBounds="True">
+        <Panel>
+          <DataGrid AutomationProperties.AutomationId="ImportInbox_DataGrid"
+                    AutomationProperties.Name="{loc:Localize ImportInbox_Title}"
+                    IsVisible="{Binding HasItems}"
+                    ItemsSource="{Binding Items}"
+                    SelectedItem="{Binding SelectedItem}"
+                    SelectionMode="Extended"
+                    SelectionChanged="OnSelectionChanged"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    GridLinesVisibility="Horizontal"
+                    HeadersVisibility="Column">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="{loc:Localize ImportInbox_Name}" Binding="{Binding DisplayName}" Width="2*" MinWidth="160"/>
+              <DataGridTextColumn Header="{loc:Localize ImportInbox_State}" Binding="{Binding StateLabel}" Width="*" MinWidth="90"/>
+              <DataGridTextColumn Header="{loc:Localize ImportInbox_Subject}" Binding="{Binding Subject}" Width="*" MinWidth="100"/>
+              <DataGridTextColumn Header="{loc:Localize ImportInbox_Type}" Binding="{Binding Type}" Width="*" MinWidth="90"/>
+              <DataGridTextColumn Header="{loc:Localize ImportInbox_Failure}" Binding="{Binding FailureLabel}" Width="*" MinWidth="110"/>
+              <DataGridTextColumn Header="{loc:Localize ImportInbox_Duplicate}" Binding="{Binding DuplicateCandidate}" Width="*" MinWidth="110"/>
+              <DataGridTextColumn Header="{loc:Localize ImportInbox_Source}" Binding="{Binding SourcePath}" Width="3*" MinWidth="180"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <!-- Empty State -->
+          <StackPanel Classes="empty-state"
+                      IsVisible="{Binding IsEmpty}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Spacing="10"
+                      Margin="24">
+            <Image Source="{DynamicResource IconImport}" Width="44" Height="44" Opacity="0.35" HorizontalAlignment="Center"/>
+            <TextBlock Text="{loc:Localize ImportInbox_Empty}"
+                       FontSize="{DynamicResource FontSizeLg}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextMuted}"
+                       HorizontalAlignment="Center"/>
+          </StackPanel>
+        </Panel>
+      </Border>
+    </DockPanel>
+  </Border>
 </UserControl>

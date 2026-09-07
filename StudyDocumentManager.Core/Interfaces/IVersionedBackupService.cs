@@ -8,7 +8,10 @@ public sealed record BackupVersionInfo(
     DateTime CreatedAtLocal,
     long SizeBytes,
     bool IsValid,
-    bool IsLatest);
+    bool IsLatest)
+{
+    public string FileName => System.IO.Path.GetFileName(FilePath);
+}
 
 /// <summary>
 /// Impact summary shown to the user before a restore is confirmed.
