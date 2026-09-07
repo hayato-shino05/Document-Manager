@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
@@ -80,5 +80,21 @@ public class ModernizedAllViewsScreenshotTests
         // 8. BatchImport
         var biModel = services.GetRequiredService<BatchImportModel>();
         SaveRenderedView(new BatchImport { DataContext = biModel }, 1200, 750, "fresh_06_BatchImport.png");
+    }
+
+    [AvaloniaFact]
+    public void Capture_PersonalNote()
+    {
+        var services = App.Services!;
+        var model = services.GetRequiredService<PersonalNoteModel>();
+        model.Load(1, "Deep Learning & Neural Networks Guide.pdf");
+        if (model.Notes.Count == 0)
+        {
+            model.Notes.Add(new Core.Entities.PersonalNote(1, 1, "summary", "Chapter 4 covers backpropagation and gradient descent optimization strategies with Adam & RMSprop.", true) { CreatedAt = DateTime.Now.AddDays(-2), UpdatedAt = DateTime.Now.AddHours(-3) });
+            model.Notes.Add(new Core.Entities.PersonalNote(2, 1, "action", "Implement custom loss function in PyTorch before Friday's lab session.", false) { CreatedAt = DateTime.Now.AddDays(-1), UpdatedAt = DateTime.Now.AddHours(-1) });
+            model.Notes.Add(new Core.Entities.PersonalNote(3, 1, "quote", "Optimization is not about finding the best possible solution, but finding an acceptable solution quickly.", false) { CreatedAt = DateTime.Now.AddDays(-3), UpdatedAt = DateTime.Now.AddDays(-1) });
+            model.SelectedNote = model.Notes[0];
+        }
+        SaveRenderedView(new PersonalNote { DataContext = model }, 1280, 800, "personal_note_current.png");
     }
 }

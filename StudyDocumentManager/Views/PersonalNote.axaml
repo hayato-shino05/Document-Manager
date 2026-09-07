@@ -7,334 +7,477 @@
              x:Name="root"
              AutomationProperties.AutomationId="Screen_PersonalNote">
 
-    <Border Background="{StaticResource ContentBackground}"
-            Padding="{StaticResource PaddingPage}">
-        <Grid RowDefinitions="Auto,Auto,*,Auto"
-              MaxWidth="920"
-              HorizontalAlignment="Stretch">
-
-            <!-- Row 0: Header & Navigation -->
-            <DockPanel Grid.Row="0" Margin="0,0,0,10">
+    <Border Background="{DynamicResource ContentBackground}"
+            Padding="{DynamicResource PaddingPage}">
+        <DockPanel>
+            <!-- Top Header & Navigation -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,12">
                 <Button x:Name="btnNoteBack"
                         Classes="secondary"
                         Command="{Binding GoBackCommand}"
-                        Padding="{StaticResource PaddingMd}"
-                        MinHeight="38"
+                        Padding="{DynamicResource PaddingMd}"
+                        MinHeight="36"
                         VerticalAlignment="Center"
                         AutomationProperties.AutomationId="PersonalNote_Back"
                         AutomationProperties.Name="{loc:Localize Toolbar_GoBack}"
                         ToolTip.Tip="{loc:Localize Toolbar_GoBack}">
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}">
-                        <Image Source="{StaticResource IconBack}"
+                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space2}">
+                        <Image Source="{DynamicResource IconBack}"
                                Width="14"
                                Height="14"
                                VerticalAlignment="Center"/>
                         <TextBlock Text="{loc:Localize Toolbar_GoBack}"
-                                   FontSize="{StaticResource FontSizeSm}"
+                                   FontSize="{DynamicResource FontSizeSm}"
+                                   FontWeight="SemiBold"
                                    VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
 
                 <StackPanel DockPanel.Dock="Right"
                             Orientation="Horizontal"
-                            Spacing="{StaticResource Space2}"
+                            Spacing="{DynamicResource Space2}"
                             VerticalAlignment="Center">
-                    <Border Background="{StaticResource StatBlueBg}"
-                            CornerRadius="{StaticResource RadiusMd}"
-                            Padding="8,4">
-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
-                            <Image Source="{StaticResource IconNote}"
-                                   Width="18"
-                                   Height="18"
+                    <Border Background="{DynamicResource StatBlueBg}"
+                            CornerRadius="{DynamicResource RadiusMd}"
+                            Padding="10,6">
+                        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space2}">
+                            <Image Source="{DynamicResource IconNote}"
+                                   Width="16"
+                                   Height="16"
                                    VerticalAlignment="Center"/>
-                            <TextBlock AutomationProperties.AutomationId="Title_PersonalNote"
+                            <TextBlock x:Name="txtPersonalNoteTitle"
+                                       AutomationProperties.AutomationId="Title_PersonalNote"
                                        Text="{loc:Localize PersonalNote_Title}"
-                                       FontSize="{StaticResource FontSizeLg}"
+                                       FontSize="{DynamicResource FontSizeLg}"
                                        FontWeight="Bold"
-                                       Foreground="{StaticResource StatBlueFg}"
+                                       Foreground="{DynamicResource StatBlueFg}"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
             </DockPanel>
 
-            <!-- Row 1: Document Info & Note Selector List -->
-            <StackPanel Grid.Row="1"
-                        Spacing="{StaticResource Space2}"
-                        Margin="0,0,0,10">
-
-                <!-- Document Context Card -->
-                <Border Background="{StaticResource SidebarBackground}"
-                        CornerRadius="{StaticResource RadiusMd}"
-                        BorderBrush="{StaticResource CardBorder}"
-                        BorderThickness="1"
-                        Padding="10,6">
-                    <DockPanel LastChildFill="True">
-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}">
-                            <TextBlock Text="{loc:Localize AddEdit_LblName}"
-                                       FontSize="{StaticResource FontSizeSm}"
-                                       Foreground="{StaticResource TextSecondary}"
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding DocumentName}"
-                                       FontSize="{StaticResource FontSizeMd}"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextPrimary}"
-                                       TextTrimming="CharacterEllipsis"
-                                       MaxWidth="500"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-
-                        <!-- Live Metrics -->
-                        <StackPanel DockPanel.Dock="Right"
-                                    Orientation="Horizontal"
-                                    Spacing="{StaticResource Space2}"
-                                    VerticalAlignment="Center">
-                            <TextBlock Text="{Binding CharCount, StringFormat='{}{0} chars'}"
-                                       FontSize="{StaticResource FontSizeXs}"
-                                       Foreground="{StaticResource TextMuted}"/>
-                            <TextBlock Text="•" Foreground="{StaticResource CardBorder}"/>
-                            <TextBlock Text="{Binding WordCount, StringFormat='{}{0} words'}"
-                                       FontSize="{StaticResource FontSizeXs}"
-                                       Foreground="{StaticResource TextMuted}"/>
-                        </StackPanel>
-                    </DockPanel>
-                </Border>
-
-                <!-- Note Selection Header & List -->
-                <Border Background="{StaticResource CardBackground}"
-                        CornerRadius="{StaticResource RadiusMd}"
-                        BorderBrush="{StaticResource CardBorder}"
-                        BorderThickness="1"
-                        Padding="10,8">
-                    <Grid RowDefinitions="Auto,Auto">
-                        <!-- Actions Header -->
-                        <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}">
-                                <TextBlock Text="{loc:Localize PersonalNote_Notes}"
-                                           FontSize="{StaticResource FontSizeSm}"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextSecondary}"
-                                           VerticalAlignment="Center"/>
-                                <Border Background="{StaticResource SidebarBackground}"
-                                        CornerRadius="{StaticResource RadiusSm}"
-                                        Padding="6,1">
-                                    <TextBlock Text="{Binding NotesCount, StringFormat='{}{0}'}"
-                                               FontSize="{StaticResource FontSizeXs}"
-                                               Foreground="{StaticResource TextMuted}"/>
-                                </Border>
-                            </StackPanel>
-
-                            <Button DockPanel.Dock="Right"
-                                    x:Name="btnNoteNew"
-                                    Classes="primary"
-                                    Command="{Binding NewNoteCommand}"
-                                    MinHeight="28"
-                                    Padding="8,2"
-                                    AutomationProperties.AutomationId="PersonalNote_New"
-                                    AutomationProperties.Name="{loc:Localize PersonalNote_BtnNew}">
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <Image Source="{StaticResource IconAdd}" Width="10" Height="10" VerticalAlignment="Center"/>
-                                    <TextBlock Text="{loc:Localize PersonalNote_BtnNew}" FontSize="{StaticResource FontSizeXs}"/>
-                                </StackPanel>
-                            </Button>
-                        </DockPanel>
-
-                        <!-- Notes List -->
-                        <ListBox Grid.Row="1"
-                                 x:Name="lstNotes"
-                                 ItemsSource="{Binding Notes}"
-                                 SelectedItem="{Binding SelectedNote, Mode=TwoWay}"
-                                 MaxHeight="90"
-                                 Background="Transparent"
-                                 BorderThickness="0"
-                                 AutomationProperties.AutomationId="PersonalNote_List"
-                                 AutomationProperties.Name="{loc:Localize PersonalNote_Notes}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid ColumnDefinitions="Auto,Auto,*" Margin="0,1">
-                                        <Border Grid.Column="0"
-                                                Background="{StaticResource StatPurpleBg}"
-                                                CornerRadius="{StaticResource RadiusSm}"
-                                                Padding="4,1"
-                                                Margin="0,0,6,0"
-                                                VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding NoteType}"
-                                                       FontSize="{StaticResource FontSizeXs}"
-                                                       FontWeight="Bold"
-                                                       Foreground="{StaticResource StatPurpleFg}"/>
-                                        </Border>
-                                        <Image Grid.Column="1"
-                                               Source="{StaticResource IconPinFilled}"
-                                               Width="12"
-                                               Height="12"
-                                               IsVisible="{Binding IsPinned}"
-                                               VerticalAlignment="Center"
-                                               Margin="0,0,4,0"/>
-                                        <TextBlock Grid.Column="2"
-                                                   Text="{Binding Content}"
-                                                   FontSize="{StaticResource FontSizeSm}"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   VerticalAlignment="Center"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </Grid>
-                </Border>
-
-                <!-- Saved Note Preview Banner (compatible with tests and visual review) -->
-                <Border x:Name="savedNotePreviewCard"
-                        Background="{StaticResource StatBlueBg}"
-                        CornerRadius="{StaticResource RadiusMd}"
-                        BorderBrush="{StaticResource CardBorder}"
-                        BorderThickness="1"
-                        Padding="10,6"
-                        IsVisible="{Binding HasSavedNotePreview}">
-                    <StackPanel Spacing="2">
-                        <TextBlock Text="{loc:Localize AddEdit_LblNotes}"
-                                   FontSize="{StaticResource FontSizeXs}"
-                                   FontWeight="Bold"
-                                   Foreground="{StaticResource StatBlueFg}"/>
-                        <TextBlock x:Name="txtSavedNotePreview"
-                                   Text="{Binding SavedNoteContent}"
-                                   FontSize="{StaticResource FontSizeSm}"
-                                   Foreground="{StaticResource TextPrimary}"
-                                   TextWrapping="Wrap"
-                                   MaxLines="2"
-                                   TextTrimming="CharacterEllipsis"
-                                   ToolTip.Tip="{Binding SavedNoteContent}"
-                                   AutomationProperties.Name="{loc:Localize AddEdit_LblNotes}"/>
-                    </StackPanel>
-                </Border>
-            </StackPanel>
-
-            <!-- Row 2: Note Editor & Tools -->
-            <Border Grid.Row="2"
-                    Background="{StaticResource CardBackground}"
-                    CornerRadius="{StaticResource RadiusMd}"
-                    BorderBrush="{StaticResource CardBorder}"
+            <!-- Document Context Banner -->
+            <Border DockPanel.Dock="Top"
+                    Background="{DynamicResource CardBackground}"
+                    CornerRadius="{DynamicResource RadiusMd}"
+                    BorderBrush="{DynamicResource CardBorder}"
                     BorderThickness="1"
-                    Padding="{StaticResource PaddingMd}"
-                    VerticalAlignment="Stretch">
-                <Grid RowDefinitions="Auto,*">
-                    <!-- Toolbar (Type ComboBox, Pin Button, Pinned State, Copy Button) -->
-                    <DockPanel Grid.Row="0" Margin="0,0,0,8">
-                        <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}">
-                            <TextBlock Text="{loc:Localize AddEdit_LblNotes}"
-                                       FontSize="{StaticResource FontSizeSm}"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextPrimary}"
+                    Padding="12,8"
+                    Margin="0,0,0,12">
+                <DockPanel LastChildFill="True">
+                    <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space2}" VerticalAlignment="Center">
+                        <Image Source="{DynamicResource IconDocPage}"
+                               Width="16"
+                               Height="16"
+                               VerticalAlignment="Center"/>
+                        <TextBlock Text="{loc:Localize AddEdit_LblName}"
+                                   FontSize="{DynamicResource FontSizeSm}"
+                                   Foreground="{DynamicResource TextSecondary}"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding DocumentName}"
+                                   FontSize="{DynamicResource FontSizeMd}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimary}"
+                                   TextTrimming="CharacterEllipsis"
+                                   MaxWidth="500"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Live Metrics -->
+                    <Border DockPanel.Dock="Right"
+                            Background="{DynamicResource SidebarBackground}"
+                            CornerRadius="{DynamicResource RadiusSm}"
+                            Padding="8,3"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space2}">
+                            <TextBlock Text="{Binding CharCount, StringFormat='{}{0} chars'}"
+                                       FontSize="{DynamicResource FontSizeXs}"
+                                       Foreground="{DynamicResource TextMuted}"
                                        VerticalAlignment="Center"/>
-                            <ComboBox x:Name="cmbNoteType"
-                                      ItemsSource="{Binding NoteTypes}"
-                                      SelectedItem="{Binding SelectedNoteType, Mode=TwoWay}"
-                                      MinWidth="120"
-                                      MinHeight="30"
-                                      AutomationProperties.AutomationId="PersonalNote_Type"
-                                      AutomationProperties.Name="{loc:Localize PersonalNote_Type}"/>
-                            <Button x:Name="btnNotePinned"
-                                    Classes="secondary"
-                                    Command="{Binding TogglePinnedCommand}"
-                                    MinHeight="30"
-                                    Padding="8,4"
-                                    AutomationProperties.AutomationId="PersonalNote_Pinned"
-                                    AutomationProperties.Name="{loc:Localize PersonalNote_Pinned}">
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <Image Source="{StaticResource IconPin}" Width="12" Height="12" VerticalAlignment="Center"/>
-                                    <TextBlock Text="{loc:Localize PersonalNote_Pinned}" FontSize="{StaticResource FontSizeXs}"/>
-                                </StackPanel>
-                            </Button>
-                            <TextBlock x:Name="txtNotePinnedState"
-                                       Text="{loc:Localize PersonalNote_Pinned}"
-                                       IsVisible="{Binding IsPinned}"
-                                       VerticalAlignment="Center"
-                                       FontSize="{StaticResource FontSizeXs}"
-                                       FontWeight="Bold"
-                                       Foreground="{StaticResource StatOrangeFg}"
-                                       AutomationProperties.Name="{loc:Localize PersonalNote_Pinned}"/>
+                            <TextBlock Text="•" Foreground="{DynamicResource CardBorder}" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding WordCount, StringFormat='{}{0} words'}"
+                                       FontSize="{DynamicResource FontSizeXs}"
+                                       Foreground="{DynamicResource TextMuted}"
+                                       VerticalAlignment="Center"/>
                         </StackPanel>
-
-                        <!-- Copy Button -->
-                        <Button DockPanel.Dock="Right"
-                                x:Name="btnNoteCopy"
-                                Classes="secondary"
-                                Command="{Binding CopyContentCommand}"
-                                IsEnabled="{Binding CanSaveNote}"
-                                MinHeight="30"
-                                Padding="8,4"
-                                AutomationProperties.AutomationId="PersonalNote_Copy"
-                                AutomationProperties.Name="{loc:Localize PersonalNote_BtnCopy}"
-                                ToolTip.Tip="{loc:Localize PersonalNote_BtnCopy}">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Image Source="{StaticResource IconCopy}" Width="12" Height="12" VerticalAlignment="Center"/>
-                                <TextBlock Text="{loc:Localize PersonalNote_BtnCopy}" FontSize="{StaticResource FontSizeXs}"/>
-                            </StackPanel>
-                        </Button>
-                    </DockPanel>
-
-                    <!-- Main Text Box Editor -->
-                    <TextBox Grid.Row="1"
-                             x:Name="txtNoteContent"
-                             AutomationProperties.AutomationId="PersonalNote_Content"
-                             Text="{Binding NoteContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             AcceptsReturn="True"
-                             TextWrapping="Wrap"
-                             MinHeight="140"
-                             FontSize="{StaticResource FontSizeMd}"
-                             Watermark="{loc:Localize PersonalNote_Placeholder}"
-                             VerticalContentAlignment="Top"
-                             AutomationProperties.Name="{loc:Localize AddEdit_LblNotes}"
-                             AutomationProperties.HelpText="{loc:Localize PersonalNote_Placeholder}"/>
-                </Grid>
+                    </Border>
+                </DockPanel>
             </Border>
 
-            <!-- Row 3: Action Buttons (Save & Delete) -->
-            <WrapPanel Grid.Row="3"
-                       Orientation="Horizontal"
-                       HorizontalAlignment="Right"
-                       Margin="0,10,0,0">
-                <Button x:Name="btnNoteSave"
-                        Classes="primary"
-                        Command="{Binding SaveNoteCommand}"
-                        IsEnabled="{Binding CanSaveNote}"
-                        Padding="{StaticResource PaddingBtnLg}"
-                        MinHeight="38"
-                        Margin="0,0,6,0"
-                        AutomationProperties.AutomationId="PersonalNote_Save"
-                        AutomationProperties.Name="{loc:Localize PersonalNote_BtnSave}"
-                        ToolTip.Tip="{loc:Localize PersonalNote_BtnSave}">
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
-                        <Image Source="{StaticResource IconSaveWhite}"
-                               Width="14"
-                               Height="14"
-                               VerticalAlignment="Center"/>
-                        <TextBlock Text="{loc:Localize PersonalNote_BtnSave}"
-                                   FontSize="{StaticResource FontSizeMd}"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-                <Button x:Name="btnNoteDelete"
-                        Classes="danger"
-                        Command="{Binding DeleteNoteCommand}"
-                        IsVisible="{Binding HasExistingNote}"
-                        Padding="{StaticResource PaddingBtnLg}"
-                        MinHeight="38"
-                        AutomationProperties.AutomationId="PersonalNote_Delete"
-                        AutomationProperties.Name="{loc:Localize PersonalNote_BtnDelete}"
-                        ToolTip.Tip="{loc:Localize PersonalNote_BtnDelete}">
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space1}">
-                        <Image Source="{StaticResource IconDelete}"
-                               Width="14"
-                               Height="14"
-                               VerticalAlignment="Center"/>
-                        <TextBlock Text="{loc:Localize PersonalNote_BtnDelete}"
-                                   FontSize="{StaticResource FontSizeMd}"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-            </WrapPanel>
-        </Grid>
+            <!-- Main 2-Column Split: Notes List (Left) + Editor (Right) -->
+            <Grid ColumnDefinitions="360,14,*">
+
+                <!-- Left Column: Notes List & Filter Panel -->
+                <Border Grid.Column="0"
+                        Background="{DynamicResource CardBackground}"
+                        CornerRadius="{DynamicResource RadiusMd}"
+                        BorderBrush="{DynamicResource CardBorder}"
+                        BorderThickness="1"
+                        ClipToBounds="True">
+                    <DockPanel>
+                        <!-- List Header -->
+                        <Border DockPanel.Dock="Top"
+                                Background="{DynamicResource SidebarBackground}"
+                                Padding="{DynamicResource PaddingMd}"
+                                BorderBrush="{DynamicResource CardBorder}"
+                                BorderThickness="0,0,0,1">
+                            <DockPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space2}" VerticalAlignment="Center">
+                                    <Image Source="{DynamicResource IconNote}"
+                                           Width="14"
+                                           Height="14"
+                                           VerticalAlignment="Center"/>
+                                    <TextBlock Text="{loc:Localize PersonalNote_Notes}"
+                                               FontSize="{DynamicResource FontSizeMd}"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               VerticalAlignment="Center"/>
+                                    <Border Background="{DynamicResource CardBackground}"
+                                            CornerRadius="{DynamicResource RadiusSm}"
+                                            BorderBrush="{DynamicResource CardBorder}"
+                                            BorderThickness="1"
+                                            Padding="6,1">
+                                        <TextBlock Text="{Binding FilteredNotesCount}"
+                                                   FontSize="{DynamicResource FontSizeXs}"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource AccentBrush}"/>
+                                    </Border>
+                                </StackPanel>
+
+                                <Button DockPanel.Dock="Right"
+                                        x:Name="btnNoteNew"
+                                        Classes="primary"
+                                        Command="{Binding NewNoteCommand}"
+                                        MinHeight="30"
+                                        Padding="10,4"
+                                        AutomationProperties.AutomationId="PersonalNote_New"
+                                        AutomationProperties.Name="{loc:Localize PersonalNote_BtnNew}">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <Image Source="{DynamicResource IconAddWhite}" Width="12" Height="12" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{loc:Localize PersonalNote_BtnNew}"
+                                                   FontSize="{DynamicResource FontSizeSm}"
+                                                   FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Button>
+                            </DockPanel>
+                        </Border>
+
+                        <!-- Search & Filter Controls -->
+                        <Border DockPanel.Dock="Top"
+                                Background="{DynamicResource CardBackground}"
+                                Padding="10,8,10,6"
+                                BorderBrush="{DynamicResource CardBorder}"
+                                BorderThickness="0,0,0,1">
+                            <TextBox Text="{Binding SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Watermark="{loc:Localize PersonalNote_SearchPlaceholder}"
+                                     Height="30"
+                                     FontSize="{DynamicResource FontSizeSm}"
+                                     CornerRadius="{DynamicResource RadiusSm}">
+                                <TextBox.InnerLeftContent>
+                                    <Image Source="{DynamicResource IconSearch}"
+                                           Width="13"
+                                           Height="13"
+                                           Margin="8,0,2,0"
+                                           Opacity="0.55"
+                                           VerticalAlignment="Center"/>
+                                </TextBox.InnerLeftContent>
+                            </TextBox>
+                        </Border>
+
+                        <!-- Notes List & Empty State -->
+                        <Panel>
+                            <ListBox x:Name="lstNotes"
+                                     ItemsSource="{Binding FilteredNotes}"
+                                     SelectedItem="{Binding SelectedNote, Mode=TwoWay}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     Padding="4"
+                                     AutomationProperties.AutomationId="PersonalNote_List"
+                                     AutomationProperties.Name="{loc:Localize PersonalNote_Notes}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="{DynamicResource RadiusSm}"
+                                                Padding="8,6"
+                                                Margin="0,1">
+                                            <DockPanel LastChildFill="True">
+                                                <!-- Top Row: Note Type Badge & Pinned Icon -->
+                                                <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
+                                                    <Border Background="{DynamicResource StatPurpleBg}"
+                                                            CornerRadius="{DynamicResource RadiusSm}"
+                                                            Padding="5,1"
+                                                            HorizontalAlignment="Left">
+                                                        <TextBlock Text="{Binding NoteType}"
+                                                                   FontSize="{DynamicResource FontSizeXs}"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="{DynamicResource StatPurpleFg}"/>
+                                                    </Border>
+                                                    <Image DockPanel.Dock="Right"
+                                                           Source="{DynamicResource IconPinFilled}"
+                                                           Width="13"
+                                                           Height="13"
+                                                           IsVisible="{Binding IsPinned}"
+                                                           VerticalAlignment="Center"
+                                                           ToolTip.Tip="{loc:Localize PersonalNote_Pinned}"/>
+                                                </DockPanel>
+
+                                                <!-- Content Snippet -->
+                                                <TextBlock Text="{Binding Content}"
+                                                           FontSize="{DynamicResource FontSizeSm}"
+                                                           Foreground="{DynamicResource TextPrimary}"
+                                                           TextWrapping="Wrap"
+                                                           MaxLines="2"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </DockPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <!-- Empty State inside list -->
+                            <StackPanel Classes="empty-state"
+                                        IsVisible="{Binding !FilteredNotesCount}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Spacing="8"
+                                        Margin="16">
+                                <Image Source="{DynamicResource IconNote}"
+                                       Width="36"
+                                       Height="36"
+                                       Opacity="0.3"
+                                       HorizontalAlignment="Center"/>
+                                <TextBlock Text="{loc:Localize PersonalNote_EmptyTitle}"
+                                           FontSize="{DynamicResource FontSizeMd}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextMuted}"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="{loc:Localize PersonalNote_EmptyDesc}"
+                                           FontSize="{DynamicResource FontSizeXs}"
+                                           Foreground="{DynamicResource TextMuted}"
+                                           TextWrapping="Wrap"
+                                           TextAlignment="Center"
+                                           MaxWidth="260"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Panel>
+                    </DockPanel>
+                </Border>
+
+                <!-- Right Column: Note Editor & Details Panel -->
+                <Border Grid.Column="2"
+                        Background="{DynamicResource CardBackground}"
+                        CornerRadius="{DynamicResource RadiusMd}"
+                        BorderBrush="{DynamicResource CardBorder}"
+                        BorderThickness="1"
+                        ClipToBounds="True">
+                    <DockPanel>
+                        <!-- Editor Toolbar Header -->
+                        <Border DockPanel.Dock="Top"
+                                Background="{DynamicResource SidebarBackground}"
+                                Padding="{DynamicResource PaddingMd}"
+                                BorderBrush="{DynamicResource CardBorder}"
+                                BorderThickness="0,0,0,1">
+                            <DockPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space2}" VerticalAlignment="Center">
+                                    <TextBlock Text="{loc:Localize PersonalNote_Type}"
+                                               FontSize="{DynamicResource FontSizeSm}"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="cmbNoteType"
+                                              ItemsSource="{Binding NoteTypes}"
+                                              SelectedItem="{Binding SelectedNoteType, Mode=TwoWay}"
+                                              MinWidth="120"
+                                              MinHeight="30"
+                                              AutomationProperties.AutomationId="PersonalNote_Type"
+                                              AutomationProperties.Name="{loc:Localize PersonalNote_Type}"
+                                              VerticalAlignment="Center"/>
+                                    <Button x:Name="btnNotePinned"
+                                            Classes="secondary"
+                                            Command="{Binding TogglePinnedCommand}"
+                                            MinHeight="30"
+                                            Padding="8,4"
+                                            AutomationProperties.AutomationId="PersonalNote_Pinned"
+                                            AutomationProperties.Name="{loc:Localize PersonalNote_Pinned}"
+                                            ToolTip.Tip="{loc:Localize PersonalNote_Pinned}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <Image Source="{DynamicResource IconPin}" Width="12" Height="12" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize PersonalNote_Pinned}" FontSize="{DynamicResource FontSizeXs}"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Border Background="{DynamicResource StatAmberBg}"
+                                            CornerRadius="{DynamicResource RadiusSm}"
+                                            Padding="6,2"
+                                            IsVisible="{Binding IsPinned}"
+                                            VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <Image Source="{DynamicResource IconPinFilled}" Width="11" Height="11" VerticalAlignment="Center"/>
+                                            <TextBlock x:Name="txtNotePinnedState"
+                                                       Text="{loc:Localize PersonalNote_Pinned}"
+                                                       FontSize="{DynamicResource FontSizeXs}"
+                                                       FontWeight="Bold"
+                                                       Foreground="{DynamicResource WarningText}"
+                                                       AutomationProperties.Name="{loc:Localize PersonalNote_Pinned}"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Editor Status & Copy Button -->
+                                <StackPanel DockPanel.Dock="Right"
+                                            Orientation="Horizontal"
+                                            Spacing="{DynamicResource Space2}"
+                                            VerticalAlignment="Center">
+                                    <Border Background="{DynamicResource StatAmberBg}"
+                                            CornerRadius="{DynamicResource RadiusSm}"
+                                            Padding="6,2"
+                                            IsVisible="{Binding HasUnsavedChanges}"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="{loc:Localize PersonalNote_Unsaved}"
+                                                   FontSize="{DynamicResource FontSizeXs}"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource WarningText}"/>
+                                    </Border>
+                                    <Border Background="{DynamicResource StatGreenBg}"
+                                            CornerRadius="{DynamicResource RadiusSm}"
+                                            Padding="6,2"
+                                            IsVisible="{Binding !HasUnsavedChanges}"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="{loc:Localize PersonalNote_Saved}"
+                                                   FontSize="{DynamicResource FontSizeXs}"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource SuccessText}"/>
+                                    </Border>
+                                    <Button x:Name="btnNoteCopy"
+                                            Classes="secondary"
+                                            Command="{Binding CopyContentCommand}"
+                                            IsEnabled="{Binding CanSaveNote}"
+                                            MinHeight="30"
+                                            Padding="8,4"
+                                            AutomationProperties.AutomationId="PersonalNote_Copy"
+                                            AutomationProperties.Name="{loc:Localize PersonalNote_BtnCopy}"
+                                            ToolTip.Tip="{loc:Localize PersonalNote_BtnCopy}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <Image Source="{DynamicResource IconCopy}" Width="12" Height="12" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize PersonalNote_BtnCopy}" FontSize="{DynamicResource FontSizeXs}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+
+                        <!-- Saved Note Preview Banner (compatible with tests and visual review) -->
+                        <Border x:Name="savedNotePreviewCard"
+                                DockPanel.Dock="Top"
+                                Background="{DynamicResource StatBlueBg}"
+                                CornerRadius="{DynamicResource RadiusSm}"
+                                BorderBrush="{DynamicResource CardBorder}"
+                                BorderThickness="1"
+                                Padding="10,6"
+                                Margin="12,10,12,0"
+                                IsVisible="{Binding HasSavedNotePreview}">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{loc:Localize AddEdit_LblNotes}"
+                                           FontSize="{DynamicResource FontSizeXs}"
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource StatBlueFg}"/>
+                                <TextBlock x:Name="txtSavedNotePreview"
+                                           Text="{Binding SavedNoteContent}"
+                                           FontSize="{DynamicResource FontSizeSm}"
+                                           Foreground="{DynamicResource TextPrimary}"
+                                           TextWrapping="Wrap"
+                                           MaxLines="2"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip.Tip="{Binding SavedNoteContent}"
+                                           AutomationProperties.Name="{loc:Localize AddEdit_LblNotes}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Action Footer Bar -->
+                        <Border DockPanel.Dock="Bottom"
+                                Background="{DynamicResource SidebarBackground}"
+                                Padding="{DynamicResource PaddingMd}"
+                                BorderBrush="{DynamicResource CardBorder}"
+                                BorderThickness="0,1,0,0">
+                            <DockPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space2}" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding CharCount, StringFormat='{}{0} chars'}"
+                                               FontSize="{DynamicResource FontSizeXs}"
+                                               Foreground="{DynamicResource TextMuted}"/>
+                                    <TextBlock Text="•" Foreground="{DynamicResource CardBorder}"/>
+                                    <TextBlock Text="{Binding WordCount, StringFormat='{}{0} words'}"
+                                               FontSize="{DynamicResource FontSizeXs}"
+                                               Foreground="{DynamicResource TextMuted}"/>
+                                </StackPanel>
+
+                                <StackPanel DockPanel.Dock="Right"
+                                            Orientation="Horizontal"
+                                            Spacing="{DynamicResource Space2}"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center">
+                                    <Button x:Name="btnNoteSave"
+                                            Classes="primary"
+                                            Command="{Binding SaveNoteCommand}"
+                                            IsEnabled="{Binding CanSaveNote}"
+                                            Padding="{DynamicResource PaddingBtnLg}"
+                                            MinHeight="36"
+                                            AutomationProperties.AutomationId="PersonalNote_Save"
+                                            AutomationProperties.Name="{loc:Localize PersonalNote_BtnSave}"
+                                            ToolTip.Tip="{loc:Localize PersonalNote_BtnSave}">
+                                        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space1}">
+                                            <Image Source="{DynamicResource IconSaveWhite}"
+                                                   Width="14"
+                                                   Height="14"
+                                                   VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize PersonalNote_BtnSave}"
+                                                       FontSize="{DynamicResource FontSizeMd}"
+                                                       FontWeight="SemiBold"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button x:Name="btnNoteDelete"
+                                            Classes="danger"
+                                            Command="{Binding DeleteNoteCommand}"
+                                            IsVisible="{Binding HasExistingNote}"
+                                            Padding="{DynamicResource PaddingBtnLg}"
+                                            MinHeight="36"
+                                            AutomationProperties.AutomationId="PersonalNote_Delete"
+                                            AutomationProperties.Name="{loc:Localize PersonalNote_BtnDelete}"
+                                            ToolTip.Tip="{loc:Localize PersonalNote_BtnDelete}">
+                                        <StackPanel Orientation="Horizontal" Spacing="{DynamicResource Space1}">
+                                            <Image Source="{DynamicResource IconDeleteWhite}"
+                                                   Width="14"
+                                                   Height="14"
+                                                   VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize PersonalNote_BtnDelete}"
+                                                       FontSize="{DynamicResource FontSizeMd}"
+                                                       FontWeight="SemiBold"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+
+                        <!-- Main Text Box Editor -->
+                        <TextBox x:Name="txtNoteContent"
+                                 AutomationProperties.AutomationId="PersonalNote_Content"
+                                 Text="{Binding NoteContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 MinHeight="140"
+                                 FontSize="{DynamicResource FontSizeMd}"
+                                 Watermark="{loc:Localize PersonalNote_Placeholder}"
+                                 VerticalContentAlignment="Top"
+                                 Padding="14,12"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 AutomationProperties.Name="{loc:Localize AddEdit_LblNotes}"
+                                 AutomationProperties.HelpText="{loc:Localize PersonalNote_Placeholder}"/>
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </DockPanel>
     </Border>
 
 </UserControl>
