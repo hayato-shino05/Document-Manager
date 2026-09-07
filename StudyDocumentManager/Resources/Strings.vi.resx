@@ -1179,4 +1179,15 @@
   <data name="Onboarding_Shortcuts_Doc" xml:space="preserve"><value>Thao tác tài liệu &amp; Không gian làm việc</value></data>
   <data name="Onboarding_Shortcuts_Tools" xml:space="preserve"><value>Tìm kiếm &amp; Bảo trì</value></data>
   <data name="Settings_Language" xml:space="preserve"><value>Ngôn ngữ hiển thị</value></data>
+  <data name="Dashboard_GreetingMorning" xml:space="preserve"><value>Chào buổi sáng</value></data>
+  <data name="Dashboard_GreetingAfternoon" xml:space="preserve"><value>Chào buổi chiều</value></data>
+  <data name="Dashboard_GreetingEvening" xml:space="preserve"><value>Chào buổi tối</value></data>
+  <data name="Dashboard_GreetingSummary" xml:space="preserve"><value>Bạn có {0} tài liệu quan trọng và {1} hạn chót sắp đến.</value></data>
+  <data name="Dashboard_RecentQuickAccess" xml:space="preserve"><value>Tài liệu mở gần đây</value></data>
+  <data name="Dashboard_DragDropToastSingle" xml:space="preserve"><value>Đã thêm tài liệu: {0}</value></data>
+  <data name="Dashboard_DragDropToastMultiple" xml:space="preserve"><value>Đã thêm thành công {0} tài liệu</value></data>
+  <data name="Toast_TitleSuccess" xml:space="preserve"><value>Thành công</value></data>
+  <data name="Toast_TitleError" xml:space="preserve"><value>Lỗi</value></data>
+  <data name="Toast_TitleWarning" xml:space="preserve"><value>Cảnh báo</value></data>
+  <data name="Toast_TitleInfo" xml:space="preserve"><value>Thông báo</value></data>
 </root>

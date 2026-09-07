@@ -1179,4 +1179,15 @@
   <data name="Onboarding_Shortcuts_Doc" xml:space="preserve"><value>文档操作与工作区</value></data>
   <data name="Onboarding_Shortcuts_Tools" xml:space="preserve"><value>搜索与维护</value></data>
   <data name="Settings_Language" xml:space="preserve"><value>显示语言</value></data>
+  <data name="Dashboard_GreetingMorning" xml:space="preserve"><value>早上好</value></data>
+  <data name="Dashboard_GreetingAfternoon" xml:space="preserve"><value>下午好</value></data>
+  <data name="Dashboard_GreetingEvening" xml:space="preserve"><value>晚上好</value></data>
+  <data name="Dashboard_GreetingSummary" xml:space="preserve"><value>您有 {0} 份重要文档和 {1} 份即将到期的文档。</value></data>
+  <data name="Dashboard_RecentQuickAccess" xml:space="preserve"><value>最近打开的文档</value></data>
+  <data name="Dashboard_DragDropToastSingle" xml:space="preserve"><value>已添加文档: {0}</value></data>
+  <data name="Dashboard_DragDropToastMultiple" xml:space="preserve"><value>已成功添加 {0} 份文档</value></data>
+  <data name="Toast_TitleSuccess" xml:space="preserve"><value>成功</value></data>
+  <data name="Toast_TitleError" xml:space="preserve"><value>错误</value></data>
+  <data name="Toast_TitleWarning" xml:space="preserve"><value>警告</value></data>
+  <data name="Toast_TitleInfo" xml:space="preserve"><value>提示</value></data>
 </root>

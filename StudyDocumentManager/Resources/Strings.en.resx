@@ -970,4 +970,15 @@ Please check your network connection.</value></data>
   <data name="Onboarding_Shortcuts_Doc" xml:space="preserve"><value>Document &amp; Workspaces</value></data>
   <data name="Onboarding_Shortcuts_Tools" xml:space="preserve"><value>Search &amp; Maintenance</value></data>
   <data name="Settings_Language" xml:space="preserve"><value>Display Language</value></data>
+  <data name="Dashboard_GreetingMorning" xml:space="preserve"><value>Good morning</value></data>
+  <data name="Dashboard_GreetingAfternoon" xml:space="preserve"><value>Good afternoon</value></data>
+  <data name="Dashboard_GreetingEvening" xml:space="preserve"><value>Good evening</value></data>
+  <data name="Dashboard_GreetingSummary" xml:space="preserve"><value>You have {0} important documents and {1} upcoming deadlines.</value></data>
+  <data name="Dashboard_RecentQuickAccess" xml:space="preserve"><value>Recent Documents</value></data>
+  <data name="Dashboard_DragDropToastSingle" xml:space="preserve"><value>Document added: {0}</value></data>
+  <data name="Dashboard_DragDropToastMultiple" xml:space="preserve"><value>Successfully added {0} documents</value></data>
+  <data name="Toast_TitleSuccess" xml:space="preserve"><value>Success</value></data>
+  <data name="Toast_TitleError" xml:space="preserve"><value>Error</value></data>
+  <data name="Toast_TitleWarning" xml:space="preserve"><value>Warning</value></data>
+  <data name="Toast_TitleInfo" xml:space="preserve"><value>Information</value></data>
 </root>

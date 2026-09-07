@@ -52,6 +52,7 @@ public partial class MainWindowModel : ModelBase
     private readonly IUpdateService _updateService;
     private readonly IUndoApplier? _undoApplier;
     private readonly IUndoService? _undoService;
+    private readonly IToastService? _toastService;
     private string? _statusKey = "Status_TotalDocs";
     private object[] _statusArguments = [0];
 
@@ -66,7 +67,8 @@ public partial class MainWindowModel : ModelBase
         ISettingsService settingsService,
         IUpdateService updateService,
         IUndoApplier? undoApplier = null,
-        IUndoService? undoService = null)
+        IUndoService? undoService = null,
+        IToastService? toastService = null)
     {
         _navigationService = navigationService;
         _dialogService = dialogService;
@@ -78,6 +80,7 @@ public partial class MainWindowModel : ModelBase
         _updateService = updateService;
         _undoApplier = undoApplier;
         _undoService = undoService;
+        _toastService = toastService;
         _currentView = dashboardModel;
         _statusText = FormatLocalizedStatus();
         if (_undoService != null)
@@ -395,6 +398,14 @@ public partial class MainWindowModel : ModelBase
 
                     dashboard.RefreshCommand.Execute(null);
                     UpdateStatusFromDashboard(dashboard);
+
+                    if (_toastService != null)
+                    {
+                        string message = validPaths.Count == 1
+                            ? string.Format(_loc["Dashboard_DragDropToastSingle"], Path.GetFileName(validPaths[0]))
+                            : string.Format(_loc["Dashboard_DragDropToastMultiple"], imported);
+                        _toastService.Show(message, ToastType.Success);
+                    }
                     return;
                 }
 

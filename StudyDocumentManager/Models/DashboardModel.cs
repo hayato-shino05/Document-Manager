@@ -32,10 +32,16 @@ public partial class DashboardModel : ModelBase, IDisposable
     private readonly IBackupService _backupService;
     private readonly IPersonalDocumentArchiveService _archiveService;
     private readonly ILocalizationService _loc;
+    private readonly IToastService? _toastService;
     private bool _isLoadingData;
     private bool _isApplyingFilters;
     private CancellationTokenSource? _backupCancellation;
     private CancellationTokenSource? _restoreCancellation;
+
+    // ═══ Greeting & Personalization ═══
+    [ObservableProperty] private string _greetingTitle = string.Empty;
+    [ObservableProperty] private string _greetingSubtitle = string.Empty;
+    [ObservableProperty] private ObservableCollection<StudyDocument> _recentQuickAccessDocuments = new();
 
     // ═══ 文書一覧 ═══
     [ObservableProperty]
@@ -175,7 +181,7 @@ public partial class DashboardModel : ModelBase, IDisposable
         : this(repository, recycleBinRepo, categoryRepo, collectionRepo, recentFileRepo,
                dialogService, fileDialogService, customDialogService, navigationService,
                clipboardService, processLauncher, exportService, backupService,
-               new NoopArchiveService(), localizationService)
+               new NoopArchiveService(), localizationService, null)
     {
     }
 
@@ -194,7 +200,8 @@ public partial class DashboardModel : ModelBase, IDisposable
         IExportService exportService,
         IBackupService backupService,
         IPersonalDocumentArchiveService archiveService,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        IToastService? toastService = null)
     {
         _repository = repository;
         _recycleBinRepo = recycleBinRepo;
@@ -211,8 +218,10 @@ public partial class DashboardModel : ModelBase, IDisposable
         _backupService = backupService;
         _archiveService = archiveService;
         _loc = localizationService;
+        _toastService = toastService;
         BuildStatusOptions();
         _statusText = _loc[_statusKey];
+        UpdateGreeting();
         _loc.LanguageChanged += OnLanguageChanged;
         // DO NOT call LoadData() here — it causes StackOverflowException
         // because DataGrid layout hasn't completed yet.
@@ -233,6 +242,7 @@ public partial class DashboardModel : ModelBase, IDisposable
             : IsEmptyState
                 ? _loc["Dashboard_EmptyState"]
                 : string.Empty;
+        UpdateGreeting();
         RefreshLocalizedStatus();
     }
 
@@ -299,6 +309,8 @@ public partial class DashboardModel : ModelBase, IDisposable
             HasLoadError = false;
             IsEmptyState = docs.Count == 0;
             StateMessage = IsEmptyState ? _loc["Dashboard_EmptyState"] : string.Empty;
+            UpdateGreeting();
+            UpdateRecentQuickAccess(docs);
             SetLocalizedStatus("Status_TotalSummary", TotalDocuments, ImportantDocuments, OverdueDocuments);
             NotifyStatPropertiesChanged();
         }
@@ -322,6 +334,41 @@ public partial class DashboardModel : ModelBase, IDisposable
             var pending = _pendingSavedSearch;
             _pendingSavedSearch = null;
             ApplySavedSearch(pending);
+        }
+    }
+
+    private void UpdateGreeting()
+    {
+        var hour = DateTime.Now.Hour;
+        var greetingKey = hour switch
+        {
+            >= 5 and < 12 => "Dashboard_GreetingMorning",
+            >= 12 and < 18 => "Dashboard_GreetingAfternoon",
+            _ => "Dashboard_GreetingEvening"
+        };
+
+        GreetingTitle = _loc[greetingKey];
+        GreetingSubtitle = string.Format(_loc["Dashboard_GreetingSummary"], ImportantDocuments, OverdueDocuments);
+    }
+
+    private void UpdateRecentQuickAccess(List<StudyDocument> allDocs)
+    {
+        RecentQuickAccessDocuments.Clear();
+        try
+        {
+            var recentItems = _recentFileRepo.GetAll().Take(5).ToList();
+            foreach (var item in recentItems)
+            {
+                var doc = allDocs.FirstOrDefault(d => d.Id == item.Id) ?? _repository.GetById(item.Id);
+                if (doc != null && !RecentQuickAccessDocuments.Any(d => d.Id == doc.Id))
+                {
+                    RecentQuickAccessDocuments.Add(doc);
+                }
+            }
+        }
+        catch
+        {
+            // Ignore if recent repository query fails
         }
     }
 
@@ -942,6 +989,14 @@ public partial class DashboardModel : ModelBase, IDisposable
 
     [RelayCommand]
     private void OpenRecentFiles() => _navigationService.NavigateTo("recentfiles");
+
+    [RelayCommand]
+    private async Task OpenRecentDocumentAsync(StudyDocument? doc)
+    {
+        if (doc == null) return;
+        SelectedDocument = doc;
+        await OpenFileAsync();
+    }
 
     [RelayCommand]
     private void OpenTreeMap() => _navigationService.NavigateTo("treemap");

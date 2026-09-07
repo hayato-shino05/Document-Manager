@@ -346,12 +346,49 @@
             <Border Grid.Column="2" ClipToBounds="True">
                 <Grid RowDefinitions="Auto,*,Auto,Auto">
 
-                    <!-- ═══ STAT CARDS ═══ -->
-                    <Border Background="{DynamicResource SidebarBackground}"
-                            Padding="{DynamicResource PaddingStatCard}"
-                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1">
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                            <Grid ColumnDefinitions="*,*,*,*,*,*">
+                    <!-- ═══ GREETING & STATS HEADER ═══ -->
+                    <StackPanel Grid.Row="0">
+                        <!-- Greeting Banner & Quick Access -->
+                        <Border Background="{DynamicResource CardBackground}"
+                                Padding="16,10,16,10"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Spacing="2" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding GreetingTitle}"
+                                               FontSize="{DynamicResource FontSizeLg}"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding GreetingSubtitle}"
+                                               FontSize="{DynamicResource FontSizeSm}"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <!-- Quick Access Button to Recent Documents -->
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <Button Classes="secondary"
+                                            Command="{Binding OpenRecentFilesCommand}"
+                                            Padding="{DynamicResource PaddingBtnSm}"
+                                            Height="{DynamicResource HeightControl}"
+                                            AutomationProperties.AutomationId="Dashboard_BtnRecentQuickAccess"
+                                            AutomationProperties.Name="{loc:Localize Dashboard_RecentQuickAccess}"
+                                            ToolTip.Tip="{loc:Localize Dashboard_RecentQuickAccess}">
+                                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                            <Image Source="{DynamicResource IconClock}" Width="14" Height="14" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize Dashboard_RecentQuickAccess}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- ═══ STAT CARDS ═══ -->
+                        <Border Background="{DynamicResource SidebarBackground}"
+                                Padding="{DynamicResource PaddingStatCard}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1">
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                <Grid ColumnDefinitions="*,*,*,*,*,*">
 
                             <!-- Card 1: Total -->
                             <Border CornerRadius="{DynamicResource RadiusMd}" Background="{DynamicResource StatBlueBg}"
@@ -445,6 +482,7 @@
                             </Grid>
                         </ScrollViewer>
                     </Border>
+                    </StackPanel>
 
                     <!-- ═══ DATA GRID ═══ -->
                     <Border Grid.Row="1" ClipToBounds="True">
