@@ -121,7 +121,7 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="{loc:Localize RC_ColCreated}" Binding="{Binding CreatedAtLocal, Mode=OneWay, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" IsReadOnly="True" Width="170" MinWidth="160"/>
+                                    <DataGridTextColumn Header="{loc:Localize RC_ColCreated}" Binding="{Binding CreatedAtLocal, Mode=OneWay, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" IsReadOnly="True" Width="200" MinWidth="195"/>
                                     <DataGridTextColumn Header="{loc:Localize RC_ColSize}" Binding="{Binding SizeBytes, Mode=OneWay, Converter={x:Static conv:FileSizeConverter.Instance}}" IsReadOnly="True" Width="110" MinWidth="100"/>
                                     <DataGridTemplateColumn Header="{loc:Localize RC_ColStatus}" Width="110" MinWidth="100">
                                         <DataGridTemplateColumn.CellTemplate>

@@ -35,10 +35,12 @@
                        FontSize="{DynamicResource FontSizeSm}"
                        Foreground="{DynamicResource TextSecondary}"
                        VerticalAlignment="Center"/>
-            <ComboBox AutomationProperties.AutomationId="ImportInbox_StateFilter"
+            <ComboBox x:Name="FilterStatusComboBox"
+                      AutomationProperties.AutomationId="ImportInbox_StateFilter"
                       AutomationProperties.Name="{loc:Localize ImportInbox_State}"
                       Width="160"
                       Height="30"
+                      PlaceholderText="{loc:Localize ImportInbox_All}"
                       SelectedItem="{Binding SelectedStateOption}"
                       ItemsSource="{Binding StateOptions}"
                       FontSize="{DynamicResource FontSizeSm}"

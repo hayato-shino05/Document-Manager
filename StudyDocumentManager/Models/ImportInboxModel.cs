@@ -38,6 +38,7 @@ public partial class ImportInboxModel : ModelBase, IDisposable
         _bulkRepository = bulkRepository;
         _loc.LanguageChanged += OnLanguageChanged;
         UpdateStateLabels();
+        SelectedStateOption = StateOptions[0];
         Refresh();
     }
 

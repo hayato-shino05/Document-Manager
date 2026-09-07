@@ -72,7 +72,8 @@
                     Classes="secondary"
                     Command="{Binding BrowseFolderCommand}"
                     Margin="0,0,8,0"
-                    Padding="{DynamicResource PaddingBtnMd}">
+                    Padding="{DynamicResource PaddingBtnMd}"
+                    VerticalAlignment="Center">
               <StackPanel Orientation="Horizontal" Spacing="4">
                 <Image Source="{DynamicResource IconOpenFile}" Width="14" Height="14" VerticalAlignment="Center"/>
                 <TextBlock Text="{loc:Localize AddEdit_BtnBrowse}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
@@ -89,7 +90,8 @@
                     AutomationProperties.Name="{loc:Localize WF_Add}"
                     Classes="primary"
                     Command="{Binding AddNewFolderCommand}"
-                    Padding="{DynamicResource PaddingBtnMd}">
+                    Padding="{DynamicResource PaddingBtnMd}"
+                    VerticalAlignment="Center">
               <StackPanel Orientation="Horizontal" Spacing="4">
                 <Image Source="{DynamicResource IconAddWhite}" Width="14" Height="14" VerticalAlignment="Center"/>
                 <TextBlock Text="{loc:Localize WF_Add}" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>

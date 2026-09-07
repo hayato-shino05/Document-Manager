@@ -111,6 +111,7 @@
                                         HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
                                 <Image Classes="empty-state-icon" Source="{DynamicResource IconDocPage}" Width="36" Height="36" Opacity="0.4"/>
                                 <TextBlock Classes="empty-state-text" Text="{loc:Localize SV_EmptyState}"
+                                           TextWrapping="Wrap" TextAlignment="Center" Margin="16,0"
                                            FontSize="{DynamicResource FontSizeMd}" Foreground="{DynamicResource TextMuted}"/>
                             </StackPanel>
                         </Panel>
