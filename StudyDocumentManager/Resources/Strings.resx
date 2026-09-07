@@ -1043,8 +1043,8 @@
   <data name="Onboarding_TabCatalog" xml:space="preserve"><value>機能ガイド</value></data>
   <data name="Onboarding_TabShortcuts" xml:space="preserve"><value>ショートカット一覧</value></data>
   <data name="Onboarding_Step1_Title" xml:space="preserve"><value>1. 検索とクイックフィルター</value></data>
-  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>ダッシュボードでは、タイトル・著者・タグで即座に文書を検索できます。緊急・通常・完了などのクイックフィルターで期限管理もスムーズに行えます。</value></data>
-  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>ヒント: F5 または Ctrl+R でいつでも表示を最新状態に更新できます。</value></data>
+  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>ダッシュボードでは時間帯ごとの挨拶・重要/期限間近の集計や、最近開いた文書へ1クリックで再アクセスできます。タイトル・著者・タグの検索やクイックフィルターにも対応しています。</value></data>
+  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>ヒント: リスト上では Enter（開く）、Space（重要フラグ切替）、Delete（ごみ箱）のキーボード操作が可能です。</value></data>
   <data name="Onboarding_Step2_Title" xml:space="preserve"><value>2. 文書の追加とドラッグ＆ドロップ</value></data>
   <data name="Onboarding_Step2_Desc" xml:space="preserve"><value>「文書追加」ボタン（Ctrl+N）のほか、エクスプローラーやLinuxファイルマネージャーからファイルを直接画面にドラッグ＆ドロップして即座に登録できます（PDF、Word、Excel、画像などに対応）。</value></data>
   <data name="Onboarding_Step2_Tip" xml:space="preserve"><value>ヒント: 複数ファイルを一度に登録したい場合は「一括インポート」（Ctrl+Shift+I）が便利です。</value></data>

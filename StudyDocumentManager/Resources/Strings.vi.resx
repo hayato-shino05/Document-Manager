@@ -1144,8 +1144,8 @@
   <data name="Onboarding_TabCatalog" xml:space="preserve"><value>Cẩm nang tính năng</value></data>
   <data name="Onboarding_TabShortcuts" xml:space="preserve"><value>Bảng phím tắt</value></data>
   <data name="Onboarding_Step1_Title" xml:space="preserve"><value>1. Tìm kiếm &amp; Bộ lọc nhanh</value></data>
-  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>Tìm kiếm tài liệu siêu tốc theo tiêu đề, tác giả hoặc tag. Sử dụng các bộ lọc trạng thái nhanh (Gấp, Bình thường, Đã xong) để theo dõi hạn nộp dễ dàng.</value></data>
-  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>Mẹo: Bấm F5 hoặc Ctrl+R bất kỳ lúc nào để làm mới dữ liệu.</value></data>
+  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>Bảng điều khiển hiển thị lời chào theo buổi, tóm tắt thông minh các tài liệu quan trọng/sắp đến hạn, cùng nút truy cập nhanh tài liệu mở gần đây. Bạn có thể tìm kiếm siêu tốc và lọc trạng thái dễ dàng.</value></data>
+  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>Mẹo: Trên danh sách, bạn có thể nhấn Enter (Mở tệp), Space (Bật/Tắt quan trọng) và Delete (Xóa vào thùng rác) cực kỳ tiện lợi.</value></data>
   <data name="Onboarding_Step2_Title" xml:space="preserve"><value>2. Thêm tài liệu &amp; Kéo thả tệp</value></data>
   <data name="Onboarding_Step2_Desc" xml:space="preserve"><value>Bấm nút 'Thêm tài liệu' (Ctrl+N) hoặc chỉ cần kéo và thả trực tiếp tệp (PDF, Word, Excel, hình ảnh...) từ máy tính vào cửa sổ ứng dụng (hỗ trợ mượt mà trên cả Windows và Linux).</value></data>
   <data name="Onboarding_Step2_Tip" xml:space="preserve"><value>Mẹo: Để nhập hàng loạt nhiều tệp cùng lúc, hãy dùng tính năng 'Nhập hàng loạt' (Ctrl+Shift+I).</value></data>

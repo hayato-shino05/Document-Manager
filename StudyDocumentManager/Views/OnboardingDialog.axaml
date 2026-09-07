@@ -433,45 +433,65 @@
                             <StackPanel Spacing="10">
                                 <TextBlock Text="{loc:Localize Onboarding_Shortcuts_Doc}" FontWeight="Bold" FontSize="{DynamicResource FontSizeMd}"
                                            Foreground="{DynamicResource AccentBrush}" />
-                                <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,4,0,0">
-                                    <!-- Ctrl+N -->
+                                <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="0,4,0,0">
+                                    <!-- Enter -->
                                     <Border Grid.Row="0" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
                                             BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
                                             CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                        <TextBlock Text="Ctrl + N" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                        <TextBlock Text="Enter" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
                                                    Foreground="{DynamicResource TextPrimary}"/>
                                     </Border>
-                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize Menu_AddNewDocument}"
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize Dashboard_CtxOpenFile}"
                                                Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
 
-                                    <!-- Ctrl+Shift+I -->
+                                    <!-- Space -->
                                     <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
                                             BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
                                             CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                        <TextBlock Text="Ctrl + Shift + I" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                        <TextBlock Text="Space" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
                                                    Foreground="{DynamicResource TextPrimary}"/>
                                     </Border>
-                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{loc:Localize Menu_BatchImport}"
-                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
-
-                                    <!-- Ctrl+S -->
-                                    <Border Grid.Row="2" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
-                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
-                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                        <TextBlock Text="Ctrl + S" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
-                                                   Foreground="{DynamicResource TextPrimary}"/>
-                                    </Border>
-                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{loc:Localize ChangeCategory_BtnSave}"
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{loc:Localize Dashboard_CtxMarkImportant}"
                                                Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
 
                                     <!-- Delete -->
-                                    <Border Grid.Row="3" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                    <Border Grid.Row="2" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
                                             BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
                                             CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
                                         <TextBlock Text="Delete" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
                                                    Foreground="{DynamicResource TextPrimary}"/>
                                     </Border>
-                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{loc:Localize Menu_DeleteDocument}"
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{loc:Localize Menu_DeleteDocument}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+
+                                    <!-- Ctrl+N -->
+                                    <Border Grid.Row="3" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + N" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{loc:Localize Menu_AddNewDocument}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+
+                                    <!-- Ctrl+Shift+I -->
+                                    <Border Grid.Row="4" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + Shift + I" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{loc:Localize Menu_BatchImport}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+
+                                    <!-- Ctrl+S -->
+                                    <Border Grid.Row="5" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + S" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{loc:Localize ChangeCategory_BtnSave}"
                                                Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
                                 </Grid>
                             </StackPanel>

@@ -1144,8 +1144,8 @@
   <data name="Onboarding_TabCatalog" xml:space="preserve"><value>功能指南</value></data>
   <data name="Onboarding_TabShortcuts" xml:space="preserve"><value>快捷键列表</value></data>
   <data name="Onboarding_Step1_Title" xml:space="preserve"><value>1. 搜索与快速筛选</value></data>
-  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>在主界面按标题、作者或标签即时搜索文档。使用快速状态筛选（紧急、普通、已完成）轻松跟踪截止日期。</value></data>
-  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>提示：随时按 F5 或 Ctrl+R 刷新视图。</value></data>
+  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>仪表板提供时段问候、重要/临期文档智能摘要，以及一键重开最近文档的快捷入口。支持按关键词极速搜索与状态过滤。</value></data>
+  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>提示：在文档列表上，可使用 Enter（打开）、Space（标记重要）、Delete（移至回收站）进行纯键盘极速操作。</value></data>
   <data name="Onboarding_Step2_Title" xml:space="preserve"><value>2. 添加文档与拖放文件</value></data>
   <data name="Onboarding_Step2_Desc" xml:space="preserve"><value>点击“添加文档”（Ctrl+N）或直接将文件（PDF、Word、Excel、图片等）从文件管理器拖放到应用窗口中（Windows 和 Linux 均完美支持）。</value></data>
   <data name="Onboarding_Step2_Tip" xml:space="preserve"><value>提示：如需一次性导入多个文件，请使用“批量导入”（Ctrl+Shift+I）。</value></data>
