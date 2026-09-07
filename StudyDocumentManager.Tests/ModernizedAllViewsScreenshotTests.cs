@@ -20,7 +20,8 @@ public class ModernizedAllViewsScreenshotTests
         Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "screenshots"),
         Path.Combine(Directory.GetCurrentDirectory(), "screenshots"),
         @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\c4c022e8-7b3f-4664-ba3f-f2151f7b7645\screenshots",
-        @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\52f12f8f-7bf7-4eb1-87ac-d5a0904b69e0\screenshots"
+        @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\52f12f8f-7bf7-4eb1-87ac-d5a0904b69e0\screenshots",
+        @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\51214019-22a3-476c-82aa-97efb6cafaf4\screenshots"
     ];
 
     private static void SaveRenderedView(Control control, int width, int height, string filename)
@@ -54,6 +55,26 @@ public class ModernizedAllViewsScreenshotTests
 
         window.Close();
         Dispatcher.UIThread.RunJobs();
+    }
+
+    private static void SaveWindowBitmap(Window window, PixelSize pixelSize, Vector dpi, string filename)
+    {
+        Dispatcher.UIThread.RunJobs();
+        using var bitmap = new RenderTargetBitmap(pixelSize, dpi);
+        bitmap.Render(window);
+
+        foreach (var dir in ScreenshotDirs)
+        {
+            try
+            {
+                Directory.CreateDirectory(dir);
+                var filePath = Path.Combine(dir, filename);
+                bitmap.Save(filePath);
+            }
+            catch
+            {
+            }
+        }
     }
 
     [AvaloniaFact]
@@ -124,41 +145,38 @@ public class ModernizedAllViewsScreenshotTests
 
         var pixelSize = new PixelSize(860, 640);
         var dpi = new Vector(96, 96);
-        using var bitmap = new RenderTargetBitmap(pixelSize, dpi);
-        bitmap.Render(dialog);
 
-        foreach (var dir in ScreenshotDirs)
-        {
-            try
-            {
-                Directory.CreateDirectory(dir);
-                var filePath = Path.Combine(dir, "fresh_onboarding.png");
-                bitmap.Save(filePath);
-            }
-            catch
-            {
-            }
-        }
+        // Quick Tour - Step 0 (1/5)
+        model.SelectedTabIndex = 0;
+        model.CurrentStepIndex = 0;
+        SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_step1.png");
+        SaveWindowBitmap(dialog, pixelSize, dpi, "fresh_onboarding.png");
 
-        // Tab 2: Catalog
+        // Quick Tour - Step 1 (2/5)
+        model.CurrentStepIndex = 1;
+        SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_step2.png");
+
+        // Quick Tour - Step 2 (3/5)
+        model.CurrentStepIndex = 2;
+        SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_step3.png");
+
+        // Quick Tour - Step 3 (4/5)
+        model.CurrentStepIndex = 3;
+        SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_step4.png");
+
+        // Quick Tour - Step 4 (5/5)
+        model.CurrentStepIndex = 4;
+        SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_step5.png");
+
+        // Tab 2: Feature Guide (Catalog)
         model.SelectedTabIndex = 1;
-        Dispatcher.UIThread.RunJobs();
-        using var bitmapTab2 = new RenderTargetBitmap(pixelSize, dpi);
-        bitmapTab2.Render(dialog);
-        foreach (var dir in ScreenshotDirs)
-        {
-            try { bitmapTab2.Save(Path.Combine(dir, "fresh_onboarding_tab2.png")); } catch { }
-        }
+        SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_tab_catalog.png");
+        SaveWindowBitmap(dialog, pixelSize, dpi, "fresh_onboarding_tab2.png");
 
-        // Tab 3: Shortcuts
+        // Tab 3: Shortcuts Cheatsheet
         model.SelectedTabIndex = 2;
-        Dispatcher.UIThread.RunJobs();
-        using var bitmapTab3 = new RenderTargetBitmap(pixelSize, dpi);
-        bitmapTab3.Render(dialog);
-        foreach (var dir in ScreenshotDirs)
-        {
-            try { bitmapTab3.Save(Path.Combine(dir, "fresh_onboarding_tab3.png")); } catch { }
-        }
+        SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_tab_shortcuts.png");
+        SaveWindowBitmap(dialog, pixelSize, dpi, "fresh_onboarding_tab3.png");
 
         dialog.Close();
         Dispatcher.UIThread.RunJobs();
