@@ -59,6 +59,11 @@ public partial class PersonalNoteModel : ModelBase
         _loc = loc;
         _clipboardService = clipboardService;
         _documentRepository = documentRepository;
+        Notes.CollectionChanged += (s, e) =>
+        {
+            OnPropertyChanged(nameof(NotesCount));
+            ApplyFilter();
+        };
     }
 
     public void Load(int docId, string docName)

@@ -623,6 +623,7 @@
   <data name="FileIntegrity_ColName" xml:space="preserve"><value>文書名</value></data>
   <data name="FileIntegrity_ColPath" xml:space="preserve"><value>ファイルパス</value></data>
   <data name="FileIntegrity_ColStatus" xml:space="preserve"><value>状態</value></data>
+  <data name="Context_CopyPath" xml:space="preserve"><value>パスをコピー</value></data>
 
   <!-- PersonalNote View -->
   <data name="PersonalNote_Title" xml:space="preserve"><value>個人メモ</value></data>
@@ -1027,13 +1028,24 @@
   <data name="OW_Conf_Internal" xml:space="preserve"><value>社内限り</value></data>
   <data name="OW_Conf_Confidential" xml:space="preserve"><value>機密</value></data>
   <data name="OW_Conf_Restricted" xml:space="preserve"><value>極秘</value></data>
+  <data name="Common_All" xml:space="preserve"><value>すべて</value></data>
+  <data name="Action_Back" xml:space="preserve"><value>戻る</value></data>
+  <data name="Search_Watermark" xml:space="preserve"><value>名前、番号、会社名などで検索...</value></data>
+  <data name="Details_Title" xml:space="preserve"><value>業務詳細メタデータ</value></data>
+  <data name="OW_EmptySelection" xml:space="preserve"><value>業務文書を選択してください</value></data>
+  <data name="OW_EmptySelectionDesc" xml:space="preserve"><value>左のリストから文書を選択すると、文書番号・契約期日・機密区分の詳細を編集できます。</value></data>
+  <data name="SW_AcademicContext" xml:space="preserve"><value>学習コンテキスト (Academic Context)</value></data>
+  <data name="SW_EmptyCourses" xml:space="preserve"><value>コースが登録されていません</value></data>
+  <data name="SW_EmptySemesters" xml:space="preserve"><value>学期が登録されていません</value></data>
+  <data name="SW_EmptyAssignments" xml:space="preserve"><value>課題がありません</value></data>
+  <data name="SW_EmptyAssignmentSelect" xml:space="preserve"><value>課題を選択するか「課題追加」で作成してください</value></data>
   <data name="OW_Error_FileNotFound" xml:space="preserve"><value>ファイルが見つかりません: {0}</value></data>
   <data name="Onboarding_TabTour" xml:space="preserve"><value>クイックツアー (5ステップ)</value></data>
   <data name="Onboarding_TabCatalog" xml:space="preserve"><value>機能ガイド</value></data>
   <data name="Onboarding_TabShortcuts" xml:space="preserve"><value>ショートカット一覧</value></data>
   <data name="Onboarding_Step1_Title" xml:space="preserve"><value>1. 検索とクイックフィルター</value></data>
-  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>ダッシュボードでは、タイトル・著者・タグで即座に文書を検索できます。緊急・通常・完了などのクイックフィルターで期限管理もスムーズに行えます。</value></data>
-  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>ヒント: F5 または Ctrl+R でいつでも表示を最新状態に更新できます。</value></data>
+  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>ダッシュボードでは時間帯ごとの挨拶・重要/期限間近の集計や、最近開いた文書へ1クリックで再アクセスできます。タイトル・著者・タグの検索やクイックフィルターにも対応しています。</value></data>
+  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>ヒント: リスト上では Enter（開く）、Space（重要フラグ切替）、Delete（ごみ箱）のキーボード操作が可能です。</value></data>
   <data name="Onboarding_Step2_Title" xml:space="preserve"><value>2. 文書の追加とドラッグ＆ドロップ</value></data>
   <data name="Onboarding_Step2_Desc" xml:space="preserve"><value>「文書追加」ボタン（Ctrl+N）のほか、エクスプローラーやLinuxファイルマネージャーからファイルを直接画面にドラッグ＆ドロップして即座に登録できます（PDF、Word、Excel、画像などに対応）。</value></data>
   <data name="Onboarding_Step2_Tip" xml:space="preserve"><value>ヒント: 複数ファイルを一度に登録したい場合は「一括インポート」（Ctrl+Shift+I）が便利です。</value></data>
@@ -1046,9 +1058,9 @@
   <data name="Onboarding_Step5_Title" xml:space="preserve"><value>5. ごみ箱・復元とZIPアーカイブ</value></data>
   <data name="Onboarding_Step5_Desc" xml:space="preserve"><value>削除した文書は「ごみ箱」（Ctrl+Shift+R）で安全に保持され、複数選択で一括復元できます。「リカバリーセンター」ではデータベースの世代バックアップと復元、さらに個人文書全体のZIPエクスポート／インポートにも対応しています。</value></data>
   <data name="Onboarding_Step5_Tip" xml:space="preserve"><value>ヒント: 大切なデータは定期的にリカバリーセンターでバックアップを作成しましょう。</value></data>
-  <data name="Onboarding_Next" xml:space="preserve"><value>次へ ➔</value></data>
-  <data name="Onboarding_Prev" xml:space="preserve"><value>⬅ 戻る</value></data>
-  <data name="Onboarding_Start" xml:space="preserve"><value>🎉 始める</value></data>
+  <data name="Onboarding_Next" xml:space="preserve"><value>次へ</value></data>
+  <data name="Onboarding_Prev" xml:space="preserve"><value>戻る</value></data>
+  <data name="Onboarding_Start" xml:space="preserve"><value>始める</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Title" xml:space="preserve"><value>フォルダ自動監視 (Watched Folder)</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Desc" xml:space="preserve"><value>指定したフォルダを常時監視し、新しいファイルが追加されると自動的に検知して登録候補とします。</value></data>
   <data name="Onboarding_Cat_Inbox_Title" xml:space="preserve"><value>インポート受信トレイ (Import Inbox)</value></data>
@@ -1063,6 +1075,21 @@
   <data name="Onboarding_Cat_Lang_Desc" xml:space="preserve"><value>日本語、English、Tiếng Việt、中文 の4言語に対応し、右上のメニューからいつでも即時切り替えが可能です。</value></data>
   <data name="Onboarding_Shortcuts_Title" xml:space="preserve"><value>操作効率を高めるグローバルショートカット</value></data>
   <data name="Onboarding_Shortcuts_Desc" xml:space="preserve"><value>キーボード操作だけで主要な全画面へ瞬時にアクセスできます。</value></data>
+  <data name="Onboarding_Shortcuts_Nav" xml:space="preserve"><value>ナビゲーション・一般</value></data>
+  <data name="Onboarding_Shortcuts_Doc" xml:space="preserve"><value>文書操作・ワークスペース</value></data>
+  <data name="Onboarding_Shortcuts_Tools" xml:space="preserve"><value>検索・保守ツール</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>表示言語</value></data>
+  <data name="Dashboard_GreetingMorning" xml:space="preserve"><value>おはようございます</value></data>
+  <data name="Dashboard_GreetingAfternoon" xml:space="preserve"><value>こんにちは</value></data>
+  <data name="Dashboard_GreetingEvening" xml:space="preserve"><value>こんばんは</value></data>
+  <data name="Dashboard_GreetingSummary" xml:space="preserve"><value>重要文書 {0} 件、期日接近文書 {1} 件があります。</value></data>
+  <data name="Dashboard_RecentQuickAccess" xml:space="preserve"><value>最近開いた文書</value></data>
+  <data name="Dashboard_DragDropToastSingle" xml:space="preserve"><value>文書を追加しました: {0}</value></data>
+  <data name="Dashboard_DragDropToastMultiple" xml:space="preserve"><value>{0} 件の文書を正常に追加しました</value></data>
+  <data name="Toast_TitleSuccess" xml:space="preserve"><value>成功</value></data>
+  <data name="Toast_TitleError" xml:space="preserve"><value>エラー</value></data>
+  <data name="Toast_TitleWarning" xml:space="preserve"><value>警告</value></data>
+  <data name="Toast_TitleInfo" xml:space="preserve"><value>情報</value></data>
 </root>
 
 

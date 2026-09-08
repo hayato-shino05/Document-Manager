@@ -146,11 +146,18 @@
         <SolidColorBrush x:Key="BorderBrush"         Color="{StaticResource BorderSubtle}"/>
 
 
-        <SolidColorBrush x:Key="StatBlueBg"  Color="{StaticResource AccentBlueBg}"/>
-        <SolidColorBrush x:Key="StatGreenBg" Color="#DCFCE7"/>
-        <SolidColorBrush x:Key="StatAmberBg" Color="#FEF3C7"/>
-        <SolidColorBrush x:Key="StatRedBg"   Color="#FEE2E2"/>
-        <SolidColorBrush x:Key="StatRedFg"   Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="StatBlueBg"   Color="{StaticResource AccentBlueBg}"/>
+        <SolidColorBrush x:Key="StatBlueFg"   Color="{StaticResource AccentBlue}"/>
+        <SolidColorBrush x:Key="StatGreenBg"  Color="#DCFCE7"/>
+        <SolidColorBrush x:Key="StatGreenFg"  Color="{StaticResource StatusGreen}"/>
+        <SolidColorBrush x:Key="StatAmberBg"  Color="#FEF3C7"/>
+        <SolidColorBrush x:Key="StatAmberFg"  Color="{StaticResource StatusAmber}"/>
+        <SolidColorBrush x:Key="StatRedBg"    Color="#FEE2E2"/>
+        <SolidColorBrush x:Key="StatRedFg"    Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="StatPurpleBg" Color="#F3E8FF"/>
+        <SolidColorBrush x:Key="StatPurpleFg" Color="#7E22CE"/>
+        <SolidColorBrush x:Key="StatOrangeBg" Color="#FFEDD5"/>
+        <SolidColorBrush x:Key="StatOrangeFg" Color="#C2410C"/>
 
 
         <SolidColorBrush x:Key="GradientIndigo"  Color="{StaticResource AccentBlue}"/>

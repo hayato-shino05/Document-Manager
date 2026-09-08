@@ -60,6 +60,8 @@ public sealed class MainWindowTaxonomyTests
             "Toolbar_Import",
             "Toolbar_Report",
             "Toolbar_TreeMap",
+            "Toolbar_StudentWorkspace",
+            "Toolbar_OfficeWorkspace",
             "Toolbar_Back",
             "MainShellRoot"
         };

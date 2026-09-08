@@ -25,7 +25,7 @@ public class DialogService : IDialogService, IFileDialogService, ICustomDialogSe
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            return desktop.MainWindow;
+            return desktop.MainWindow ?? (desktop.Windows.Count > 0 ? desktop.Windows[0] : null);
         }
         return null;
     }

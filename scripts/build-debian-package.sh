@@ -22,7 +22,7 @@ while (($#)); do
     esac
 done
 
-for command in dotnet dpkg dpkg-deb; do
+for command in dpkg dpkg-deb; do
     command -v "$command" >/dev/null 2>&1 || fail "Required command not found: $command"
 done
 
@@ -36,15 +36,16 @@ dpkg --validate-version "$version" || fail "Invalid Debian package version: $ver
 publish_dir="$repo_root/artifacts/publish/linux-x64"
 output_dir="$repo_root/artifacts/installer"
 template_dir="$repo_root/packaging/debian"
-output_file="$output_dir/document-manager_${version}_amd64.deb"
+output_file="$output_dir/DocumentManager.deb"
 
 mkdir -p "$output_dir"
-package_dir="$(mktemp -d "$output_dir/.document-manager.XXXXXX")"
-contents_file="$(mktemp "$output_dir/.document-manager-contents.XXXXXX")"
+package_dir="$(mktemp -d "/tmp/.document-manager.XXXXXX")"
+contents_file="$(mktemp "/tmp/.document-manager-contents.XXXXXX")"
 trap 'rm -rf "$package_dir" "$contents_file"' EXIT
 
-rm -rf "$publish_dir"
-dotnet publish "$repo_root/StudyDocumentManager/StudyDocumentManager.csproj" \
+if command -v dotnet >/dev/null 2>&1; then
+    rm -rf "$publish_dir"
+    dotnet publish "$repo_root/StudyDocumentManager/StudyDocumentManager.csproj" \
     -c Release \
     -r linux-x64 \
     --self-contained true \
@@ -54,14 +55,18 @@ dotnet publish "$repo_root/StudyDocumentManager/StudyDocumentManager.csproj" \
     -p:DebugSymbols=false \
     -p:Version="$version" \
     -o "$publish_dir"
+fi
 
 app_binary="$publish_dir/DocumentManager"
 [ -x "$app_binary" ] || fail "Linux publish output is missing executable $app_binary. Apply the Linux platform support changes before packaging."
 
 cp -a "$template_dir/." "$package_dir/"
 sed -i "s/@VERSION@/$version/g" "$package_dir/DEBIAN/control"
+chmod 0755 "$package_dir/DEBIAN"
+chmod 0644 "$package_dir/DEBIAN/control"
 install -d "$package_dir/usr/lib/document-manager"
 cp -a "$publish_dir/." "$package_dir/usr/lib/document-manager/"
+chmod -R u+w,go-w "$package_dir/usr"
 chmod 0755 "$package_dir/usr/bin/document-manager" "$package_dir/usr/lib/document-manager/DocumentManager"
 rm -f "$output_file"
 dpkg-deb --build --root-owner-group "$package_dir" "$output_file"

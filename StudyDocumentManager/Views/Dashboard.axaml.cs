@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using StudyDocumentManager.Models;
@@ -26,6 +26,28 @@ public partial class Dashboard : UserControl
             {
                 if (DataContext is DashboardModel vm && vm.SelectedDocument != null)
                     vm.OpenFileCommand.Execute(null);
+            };
+
+            // Keyboard navigation: Enter to open, Delete to trash, Space to toggle important
+            dgv.KeyDown += (s, e) =>
+            {
+                if (DataContext is not DashboardModel vm || vm.SelectedDocument == null) return;
+
+                if (e.Key == Avalonia.Input.Key.Enter)
+                {
+                    e.Handled = true;
+                    vm.OpenFileCommand.Execute(null);
+                }
+                else if (e.Key == Avalonia.Input.Key.Delete)
+                {
+                    e.Handled = true;
+                    vm.DeleteDocumentCommand.Execute(null);
+                }
+                else if (e.Key == Avalonia.Input.Key.Space)
+                {
+                    e.Handled = true;
+                    vm.ToggleImportantCommand.Execute(null);
+                }
             };
 
             dgv.SelectionChanged += (s, e) =>

@@ -1,128 +1,147 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-        xmlns:loc="using:StudyDocumentManager.Markup"
-                     x:Class="StudyDocumentManager.Views.CollectionManagement"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             x:Class="StudyDocumentManager.Views.CollectionManagement"
              x:DataType="vm:CollectionManagementModel"
              AutomationProperties.AutomationId="Screen_CollectionManagement">
 
-    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+    <Border Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
         <DockPanel>
-            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,14">
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <Image Source="{StaticResource IconCollection}" Width="20" Height="20"/>
+                    <Image Source="{DynamicResource IconCollection}" Width="20" Height="20" VerticalAlignment="Center"/>
                     <TextBlock AutomationProperties.AutomationId="Title_CollectionManagement"
-                               Text="{loc:Localize CollectionMgmt_Title}" FontSize="{StaticResource FontSizeXl}"
-                               FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                               Text="{loc:Localize CollectionMgmt_Title}" FontSize="{DynamicResource FontSizeHeading}"
+                               FontWeight="Bold" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Button Classes="primary" AutomationProperties.AutomationId="CollectionManagement_Create"
                             AutomationProperties.Name="{loc:Localize CollectionMgmt_BtnCreate}"
-                            Command="{Binding CreateCollectionCommand}">
+                            Command="{Binding CreateCollectionCommand}" Padding="{DynamicResource PaddingBtnMd}">
                         <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconAddWhite}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnCreate}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                            <Image Source="{DynamicResource IconAddWhite}" Width="15" Height="15" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnCreate}" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
             </DockPanel>
 
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <Grid ColumnDefinitions="300,16,*">
+                <Grid ColumnDefinitions="320,16,*">
 
-                <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                <!-- Left Column: Collections List -->
+                <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                        BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" ClipToBounds="True">
                     <DockPanel>
-                        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
-                                CornerRadius="6,6,0,0" Padding="{StaticResource PaddingMd}">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Image Source="{StaticResource IconCollection}" Width="14" Height="14"/>
-                                <TextBlock Text="{loc:Localize CollectionMgmt_ListHeader}" FontSize="{StaticResource FontSizeLg}"
-                                           FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                        <Border DockPanel.Dock="Top" Background="{DynamicResource SidebarBackground}"
+                                Padding="{DynamicResource PaddingMd}">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                <Image Source="{DynamicResource IconCollection}" Width="14" Height="14" VerticalAlignment="Center"/>
+                                <TextBlock Text="{loc:Localize CollectionMgmt_ListHeader}" FontSize="{DynamicResource FontSizeLg}"
+                                           FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Border>
 
                         <Panel>
                             <ListBox ItemsSource="{Binding Collections}"
                                      SelectedItem="{Binding SelectedCollection}"
-                                     Padding="{StaticResource PaddingIcon}">
+                                     Padding="{DynamicResource PaddingIcon}">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" Spacing="8" Margin="6,6">
-                                            <Image Source="{StaticResource IconCollection}" Width="14" Height="14"/>
+                                            <Image Source="{DynamicResource IconCollection}" Width="14" Height="14" VerticalAlignment="Center"/>
                                             <StackPanel Spacing="2">
-                                                <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMd}"
-                                                           FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
-                                                <TextBlock Text="{Binding Description}" FontSize="{StaticResource FontSizeXs}"
-                                                           Foreground="{StaticResource TextSecondary}" TextTrimming="CharacterEllipsis"
-                                                           MaxWidth="220"/>
+                                                <TextBlock Text="{Binding Name}" FontSize="{DynamicResource FontSizeMd}"
+                                                           FontWeight="Medium" Foreground="{DynamicResource TextPrimary}"/>
+                                                <TextBlock Text="{Binding Description}" FontSize="{DynamicResource FontSizeXs}"
+                                                           Foreground="{DynamicResource TextSecondary}" TextTrimming="CharacterEllipsis"
+                                                           MaxWidth="230"/>
                                             </StackPanel>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
 
-                            <StackPanel Classes="empty-state" IsVisible="{Binding !Collections.Count}" Margin="16">
-                                <Image Classes="empty-state-icon" Source="{StaticResource IconCollection}"/>
-                                <TextBlock Classes="empty-state-text" Text="{loc:Localize Common_NoData}"/>
+                            <StackPanel Classes="empty-state" IsVisible="{Binding !Collections.Count}"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" Margin="24">
+                                <Image Source="{DynamicResource IconCollection}" Width="44" Height="44" Opacity="0.35" HorizontalAlignment="Center"/>
+                                <TextBlock Classes="empty-state-text" Text="{loc:Localize Common_NoData}"
+                                           FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextMuted}" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Panel>
                     </DockPanel>
                 </Border>
 
-                <Border Grid.Column="2" Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                <!-- Right Column: Collection Details -->
+                <Border Grid.Column="2" Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                        BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" ClipToBounds="True">
                     <DockPanel>
-                        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
-                                CornerRadius="6,6,0,0" Padding="{StaticResource PaddingMd}">
+                        <Border DockPanel.Dock="Top" Background="{DynamicResource SidebarBackground}"
+                                Padding="{DynamicResource PaddingMd}">
                             <DockPanel>
                                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                    <Image Source="{StaticResource IconDocPage}" Width="14" Height="14"/>
-                                    <TextBlock Text="{loc:Localize CollectionMgmt_DetailHeader}" FontSize="{StaticResource FontSizeLg}"
-                                               FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                    <Image Source="{DynamicResource IconDocPage}" Width="14" Height="14" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{loc:Localize CollectionMgmt_DetailHeader}" FontSize="{DynamicResource FontSizeLg}"
+                                               FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                                 </StackPanel>
-                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4"
-                                            HorizontalAlignment="Right">
-                                    <Button Classes="secondary" Command="{Binding AddDocumentToCollectionCommand}" Padding="{StaticResource PaddingSm}"
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Button Classes="primary" Command="{Binding AddDocumentToCollectionCommand}" Padding="{DynamicResource PaddingBtnSm}"
+                                            AutomationProperties.AutomationId="CollectionManagement_AddDocument"
+                                            AutomationProperties.Name="{loc:Localize CollectionMgmt_BtnAddDoc}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconAdd}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnAddDoc}" FontSize="{StaticResource FontSizeSm}"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <Image Source="{DynamicResource IconAddWhite}" Width="12" Height="12" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnAddDoc}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Button>
-                                    <Button Classes="secondary" Command="{Binding RenameCollectionCommand}" Padding="{StaticResource PaddingSm}"
+                                    <Button Classes="secondary" Command="{Binding RenameCollectionCommand}" Padding="{DynamicResource PaddingBtnSm}"
+                                            AutomationProperties.AutomationId="CollectionManagement_RenameCollection"
+                                            AutomationProperties.Name="{loc:Localize CollectionMgmt_BtnRename}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconEdit}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnRename}" FontSize="{StaticResource FontSizeSm}"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <Image Source="{DynamicResource IconEdit}" Width="12" Height="12" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnRename}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Button>
                                     <Button Classes="secondary" Click="OnSelectAllDocumentsClicked"
                                             AutomationProperties.AutomationId="CollectionManagement_SelectAllDocuments"
                                             AutomationProperties.Name="{loc:Localize Bulk_BtnSelectAll}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                            Padding="{StaticResource PaddingSm}">
-                                        <TextBlock Text="{loc:Localize Bulk_BtnSelectAll}" FontSize="{StaticResource FontSizeSm}"/>
+                                            Padding="{DynamicResource PaddingBtnSm}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <Image Source="{DynamicResource IconCheckNeutral}" Width="12" Height="12" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize Bulk_BtnSelectAll}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
+                                        </StackPanel>
                                     </Button>
                                     <Button Classes="secondary" Click="OnDeselectAllDocumentsClicked"
                                             AutomationProperties.AutomationId="CollectionManagement_DeselectAllDocuments"
                                             AutomationProperties.Name="{loc:Localize Bulk_BtnDeselectAll}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                            Padding="{StaticResource PaddingSm}">
-                                        <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{StaticResource FontSizeSm}"/>
-                                    </Button>
-                                    <Button Classes="danger" Command="{Binding RemoveSelectedDocumentsCommand}" Padding="{StaticResource PaddingSm}"
-                                            IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnRemoveDoc}" FontSize="{StaticResource FontSizeSm}"/>
+                                            Padding="{DynamicResource PaddingBtnSm}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <Image Source="{DynamicResource IconClose}" Width="12" Height="12" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize Bulk_BtnDeselectAll}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Button>
-                                    <Button Classes="danger" Command="{Binding DeleteCollectionCommand}" Padding="{StaticResource PaddingSm}"
+                                    <Button Classes="danger" Command="{Binding RemoveSelectedDocumentsCommand}" Padding="{DynamicResource PaddingBtnSm}"
+                                            AutomationProperties.AutomationId="CollectionManagement_RemoveSelectedDocs"
+                                            AutomationProperties.Name="{loc:Localize CollectionMgmt_BtnRemoveDoc}"
                                             IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <StackPanel Orientation="Horizontal" Spacing="3">
-                                            <Image Source="{StaticResource IconDeleteWhite}" Width="11" Height="11"/>
-                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnDelete}" FontSize="{StaticResource FontSizeSm}"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <Image Source="{DynamicResource IconDeleteWhite}" Width="12" Height="12" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnRemoveDoc}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Classes="danger" Command="{Binding DeleteCollectionCommand}" Padding="{DynamicResource PaddingBtnSm}"
+                                            AutomationProperties.AutomationId="CollectionManagement_DeleteCollection"
+                                            AutomationProperties.Name="{loc:Localize CollectionMgmt_BtnDelete}"
+                                            IsEnabled="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <Image Source="{DynamicResource IconDeleteWhite}" Width="12" Height="12" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize CollectionMgmt_BtnDelete}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
@@ -131,22 +150,24 @@
 
                         <Panel>
                             <StackPanel IsVisible="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNull}}"
-                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
-                                <Image Source="{StaticResource IconCollection}" Width="36" Height="36" Opacity="0.4"/>
+                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="24">
+                                <Image Source="{DynamicResource IconCollection}" Width="44" Height="44" Opacity="0.35" HorizontalAlignment="Center"/>
                                 <TextBlock AutomationProperties.AutomationId="CollectionManagement_EmptyState"
                                            AutomationProperties.LiveSetting="Polite"
                                            Text="{loc:Localize CollectionMgmt_EmptyState}"
-                                           FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
+                                           FontSize="{DynamicResource FontSizeLg}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextMuted}"
                                            HorizontalAlignment="Center"/>
                             </StackPanel>
 
                             <DockPanel IsVisible="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                <Border DockPanel.Dock="Top" Padding="{StaticResource PaddingMd}">
+                                <Border DockPanel.Dock="Top" Padding="{DynamicResource PaddingMd}">
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="{Binding SelectedCollection.Name}" FontSize="{StaticResource FontSizeLg}"
-                                                   FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                                        <TextBlock Text="{Binding SelectedCollection.Description}" FontSize="{StaticResource FontSizeSm}"
-                                                   Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+                                        <TextBlock Text="{Binding SelectedCollection.Name, FallbackValue=''}" FontSize="{DynamicResource FontSizeLg}"
+                                                   FontWeight="Bold" Foreground="{DynamicResource TextPrimary}"/>
+                                        <TextBlock Text="{Binding SelectedCollection.Description, FallbackValue=''}" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </Border>
 
@@ -154,21 +175,24 @@
                                     <ListBox x:Name="DocumentGrid"
                                              AutomationProperties.AutomationId="CollectionManagement_DocumentGrid"
                                              AutomationProperties.Name="{loc:Localize CollectionMgmt_DetailHeader}"
-                                             ItemsSource="{Binding DocumentsInCollection}" SelectionMode="Multiple" Padding="{StaticResource PaddingIcon}">
+                                             ItemsSource="{Binding DocumentsInCollection}" SelectionMode="Multiple" Padding="{DynamicResource PaddingIcon}">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" Spacing="8" Margin="6,4">
-                                                    <Image Source="{StaticResource IconDocPage}" Width="16" Height="16"/>
-                                                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeMd}"
-                                                               Foreground="{StaticResource TextPrimary}"/>
+                                                    <Image Source="{DynamicResource IconDocPage}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding Name}" FontSize="{DynamicResource FontSizeMd}"
+                                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                     </ListBox>
 
-                                    <StackPanel Classes="empty-state" IsVisible="{Binding !DocumentsInCollection.Count}" Margin="16">
-                                        <Image Classes="empty-state-icon" Source="{StaticResource IconDocPage}"/>
-                                        <TextBlock Classes="empty-state-text" Text="{loc:Localize Common_NoData}"/>
+                                    <StackPanel Classes="empty-state" IsVisible="{Binding !DocumentsInCollection.Count}"
+                                                HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" Margin="24">
+                                        <Image Source="{DynamicResource IconDocPage}" Width="44" Height="44" Opacity="0.35" HorizontalAlignment="Center"/>
+                                        <TextBlock Classes="empty-state-text" Text="{loc:Localize Common_NoData}"
+                                                   FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextMuted}" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Panel>
                             </DockPanel>

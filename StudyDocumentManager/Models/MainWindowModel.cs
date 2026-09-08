@@ -1,4 +1,5 @@
 using StudyDocumentManager.Core;
+using StudyDocumentManager.Core.DTOs;
 using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -25,6 +26,15 @@ public partial class MainWindowModel : ModelBase
     [ObservableProperty]
     private bool _canUndo;
 
+    [ObservableProperty]
+    private bool _hasUpdateAvailable;
+
+    [ObservableProperty]
+    private string _updateVersionText = string.Empty;
+
+    [ObservableProperty]
+    private UpdateInfo? _latestUpdateInfo;
+
     public IReadOnlyList<SupportedLanguage> AvailableLanguages => _loc.AvailableLanguages;
 
     public bool CanGoBack => _navigationService.CanGoBack;
@@ -42,6 +52,7 @@ public partial class MainWindowModel : ModelBase
     private readonly IUpdateService _updateService;
     private readonly IUndoApplier? _undoApplier;
     private readonly IUndoService? _undoService;
+    private readonly IToastService? _toastService;
     private string? _statusKey = "Status_TotalDocs";
     private object[] _statusArguments = [0];
 
@@ -56,7 +67,8 @@ public partial class MainWindowModel : ModelBase
         ISettingsService settingsService,
         IUpdateService updateService,
         IUndoApplier? undoApplier = null,
-        IUndoService? undoService = null)
+        IUndoService? undoService = null,
+        IToastService? toastService = null)
     {
         _navigationService = navigationService;
         _dialogService = dialogService;
@@ -68,6 +80,7 @@ public partial class MainWindowModel : ModelBase
         _updateService = updateService;
         _undoApplier = undoApplier;
         _undoService = undoService;
+        _toastService = toastService;
         _currentView = dashboardModel;
         _statusText = FormatLocalizedStatus();
         if (_undoService != null)
@@ -90,7 +103,20 @@ public partial class MainWindowModel : ModelBase
         _ = Task.Run(async () =>
         {
             await Task.Delay(3000);
-            await _updateService.CheckSilentlyAsync();
+            try
+            {
+                var info = await _updateService.CheckForUpdateAsync();
+                if (info is { HasUpdate: true })
+                {
+                    HasUpdateAvailable = true;
+                    UpdateVersionText = info.NewVersion;
+                    LatestUpdateInfo = info;
+                }
+                await _updateService.CheckSilentlyAsync();
+            }
+            catch
+            {
+            }
         });
     }
 
@@ -111,6 +137,19 @@ public partial class MainWindowModel : ModelBase
     }
 
     [RelayCommand]
+    private async Task OpenUpdateDialogAsync()
+    {
+        if (LatestUpdateInfo is { HasUpdate: true })
+        {
+            await _updateService.HandleUpdateAsync(LatestUpdateInfo);
+        }
+        else
+        {
+            await CheckForUpdateAsync();
+        }
+    }
+
+    [RelayCommand]
     private async Task CheckForUpdateAsync()
     {
         SetLocalizedStatus("Status_CheckingUpdate");
@@ -122,12 +161,18 @@ public partial class MainWindowModel : ModelBase
         }
         else if (!info.HasUpdate)
         {
+            HasUpdateAvailable = false;
+            UpdateVersionText = string.Empty;
+            LatestUpdateInfo = null;
             await _dialogService.ShowMessageAsync(_loc["Main_UpdateTitle"],
                 string.Format(_loc["Main_AlreadyLatest"], Core.Services.AppVersion.Current));
             SetLocalizedStatus("Status_UpToDate");
         }
         else
         {
+            HasUpdateAvailable = true;
+            UpdateVersionText = info.NewVersion;
+            LatestUpdateInfo = info;
             await _updateService.HandleUpdateAsync(info);
             SetLocalizedStatus("Status_NewVersionAvailable", info.NewVersion);
         }
@@ -353,6 +398,14 @@ public partial class MainWindowModel : ModelBase
 
                     dashboard.RefreshCommand.Execute(null);
                     UpdateStatusFromDashboard(dashboard);
+
+                    if (_toastService != null)
+                    {
+                        string message = validPaths.Count == 1
+                            ? string.Format(_loc["Dashboard_DragDropToastSingle"], Path.GetFileName(validPaths[0]))
+                            : string.Format(_loc["Dashboard_DragDropToastMultiple"], imported);
+                        _toastService.Show(message, ToastType.Success);
+                    }
                     return;
                 }
 
@@ -404,24 +457,16 @@ public partial class MainWindowModel : ModelBase
 
     partial void OnSelectedLanguageChanged(SupportedLanguage value)
     {
-        System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] OnSelectedLanguageChanged fired: value={value}");
         _loc.SetLanguage(value);
         _settingsService.SetSetting("language", value.ToString());
-        System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] Language persisted to DB: {value}");
     }
 
     [RelayCommand]
     private void ChangeLanguage(string langName)
     {
-        System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] ChangeLanguageCommand invoked: langName='{langName}'");
         if (Enum.TryParse<SupportedLanguage>(langName, out var lang))
         {
-            System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] Parsed OK → {lang}, current={SelectedLanguage}");
             SelectedLanguage = lang;
-        }
-        else
-        {
-            System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] PARSE FAILED for '{langName}'");
         }
     }
 }

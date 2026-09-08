@@ -1,4 +1,6 @@
 using Xunit;
+using StudyDocumentManager.Core;
+using StudyDocumentManager.Core.Interfaces;
 using StudyDocumentManager.Models;
 using StudyDocumentManager.Tests.TestDoubles;
 
@@ -135,5 +137,33 @@ public sealed class OnboardingModelTests
         model.GoToStepCommand.Execute(0);
         Assert.Equal(0, model.CurrentStepIndex);
         Assert.True(model.IsStep0);
+    }
+
+    [Fact]
+    public void LanguageSelection_InitializesFromLoc_And_PersistsOnChange()
+    {
+        var settings = new InMemorySettingsService();
+        var loc = new StubLocalizationService(SupportedLanguage.Vietnamese);
+        var model = new OnboardingModel(settings, loc);
+
+        Assert.Equal(SupportedLanguage.Vietnamese, model.SelectedLanguage);
+        Assert.Equal(loc.AvailableLanguages, model.AvailableLanguages);
+
+        model.SelectedLanguage = SupportedLanguage.Chinese;
+        Assert.Equal(SupportedLanguage.Chinese, loc.CurrentLanguage);
+        Assert.Equal("Chinese", settings.GetSetting("language"));
+    }
+
+    [Fact]
+    public void FallbackConstructor_WithoutLoc_UsesJapaneseAndEnumValues()
+    {
+        var settings = new InMemorySettingsService();
+        var model = new OnboardingModel(settings);
+
+        Assert.Equal(SupportedLanguage.Japanese, model.SelectedLanguage);
+        Assert.Equal(4, model.AvailableLanguages.Count);
+
+        model.SelectedLanguage = SupportedLanguage.English;
+        Assert.Equal("English", settings.GetSetting("language"));
     }
 }

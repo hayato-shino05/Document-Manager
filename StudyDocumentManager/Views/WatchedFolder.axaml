@@ -7,42 +7,194 @@
              x:Name="Root"
              AutomationProperties.AutomationId="WatchedFolder_Screen"
              x:DataType="vm:WatchedFolderModel">
-  <DockPanel Margin="24">
-      <StackPanel DockPanel.Dock="Top" Spacing="10">
-        <WrapPanel Orientation="Horizontal">
-          <Button AutomationProperties.AutomationId="WatchedFolder_Back" Content="{loc:Localize Btn_Back}" Command="{Binding GoBackCommand}" Margin="0,0,8,0" />
-        <TextBlock Text="{loc:Localize WF_Title}" FontSize="24" Margin="0,0,8,0" />
-        <Button AutomationProperties.AutomationId="WatchedFolder_Start" Content="{loc:Localize WF_Start}" Command="{Binding StartWatchingCommand}" IsEnabled="{Binding !IsWatching}" Margin="0,0,8,0" />
-        <Button AutomationProperties.AutomationId="WatchedFolder_Stop" Content="{loc:Localize WF_Stop}" Command="{Binding StopWatchingCommand}" IsEnabled="{Binding IsWatching}" />
-      </WrapPanel>
-        <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-          <TextBox Grid.Column="0" AutomationProperties.AutomationId="WatchedFolder_Path" AutomationProperties.Name="{loc:Localize WF_FolderPath}" MinWidth="160" Margin="0,0,8,0" Text="{Binding NewFolderPath}" Watermark="{loc:Localize WF_FolderPath}" />
-          <Button Grid.Column="1" AutomationProperties.AutomationId="WatchedFolder_Browse" AutomationProperties.Name="{loc:Localize AddEdit_BtnBrowse}" Content="{loc:Localize AddEdit_BtnBrowse}" Command="{Binding BrowseFolderCommand}" Margin="0,0,8,0" />
-          <CheckBox Grid.Column="2" AutomationProperties.AutomationId="WatchedFolder_IncludeSub" Content="{loc:Localize WF_IncludeSub}" IsChecked="{Binding NewFolderIncludeSubdirectories}" VerticalAlignment="Center" Margin="0,0,8,0" />
-          <Button Grid.Column="3" AutomationProperties.AutomationId="WatchedFolder_Add" Content="{loc:Localize WF_Add}" Command="{Binding AddNewFolderCommand}" />
-        </Grid>
-      <TextBlock AutomationProperties.AutomationId="WatchedFolder_Status" AutomationProperties.LiveSetting="Polite" Text="{Binding StatusMessage}" IsVisible="{Binding StatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}" />
-      <TextBlock AutomationProperties.AutomationId="WatchedFolder_Error" AutomationProperties.LiveSetting="Polite" Text="{Binding LastError}" Foreground="{StaticResource DangerBrush}" IsVisible="{Binding LastError, Converter={x:Static ObjectConverters.IsNotNull}}" />
-      <TextBlock AutomationProperties.AutomationId="WatchedFolder_NoFolders" Text="{loc:Localize WF_NoFolders}" IsVisible="{Binding !HasFolders}" />
-    </StackPanel>
-    <ListBox AutomationProperties.AutomationId="WatchedFolder_List" ItemsSource="{Binding Folders}">
-      <ListBox.ItemTemplate>
-        <DataTemplate x:DataType="ent:WatchedFolder">
-          <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="4">
-            <StackPanel Grid.Column="0" Spacing="2">
-              <TextBlock Text="{Binding FolderPath}" FontWeight="Bold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FolderPath}" />
-              <StackPanel Orientation="Horizontal" Spacing="6">
-                <TextBlock Text="{Binding LastScanAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" FontSize="11" Opacity="0.7" />
-                <TextBlock Text="{Binding WatcherStatus, Converter={StaticResource WatcherStatusLabelConverter}}" FontSize="11" Opacity="0.7" />
-              </StackPanel>
-              <TextBlock AutomationProperties.AutomationId="WatchedFolder_ItemError" AutomationProperties.LiveSetting="Polite" Text="{Binding WatcherError}" FontSize="11" Foreground="{StaticResource DangerBrush}" IsVisible="{Binding WatcherError, Converter={x:Static ObjectConverters.IsNotNull}}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding WatcherError}" />
+
+  <Border Classes="page-wrapper" Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
+    <DockPanel>
+      <!-- Header -->
+      <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <Image Source="{DynamicResource IconCategory}" Width="20" Height="20" VerticalAlignment="Center"/>
+          <TextBlock AutomationProperties.AutomationId="Title_WatchedFolder"
+                     Text="{loc:Localize WF_Title}"
+                     FontSize="{DynamicResource FontSizeHeading}"
+                     FontWeight="Bold"
+                     Foreground="{DynamicResource TextPrimary}"
+                     VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+          <Button AutomationProperties.AutomationId="WatchedFolder_Start"
+                  AutomationProperties.Name="{loc:Localize WF_Start}"
+                  Classes="primary"
+                  Command="{Binding StartWatchingCommand}"
+                  IsEnabled="{Binding !IsWatching}"
+                  Padding="{DynamicResource PaddingBtnMd}">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <Image Source="{DynamicResource IconScanWhite}" Width="15" Height="15" VerticalAlignment="Center"/>
+              <TextBlock Text="{loc:Localize WF_Start}" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
             </StackPanel>
-            <CheckBox Grid.Column="1" Content="{loc:Localize WF_Enable}" IsChecked="{Binding Enabled}" Command="{Binding DataContext.ToggleEnabledCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding .}" />
-            <Button Grid.Column="2" AutomationProperties.AutomationId="WatchedFolder_Retry" AutomationProperties.Name="{loc:Localize ImportInbox_Retry}" Content="{loc:Localize ImportInbox_Retry}" Command="{Binding DataContext.RetryFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}" />
-            <Button Grid.Column="3" Content="{loc:Localize WF_Remove}" Command="{Binding DataContext.RemoveFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}" />
+          </Button>
+          <Button AutomationProperties.AutomationId="WatchedFolder_Stop"
+                  AutomationProperties.Name="{loc:Localize WF_Stop}"
+                  Classes="danger"
+                  Command="{Binding StopWatchingCommand}"
+                  IsEnabled="{Binding IsWatching}"
+                  Padding="{DynamicResource PaddingBtnMd}">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <Image Source="{DynamicResource IconDeleteWhite}" Width="14" Height="14" VerticalAlignment="Center"/>
+              <TextBlock Text="{loc:Localize WF_Stop}" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </DockPanel>
+
+      <!-- Input Toolbar Card -->
+      <Border DockPanel.Dock="Top"
+              Background="{DynamicResource CardBackground}"
+              CornerRadius="{DynamicResource RadiusMd}"
+              BorderBrush="{DynamicResource CardBorder}"
+              BorderThickness="1"
+              Padding="{DynamicResource PaddingCard}"
+              Margin="0,0,0,12">
+        <StackPanel Spacing="10">
+          <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+            <TextBox Grid.Column="0"
+                     AutomationProperties.AutomationId="WatchedFolder_Path"
+                     AutomationProperties.Name="{loc:Localize WF_FolderPath}"
+                     MinWidth="160"
+                     Margin="0,0,8,0"
+                     Text="{Binding NewFolderPath}"
+                     Watermark="{loc:Localize WF_FolderPath}"
+                     FontSize="{DynamicResource FontSizeMd}"
+                     VerticalAlignment="Center"/>
+            <Button Grid.Column="1"
+                    AutomationProperties.AutomationId="WatchedFolder_Browse"
+                    AutomationProperties.Name="{loc:Localize AddEdit_BtnBrowse}"
+                    Classes="secondary"
+                    Command="{Binding BrowseFolderCommand}"
+                    Margin="0,0,8,0"
+                    Padding="{DynamicResource PaddingBtnMd}"
+                    VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Image Source="{DynamicResource IconOpenFile}" Width="14" Height="14" VerticalAlignment="Center"/>
+                <TextBlock Text="{loc:Localize AddEdit_BtnBrowse}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
+            <CheckBox Grid.Column="2"
+                      AutomationProperties.AutomationId="WatchedFolder_IncludeSub"
+                      Content="{loc:Localize WF_IncludeSub}"
+                      IsChecked="{Binding NewFolderIncludeSubdirectories}"
+                      VerticalAlignment="Center"
+                      Margin="0,0,8,0"/>
+            <Button Grid.Column="3"
+                    AutomationProperties.AutomationId="WatchedFolder_Add"
+                    AutomationProperties.Name="{loc:Localize WF_Add}"
+                    Classes="primary"
+                    Command="{Binding AddNewFolderCommand}"
+                    Padding="{DynamicResource PaddingBtnMd}"
+                    VerticalAlignment="Center">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Image Source="{DynamicResource IconAddWhite}" Width="14" Height="14" VerticalAlignment="Center"/>
+                <TextBlock Text="{loc:Localize WF_Add}" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Button>
           </Grid>
-        </DataTemplate>
-      </ListBox.ItemTemplate>
-    </ListBox>
-  </DockPanel>
+          <TextBlock AutomationProperties.AutomationId="WatchedFolder_Status"
+                     AutomationProperties.LiveSetting="Polite"
+                     Text="{Binding StatusMessage}"
+                     Foreground="{DynamicResource TextSecondary}"
+                     FontSize="{DynamicResource FontSizeSm}"
+                     IsVisible="{Binding StatusMessage, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+          <TextBlock AutomationProperties.AutomationId="WatchedFolder_Error"
+                     AutomationProperties.LiveSetting="Polite"
+                     Text="{Binding LastError}"
+                     Foreground="{DynamicResource DangerBrush}"
+                     FontSize="{DynamicResource FontSizeSm}"
+                     FontWeight="SemiBold"
+                     IsVisible="{Binding LastError, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Watched Folders List Card -->
+      <Border Background="{DynamicResource CardBackground}"
+              CornerRadius="{DynamicResource RadiusMd}"
+              BorderBrush="{DynamicResource CardBorder}"
+              BorderThickness="1"
+              ClipToBounds="True">
+        <Panel>
+          <ListBox AutomationProperties.AutomationId="WatchedFolder_List"
+                   AutomationProperties.Name="{loc:Localize WF_Title}"
+                   ItemsSource="{Binding Folders}"
+                   IsVisible="{Binding HasFolders}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="ent:WatchedFolder">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="8,6">
+                  <StackPanel Grid.Column="0" Spacing="3" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <Image Source="{DynamicResource IconCategory}" Width="16" Height="16" VerticalAlignment="Center"/>
+                      <TextBlock Text="{Binding FolderPath}" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMd}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FolderPath}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="24,0,0,0">
+                      <TextBlock Text="{Binding LastScanAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource TextMuted}"/>
+                      <TextBlock Text="•" FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource TextMuted}"/>
+                      <TextBlock Text="{Binding WatcherStatus, Converter={StaticResource WatcherStatusLabelConverter}}" FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource TextSecondary}"/>
+                    </StackPanel>
+                    <TextBlock AutomationProperties.AutomationId="WatchedFolder_ItemError"
+                               AutomationProperties.LiveSetting="Polite"
+                               Text="{Binding WatcherError}"
+                               FontSize="{DynamicResource FontSizeXs}"
+                               Foreground="{DynamicResource DangerBrush}"
+                               IsVisible="{Binding WatcherError, Converter={x:Static ObjectConverters.IsNotNull}}"
+                               TextTrimming="CharacterEllipsis"
+                               ToolTip.Tip="{Binding WatcherError}"
+                               Margin="24,0,0,0"/>
+                  </StackPanel>
+                  <CheckBox Grid.Column="1" Content="{loc:Localize WF_Enable}" IsChecked="{Binding Enabled}" Command="{Binding DataContext.ToggleEnabledCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding .}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                  <Button Grid.Column="2"
+                          AutomationProperties.AutomationId="WatchedFolder_Retry"
+                          AutomationProperties.Name="{loc:Localize ImportInbox_Retry}"
+                          Classes="secondary"
+                          Command="{Binding DataContext.RetryFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                          CommandParameter="{Binding Id}"
+                          Margin="0,0,8,0"
+                          Padding="{DynamicResource PaddingSm}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <Image Source="{DynamicResource IconRefresh}" Width="13" Height="13" VerticalAlignment="Center"/>
+                      <TextBlock Text="{loc:Localize ImportInbox_Retry}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                  </Button>
+                  <Button Grid.Column="3"
+                          Classes="danger"
+                          Command="{Binding DataContext.RemoveFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                          CommandParameter="{Binding Id}"
+                          Padding="{DynamicResource PaddingSm}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                      <Image Source="{DynamicResource IconDeleteWhite}" Width="13" Height="13" VerticalAlignment="Center"/>
+                      <TextBlock Text="{loc:Localize WF_Remove}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                  </Button>
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+
+          <!-- Empty state -->
+          <StackPanel Classes="empty-state"
+                      IsVisible="{Binding !HasFolders}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Spacing="10"
+                      Margin="24">
+            <Image Source="{DynamicResource IconCategory}" Width="44" Height="44" Opacity="0.35" HorizontalAlignment="Center"/>
+            <TextBlock AutomationProperties.AutomationId="WatchedFolder_NoFolders"
+                       AutomationProperties.LiveSetting="Polite"
+                       Text="{loc:Localize WF_NoFolders}"
+                       FontSize="{DynamicResource FontSizeLg}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextMuted}"
+                       HorizontalAlignment="Center"/>
+          </StackPanel>
+        </Panel>
+      </Border>
+    </DockPanel>
+  </Border>
 </UserControl>

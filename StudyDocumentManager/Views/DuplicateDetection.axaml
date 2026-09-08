@@ -1,39 +1,39 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-        xmlns:loc="using:StudyDocumentManager.Markup"
-                     x:Class="StudyDocumentManager.Views.DuplicateDetection"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             x:Class="StudyDocumentManager.Views.DuplicateDetection"
              x:DataType="vm:DuplicateDetectionModel"
              AutomationProperties.AutomationId="Screen_DuplicateDetection">
 
-    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+    <Border Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
         <DockPanel>
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <Image Source="{StaticResource IconDuplicate}" Width="20" Height="20"/>
+                    <Image Source="{DynamicResource IconDuplicate}" Width="20" Height="20"/>
                     <TextBlock AutomationProperties.AutomationId="Title_DuplicateDetection"
-                               Text="{loc:Localize DuplicateDetection_Title}" FontSize="{StaticResource FontSizeXl}"
-                               FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                               Text="{loc:Localize DuplicateDetection_Title}" FontSize="{DynamicResource FontSizeXl}"
+                               FontWeight="Bold" Foreground="{DynamicResource TextPrimary}"/>
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Button Classes="primary" AutomationProperties.AutomationId="DuplicateDetection_Scan"
                             AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnScan}"
                             Command="{Binding ScanDuplicatesCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize DuplicateDetection_BtnScan}" FontSize="{StaticResource FontSizeSm}" Foreground="White"/>
+                        <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Image Source="{DynamicResource IconSearchWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Localize DuplicateDetection_BtnScan}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
             </DockPanel>
 
-            <Border DockPanel.Dock="Top" Background="{StaticResource StatBlueBg}"
-                    CornerRadius="{StaticResource RadiusMd}" Padding="{StaticResource PaddingSidebar}" Margin="0,0,0,12"
-                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+            <Border DockPanel.Dock="Top" Background="{DynamicResource StatBlueBg}"
+                    CornerRadius="{DynamicResource RadiusMd}" Padding="{DynamicResource PaddingSidebar}" Margin="0,0,0,12"
+                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1">
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Image Source="{StaticResource IconInfo}" Width="13" Height="13"/>
+                    <Image Source="{DynamicResource IconInfo}" Width="13" Height="13"/>
                     <TextBlock Text="{loc:Localize DuplicateDetection_InfoHint}"
-                               FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
+                               FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextSecondary}"
                                TextWrapping="Wrap"/>
                 </StackPanel>
             </Border>
@@ -46,24 +46,24 @@
                     <TextBlock AutomationProperties.AutomationId="DuplicateDetection_Scanning"
                                AutomationProperties.LiveSetting="Polite"
                                Text="{loc:Localize DuplicateDetection_Scanning}"
-                               FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
+                               FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextSecondary}"
                                HorizontalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
-            <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+            <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1">
                 <DockPanel>
-                    <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
-                            CornerRadius="6,6,0,0" Padding="{StaticResource PaddingMd}">
+                    <Border DockPanel.Dock="Top" Background="{DynamicResource SidebarBackground}"
+                            CornerRadius="6,6,0,0" Padding="{DynamicResource PaddingMd}">
                         <DockPanel>
                             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                <Image Source="{StaticResource IconDuplicate}" Width="14" Height="14"/>
-                                <TextBlock Text="{loc:Localize DuplicateDetection_ResultHeader}" FontSize="{StaticResource FontSizeLg}"
-                                           FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                <Image Source="{DynamicResource IconDuplicate}" Width="14" Height="14"/>
+                                <TextBlock Text="{loc:Localize DuplicateDetection_ResultHeader}" FontSize="{DynamicResource FontSizeLg}"
+                                           FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
                             </StackPanel>
                             <TextBlock DockPanel.Dock="Right" Text="{Binding DuplicateGroups.Count, StringFormat='({0})'}"
-                                       FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextMuted}"
                                        VerticalAlignment="Center" HorizontalAlignment="Right"/>
                         </DockPanel>
                     </Border>
@@ -71,50 +71,55 @@
                     <Panel>
                         <!-- Initial Prompt State (before scan) -->
                         <StackPanel IsVisible="{Binding IsInitialState}"
-                                    VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="0,40">
-                            <Image Source="{StaticResource IconDuplicate}" Width="36" Height="36" Opacity="0.4"/>
+                                    VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12" Margin="0,40">
+                            <Image Source="{DynamicResource IconDuplicate}" Width="48" Height="48" Opacity="0.4" HorizontalAlignment="Center"/>
                             <TextBlock AutomationProperties.AutomationId="DuplicateDetection_EmptyState"
                                        AutomationProperties.LiveSetting="Polite"
                                        Text="{loc:Localize DuplicateDetection_EmptyState}"
-                                       FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
-                                       HorizontalAlignment="Center"/>
+                                       FontSize="{DynamicResource FontSizeMd}" Foreground="{DynamicResource TextMuted}"
+                                       HorizontalAlignment="Center" TextAlignment="Center"/>
                             <Button Classes="primary" Command="{Binding ScanDuplicatesCommand}"
-                                    Content="{loc:Localize DuplicateDetection_BtnScan}"
-                                    Padding="{StaticResource PaddingBtnSm}" Margin="0,6,0,0"
-                                    AutomationProperties.AutomationId="DuplicateDetection_EmptyState_ScanButton"/>
+                                    HorizontalAlignment="Center"
+                                    Padding="{DynamicResource PaddingBtn}" Margin="0,6,0,0"
+                                    AutomationProperties.AutomationId="DuplicateDetection_EmptyState_ScanButton">
+                                <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Image Source="{DynamicResource IconSearchWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnScan}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
 
                         <!-- Clean State (scanned, no duplicates found) -->
                         <StackPanel IsVisible="{Binding IsCleanState}"
-                                    VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="0,40">
-                            <Image Source="{StaticResource IconCheckSuccess}" Width="36" Height="36"/>
+                                    VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,40">
+                            <Image Source="{DynamicResource IconCheckSuccess}" Width="44" Height="44" HorizontalAlignment="Center"/>
                             <TextBlock AutomationProperties.AutomationId="DuplicateDetection_CleanState"
                                        AutomationProperties.LiveSetting="Polite"
                                        Text="{Binding CleanSummaryText}"
-                                       FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource SuccessText}"
+                                       FontSize="{DynamicResource FontSizeMd}" Foreground="{DynamicResource SuccessText}"
                                        FontWeight="Medium"
-                                       HorizontalAlignment="Center"/>
+                                       HorizontalAlignment="Center" TextAlignment="Center"/>
                         </StackPanel>
 
                         <ListBox IsVisible="{Binding HasResults}"
                                  ItemsSource="{Binding DuplicateGroups}"
-                                 Padding="{StaticResource PaddingIcon}">
+                                 Padding="{DynamicResource PaddingIcon}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="{StaticResource SidebarBackground}" CornerRadius="4"
+                                    <Border Background="{DynamicResource SidebarBackground}" CornerRadius="4"
                                             Padding="10,8" Margin="2,3">
                                         <StackPanel Spacing="6">
                                             <DockPanel>
                                                 <StackPanel Spacing="2">
-                                                    <TextBlock Text="{Binding GroupTitle}" FontSize="{StaticResource FontSizeMd}"
-                                                                FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
-                                                    <TextBlock Text="{Binding MatchInfo}" FontSize="{StaticResource FontSizeXs}"
-                                                                Foreground="{StaticResource TextSecondary}"/>
+                                                    <TextBlock Text="{Binding GroupTitle}" FontSize="{DynamicResource FontSizeMd}"
+                                                                FontWeight="Medium" Foreground="{DynamicResource TextPrimary}"/>
+                                                    <TextBlock Text="{Binding MatchInfo}" FontSize="{DynamicResource FontSizeXs}"
+                                                                Foreground="{DynamicResource TextSecondary}"/>
                                                 </StackPanel>
-                                                <Button DockPanel.Dock="Right" Classes="danger" AutomationProperties.AutomationId="DuplicateDetection_Merge" AutomationProperties.Name="{loc:Localize DuplicateDetection_Merge}"
+                                                <Button DockPanel.Dock="Right" Classes="primary" AutomationProperties.AutomationId="DuplicateDetection_Merge" AutomationProperties.Name="{loc:Localize DuplicateDetection_Merge}"
                                                         Command="{Binding DataContext.MergeDuplicateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                        CommandParameter="{Binding}" Padding="{StaticResource PaddingSm}">
-                                                    <TextBlock Text="{loc:Localize DuplicateDetection_Merge}" FontSize="{StaticResource FontSizeXs}"/>
+                                                        CommandParameter="{Binding}" Padding="{DynamicResource PaddingSm}">
+                                                    <TextBlock Text="{loc:Localize DuplicateDetection_Merge}" FontSize="{DynamicResource FontSizeXs}"/>
                                                 </Button>
                                             </DockPanel>
                                             <ItemsControl ItemsSource="{Binding Documents}" Margin="0,2,0,0">
@@ -125,20 +130,20 @@
                                                                         VerticalAlignment="Center">
                                                                 <Button Classes="secondary" AutomationProperties.AutomationId="DuplicateDetection_View" AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnView}"
                                                                         Command="{Binding DataContext.ViewDocumentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                                        CommandParameter="{Binding}" Padding="{StaticResource PaddingSm}">
-                                                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnView}" FontSize="{StaticResource FontSizeXs}"/>
+                                                                        CommandParameter="{Binding}" Padding="{DynamicResource PaddingSm}">
+                                                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnView}" FontSize="{DynamicResource FontSizeXs}"/>
                                                                 </Button>
-                                                                <Button Classes="secondary" AutomationProperties.AutomationId="DuplicateDetection_Delete" AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnDelete}"
+                                                                <Button Classes="danger" AutomationProperties.AutomationId="DuplicateDetection_Delete" AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnDelete}"
                                                                         Command="{Binding DataContext.DeleteDuplicateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                                        CommandParameter="{Binding}" Padding="{StaticResource PaddingSm}">
-                                                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnDelete}" FontSize="{StaticResource FontSizeXs}"/>
+                                                                        CommandParameter="{Binding}" Padding="{DynamicResource PaddingSm}">
+                                                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnDelete}" FontSize="{DynamicResource FontSizeXs}"/>
                                                                 </Button>
                                                             </StackPanel>
                                                             <StackPanel Spacing="1" VerticalAlignment="Center">
-                                                                <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeXs}"
-                                                                            FontWeight="Medium" Foreground="{StaticResource TextPrimary}"/>
-                                                                <TextBlock Text="{Binding FilePath}" FontSize="{StaticResource FontSizeXs}"
-                                                                            Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"
+                                                                <TextBlock Text="{Binding Name}" FontSize="{DynamicResource FontSizeXs}"
+                                                                            FontWeight="Medium" Foreground="{DynamicResource TextPrimary}"/>
+                                                                <TextBlock Text="{Binding FilePath}" FontSize="{DynamicResource FontSizeXs}"
+                                                                            Foreground="{DynamicResource TextMuted}" TextTrimming="CharacterEllipsis"
                                                                             ToolTip.Tip="{Binding FilePath}"/>
                                                             </StackPanel>
                                                         </DockPanel>

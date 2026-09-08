@@ -2,30 +2,72 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:StudyDocumentManager.Models"
         xmlns:loc="using:StudyDocumentManager.Markup"
+        xmlns:conv="using:StudyDocumentManager.Converters"
         x:Class="StudyDocumentManager.Views.OnboardingDialog"
         x:DataType="vm:OnboardingModel"
         AutomationProperties.AutomationId="Dialog_Onboarding"
         Title="{loc:Localize Onboarding_Title}"
-        Width="740" Height="620"
-        MinWidth="600" MinHeight="500"
+        Width="860" Height="640"
+        MinWidth="800" MinHeight="500"
         WindowStartupLocation="CenterOwner"
         CanResize="True"
         ShowInTaskbar="False"
-        Background="{StaticResource ContentBackground}">
+        Background="{DynamicResource ContentBackground}">
+    <Window.Resources>
+        <conv:LangDisplayConverter x:Key="LangDisplayConverter" />
+    </Window.Resources>
+    <Window.Styles>
+        <Style Selector="TabItem">
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </Window.Styles>
     <Grid RowDefinitions="Auto,*,Auto" Margin="24">
         <!-- Header -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
-            <StackPanel Grid.Column="0" Spacing="4">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16" VerticalAlignment="Center">
+            <StackPanel Grid.Column="0" Spacing="4" VerticalAlignment="Center">
                 <TextBlock Text="{loc:Localize Onboarding_Welcome}"
                            AutomationProperties.AutomationId="Onboarding_Welcome"
-                           FontSize="{StaticResource FontSizeXl}"
+                           FontSize="{DynamicResource FontSizeHeading}"
                            FontWeight="Bold"
-                           Foreground="{StaticResource TextPrimary}" />
+                           Foreground="{DynamicResource TextPrimary}" />
                 <TextBlock Text="{loc:Localize Onboarding_Intro}"
                            TextWrapping="Wrap"
-                           FontSize="{StaticResource FontSizeSm}"
-                           Foreground="{StaticResource TextSecondary}" />
+                           FontSize="{DynamicResource FontSizeSm}"
+                           Foreground="{DynamicResource TextSecondary}" />
             </StackPanel>
+
+            <!-- Language Selector Card -->
+            <Border Grid.Column="1"
+                    Background="{DynamicResource CardBackground}"
+                    BorderBrush="{DynamicResource CardBorder}"
+                    BorderThickness="1"
+                    CornerRadius="{DynamicResource RadiusMd}"
+                    Padding="12,6"
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="{DynamicResource IconSettings}" Width="16" Height="16" VerticalAlignment="Center" />
+                    <TextBlock Text="{loc:Localize Settings_Language}"
+                               FontSize="{DynamicResource FontSizeSm}"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource TextPrimary}"
+                               VerticalAlignment="Center" />
+                    <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                              SelectedItem="{Binding SelectedLanguage}"
+                              MinWidth="120"
+                              Height="32"
+                              VerticalAlignment="Center">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource LangDisplayConverter}}"
+                                           VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </Border>
         </Grid>
 
         <!-- Main Tabs -->
@@ -36,11 +78,11 @@
                     <!-- Step Progress Header -->
                     <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,14" VerticalAlignment="Center">
                         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-                            <Border Background="{StaticResource PrimaryColor}" CornerRadius="12" Padding="10,3">
+                            <Border Background="{DynamicResource StatBlueBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="{DynamicResource RadiusFull}" Padding="10,3">
                                 <TextBlock Text="{Binding StepNumberText}"
-                                           Foreground="White"
+                                           Foreground="{DynamicResource AccentBrush}"
                                            FontWeight="SemiBold"
-                                           FontSize="{StaticResource FontSizeXs}" />
+                                           FontSize="{DynamicResource FontSizeXs}" />
                             </Border>
                         </StackPanel>
                         <ProgressBar Grid.Column="1"
@@ -48,36 +90,37 @@
                                      Value="{Binding StepProgress}"
                                      Maximum="100"
                                      Height="6"
-                                     Foreground="{StaticResource PrimaryColor}"
-                                     Background="{StaticResource SurfaceHover}"
+                                     Foreground="{DynamicResource AccentBrush}"
+                                     Background="{DynamicResource SidebarBackground}"
                                      CornerRadius="3" />
                     </Grid>
 
                     <!-- Step Cards Container -->
-                    <Border Grid.Row="1" Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="12" Padding="20">
+                    <Border Grid.Row="1" Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="20">
                         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                             <Panel>
                                 <!-- Step 0: Search & Filters -->
                                 <StackPanel Spacing="14" IsVisible="{Binding IsStep0}">
                                     <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                                        <Border Width="40" Height="40" CornerRadius="20" Background="{StaticResource PrimaryLightBrush}">
-                                            <Image Source="{StaticResource IconSearch}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{DynamicResource StatBlueBg}">
+                                            <Image Source="{DynamicResource IconSearch}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
                                         <TextBlock Text="{loc:Localize Onboarding_Step1_Title}"
-                                                   FontSize="{StaticResource FontSizeLg}"
+                                                   FontSize="{DynamicResource FontSizeLg}"
                                                    FontWeight="Bold"
-                                                   Foreground="{StaticResource TextPrimary}"
+                                                   Foreground="{DynamicResource TextPrimary}"
                                                    VerticalAlignment="Center" />
                                     </StackPanel>
                                     <TextBlock Text="{loc:Localize Onboarding_Step1_Desc}"
-                                               FontSize="{StaticResource FontSizeMd}"
+                                               FontSize="{DynamicResource FontSizeMd}"
                                                LineHeight="22"
                                                TextWrapping="Wrap"
-                                               Foreground="{StaticResource TextPrimary}" />
-                                    <Border Background="{StaticResource SurfaceHover}" CornerRadius="8" Padding="12,10" Margin="0,6,0,0">
+                                               Foreground="{DynamicResource TextPrimary}" />
+                                    <Border Background="{DynamicResource SidebarBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="{DynamicResource RadiusSm}" Padding="12,10" Margin="0,6,0,0">
                                         <TextBlock Text="{loc:Localize Onboarding_Step1_Tip}"
-                                                   FontSize="{StaticResource FontSizeSm}"
-                                                   Foreground="{StaticResource PrimaryColor}"
+                                                   FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource AccentBrush}"
                                                    TextWrapping="Wrap"
                                                    FontWeight="Medium" />
                                     </Border>
@@ -86,24 +129,24 @@
                                 <!-- Step 1: Add Document & Drag and Drop -->
                                 <StackPanel Spacing="14" IsVisible="{Binding IsStep1}">
                                     <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                                        <Border Width="40" Height="40" CornerRadius="20" Background="{StaticResource PrimaryLightBrush}">
-                                            <Image Source="{StaticResource IconAdd}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{DynamicResource StatGreenBg}">
+                                            <Image Source="{DynamicResource IconAdd}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
                                         <TextBlock Text="{loc:Localize Onboarding_Step2_Title}"
-                                                   FontSize="{StaticResource FontSizeLg}"
+                                                   FontSize="{DynamicResource FontSizeLg}"
                                                    FontWeight="Bold"
-                                                   Foreground="{StaticResource TextPrimary}"
+                                                   Foreground="{DynamicResource TextPrimary}"
                                                    VerticalAlignment="Center" />
                                     </StackPanel>
                                     <TextBlock Text="{loc:Localize Onboarding_Step2_Desc}"
-                                               FontSize="{StaticResource FontSizeMd}"
+                                               FontSize="{DynamicResource FontSizeMd}"
                                                LineHeight="22"
                                                TextWrapping="Wrap"
-                                               Foreground="{StaticResource TextPrimary}" />
-                                    <Border Background="{StaticResource SurfaceHover}" CornerRadius="8" Padding="12,10" Margin="0,6,0,0">
+                                               Foreground="{DynamicResource TextPrimary}" />
+                                    <Border Background="{DynamicResource SidebarBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="{DynamicResource RadiusSm}" Padding="12,10" Margin="0,6,0,0">
                                         <TextBlock Text="{loc:Localize Onboarding_Step2_Tip}"
-                                                   FontSize="{StaticResource FontSizeSm}"
-                                                   Foreground="{StaticResource PrimaryColor}"
+                                                   FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource SuccessBrush}"
                                                    TextWrapping="Wrap"
                                                    FontWeight="Medium" />
                                     </Border>
@@ -112,24 +155,24 @@
                                 <!-- Step 2: Dedicated Workspaces -->
                                 <StackPanel Spacing="14" IsVisible="{Binding IsStep2}">
                                     <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                                        <Border Width="40" Height="40" CornerRadius="20" Background="{StaticResource PrimaryLightBrush}">
-                                            <Image Source="{StaticResource IconWorkspaces}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{DynamicResource StatBlueBg}">
+                                            <Image Source="{DynamicResource IconCollection}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
                                         <TextBlock Text="{loc:Localize Onboarding_Step3_Title}"
-                                                   FontSize="{StaticResource FontSizeLg}"
+                                                   FontSize="{DynamicResource FontSizeLg}"
                                                    FontWeight="Bold"
-                                                   Foreground="{StaticResource TextPrimary}"
+                                                   Foreground="{DynamicResource TextPrimary}"
                                                    VerticalAlignment="Center" />
                                     </StackPanel>
                                     <TextBlock Text="{loc:Localize Onboarding_Step3_Desc}"
-                                               FontSize="{StaticResource FontSizeMd}"
+                                               FontSize="{DynamicResource FontSizeMd}"
                                                LineHeight="22"
                                                TextWrapping="Wrap"
-                                               Foreground="{StaticResource TextPrimary}" />
-                                    <Border Background="{StaticResource SurfaceHover}" CornerRadius="8" Padding="12,10" Margin="0,6,0,0">
+                                               Foreground="{DynamicResource TextPrimary}" />
+                                    <Border Background="{DynamicResource SidebarBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="{DynamicResource RadiusSm}" Padding="12,10" Margin="0,6,0,0">
                                         <TextBlock Text="{loc:Localize Onboarding_Step3_Tip}"
-                                                   FontSize="{StaticResource FontSizeSm}"
-                                                   Foreground="{StaticResource PrimaryColor}"
+                                                   FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource AccentBrush}"
                                                    TextWrapping="Wrap"
                                                    FontWeight="Medium" />
                                     </Border>
@@ -138,24 +181,24 @@
                                 <!-- Step 3: Duplicate & Integrity -->
                                 <StackPanel Spacing="14" IsVisible="{Binding IsStep3}">
                                     <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                                        <Border Width="40" Height="40" CornerRadius="20" Background="{StaticResource PrimaryLightBrush}">
-                                            <Image Source="{StaticResource IconTools}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{DynamicResource StatAmberBg}">
+                                            <Image Source="{DynamicResource IconIntegrity}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
                                         <TextBlock Text="{loc:Localize Onboarding_Step4_Title}"
-                                                   FontSize="{StaticResource FontSizeLg}"
+                                                   FontSize="{DynamicResource FontSizeLg}"
                                                    FontWeight="Bold"
-                                                   Foreground="{StaticResource TextPrimary}"
+                                                   Foreground="{DynamicResource TextPrimary}"
                                                    VerticalAlignment="Center" />
                                     </StackPanel>
                                     <TextBlock Text="{loc:Localize Onboarding_Step4_Desc}"
-                                               FontSize="{StaticResource FontSizeMd}"
+                                               FontSize="{DynamicResource FontSizeMd}"
                                                LineHeight="22"
                                                TextWrapping="Wrap"
-                                               Foreground="{StaticResource TextPrimary}" />
-                                    <Border Background="{StaticResource SurfaceHover}" CornerRadius="8" Padding="12,10" Margin="0,6,0,0">
+                                               Foreground="{DynamicResource TextPrimary}" />
+                                    <Border Background="{DynamicResource SidebarBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="{DynamicResource RadiusSm}" Padding="12,10" Margin="0,6,0,0">
                                         <TextBlock Text="{loc:Localize Onboarding_Step4_Tip}"
-                                                   FontSize="{StaticResource FontSizeSm}"
-                                                   Foreground="{StaticResource PrimaryColor}"
+                                                   FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource WarningBrush}"
                                                    TextWrapping="Wrap"
                                                    FontWeight="Medium" />
                                     </Border>
@@ -164,24 +207,24 @@
                                 <!-- Step 4: Recycle Bin & Recovery -->
                                 <StackPanel Spacing="14" IsVisible="{Binding IsStep4}">
                                     <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                                        <Border Width="40" Height="40" CornerRadius="20" Background="{StaticResource PrimaryLightBrush}">
-                                            <Image Source="{StaticResource IconRestore}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Border Width="40" Height="40" CornerRadius="20" Background="{DynamicResource StatGreenBg}">
+                                            <Image Source="{DynamicResource IconRestore}" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
                                         <TextBlock Text="{loc:Localize Onboarding_Step5_Title}"
-                                                   FontSize="{StaticResource FontSizeLg}"
+                                                   FontSize="{DynamicResource FontSizeLg}"
                                                    FontWeight="Bold"
-                                                   Foreground="{StaticResource TextPrimary}"
+                                                   Foreground="{DynamicResource TextPrimary}"
                                                    VerticalAlignment="Center" />
                                     </StackPanel>
                                     <TextBlock Text="{loc:Localize Onboarding_Step5_Desc}"
-                                               FontSize="{StaticResource FontSizeMd}"
+                                               FontSize="{DynamicResource FontSizeMd}"
                                                LineHeight="22"
                                                TextWrapping="Wrap"
-                                               Foreground="{StaticResource TextPrimary}" />
-                                    <Border Background="{StaticResource SurfaceHover}" CornerRadius="8" Padding="12,10" Margin="0,6,0,0">
+                                               Foreground="{DynamicResource TextPrimary}" />
+                                    <Border Background="{DynamicResource SidebarBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="{DynamicResource RadiusSm}" Padding="12,10" Margin="0,6,0,0">
                                         <TextBlock Text="{loc:Localize Onboarding_Step5_Tip}"
-                                                   FontSize="{StaticResource FontSizeSm}"
-                                                   Foreground="{StaticResource PrimaryColor}"
+                                                   FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource SuccessBrush}"
                                                    TextWrapping="Wrap"
                                                    FontWeight="Medium" />
                                     </Border>
@@ -195,143 +238,334 @@
             <!-- TAB 2: Feature Guide (Catalog) -->
             <TabItem Header="{loc:Localize Onboarding_TabCatalog}" AutomationProperties.AutomationId="Onboarding_Tab_Catalog">
                 <ScrollViewer Margin="0,12,0,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                    <StackPanel Spacing="12">
-                        <!-- Watched Folder -->
-                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
-                            <StackPanel Spacing="6">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Image Source="{StaticResource IconFolder}" Width="18" Height="18" />
-                                    <TextBlock Text="{loc:Localize Onboarding_Cat_WatchedFolder_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,0,0,8">
+                        <!-- Office & Student Workspaces -->
+                        <Border Grid.Row="0" Grid.Column="0" Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="14" Margin="0,0,6,10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource StatBlueBg}">
+                                        <Image Source="{DynamicResource IconCollection}" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="{loc:Localize Onboarding_Step3_Title}" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMd}"
+                                               Foreground="{DynamicResource TextPrimary}" TextWrapping="Wrap" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <TextBlock Text="{loc:Localize Onboarding_Cat_WatchedFolder_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                                <TextBlock Text="{loc:Localize Onboarding_Step3_Desc}" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondary}" FontSize="{DynamicResource FontSizeSm}" LineHeight="18" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Watched Folder -->
+                        <Border Grid.Row="0" Grid.Column="1" Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="14" Margin="6,0,0,10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource StatBlueBg}">
+                                        <Image Source="{DynamicResource IconCategory}" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="{loc:Localize Onboarding_Cat_WatchedFolder_Title}" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMd}"
+                                               Foreground="{DynamicResource TextPrimary}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Text="{loc:Localize Onboarding_Cat_WatchedFolder_Desc}" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondary}" FontSize="{DynamicResource FontSizeSm}" LineHeight="18" />
                             </StackPanel>
                         </Border>
 
                         <!-- Import Inbox -->
-                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
-                            <StackPanel Spacing="6">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Image Source="{StaticResource IconImport}" Width="18" Height="18" />
-                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Inbox_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                        <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="14" Margin="0,0,6,10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource StatGreenBg}">
+                                        <Image Source="{DynamicResource IconImport}" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Inbox_Title}" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMd}"
+                                               Foreground="{DynamicResource TextPrimary}" TextWrapping="Wrap" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <TextBlock Text="{loc:Localize Onboarding_Cat_Inbox_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                                <TextBlock Text="{loc:Localize Onboarding_Cat_Inbox_Desc}" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondary}" FontSize="{DynamicResource FontSizeSm}" LineHeight="18" />
                             </StackPanel>
                         </Border>
 
                         <!-- Reports & TreeMap -->
-                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
-                            <StackPanel Spacing="6">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Image Source="{StaticResource IconReport}" Width="18" Height="18" />
-                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Reports_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="14" Margin="6,0,0,10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource StatBlueBg}">
+                                        <Image Source="{DynamicResource IconReport}" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Reports_Title}" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMd}"
+                                               Foreground="{DynamicResource TextPrimary}" TextWrapping="Wrap" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <TextBlock Text="{loc:Localize Onboarding_Cat_Reports_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                                <TextBlock Text="{loc:Localize Onboarding_Cat_Reports_Desc}" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondary}" FontSize="{DynamicResource FontSizeSm}" LineHeight="18" />
                             </StackPanel>
                         </Border>
 
                         <!-- Personal Notes & Relations -->
-                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
-                            <StackPanel Spacing="6">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Image Source="{StaticResource IconTag}" Width="18" Height="18" />
-                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Notes_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                        <Border Grid.Row="2" Grid.Column="0" Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="14" Margin="0,0,6,10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource StatBlueBg}">
+                                        <Image Source="{DynamicResource IconNote}" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Notes_Title}" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMd}"
+                                               Foreground="{DynamicResource TextPrimary}" TextWrapping="Wrap" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <TextBlock Text="{loc:Localize Onboarding_Cat_Notes_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                                <TextBlock Text="{loc:Localize Onboarding_Cat_Notes_Desc}" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondary}" FontSize="{DynamicResource FontSizeSm}" LineHeight="18" />
                             </StackPanel>
                         </Border>
 
-                        <!-- Archive ZIP -->
-                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
-                            <StackPanel Spacing="6">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Image Source="{StaticResource IconExport}" Width="18" Height="18" />
-                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Archive_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                        <!-- Duplicate Detection & Integrity -->
+                        <Border Grid.Row="2" Grid.Column="1" Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="14" Margin="6,0,0,10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource StatAmberBg}">
+                                        <Image Source="{DynamicResource IconIntegrity}" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="{loc:Localize Onboarding_Step4_Title}" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMd}"
+                                               Foreground="{DynamicResource TextPrimary}" TextWrapping="Wrap" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <TextBlock Text="{loc:Localize Onboarding_Cat_Archive_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                                <TextBlock Text="{loc:Localize Onboarding_Step4_Desc}" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondary}" FontSize="{DynamicResource FontSizeSm}" LineHeight="18" />
                             </StackPanel>
                         </Border>
 
-                        <!-- Localization -->
-                        <Border Classes="card" Background="{StaticResource SurfaceBackground}" CornerRadius="8" Padding="14">
-                            <StackPanel Spacing="6">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Image Source="{StaticResource IconSettings}" Width="18" Height="18" />
-                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Lang_Title}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" />
+                        <!-- Recycle Bin & Recovery Center -->
+                        <Border Grid.Row="3" Grid.Column="0" Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="14" Margin="0,0,6,10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource StatGreenBg}">
+                                        <Image Source="{DynamicResource IconRestore}" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="{loc:Localize Onboarding_Step5_Title}" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMd}"
+                                               Foreground="{DynamicResource TextPrimary}" TextWrapping="Wrap" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <TextBlock Text="{loc:Localize Onboarding_Cat_Lang_Desc}" TextWrapping="Wrap" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" />
+                                <TextBlock Text="{loc:Localize Onboarding_Step5_Desc}" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondary}" FontSize="{DynamicResource FontSizeSm}" LineHeight="18" />
                             </StackPanel>
                         </Border>
-                    </StackPanel>
+
+                        <!-- Personal Document ZIP Archive -->
+                        <Border Grid.Row="3" Grid.Column="1" Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="14" Margin="6,0,0,10">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <Border Width="32" Height="32" CornerRadius="16" Background="{DynamicResource StatBlueBg}">
+                                        <Image Source="{DynamicResource IconExport}" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="{loc:Localize Onboarding_Cat_Archive_Title}" FontWeight="SemiBold" FontSize="{DynamicResource FontSizeMd}"
+                                               Foreground="{DynamicResource TextPrimary}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Text="{loc:Localize Onboarding_Cat_Archive_Desc}" TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TextSecondary}" FontSize="{DynamicResource FontSizeSm}" LineHeight="18" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
                 </ScrollViewer>
             </TabItem>
 
             <!-- TAB 3: Shortcuts Cheatsheet -->
             <TabItem Header="{loc:Localize Onboarding_TabShortcuts}" AutomationProperties.AutomationId="Onboarding_Tab_Shortcuts">
                 <ScrollViewer Margin="0,12,0,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                    <StackPanel Spacing="10">
-                        <TextBlock Text="{loc:Localize Onboarding_Shortcuts_Desc}" Foreground="{StaticResource TextSecondary}" FontSize="{StaticResource FontSizeSm}" Margin="0,0,0,6" />
-                        
-                        <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="4">
-                            <!-- Row 0: Ctrl+N -->
-                            <Border Grid.Row="0" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                <TextBlock Text="Ctrl + N" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
-                            </Border>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize Onboarding_Step2_Title}" VerticalAlignment="Center" Margin="8,0" />
+                    <StackPanel Spacing="16" Margin="0,0,0,8">
+                        <TextBlock Text="{loc:Localize Onboarding_Shortcuts_Desc}" Foreground="{DynamicResource TextSecondary}"
+                                   FontSize="{DynamicResource FontSizeSm}" />
 
-                            <!-- Row 1: Ctrl+Shift+I -->
-                            <Border Grid.Row="1" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                <TextBlock Text="Ctrl + Shift + I" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
-                            </Border>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{loc:Localize Main_Menu_BatchImport}" VerticalAlignment="Center" Margin="8,0" />
+                        <!-- Group 1: Navigation & System -->
+                        <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="16">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="{loc:Localize Onboarding_Shortcuts_Nav}" FontWeight="Bold" FontSize="{DynamicResource FontSizeMd}"
+                                           Foreground="{DynamicResource AccentBrush}" />
+                                <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,4,0,0">
+                                    <!-- F1 -->
+                                    <Border Grid.Row="0" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="F1" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize Onboarding_MenuItem}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
 
-                            <!-- Row 2: Ctrl+Shift+R -->
-                            <Border Grid.Row="2" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                <TextBlock Text="Ctrl + Shift + R" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
-                            </Border>
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{loc:Localize Main_Menu_RecycleBin}" VerticalAlignment="Center" Margin="8,0" />
+                                    <!-- Alt+Left -->
+                                    <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Alt + Left" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{loc:Localize Nav_Dashboard}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
 
-                            <!-- Row 3: Ctrl+D -->
-                            <Border Grid.Row="3" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                <TextBlock Text="Ctrl + D" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
-                            </Border>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{loc:Localize Main_Menu_DuplicateDetection}" VerticalAlignment="Center" Margin="8,0" />
+                                    <!-- F5 / Ctrl+R -->
+                                    <Border Grid.Row="2" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="F5 / Ctrl + R" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{loc:Localize Menu_RefreshList}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
 
-                            <!-- Row 4: Ctrl+H -->
-                            <Border Grid.Row="4" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                <TextBlock Text="Ctrl + H" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
-                            </Border>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{loc:Localize Main_Menu_FileIntegrityCheck}" VerticalAlignment="Center" Margin="8,0" />
+                                    <!-- Ctrl+1..4 -->
+                                    <Border Grid.Row="3" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + 1..4" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{loc:Localize Menu_ChangeLanguage}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
 
-                            <!-- Row 5: Ctrl+Shift+C -->
-                            <Border Grid.Row="5" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                <TextBlock Text="Ctrl + Shift + C" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
-                            </Border>
-                            <TextBlock Grid.Row="5" Grid.Column="1" Text="{loc:Localize Main_Menu_CategoryManagement}" VerticalAlignment="Center" Margin="8,0" />
+                        <!-- Group 2: Document Operations -->
+                        <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="16">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="{loc:Localize Onboarding_Shortcuts_Doc}" FontWeight="Bold" FontSize="{DynamicResource FontSizeMd}"
+                                           Foreground="{DynamicResource AccentBrush}" />
+                                <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="0,4,0,0">
+                                    <!-- Enter -->
+                                    <Border Grid.Row="0" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Enter" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize Dashboard_CtxOpenFile}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
 
-                            <!-- Row 6: Ctrl+Shift+L -->
-                            <Border Grid.Row="6" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                <TextBlock Text="Ctrl + Shift + L" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
-                            </Border>
-                            <TextBlock Grid.Row="6" Grid.Column="1" Text="{loc:Localize Main_Menu_CollectionManagement}" VerticalAlignment="Center" Margin="8,0" />
+                                    <!-- Space -->
+                                    <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Space" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{loc:Localize Dashboard_CtxMarkImportant}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
 
-                            <!-- Row 7: Alt+Left -->
-                            <Border Grid.Row="7" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                <TextBlock Text="Alt + Left" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
-                            </Border>
-                            <TextBlock Grid.Row="7" Grid.Column="1" Text="{loc:Localize Main_Menu_BackToDashboard}" VerticalAlignment="Center" Margin="8,0" />
+                                    <!-- Delete -->
+                                    <Border Grid.Row="2" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Delete" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{loc:Localize Menu_DeleteDocument}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
 
-                            <!-- Row 8: F5 / Ctrl+R -->
-                            <Border Grid.Row="8" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                <TextBlock Text="F5 / Ctrl + R" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
-                            </Border>
-                            <TextBlock Grid.Row="8" Grid.Column="1" Text="{loc:Localize Main_Menu_Refresh}" VerticalAlignment="Center" Margin="8,0" />
+                                    <!-- Ctrl+N -->
+                                    <Border Grid.Row="3" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + N" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{loc:Localize Menu_AddNewDocument}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
 
-                            <!-- Row 9: F1 -->
-                            <Border Grid.Row="9" Grid.Column="0" Background="{StaticResource SurfaceHover}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
-                                <TextBlock Text="F1" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{StaticResource FontSizeSm}" />
-                            </Border>
-                            <TextBlock Grid.Row="9" Grid.Column="1" Text="{loc:Localize Onboarding_MenuItem}" VerticalAlignment="Center" Margin="8,0" />
-                        </Grid>
+                                    <!-- Ctrl+Shift+I -->
+                                    <Border Grid.Row="4" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + Shift + I" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{loc:Localize Menu_BatchImport}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+
+                                    <!-- Ctrl+S -->
+                                    <Border Grid.Row="5" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + S" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{loc:Localize ChangeCategory_BtnSave}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Group 3: Search & Maintenance -->
+                        <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="16">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="{loc:Localize Onboarding_Shortcuts_Tools}" FontWeight="Bold" FontSize="{DynamicResource FontSizeMd}"
+                                           Foreground="{DynamicResource AccentBrush}" />
+                                <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="0,4,0,0">
+                                    <!-- Ctrl+F -->
+                                    <Border Grid.Row="0" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + F" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:Localize Search_BtnSearch}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+
+                                    <!-- Ctrl+Shift+C -->
+                                    <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + Shift + C" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{loc:Localize Menu_ManageCategories}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+
+                                    <!-- Ctrl+Shift+L -->
+                                    <Border Grid.Row="2" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + Shift + L" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{loc:Localize Menu_Collections}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+
+                                    <!-- Ctrl+Shift+R -->
+                                    <Border Grid.Row="3" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + Shift + R" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{loc:Localize Menu_RecycleBin}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+
+                                    <!-- Ctrl+D -->
+                                    <Border Grid.Row="4" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + D" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{loc:Localize Menu_FindDuplicates}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+
+                                    <!-- Ctrl+H -->
+                                    <Border Grid.Row="5" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
+                                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                                            CornerRadius="3" Padding="6,2" HorizontalAlignment="Left" Margin="0,3">
+                                        <TextBlock Text="Ctrl + H" FontWeight="Bold" FontFamily="Consolas, monospace" FontSize="{DynamicResource FontSizeSm}"
+                                                   Foreground="{DynamicResource TextPrimary}"/>
+                                    </Border>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{loc:Localize Menu_FileCheck}"
+                                               Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" Margin="8,0" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -339,33 +573,45 @@
 
         <!-- Footer Navigation Controls -->
         <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
-            <!-- Left: Skip -->
+            <!-- Left: Skip Button -->
             <Button Grid.Column="0"
                     Name="SkipButton"
                     Content="{loc:Localize Onboarding_Skip}"
                     AutomationProperties.AutomationId="Onboarding_Skip"
+                    AutomationProperties.Name="{loc:Localize Onboarding_Skip}"
+                    AutomationProperties.HelpText="{loc:Localize Onboarding_Skip}"
                     Classes="secondary"
                     IsCancel="True"
+                    Padding="{DynamicResource PaddingBtnMd}"
                     Command="{Binding SkipCommand}" />
 
-            <!-- Right: Step Navigation & Finish -->
+            <!-- Right: Step Navigation & Finish Buttons -->
             <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
                 <Button Name="PrevButton"
                         Content="{loc:Localize Onboarding_Prev}"
                         AutomationProperties.AutomationId="Onboarding_Prev"
+                        AutomationProperties.Name="{loc:Localize Onboarding_Prev}"
+                        AutomationProperties.HelpText="{loc:Localize Onboarding_Prev}"
                         Classes="secondary"
+                        Padding="{DynamicResource PaddingBtnMd}"
                         IsVisible="{Binding CanGoPrevious}"
                         Command="{Binding PreviousStepCommand}" />
                 <Button Name="NextButton"
                         Content="{loc:Localize Onboarding_Next}"
                         AutomationProperties.AutomationId="Onboarding_Next"
+                        AutomationProperties.Name="{loc:Localize Onboarding_Next}"
+                        AutomationProperties.HelpText="{loc:Localize Onboarding_Next}"
                         Classes="primary"
+                        Padding="{DynamicResource PaddingBtnMd}"
                         IsVisible="{Binding CanGoNext}"
                         Command="{Binding NextStepCommand}" />
                 <Button Name="FinishButton"
                         Content="{loc:Localize Onboarding_Start}"
                         AutomationProperties.AutomationId="Onboarding_Finish"
+                        AutomationProperties.Name="{loc:Localize Onboarding_Start}"
+                        AutomationProperties.HelpText="{loc:Localize Onboarding_Start}"
                         Classes="primary"
+                        Padding="{DynamicResource PaddingBtnMd}"
                         IsDefault="True"
                         IsVisible="{Binding IsLastStep}"
                         Command="{Binding FinishCommand}" />

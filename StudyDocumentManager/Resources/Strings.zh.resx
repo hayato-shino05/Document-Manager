@@ -783,6 +783,7 @@
   <data name="FileIntegrity_ColName" xml:space="preserve"><value>文档名称</value></data>
   <data name="FileIntegrity_ColPath" xml:space="preserve"><value>文件路径</value></data>
   <data name="FileIntegrity_ColStatus" xml:space="preserve"><value>状态</value></data>
+  <data name="Context_CopyPath" xml:space="preserve"><value>复制路径</value></data>
   <data name="PersonalNote_Title" xml:space="preserve"><value>个人备注</value></data>
   <data name="PersonalNote_BtnSave" xml:space="preserve"><value>保存</value></data>
   <data name="PersonalNote_BtnDelete" xml:space="preserve"><value>删除</value></data>
@@ -1128,13 +1129,24 @@
   <data name="OW_Conf_Internal" xml:space="preserve"><value>内部</value></data>
   <data name="OW_Conf_Confidential" xml:space="preserve"><value>机密</value></data>
   <data name="OW_Conf_Restricted" xml:space="preserve"><value>绝密</value></data>
+  <data name="Common_All" xml:space="preserve"><value>全部</value></data>
+  <data name="Action_Back" xml:space="preserve"><value>返回</value></data>
+  <data name="Search_Watermark" xml:space="preserve"><value>按名称、编号、公司等搜索...</value></data>
+  <data name="Details_Title" xml:space="preserve"><value>业务元数据</value></data>
+  <data name="OW_EmptySelection" xml:space="preserve"><value>请选择文档</value></data>
+  <data name="OW_EmptySelectionDesc" xml:space="preserve"><value>从列表中选择文档以编辑其详细信息。</value></data>
+  <data name="SW_AcademicContext" xml:space="preserve"><value>学习上下文 (Academic Context)</value></data>
+  <data name="SW_EmptyCourses" xml:space="preserve"><value>尚未登记课程</value></data>
+  <data name="SW_EmptySemesters" xml:space="preserve"><value>尚未登记学期</value></data>
+  <data name="SW_EmptyAssignments" xml:space="preserve"><value>暂无作业</value></data>
+  <data name="SW_EmptyAssignmentSelect" xml:space="preserve"><value>请选择一个作业或点击“添加作业”进行创建</value></data>
   <data name="OW_Error_FileNotFound" xml:space="preserve"><value>找不到文件: {0}</value></data>
   <data name="Onboarding_TabTour" xml:space="preserve"><value>快速教程 (5步)</value></data>
   <data name="Onboarding_TabCatalog" xml:space="preserve"><value>功能指南</value></data>
   <data name="Onboarding_TabShortcuts" xml:space="preserve"><value>快捷键列表</value></data>
   <data name="Onboarding_Step1_Title" xml:space="preserve"><value>1. 搜索与快速筛选</value></data>
-  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>在主界面按标题、作者或标签即时搜索文档。使用快速状态筛选（紧急、普通、已完成）轻松跟踪截止日期。</value></data>
-  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>提示：随时按 F5 或 Ctrl+R 刷新视图。</value></data>
+  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>仪表板提供时段问候、重要/临期文档智能摘要，以及一键重开最近文档的快捷入口。支持按关键词极速搜索与状态过滤。</value></data>
+  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>提示：在文档列表上，可使用 Enter（打开）、Space（标记重要）、Delete（移至回收站）进行纯键盘极速操作。</value></data>
   <data name="Onboarding_Step2_Title" xml:space="preserve"><value>2. 添加文档与拖放文件</value></data>
   <data name="Onboarding_Step2_Desc" xml:space="preserve"><value>点击“添加文档”（Ctrl+N）或直接将文件（PDF、Word、Excel、图片等）从文件管理器拖放到应用窗口中（Windows 和 Linux 均完美支持）。</value></data>
   <data name="Onboarding_Step2_Tip" xml:space="preserve"><value>提示：如需一次性导入多个文件，请使用“批量导入”（Ctrl+Shift+I）。</value></data>
@@ -1147,9 +1159,9 @@
   <data name="Onboarding_Step5_Title" xml:space="preserve"><value>5. 回收站、恢复中心与ZIP归档</value></data>
   <data name="Onboarding_Step5_Desc" xml:space="preserve"><value>删除的文档保存在“回收站”（Ctrl+Shift+R）中，支持多选批量恢复。“恢复中心”提供数据库备份与恢复，并支持个人文档 ZIP 导出/导入。</value></data>
   <data name="Onboarding_Step5_Tip" xml:space="preserve"><value>提示：定期在恢复中心创建数据库快照以确保数据安全。</value></data>
-  <data name="Onboarding_Next" xml:space="preserve"><value>下一步 ➔</value></data>
-  <data name="Onboarding_Prev" xml:space="preserve"><value>⬅ 返回</value></data>
-  <data name="Onboarding_Start" xml:space="preserve"><value>🎉 开始使用</value></data>
+  <data name="Onboarding_Next" xml:space="preserve"><value>下一步</value></data>
+  <data name="Onboarding_Prev" xml:space="preserve"><value>返回</value></data>
+  <data name="Onboarding_Start" xml:space="preserve"><value>开始使用</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Title" xml:space="preserve"><value>文件夹自动监控 (Watched Folder)</value></data>
   <data name="Onboarding_Cat_WatchedFolder_Desc" xml:space="preserve"><value>在后台持续监控指定文件夹，发现新文件时自动将其列入导入候选。</value></data>
   <data name="Onboarding_Cat_Inbox_Title" xml:space="preserve"><value>导入收件箱 (Import Inbox)</value></data>
@@ -1164,4 +1176,19 @@
   <data name="Onboarding_Cat_Lang_Desc" xml:space="preserve"><value>支持日语、英语、越南语、中文，可在右上角菜单即时切换。</value></data>
   <data name="Onboarding_Shortcuts_Title" xml:space="preserve"><value>全局快捷键</value></data>
   <data name="Onboarding_Shortcuts_Desc" xml:space="preserve"><value>通过键盘快捷键快速访问核心功能，全面提升日常办公效率。</value></data>
+  <data name="Onboarding_Shortcuts_Nav" xml:space="preserve"><value>导航与常规</value></data>
+  <data name="Onboarding_Shortcuts_Doc" xml:space="preserve"><value>文档操作与工作区</value></data>
+  <data name="Onboarding_Shortcuts_Tools" xml:space="preserve"><value>搜索与维护</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>显示语言</value></data>
+  <data name="Dashboard_GreetingMorning" xml:space="preserve"><value>早上好</value></data>
+  <data name="Dashboard_GreetingAfternoon" xml:space="preserve"><value>下午好</value></data>
+  <data name="Dashboard_GreetingEvening" xml:space="preserve"><value>晚上好</value></data>
+  <data name="Dashboard_GreetingSummary" xml:space="preserve"><value>您有 {0} 份重要文档和 {1} 份即将到期的文档。</value></data>
+  <data name="Dashboard_RecentQuickAccess" xml:space="preserve"><value>最近打开的文档</value></data>
+  <data name="Dashboard_DragDropToastSingle" xml:space="preserve"><value>已添加文档: {0}</value></data>
+  <data name="Dashboard_DragDropToastMultiple" xml:space="preserve"><value>已成功添加 {0} 份文档</value></data>
+  <data name="Toast_TitleSuccess" xml:space="preserve"><value>成功</value></data>
+  <data name="Toast_TitleError" xml:space="preserve"><value>错误</value></data>
+  <data name="Toast_TitleWarning" xml:space="preserve"><value>警告</value></data>
+  <data name="Toast_TitleInfo" xml:space="preserve"><value>提示</value></data>
 </root>
