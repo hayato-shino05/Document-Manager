@@ -369,5 +369,84 @@ public sealed class ViewVisualEvaluationTests
         dialog.Close();
         Dispatcher.UIThread.RunJobs();
     }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_AddDocumentDialog_RendersSuccessfully()
+    {
+        var dialog = new AddDocumentDialog(@"C:\docs\Test.pdf", new[] { "Math", "Science" }, new[] { "PDF", "Word" });
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_AddDocument", screenId);
+
+        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        Assert.True(buttons.Count >= 2);
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_AddToCollectionDialog_RendersSuccessfully()
+    {
+        var loc = App.Services!.GetRequiredService<StudyDocumentManager.Core.Interfaces.ILocalizationService>();
+        var candidates = new List<StudyDocumentManager.Core.Entities.StudyDocument>
+        {
+            new() { Id = 1, Name = "Doc 1.pdf", FilePath = @"C:\docs\Doc1.pdf", FileSize = 1.0, Subject = "Math", Type = "PDF", CreatedAt = DateTime.UtcNow }
+        };
+        var dialog = new AddToCollectionDialog(candidates, new HashSet<int>(), "Math Collection", loc);
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_AddToCollection", screenId);
+
+        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        Assert.NotEmpty(buttons);
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_ChangeCategoryDialog_RendersSuccessfully()
+    {
+        var loc = App.Services?.GetService<StudyDocumentManager.Core.Interfaces.ILocalizationService>();
+        var dialog = new ChangeCategoryDialog("TestDoc", new[] { "Math", "Physics" }, "Math", loc);
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_ChangeCategory", screenId);
+
+        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        Assert.True(buttons.Count >= 2);
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_SelectCollectionDialog_RendersSuccessfully()
+    {
+        var collections = new List<(int Id, string Name, int DocCount)>
+        {
+            (1, "Collection A", 5)
+        };
+        var loc = App.Services?.GetService<StudyDocumentManager.Core.Interfaces.ILocalizationService>();
+        var dialog = new SelectCollectionDialog("TestDoc", collections, loc);
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_SelectCollection", screenId);
+
+        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        Assert.True(buttons.Count >= 2);
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
 }
 

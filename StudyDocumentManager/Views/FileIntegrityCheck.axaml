@@ -14,15 +14,15 @@
                     <TextBlock Text="{loc:Localize FileIntegrity_Title}" FontSize="{StaticResource FontSizeXl}"
                                FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Button Classes="primary"
                             AutomationProperties.AutomationId="FileIntegrity_Scan"
                             AutomationProperties.Name="{loc:Localize FileIntegrity_BtnScan}"
                             Command="{Binding CheckIntegrityCommand}"
                             IsEnabled="{Binding !IsChecking}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{StaticResource FontSizeSm}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                            <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary"
@@ -31,14 +31,14 @@
                             Command="{Binding RetryMissingCommand}"
                             IsVisible="{Binding Results.Count}"
                             IsEnabled="{Binding !IsChecking}">
-                        <TextBlock Text="{loc:Localize FileIntegrity_BtnRetryMissing}" FontSize="{StaticResource FontSizeSm}"/>
+                        <TextBlock Text="{loc:Localize FileIntegrity_BtnRetryMissing}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                     </Button>
                     <Button Classes="secondary"
                             AutomationProperties.AutomationId="FileIntegrity_Cancel"
                             AutomationProperties.Name="{loc:Localize FileIntegrity_BtnCancel}"
                             Command="{Binding CancelCheckCommand}"
                             IsVisible="{Binding IsChecking}">
-                        <TextBlock Text="{loc:Localize FileIntegrity_BtnCancel}" FontSize="{StaticResource FontSizeSm}"/>
+                        <TextBlock Text="{loc:Localize FileIntegrity_BtnCancel}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                     </Button>
                 </StackPanel>
             </DockPanel>

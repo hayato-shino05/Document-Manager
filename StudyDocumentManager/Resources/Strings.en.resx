@@ -540,6 +540,7 @@ Please check your network connection.</value></data>
   <data name="FileIntegrity_ColName" xml:space="preserve"><value>Document Name</value></data>
   <data name="FileIntegrity_ColPath" xml:space="preserve"><value>File Path</value></data>
   <data name="FileIntegrity_ColStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="Context_CopyPath" xml:space="preserve"><value>Copy Path</value></data>
   <data name="PersonalNote_Title" xml:space="preserve"><value>Personal Note</value></data>
   <data name="PersonalNote_BtnSave" xml:space="preserve"><value>Save</value></data>
   <data name="PersonalNote_BtnDelete" xml:space="preserve"><value>Delete</value></data>

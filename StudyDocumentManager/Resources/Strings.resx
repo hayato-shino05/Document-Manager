@@ -623,6 +623,7 @@
   <data name="FileIntegrity_ColName" xml:space="preserve"><value>文書名</value></data>
   <data name="FileIntegrity_ColPath" xml:space="preserve"><value>ファイルパス</value></data>
   <data name="FileIntegrity_ColStatus" xml:space="preserve"><value>状態</value></data>
+  <data name="Context_CopyPath" xml:space="preserve"><value>パスをコピー</value></data>
 
   <!-- PersonalNote View -->
   <data name="PersonalNote_Title" xml:space="preserve"><value>個人メモ</value></data>

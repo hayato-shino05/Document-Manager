@@ -15,13 +15,13 @@
                                Text="{loc:Localize DuplicateDetection_Title}" FontSize="{StaticResource FontSizeXl}"
                                FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                 </StackPanel>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Button Classes="primary" AutomationProperties.AutomationId="DuplicateDetection_Scan"
                             AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnScan}"
                             Command="{Binding ScanDuplicatesCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize DuplicateDetection_BtnScan}" FontSize="{StaticResource FontSizeSm}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                            <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Localize DuplicateDetection_BtnScan}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>

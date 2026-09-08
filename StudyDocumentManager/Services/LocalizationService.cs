@@ -30,17 +30,11 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
         ApplyCurrentCulture();
     }
 
-    private int _indexerCallCount;
-
     public string this[string key]
     {
         get
         {
-            _indexerCallCount++;
             var value = _resourceManager.GetString(key, _culture);
-            // 言語切替後のbinding再評価を確認（最初の大量呼び出しはスキップ）
-            if (_indexerCallCount > 50)
-                System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] Indexer['{key}'] → '{value}' (culture={_culture.Name})");
             return value ?? $"[{key}]";
         }
     }
@@ -49,23 +43,16 @@ public class LocalizationService : ILocalizationService, INotifyPropertyChanged
 
     public void SetLanguage(SupportedLanguage language)
     {
-        System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] SetLanguage called: requested={language}, current={CurrentLanguage}");
         if (CurrentLanguage == language)
-        {
-            System.Diagnostics.Debug.WriteLine("[LANG-DEBUG] SetLanguage SKIPPED (same language)");
             return;
-        }
 
         CurrentLanguage = language;
         _culture = new CultureInfo(CultureMap[language]);
         ApplyCurrentCulture();
 
-        System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] Culture set to '{_culture.Name}', firing events...");
         LanguageChanged?.Invoke(this, EventArgs.Empty);
-        _indexerCallCount = 0;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Item[]"));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
-        System.Diagnostics.Debug.WriteLine($"[LANG-DEBUG] PropertyChanged fired, indexer re-reads={_indexerCallCount}, subscribers={PropertyChanged?.GetInvocationList().Length ?? 0}");
     }
 
     private void ApplyCurrentCulture()
