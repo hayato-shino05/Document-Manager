@@ -1015,16 +1015,31 @@ public partial class DashboardModel : ModelBase, IDisposable
         _navigationService.NavigateTo("related-docs", (SelectedDocument.Id, SelectedDocument.Name));
     }
 
-    // ——— Context menu actions ——— 
     [RelayCommand]
     private async Task CopyPathAsync()
     {
-        if (SelectedDocument == null || string.IsNullOrEmpty(SelectedDocument.FilePath)) return;
+        var doc = SelectedDocument ?? Documents.FirstOrDefault();
+        if (doc == null)
+        {
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Notice"], _loc["Dashboard_EmptyState"]);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(doc.FilePath))
+        {
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Notice"], _loc["Integrity_FileNotExist"]);
+            return;
+        }
+
         try
         {
-            await _clipboardService.SetTextAsync(SelectedDocument.FilePath);
+            await _clipboardService.SetTextAsync(doc.FilePath);
+            SetLocalizedStatus("Integrity_PathCopied");
         }
-        catch { }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], ex.Message);
+        }
     }
 
     [RelayCommand]
@@ -1140,14 +1155,43 @@ public partial class DashboardModel : ModelBase, IDisposable
     }
 
     [RelayCommand]
-    private void OpenFolder()
+    private async Task OpenFolderAsync()
     {
-        if (SelectedDocument == null || string.IsNullOrEmpty(SelectedDocument.FilePath)) return;
+        var doc = SelectedDocument ?? Documents.FirstOrDefault();
+        if (doc == null)
+        {
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Notice"], _loc["Dashboard_EmptyState"]);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(doc.FilePath))
+        {
+            await _dialogService.ShowMessageAsync(_loc["Dialog_Notice"], _loc["Integrity_FileNotExist"]);
+            return;
+        }
+
+        var path = doc.FilePath;
+        var dir = Directory.Exists(path) ? path : Path.GetDirectoryName(path);
+
+        if (string.IsNullOrEmpty(dir) || !Directory.Exists(dir))
+        {
+            var confirmed = await _dialogService.ShowConfirmAsync(
+                _loc["Dialog_Notice"],
+                _loc["Dashboard_FileMissingMessage"],
+                _loc["Menu_FileCheck"]);
+            if (confirmed)
+                _navigationService.NavigateTo("fileintegrity");
+            return;
+        }
+
         try
         {
-            _processLauncher.RevealInExplorer(SelectedDocument.FilePath);
+            _processLauncher.RevealInExplorer(path);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            await _dialogService.ShowErrorAsync(_loc["Dialog_Error"], ex.Message);
+        }
     }
 
     // 期限クイックフィルター

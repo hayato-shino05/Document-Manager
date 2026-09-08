@@ -348,6 +348,16 @@
             </DrawingGroup>
         </DrawingImage>
 
+        <!-- Folder (standard directory icon) -->
+        <DrawingImage x:Key="IconFolder">
+            <DrawingGroup>
+                <GeometryDrawing Brush="{StaticResource BrushIconFolderBase}"
+                    Geometry="M2,6 L2,19 C2,20.1 2.9,21 4,21 L20,21 C21.1,21 22,20.1 22,19 L22,8 C22,6.9 21.1,6 20,6 L12,6 L10,3 L4,3 C2.9,3 2,3.9 2,5 Z"/>
+                <GeometryDrawing Brush="{StaticResource BrushIconFolderFlap}"
+                    Geometry="M1,10 L7,10 L8,7 L22,7 L20,21 L2,21 Z"/>
+            </DrawingGroup>
+        </DrawingImage>
+
         <!-- Export (upload arrow) -->
         <DrawingImage x:Key="IconExport">
             <DrawingGroup>

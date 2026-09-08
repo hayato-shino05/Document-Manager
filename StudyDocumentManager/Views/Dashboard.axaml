@@ -798,9 +798,9 @@
                                     IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
                                     Margin="4,0" Height="{DynamicResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipCopyPath}">
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <Image Source="{DynamicResource IconClipboard}" Width="12" Height="12"/>
-                                    <TextBlock Text="{loc:Localize Dashboard_CtxCopyPath}" FontSize="{DynamicResource FontSizeXs}"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                    <Image Source="{DynamicResource IconClipboard}" Width="12" Height="12" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{loc:Localize Dashboard_CtxCopyPath}" FontSize="{DynamicResource FontSizeXs}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                             <Button x:Name="StatusOpenFolderButton" Grid.Column="5" Classes="secondary" Padding="{DynamicResource PaddingBtnSm}"
@@ -811,9 +811,9 @@
                                     IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
                                     Margin="4,0" Height="{DynamicResource HeightButton}" VerticalAlignment="Center"
                                     ToolTip.Tip="{loc:Localize Dashboard_TipOpenFolder}">
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <Image Source="{DynamicResource IconFolder}" Width="12" Height="12"/>
-                                    <TextBlock Text="{loc:Localize Dashboard_BtnOpenFolder}" FontSize="{DynamicResource FontSizeXs}"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                    <Image Source="{DynamicResource IconFolder}" Width="12" Height="12" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{loc:Localize Dashboard_BtnOpenFolder}" FontSize="{DynamicResource FontSizeXs}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                             <Button Grid.Column="6" Classes="secondary" Padding="{DynamicResource PaddingBtnSm}"

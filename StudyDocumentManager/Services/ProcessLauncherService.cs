@@ -40,11 +40,24 @@ public class ProcessLauncherService : IProcessLauncherService
 
     public void RevealInExplorer(string filePath)
     {
+        if (string.IsNullOrWhiteSpace(filePath))
+            return;
+
         if (_platformInfo.IsLinux)
         {
-            var directory = Path.GetDirectoryName(filePath);
+            var directory = Directory.Exists(filePath) ? filePath : Path.GetDirectoryName(filePath);
             if (!string.IsNullOrEmpty(directory) && Directory.Exists(directory))
                 StartLinuxTarget(directory);
+            return;
+        }
+
+        if (Directory.Exists(filePath))
+        {
+            _startProcess(new ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = $"\"{filePath}\""
+            });
             return;
         }
 
