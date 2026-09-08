@@ -113,6 +113,10 @@ public class ModernizedAllViewsScreenshotTests
         // 8. BatchImport
         var biModel = services.GetRequiredService<BatchImportModel>();
         SaveRenderedView(new BatchImport { DataContext = biModel }, 1200, 750, "fresh_06_BatchImport.png");
+
+        // 9. RecentFiles
+        var rfModel = services.GetRequiredService<RecentFilesModel>();
+        SaveRenderedView(new RecentFiles { DataContext = rfModel }, 1200, 750, "recent_files_current.png");
     }
 
     [AvaloniaFact]
