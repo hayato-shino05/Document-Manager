@@ -503,46 +503,46 @@
                                     <!-- Primary actions -->
                                     <MenuItem AutomationProperties.AutomationId="Context_OpenFile"
                                               Header="{loc:Localize Dashboard_CtxOpenFile}"
-                                              Command="{Binding $parent[DataGrid].DataContext.OpenFileCommand}">
+                                              Command="{Binding $parent[UserControl].DataContext.OpenFileCommand}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconDocPage}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_EditDocument"
                                               Header="{loc:Localize Dashboard_CtxEditDoc}"
-                                              Command="{Binding $parent[DataGrid].DataContext.EditDocumentCommand}">
+                                              Command="{Binding $parent[UserControl].DataContext.EditDocumentCommand}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconEdit}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_ChangeCategory"
                                               Header="{loc:Localize Dashboard_CtxChangeCategory}"
-                                              Command="{Binding $parent[DataGrid].DataContext.ChangeCategoryCommand}">
+                                              Command="{Binding $parent[UserControl].DataContext.ChangeCategoryCommand}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconCategory}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_DeleteToTrash"
                                               Header="{loc:Localize Dashboard_CtxDeleteToTrash}"
-                                              Command="{Binding $parent[DataGrid].DataContext.DeleteDocumentCommand}">
+                                              Command="{Binding $parent[UserControl].DataContext.DeleteDocumentCommand}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconDelete}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
                                     <!-- Copy & Open -->
                                     <MenuItem AutomationProperties.AutomationId="Context_CopyName"
                                               Header="{loc:Localize Dashboard_CtxCopyName}"
-                                              Command="{Binding $parent[DataGrid].DataContext.CopyNameCommand}">
+                                              Command="{Binding $parent[UserControl].DataContext.CopyNameCommand}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconClipboard}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_CopyPath"
                                               Header="{loc:Localize Dashboard_CtxCopyPath}"
-                                              Command="{Binding $parent[DataGrid].DataContext.CopyPathCommand}">
+                                              Command="{Binding $parent[UserControl].DataContext.CopyPathCommand}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconExport}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_OpenFolder"
                                               Header="{loc:Localize Dashboard_CtxOpenFolder}"
-                                              Command="{Binding $parent[DataGrid].DataContext.OpenFolderCommand}">
+                                              Command="{Binding $parent[UserControl].DataContext.OpenFolderCommand}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconOpenFile}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
                                     <!-- Quick-edit hidden fields -->
                                     <MenuItem AutomationProperties.AutomationId="Context_EditTags"
                                               Header="{loc:Localize Dashboard_CtxEditTags}"
-                                              Command="{Binding $parent[DataGrid].DataContext.QuickEditTagsCommand}"
+                                              Command="{Binding $parent[UserControl].DataContext.QuickEditTagsCommand}"
                                               ToolTip.Tip="{loc:Localize Dashboard_TipEditTags}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconTag}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
@@ -550,24 +550,24 @@
                                     <!-- Mark & manage -->
                                     <MenuItem AutomationProperties.AutomationId="Context_MarkImportant"
                                               Header="{loc:Localize Dashboard_CtxMarkImportant}"
-                                              Command="{Binding $parent[DataGrid].DataContext.ToggleImportantCommand}">
+                                              Command="{Binding $parent[UserControl].DataContext.ToggleImportantCommand}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconStar}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_PersonalNote"
                                               Header="{loc:Localize Dashboard_CtxPersonalNote}"
-                                              Command="{Binding $parent[DataGrid].DataContext.OpenPersonalNoteCommand}"
+                                              Command="{Binding $parent[UserControl].DataContext.OpenPersonalNoteCommand}"
                                               ToolTip.Tip="{loc:Localize Dashboard_TipPersonalNote}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconNote}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem AutomationProperties.AutomationId="Context_AddToCollection"
                                               Header="{loc:Localize Dashboard_CtxAddToCollection}"
-                                              Command="{Binding $parent[DataGrid].DataContext.AddToCollectionCommand}">
+                                              Command="{Binding $parent[UserControl].DataContext.AddToCollectionCommand}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconAdd}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                     <Separator/>
                                     <MenuItem AutomationProperties.AutomationId="Context_RelatedDocuments"
                                               Header="{loc:Localize Dashboard_CtxRelatedDocs}"
-                                              Command="{Binding $parent[DataGrid].DataContext.OpenRelatedDocumentsCommand}">
+                                              Command="{Binding $parent[UserControl].DataContext.OpenRelatedDocumentsCommand}">
                                         <MenuItem.Icon><Image Source="{DynamicResource IconRelatedDocs}" Width="14" Height="14"/></MenuItem.Icon>
                                     </MenuItem>
                                 </ContextMenu>
@@ -613,7 +613,7 @@
                                                     HorizontalAlignment="Center" VerticalAlignment="Center"
                                                     AutomationProperties.Name="{loc:Localize Dashboard_A11yToggleImportant}"
                                                     ToolTip.Tip="{loc:Localize Dashboard_A11yToggleImportant}"
-                                                    Command="{Binding $parent[DataGrid].DataContext.ToggleImportantInlineCommand}"
+                                                    Command="{Binding $parent[UserControl].DataContext.ToggleImportantInlineCommand}"
                                                     CommandParameter="{Binding}">
                                                 <Panel>
                                                     <Image Source="{DynamicResource IconStar}" Width="14" Height="14"
@@ -667,82 +667,88 @@
                     </Border>
 
                     <!-- ═══ DOCUMENT PREVIEW PANEL (Collapsible metadata card) ═══ -->
-                    <Border Grid.Row="2"
-                            IsVisible="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
-                            Background="{DynamicResource SidebarBackground}"
-                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0"
-                            Padding="{DynamicResource PaddingCardLg}" MaxHeight="140">
-                        <Grid ColumnDefinitions="Auto,*">
+                    <ContentControl Grid.Row="2"
+                                    Content="{Binding SelectedDocument}"
+                                    IsVisible="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <ContentControl.ContentTemplate>
+                            <DataTemplate DataType="{x:Type core:StudyDocument}">
+                                <Border Background="{DynamicResource SidebarBackground}"
+                                        BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0"
+                                        Padding="{DynamicResource PaddingCardLg}" MaxHeight="140">
+                                    <Grid ColumnDefinitions="Auto,*">
 
-                            <!-- Image preview (show for image files) -->
-                            <Border CornerRadius="{DynamicResource RadiusMd}" ClipToBounds="True"
-                                    Width="100" Height="100" Margin="0,0,16,0"
-                                    Background="{DynamicResource CardBackground}"
-                                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1">
-                                <Panel>
-                                    <!-- Document type icon -->
-                                    <Image Source="{DynamicResource IconDocPage}" Width="40" Height="40"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center"
-                                           Opacity="0.6"/>
-                                </Panel>
-                            </Border>
+                                        <!-- Image preview (show for image files) -->
+                                        <Border CornerRadius="{DynamicResource RadiusMd}" ClipToBounds="True"
+                                                Width="100" Height="100" Margin="0,0,16,0"
+                                                Background="{DynamicResource CardBackground}"
+                                                BorderBrush="{DynamicResource CardBorder}" BorderThickness="1">
+                                            <Panel>
+                                                <!-- Document type icon -->
+                                                <Image Source="{DynamicResource IconDocPage}" Width="40" Height="40"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       Opacity="0.6"/>
+                                            </Panel>
+                                        </Border>
 
-                            <!-- Metadata -->
-                            <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding SelectedDocument.Name}" FontSize="{DynamicResource FontSizeLg}" FontWeight="Bold"
-                                            Foreground="{DynamicResource TextPrimary}"
-                                            TextTrimming="CharacterEllipsis"
-                                            ToolTip.Tip="{Binding SelectedDocument.Name}"/>
-                                <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <Image Source="{DynamicResource IconCategory}" Width="12" Height="12"/>
-                                        <TextBlock Text="{Binding SelectedDocument.Subject}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextSecondary}"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <Image Source="{DynamicResource IconDocPage}" Width="12" Height="12"/>
-                                        <TextBlock Text="{Binding SelectedDocument.Type}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextSecondary}"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="4"
-                                                IsVisible="{Binding SelectedDocument.IsImportant}">
-                                        <Image Source="{DynamicResource IconStar}" Width="12" Height="12"/>
-                                        <TextBlock Text="{loc:Localize Dashboard_PreviewImportant}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource WarningBrush}"/>
-                                    </StackPanel>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <Image Source="{DynamicResource IconOpenFile}" Width="11" Height="11"/>
-                                    <TextBlock Text="{Binding SelectedDocument.FilePath}" FontSize="{DynamicResource FontSizeXs}"
-                                                Foreground="{DynamicResource TextMuted}" TextTrimming="CharacterEllipsis"
-                                                ToolTip.Tip="{Binding SelectedDocument.FilePath}"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <Image Source="{DynamicResource IconCalendar}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding SelectedDocument.CreatedAt, StringFormat=\{0:dd/MM/yyyy HH:mm\}}"
-                                                   FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource TextMuted}"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="4"
-                                                IsVisible="{Binding SelectedDocument.FileSize, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <Image Source="{DynamicResource IconHDD}" Width="11" Height="11"/>
-                                        <TextBlock Text="{Binding SelectedDocument.FileSize, StringFormat=\{0:F2\} MB}"
-                                                   FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource TextMuted}"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="4"
-                                                IsVisible="{Binding SelectedDocument.Deadline, Converter={x:Static ObjectConverters.IsNotNull}}">
-                                        <Image Source="{DynamicResource IconClock}" Width="14" Height="14"/>
-                                        <TextBlock Text="{Binding SelectedDocument.Deadline, StringFormat={loc:Localize Dashboard_PreviewDeadline}}"
-                                                   FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource DangerBrush}"/>
-                                    </StackPanel>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="4"
-                                            IsVisible="{Binding SelectedDocument.Tags, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                                    <Image Source="{DynamicResource IconTag}" Width="11" Height="11"/>
-                                    <TextBlock Text="{Binding SelectedDocument.Tags}" FontSize="{DynamicResource FontSizeXs}"
-                                                Foreground="{DynamicResource TextMuted}" TextTrimming="CharacterEllipsis"
-                                                ToolTip.Tip="{Binding SelectedDocument.Tags}"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
+                                        <!-- Metadata -->
+                                        <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontSize="{DynamicResource FontSizeLg}" FontWeight="Bold"
+                                                       Foreground="{DynamicResource TextPrimary}"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       ToolTip.Tip="{Binding Name}"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <Image Source="{DynamicResource IconCategory}" Width="12" Height="12"/>
+                                                    <TextBlock Text="{Binding Subject}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextSecondary}"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <Image Source="{DynamicResource IconDocPage}" Width="12" Height="12"/>
+                                                    <TextBlock Text="{Binding Type}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextSecondary}"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="4"
+                                                            IsVisible="{Binding IsImportant}">
+                                                    <Image Source="{DynamicResource IconStar}" Width="12" Height="12"/>
+                                                    <TextBlock Text="{loc:Localize Dashboard_PreviewImportant}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource WarningBrush}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <Image Source="{DynamicResource IconOpenFile}" Width="11" Height="11"/>
+                                                <TextBlock Text="{Binding FilePath}" FontSize="{DynamicResource FontSizeXs}"
+                                                           Foreground="{DynamicResource TextMuted}" TextTrimming="CharacterEllipsis"
+                                                           ToolTip.Tip="{Binding FilePath}"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <Image Source="{DynamicResource IconCalendar}" Width="11" Height="11"/>
+                                                    <TextBlock Text="{Binding CreatedAt, StringFormat=\{0:dd/MM/yyyy HH:mm\}}"
+                                                               FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource TextMuted}"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="4"
+                                                            IsVisible="{Binding FileSize, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                                    <Image Source="{DynamicResource IconHDD}" Width="11" Height="11"/>
+                                                    <TextBlock Text="{Binding FileSize, StringFormat=\{0:F2\} MB}"
+                                                               FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource TextMuted}"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="4"
+                                                            IsVisible="{Binding Deadline, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                                    <Image Source="{DynamicResource IconClock}" Width="14" Height="14"/>
+                                                    <TextBlock Text="{Binding Deadline, StringFormat={loc:Localize Dashboard_PreviewDeadline}}"
+                                                               FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource DangerBrush}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="4"
+                                                        IsVisible="{Binding Tags, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                                <Image Source="{DynamicResource IconTag}" Width="11" Height="11"/>
+                                                <TextBlock Text="{Binding Tags}" FontSize="{DynamicResource FontSizeXs}"
+                                                           Foreground="{DynamicResource TextMuted}" TextTrimming="CharacterEllipsis"
+                                                           ToolTip.Tip="{Binding Tags}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ContentControl.ContentTemplate>
+                    </ContentControl>
 
                     <!-- Status Bar -->
                     <Border Grid.Row="3" Background="{DynamicResource CardBackground}"
