@@ -119,8 +119,8 @@ public class ModernizedAllViewsScreenshotTests
         SaveRenderedView(new RecentFiles { DataContext = rfModel }, 1200, 750, "recent_files_current.png");
 
         // 10. FileIntegrityCheck
-        var ficModel = services.GetRequiredService<FileIntegrityCheckModel>();
-        SaveRenderedView(new FileIntegrityCheck { DataContext = ficModel }, 1200, 750, "fresh_file_integrity.png");
+        var fiModel = services.GetRequiredService<FileIntegrityCheckModel>();
+        SaveRenderedView(new FileIntegrityCheck { DataContext = fiModel }, 1200, 750, "fresh_file_integrity.png");
 
         // 11. DuplicateDetection
         var ddModel = services.GetRequiredService<DuplicateDetectionModel>();

@@ -1,29 +1,28 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-        xmlns:loc="using:StudyDocumentManager.Markup"
-                     x:Class="StudyDocumentManager.Views.FileIntegrityCheck"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             x:Class="StudyDocumentManager.Views.FileIntegrityCheck"
              x:DataType="vm:FileIntegrityCheckModel"
              AutomationProperties.AutomationId="Screen_FileIntegrityCheck">
 
-    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+    <Border Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
         <DockPanel>
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                    <Image Source="{StaticResource IconIntegrity}" Width="20" Height="20"/>
-                    <TextBlock Text="{loc:Localize FileIntegrity_Title}" FontSize="{StaticResource FontSizeXl}"
-                               FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                    <Image Source="{DynamicResource IconIntegrity}" Width="20" Height="20"/>
+                    <TextBlock Text="{loc:Localize FileIntegrity_Title}" FontSize="{DynamicResource FontSizeXl}"
+                               FontWeight="Bold" Foreground="{DynamicResource TextPrimary}"/>
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Button Classes="primary"
                             AutomationProperties.AutomationId="FileIntegrity_Scan"
                             AutomationProperties.Name="{loc:Localize FileIntegrity_BtnScan}"
                             Command="{Binding CheckIntegrityCommand}"
-                            IsEnabled="{Binding !IsChecking}"
-                            VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <Image Source="{StaticResource IconSearchWhite}" Width="15" Height="15" VerticalAlignment="Center"/>
-                            <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            IsEnabled="{Binding !IsChecking}">
+                        <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Image Source="{DynamicResource IconSearchWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary"
@@ -31,28 +30,26 @@
                             AutomationProperties.Name="{loc:Localize FileIntegrity_BtnRetryMissing}"
                             Command="{Binding RetryMissingCommand}"
                             IsVisible="{Binding Results.Count}"
-                            IsEnabled="{Binding !IsChecking}"
-                            VerticalAlignment="Center">
-                        <TextBlock Text="{loc:Localize FileIntegrity_BtnRetryMissing}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                            IsEnabled="{Binding !IsChecking}">
+                        <TextBlock Text="{loc:Localize FileIntegrity_BtnRetryMissing}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                     </Button>
                     <Button Classes="secondary"
                             AutomationProperties.AutomationId="FileIntegrity_Cancel"
                             AutomationProperties.Name="{loc:Localize FileIntegrity_BtnCancel}"
                             Command="{Binding CancelCheckCommand}"
-                            IsVisible="{Binding IsChecking}"
-                            VerticalAlignment="Center">
-                        <TextBlock Text="{loc:Localize FileIntegrity_BtnCancel}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                            IsVisible="{Binding IsChecking}">
+                        <TextBlock Text="{loc:Localize FileIntegrity_BtnCancel}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                     </Button>
                 </StackPanel>
             </DockPanel>
 
-            <Border DockPanel.Dock="Top" Background="{StaticResource StatBlueBg}"
-                    CornerRadius="{StaticResource RadiusMd}" Padding="{StaticResource PaddingSidebar}" Margin="0,0,0,12"
-                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+            <Border DockPanel.Dock="Top" Background="{DynamicResource StatBlueBg}"
+                    CornerRadius="{DynamicResource RadiusMd}" Padding="{DynamicResource PaddingSidebar}" Margin="0,0,0,12"
+                    BorderBrush="{DynamicResource CardBorder}" BorderThickness="1">
                 <StackPanel Orientation="Horizontal" Spacing="6">
-                    <Image Source="{StaticResource IconInfo}" Width="13" Height="13"/>
+                    <Image Source="{DynamicResource IconInfo}" Width="13" Height="13"/>
                     <TextBlock Text="{loc:Localize FileIntegrity_InfoHint}"
-                               FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
+                               FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextSecondary}"
                                TextWrapping="Wrap"/>
                 </StackPanel>
             </Border>
@@ -65,33 +62,33 @@
                     <TextBlock AutomationProperties.AutomationId="FileIntegrity_Checking"
                                AutomationProperties.LiveSetting="Polite"
                                Text="{loc:Localize FileIntegrity_Checking}"
-                               FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
+                               FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextSecondary}"
                                HorizontalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
             <Grid>
-                <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                        BorderBrush="{DynamicResource CardBorder}" BorderThickness="1">
                     <DockPanel>
-                        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
-                                CornerRadius="6,6,0,0" Padding="{StaticResource PaddingMd}">
+                        <Border DockPanel.Dock="Top" Background="{DynamicResource SidebarBackground}"
+                                CornerRadius="6,6,0,0" Padding="{DynamicResource PaddingMd}">
                             <StackPanel Spacing="4">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Image Source="{StaticResource IconDocPage}" Width="14" Height="14"/>
-                                    <TextBlock Text="{loc:Localize FileIntegrity_ResultHeader}" FontSize="{StaticResource FontSizeLg}"
-                                               FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                    <Image Source="{DynamicResource IconDocPage}" Width="14" Height="14"/>
+                                    <TextBlock Text="{loc:Localize FileIntegrity_ResultHeader}" FontSize="{DynamicResource FontSizeLg}"
+                                               FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
                                 </StackPanel>
                                 <TextBlock AutomationProperties.AutomationId="FileIntegrity_Status"
                                            AutomationProperties.LiveSetting="Polite"
-                                           Text="{Binding StatusText}" FontSize="{StaticResource FontSizeSm}"
-                                           Foreground="{StaticResource TextSecondary}"/>
+                                           Text="{Binding StatusText}" FontSize="{DynamicResource FontSizeSm}"
+                                           Foreground="{DynamicResource TextSecondary}"/>
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <TextBlock Text="{loc:Localize Integrity_DatabaseLocation}"
-                                               FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextMuted}"/>
+                                               FontSize="{DynamicResource FontSizeXs}" Foreground="{DynamicResource TextMuted}"/>
                                     <TextBlock AutomationProperties.AutomationId="FileIntegrity_DatabaseLocation"
-                                                Text="{Binding DatabaseLocation}" FontSize="{StaticResource FontSizeXs}"
-                                                Foreground="{StaticResource TextMuted}" TextTrimming="CharacterEllipsis"
+                                                Text="{Binding DatabaseLocation}" FontSize="{DynamicResource FontSizeXs}"
+                                                Foreground="{DynamicResource TextMuted}" TextTrimming="CharacterEllipsis"
                                                 ToolTip.Tip="{Binding DatabaseLocation}"/>
                                 </StackPanel>
                             </StackPanel>
@@ -100,89 +97,90 @@
                         <Panel>
                             <!-- Initial Prompt State (before scan) -->
                             <StackPanel IsVisible="{Binding IsInitialState}"
-                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,40">
-                                <Image Source="{StaticResource IconIntegrity}" Width="40" Height="40" Opacity="0.4" HorizontalAlignment="Center"/>
+                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12" Margin="0,40">
+                                <Image Source="{DynamicResource IconIntegrity}" Width="48" Height="48" Opacity="0.4" HorizontalAlignment="Center"/>
                                 <TextBlock Text="{loc:Localize FileIntegrity_EmptyState}"
-                                           FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
-                                           HorizontalAlignment="Center"/>
+                                           FontSize="{DynamicResource FontSizeMd}" Foreground="{DynamicResource TextMuted}"
+                                           HorizontalAlignment="Center" TextAlignment="Center"/>
                                 <Button Classes="primary" Command="{Binding CheckIntegrityCommand}"
-                                        Padding="16,8" Margin="0,4,0,0"
+                                        HorizontalAlignment="Center"
+                                        Padding="{DynamicResource PaddingBtn}" Margin="0,6,0,0"
                                         AutomationProperties.AutomationId="FileIntegrity_EmptyState_ScanButton">
-                                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <Image Source="{StaticResource IconSearchWhite}" Width="15" Height="15" VerticalAlignment="Center"/>
-                                        <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Image Source="{DynamicResource IconSearchWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
 
                             <!-- Healthy State (scanned, all files intact) -->
                             <StackPanel IsVisible="{Binding IsHealthyState}"
-                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="0,40">
-                                <Image Source="{StaticResource IconCheckSuccess}" Width="36" Height="36"/>
+                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,40">
+                                <Image Source="{DynamicResource IconCheckSuccess}" Width="44" Height="44" HorizontalAlignment="Center"/>
                                 <TextBlock AutomationProperties.AutomationId="FileIntegrity_HealthyState"
                                            AutomationProperties.LiveSetting="Polite"
                                            Text="{Binding HealthySummaryText}"
-                                           FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource SuccessText}"
+                                           FontSize="{DynamicResource FontSizeMd}" Foreground="{DynamicResource SuccessText}"
                                            FontWeight="Medium"
-                                           HorizontalAlignment="Center"/>
+                                           HorizontalAlignment="Center" TextAlignment="Center"/>
                             </StackPanel>
 
                             <ListBox IsVisible="{Binding Results.Count}"
                                      ItemsSource="{Binding Results}"
-                                     Padding="{StaticResource PaddingIcon}">
+                                     Padding="{DynamicResource PaddingIcon}">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Border CornerRadius="4" Padding="10,8" Margin="2,3"
-                                                Background="{StaticResource StatRedBg}">
+                                                Background="{DynamicResource StatRedBg}">
                                             <DockPanel>
-                                                <Image DockPanel.Dock="Left" Source="{StaticResource IconWarning}" Width="14" Height="14"
+                                                <Image DockPanel.Dock="Left" Source="{DynamicResource IconWarning}" Width="14" Height="14"
                                                        Margin="0,0,8,0" VerticalAlignment="Center"/>
                                                 <StackPanel Spacing="2">
-                                                    <TextBlock Text="{Binding Document.Name}" FontSize="{StaticResource FontSizeMd}"
-                                                                FontWeight="Medium" Foreground="{StaticResource TextPrimary}"
+                                                    <TextBlock Text="{Binding Document.Name}" FontSize="{DynamicResource FontSizeMd}"
+                                                                FontWeight="Medium" Foreground="{DynamicResource TextPrimary}"
                                                                 TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Document.Name}"/>
                                                     <TextBlock AutomationProperties.Name="{Binding FilePath}"
-                                                                Text="{Binding FilePath}" FontSize="{StaticResource FontSizeXs}"
-                                                                Foreground="{StaticResource TextSecondary}"
+                                                                Text="{Binding FilePath}" FontSize="{DynamicResource FontSizeXs}"
+                                                                Foreground="{DynamicResource TextSecondary}"
                                                                 TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding FilePath}"/>
                                                     <TextBlock AutomationProperties.LiveSetting="Polite"
-                                                               Text="{Binding Status}" FontSize="{StaticResource FontSizeXs}"
-                                                               Foreground="{StaticResource StatRedFg}"/>
+                                                                Text="{Binding Status}" FontSize="{DynamicResource FontSizeXs}"
+                                                                Foreground="{DynamicResource StatRedFg}"/>
                                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                                         <Button Classes="secondary"
                                                                 AutomationProperties.AutomationId="FileIntegrity_OpenFolder"
                                                                 AutomationProperties.Name="{loc:Localize Integrity_OpenContainingFolder}"
                                                                 IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 Command="{Binding DataContext.OpenContainingFolderCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
-                                                            <TextBlock Text="{loc:Localize Integrity_OpenContainingFolder}" FontSize="{StaticResource FontSizeXs}"/>
+                                                            <TextBlock Text="{loc:Localize Integrity_OpenContainingFolder}" FontSize="{DynamicResource FontSizeXs}"/>
                                                         </Button>
                                                         <Button Classes="secondary"
                                                                 AutomationProperties.AutomationId="FileIntegrity_CopyPath"
                                                                 AutomationProperties.Name="{loc:Localize Context_CopyPath}"
                                                                 IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 Command="{Binding DataContext.CopyPathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
-                                                            <TextBlock Text="{loc:Localize Context_CopyPath}" FontSize="{StaticResource FontSizeXs}"/>
+                                                            <TextBlock Text="{loc:Localize Context_CopyPath}" FontSize="{DynamicResource FontSizeXs}"/>
                                                         </Button>
                                                         <Button Classes="secondary"
                                                                 AutomationProperties.AutomationId="FileIntegrity_BtnRelink"
                                                                 AutomationProperties.Name="{loc:Localize FileIntegrity_BtnRelink}"
                                                                 IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 Command="{Binding DataContext.SelectNewFileCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
-                                                            <TextBlock Text="{loc:Localize FileIntegrity_BtnRelink}" FontSize="{StaticResource FontSizeXs}"/>
+                                                            <TextBlock Text="{loc:Localize FileIntegrity_BtnRelink}" FontSize="{DynamicResource FontSizeXs}"/>
                                                         </Button>
                                                         <Button Classes="danger"
                                                                 AutomationProperties.AutomationId="FileIntegrity_BtnClearPath"
                                                                 AutomationProperties.Name="{loc:Localize FileIntegrity_BtnClearPath}"
                                                                 IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 Command="{Binding DataContext.ClearFilePathCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
-                                                            <TextBlock Text="{loc:Localize FileIntegrity_BtnClearPath}" FontSize="{StaticResource FontSizeXs}"/>
+                                                            <TextBlock Text="{loc:Localize FileIntegrity_BtnClearPath}" FontSize="{DynamicResource FontSizeXs}"/>
                                                         </Button>
                                                         <Button Classes="danger"
                                                                 AutomationProperties.AutomationId="FileIntegrity_BtnDelete"
                                                                 AutomationProperties.Name="{loc:Localize Action_Delete}"
                                                                 IsEnabled="{Binding !DataContext.IsChecking, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                 Command="{Binding DataContext.DeleteDocumentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
-                                                            <TextBlock Text="{loc:Localize Action_Delete}" FontSize="{StaticResource FontSizeXs}"/>
+                                                            <TextBlock Text="{loc:Localize Action_Delete}" FontSize="{DynamicResource FontSizeXs}"/>
                                                         </Button>
                                                     </StackPanel>
                                                 </StackPanel>
