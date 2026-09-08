@@ -19,10 +19,11 @@
                             AutomationProperties.AutomationId="FileIntegrity_Scan"
                             AutomationProperties.Name="{loc:Localize FileIntegrity_BtnScan}"
                             Command="{Binding CheckIntegrityCommand}"
-                            IsEnabled="{Binding !IsChecking}">
-                        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                            <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
-                            <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                            IsEnabled="{Binding !IsChecking}"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <Image Source="{StaticResource IconSearchWhite}" Width="15" Height="15" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     <Button Classes="secondary"
@@ -30,14 +31,16 @@
                             AutomationProperties.Name="{loc:Localize FileIntegrity_BtnRetryMissing}"
                             Command="{Binding RetryMissingCommand}"
                             IsVisible="{Binding Results.Count}"
-                            IsEnabled="{Binding !IsChecking}">
+                            IsEnabled="{Binding !IsChecking}"
+                            VerticalAlignment="Center">
                         <TextBlock Text="{loc:Localize FileIntegrity_BtnRetryMissing}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                     </Button>
                     <Button Classes="secondary"
                             AutomationProperties.AutomationId="FileIntegrity_Cancel"
                             AutomationProperties.Name="{loc:Localize FileIntegrity_BtnCancel}"
                             Command="{Binding CancelCheckCommand}"
-                            IsVisible="{Binding IsChecking}">
+                            IsVisible="{Binding IsChecking}"
+                            VerticalAlignment="Center">
                         <TextBlock Text="{loc:Localize FileIntegrity_BtnCancel}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
                     </Button>
                 </StackPanel>
@@ -97,15 +100,19 @@
                         <Panel>
                             <!-- Initial Prompt State (before scan) -->
                             <StackPanel IsVisible="{Binding IsInitialState}"
-                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="0,40">
-                                <Image Source="{StaticResource IconIntegrity}" Width="36" Height="36" Opacity="0.4"/>
+                                        VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,40">
+                                <Image Source="{StaticResource IconIntegrity}" Width="40" Height="40" Opacity="0.4" HorizontalAlignment="Center"/>
                                 <TextBlock Text="{loc:Localize FileIntegrity_EmptyState}"
                                            FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
                                            HorizontalAlignment="Center"/>
                                 <Button Classes="primary" Command="{Binding CheckIntegrityCommand}"
-                                        Content="{loc:Localize FileIntegrity_BtnScan}"
-                                        Padding="{StaticResource PaddingBtnSm}" Margin="0,6,0,0"
-                                        AutomationProperties.AutomationId="FileIntegrity_EmptyState_ScanButton"/>
+                                        Padding="16,8" Margin="0,4,0,0"
+                                        AutomationProperties.AutomationId="FileIntegrity_EmptyState_ScanButton">
+                                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <Image Source="{StaticResource IconSearchWhite}" Width="15" Height="15" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{loc:Localize FileIntegrity_BtnScan}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
                             </StackPanel>
 
                             <!-- Healthy State (scanned, all files intact) -->

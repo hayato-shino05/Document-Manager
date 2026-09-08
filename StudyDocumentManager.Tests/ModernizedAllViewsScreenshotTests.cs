@@ -117,6 +117,14 @@ public class ModernizedAllViewsScreenshotTests
         // 9. RecentFiles
         var rfModel = services.GetRequiredService<RecentFilesModel>();
         SaveRenderedView(new RecentFiles { DataContext = rfModel }, 1200, 750, "recent_files_current.png");
+
+        // 10. FileIntegrityCheck
+        var ficModel = services.GetRequiredService<FileIntegrityCheckModel>();
+        SaveRenderedView(new FileIntegrityCheck { DataContext = ficModel }, 1200, 750, "fresh_file_integrity.png");
+
+        // 11. DuplicateDetection
+        var ddModel = services.GetRequiredService<DuplicateDetectionModel>();
+        SaveRenderedView(new DuplicateDetection { DataContext = ddModel }, 1200, 750, "fresh_duplicate_detection.png");
     }
 
     [AvaloniaFact]

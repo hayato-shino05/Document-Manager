@@ -30,9 +30,9 @@
                     <Button Classes="secondary" AutomationProperties.AutomationId="BulkDelete_SearchButton"
                             AutomationProperties.Name="{loc:Localize Search_BtnSearch}"
                             Command="{Binding SearchCommand}" Padding="12,5">
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Image Source="{DynamicResource IconSearch}" Width="16" Height="16"/>
-                            <TextBlock Text="{loc:Localize Search_BtnSearch}" FontSize="{DynamicResource FontSizeSm}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <Image Source="{DynamicResource IconSearch}" Width="15" Height="15" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Localize Search_BtnSearch}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 

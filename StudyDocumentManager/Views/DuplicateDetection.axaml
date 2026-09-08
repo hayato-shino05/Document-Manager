@@ -18,10 +18,11 @@
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <Button Classes="primary" AutomationProperties.AutomationId="DuplicateDetection_Scan"
                             AutomationProperties.Name="{loc:Localize DuplicateDetection_BtnScan}"
-                            Command="{Binding ScanDuplicatesCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                            <Image Source="{StaticResource IconSearchWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
-                            <TextBlock Text="{loc:Localize DuplicateDetection_BtnScan}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                            Command="{Binding ScanDuplicatesCommand}"
+                            VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <Image Source="{StaticResource IconSearchWhite}" Width="15" Height="15" VerticalAlignment="Center"/>
+                            <TextBlock Text="{loc:Localize DuplicateDetection_BtnScan}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -71,17 +72,21 @@
                     <Panel>
                         <!-- Initial Prompt State (before scan) -->
                         <StackPanel IsVisible="{Binding IsInitialState}"
-                                    VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Margin="0,40">
-                            <Image Source="{StaticResource IconDuplicate}" Width="36" Height="36" Opacity="0.4"/>
+                                    VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,40">
+                            <Image Source="{StaticResource IconDuplicate}" Width="40" Height="40" Opacity="0.4" HorizontalAlignment="Center"/>
                             <TextBlock AutomationProperties.AutomationId="DuplicateDetection_EmptyState"
                                        AutomationProperties.LiveSetting="Polite"
                                        Text="{loc:Localize DuplicateDetection_EmptyState}"
                                        FontSize="{StaticResource FontSizeMd}" Foreground="{StaticResource TextMuted}"
                                        HorizontalAlignment="Center"/>
                             <Button Classes="primary" Command="{Binding ScanDuplicatesCommand}"
-                                    Content="{loc:Localize DuplicateDetection_BtnScan}"
-                                    Padding="{StaticResource PaddingBtnSm}" Margin="0,6,0,0"
-                                    AutomationProperties.AutomationId="DuplicateDetection_EmptyState_ScanButton"/>
+                                    Padding="16,8" Margin="0,4,0,0"
+                                    AutomationProperties.AutomationId="DuplicateDetection_EmptyState_ScanButton">
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <Image Source="{StaticResource IconSearchWhite}" Width="15" Height="15" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{loc:Localize DuplicateDetection_BtnScan}" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
 
                         <!-- Clean State (scanned, no duplicates found) -->

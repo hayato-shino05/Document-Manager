@@ -35,7 +35,7 @@
                                 AutomationProperties.Name="{loc:Localize BatchImport_BtnBrowse}"
                                 Command="{Binding BrowseFolderCommand}" Padding="{DynamicResource PaddingBtnMd}" Margin="8,0,0,0"
                                 VerticalAlignment="Center">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <Image Source="{DynamicResource IconOpenFile}" Width="14" Height="14" VerticalAlignment="Center"/>
                                 <TextBlock Text="{loc:Localize BatchImport_BtnBrowse}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                             </StackPanel>
@@ -45,7 +45,7 @@
                                 AutomationProperties.Name="{loc:Localize BatchImport_BtnScan}"
                                 Command="{Binding ScanFolderCommand}" Padding="{DynamicResource PaddingBtnMd}" Margin="8,0,0,0"
                                 VerticalAlignment="Center">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <Image Source="{DynamicResource IconScanWhite}" Width="15" Height="15" VerticalAlignment="Center"/>
                                 <TextBlock Text="{loc:Localize BatchImport_BtnScan}" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             </StackPanel>
