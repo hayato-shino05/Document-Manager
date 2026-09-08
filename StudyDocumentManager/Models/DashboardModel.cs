@@ -700,10 +700,10 @@ public partial class DashboardModel : ModelBase, IDisposable
     [RelayCommand]
     private async Task OpenFileAsync()
     {
-        if (SelectedDocument == null || string.IsNullOrEmpty(SelectedDocument.FilePath))
+        if (SelectedDocument == null)
             return;
 
-        if (!File.Exists(SelectedDocument.FilePath))
+        if (string.IsNullOrEmpty(SelectedDocument.FilePath) || !File.Exists(SelectedDocument.FilePath))
         {
             var confirmed = await _dialogService.ShowConfirmAsync(
                 _loc["Dialog_Notice"],

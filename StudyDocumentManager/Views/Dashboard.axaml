@@ -613,7 +613,7 @@
                                                     HorizontalAlignment="Center" VerticalAlignment="Center"
                                                     AutomationProperties.Name="{loc:Localize Dashboard_A11yToggleImportant}"
                                                     ToolTip.Tip="{loc:Localize Dashboard_A11yToggleImportant}"
-                                                    Command="{Binding $parent[UserControl].DataContext.ToggleImportantInlineCommand}"
+                                                    Command="{Binding $parent[UserControl].DataContext.ToggleImportantInlineCommand, FallbackValue={x:Null}}"
                                                     CommandParameter="{Binding}">
                                                 <Panel>
                                                     <Image Source="{DynamicResource IconStar}" Width="14" Height="14"

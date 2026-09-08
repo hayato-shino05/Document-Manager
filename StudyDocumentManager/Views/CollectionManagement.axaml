@@ -164,9 +164,9 @@
                             <DockPanel IsVisible="{Binding SelectedCollection, Converter={x:Static ObjectConverters.IsNotNull}}">
                                 <Border DockPanel.Dock="Top" Padding="{DynamicResource PaddingMd}">
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="{Binding SelectedCollection.Name}" FontSize="{DynamicResource FontSizeLg}"
+                                        <TextBlock Text="{Binding SelectedCollection.Name, FallbackValue=''}" FontSize="{DynamicResource FontSizeLg}"
                                                    FontWeight="Bold" Foreground="{DynamicResource TextPrimary}"/>
-                                        <TextBlock Text="{Binding SelectedCollection.Description}" FontSize="{DynamicResource FontSizeSm}"
+                                        <TextBlock Text="{Binding SelectedCollection.Description, FallbackValue=''}" FontSize="{DynamicResource FontSizeSm}"
                                                    Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap"/>
                                     </StackPanel>
                                 </Border>
