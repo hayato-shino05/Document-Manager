@@ -1090,6 +1090,9 @@
   <data name="Toast_TitleError" xml:space="preserve"><value>エラー</value></data>
   <data name="Toast_TitleWarning" xml:space="preserve"><value>警告</value></data>
   <data name="Toast_TitleInfo" xml:space="preserve"><value>情報</value></data>
+  <data name="AffectedPreview_Items" xml:space="preserve"><value>対象項目一覧</value></data>
+  <data name="OW_FilterExpiry" xml:space="preserve"><value>期限フィルター</value></data>
+  <data name="OW_FilterConfidentiality" xml:space="preserve"><value>機密区分フィルター</value></data>
 </root>
 
 

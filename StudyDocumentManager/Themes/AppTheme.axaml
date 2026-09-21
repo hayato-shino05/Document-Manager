@@ -592,7 +592,7 @@
             <DrawingGroup>
                 <!-- Handle -->
                 <GeometryDrawing Brush="{StaticResource BrushIconNeutral}"
-                    Geometry="M9,3 C9,1.9 9.9,1 11,1 L13,1 C14.1,1 15,1.9 15,3 L15,5 L9,5 Z M10.5,3 L13.5,3 L13.5,5 L10.5,5 Z"/>
+                    Geometry="F0 M9,3 C9,1.9 9.9,1 11,1 L13,1 C14.1,1 15,1.9 15,3 L15,5 L9,5 Z M10.5,3 L10.5,5 L13.5,5 L13.5,3 Z"/>
                 <!-- Briefcase main body -->
                 <GeometryDrawing Brush="{StaticResource BrushIconAmberDark}"
                     Geometry="M3,5 L21,5 C22.1,5 23,5.9 23,7 L23,19 C23,20.1 22.1,21 21,21 L3,21 C1.9,21 1,20.1 1,19 L1,7 C1,5.9 1.9,5 3,5 Z"/>
@@ -633,9 +633,6 @@
         <Setter Property="FontWeight" Value="Normal"/>
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
     <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource AccentBrushHover}"/>
@@ -650,9 +647,6 @@
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
         <Setter Property="Padding" Value="14,8"/>
         <Setter Property="FontSize" Value="12"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
     <Style Selector="Button.secondary:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource SidebarBackground}"/>
@@ -665,9 +659,6 @@
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
         <Setter Property="Padding" Value="16,8"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
     <!-- ── Success Button ── -->
@@ -677,9 +668,6 @@
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
         <Setter Property="Padding" Value="16,8"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
     <!-- ── Card ── -->

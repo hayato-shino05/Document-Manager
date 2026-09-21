@@ -87,22 +87,22 @@
                               ItemsSource="{Binding DeletedItems}"
                               SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
                         <DataGrid.Columns>
-                            <DataGridCheckBoxColumn Header="" Binding="{Binding IsSelected, Mode=TwoWay}" Width="40"/>
-                            <DataGridTemplateColumn Header="{loc:Localize RecycleBin_ColName}" Width="*" MinWidth="200" SortMemberPath="Document.Name">
+                            <DataGridCheckBoxColumn Header="" Binding="{Binding IsSelected, Mode=TwoWay}" Width="36"/>
+                            <DataGridTemplateColumn Header="{loc:Localize RecycleBin_ColName}" Width="*" MinWidth="150" SortMemberPath="Document.Name">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate x:DataType="vm:SelectableDocument">
-                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,0">
-                                            <Image Source="{Binding Document.Type, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}" 
-                                                   Width="16" Height="16" VerticalAlignment="Center" />
-                                            <TextBlock Text="{Binding Document.Name}" VerticalAlignment="Center"
+                                        <Grid ColumnDefinitions="Auto,*" Margin="8,0">
+                                            <Image Grid.Column="0" Source="{Binding Document.Type, Converter={x:Static conv:DocumentTypeIconConverter.Instance}}"
+                                                   Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Document.Name}" VerticalAlignment="Center"
                                                        TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Document.Name}"/>
-                                        </StackPanel>
+                                        </Grid>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColSubject}" Binding="{Binding Document.Subject, Mode=OneWay}" Width="140" MinWidth="120" SortMemberPath="Document.Subject"/>
-                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColType}" Binding="{Binding Document.Type, Mode=OneWay}" Width="110" MinWidth="100" SortMemberPath="Document.Type"/>
-                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColDate}" Binding="{Binding Document.CreatedAt, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="140" MinWidth="140"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColSubject}" Binding="{Binding Document.Subject, Mode=OneWay}" Width="110" MinWidth="90" SortMemberPath="Document.Subject"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColType}" Binding="{Binding Document.Type, Mode=OneWay}" Width="80" MinWidth="70" SortMemberPath="Document.Type"/>
+                            <DataGridTextColumn Header="{loc:Localize RecycleBin_ColDate}" Binding="{Binding Document.CreatedAt, Mode=OneWay, StringFormat=\{0:dd/MM/yyyy\}}" Width="95" MinWidth="85"/>
                         </DataGrid.Columns>
                     </DataGrid>
 

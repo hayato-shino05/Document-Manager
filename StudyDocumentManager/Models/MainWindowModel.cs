@@ -1,3 +1,4 @@
+using Avalonia.Threading;
 using StudyDocumentManager.Core;
 using StudyDocumentManager.Core.DTOs;
 using StudyDocumentManager.Core.Interfaces;
@@ -108,11 +109,18 @@ public partial class MainWindowModel : ModelBase
                 var info = await _updateService.CheckForUpdateAsync();
                 if (info is { HasUpdate: true })
                 {
-                    HasUpdateAvailable = true;
-                    UpdateVersionText = info.NewVersion;
-                    LatestUpdateInfo = info;
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        HasUpdateAvailable = true;
+                        UpdateVersionText = info.NewVersion;
+                        LatestUpdateInfo = info;
+                    });
+
+                    _toastService?.Show(
+                        string.Format(_loc["Update_ToastNewVersion"], info.NewVersion),
+                        ToastType.Info,
+                        5000);
                 }
-                await _updateService.CheckSilentlyAsync();
             }
             catch
             {

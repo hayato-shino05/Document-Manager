@@ -1191,4 +1191,7 @@
   <data name="Toast_TitleError" xml:space="preserve"><value>Lỗi</value></data>
   <data name="Toast_TitleWarning" xml:space="preserve"><value>Cảnh báo</value></data>
   <data name="Toast_TitleInfo" xml:space="preserve"><value>Thông báo</value></data>
+  <data name="AffectedPreview_Items" xml:space="preserve"><value>Danh sách các mục bị ảnh hưởng</value></data>
+  <data name="OW_FilterExpiry" xml:space="preserve"><value>Bộ lọc thời hạn</value></data>
+  <data name="OW_FilterConfidentiality" xml:space="preserve"><value>Bộ lọc độ mật</value></data>
 </root>

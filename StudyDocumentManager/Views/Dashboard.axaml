@@ -604,7 +604,8 @@
                                     Binding="{Binding FileSize, Mode=OneWay, StringFormat=\{0:F2\}}" Width="80"/>
                                 <DataGridTemplateColumn Width="40">
                                     <DataGridTemplateColumn.Header>
-                                        <Image Source="{DynamicResource IconStar}" Width="13" Height="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <Image Source="{DynamicResource IconStar}" Width="13" Height="13" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               AutomationProperties.Name="{loc:Localize Dashboard_LblImportantOnly}"/>
                                     </DataGridTemplateColumn.Header>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate DataType="{x:Type core:StudyDocument}">

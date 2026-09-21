@@ -982,4 +982,7 @@ Please check your network connection.</value></data>
   <data name="Toast_TitleError" xml:space="preserve"><value>Error</value></data>
   <data name="Toast_TitleWarning" xml:space="preserve"><value>Warning</value></data>
   <data name="Toast_TitleInfo" xml:space="preserve"><value>Information</value></data>
+  <data name="AffectedPreview_Items" xml:space="preserve"><value>Affected items list</value></data>
+  <data name="OW_FilterExpiry" xml:space="preserve"><value>Expiry filter</value></data>
+  <data name="OW_FilterConfidentiality" xml:space="preserve"><value>Confidentiality filter</value></data>
 </root>

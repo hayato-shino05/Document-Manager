@@ -125,14 +125,15 @@
                         <StackPanel Margin="{DynamicResource PaddingCardLg}" Spacing="16">
 
                             <!-- Top Action Bar for Selected Smart View -->
-                            <StackPanel Orientation="Horizontal" Spacing="8"
-                                        IsVisible="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <WrapPanel Orientation="Horizontal"
+                                       IsVisible="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
                                 <Button Classes="primary" x:Name="btnOpen"
                                         AutomationProperties.AutomationId="SmartViews_Open"
                                         AutomationProperties.Name="{loc:Localize SV_Open}"
                                         AutomationProperties.HelpText="{loc:Localize SV_Open}"
                                         Command="{Binding OpenCommand}"
                                         Padding="{DynamicResource PaddingBtnMd}"
+                                        Margin="0,0,8,8"
                                         IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
                                     <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                                         <Image Source="{DynamicResource IconOpenFile}" Width="14" Height="14" VerticalAlignment="Center"/>
@@ -146,6 +147,7 @@
                                         AutomationProperties.HelpText="{loc:Localize SV_Edit}"
                                         Command="{Binding EditCommand}"
                                         Padding="{DynamicResource PaddingBtnMd}"
+                                        Margin="0,0,8,8"
                                         IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
                                     <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                                         <Image Source="{DynamicResource IconEdit}" Width="14" Height="14" VerticalAlignment="Center"/>
@@ -158,6 +160,7 @@
                                         AutomationProperties.HelpText="{loc:Localize SV_Duplicate}"
                                         Command="{Binding DuplicateCommand}"
                                         Padding="{DynamicResource PaddingBtnMd}"
+                                        Margin="0,0,8,8"
                                         IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
                                     <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                                         <Image Source="{DynamicResource IconDuplicate}" Width="14" Height="14" VerticalAlignment="Center"/>
@@ -170,6 +173,7 @@
                                         AutomationProperties.HelpText="{loc:Localize SV_Delete}"
                                         Command="{Binding DeleteCommand}"
                                         Padding="{DynamicResource PaddingBtnMd}"
+                                        Margin="0,0,8,8"
                                         IsEnabled="{Binding SelectedSavedSearch, Converter={x:Static ObjectConverters.IsNotNull}}">
                                     <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                                         <Image Source="{DynamicResource IconDeleteWhite}" Width="14" Height="14" VerticalAlignment="Center"/>
@@ -177,7 +181,7 @@
                                                    Foreground="{DynamicResource OnColorPrimaryBrush}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
-                            </StackPanel>
+                            </WrapPanel>
 
                             <!-- No Selection Hint -->
                             <StackPanel IsVisible="{Binding ShowNoSelectionHint}"

@@ -1191,4 +1191,7 @@
   <data name="Toast_TitleError" xml:space="preserve"><value>错误</value></data>
   <data name="Toast_TitleWarning" xml:space="preserve"><value>警告</value></data>
   <data name="Toast_TitleInfo" xml:space="preserve"><value>提示</value></data>
+  <data name="AffectedPreview_Items" xml:space="preserve"><value>受影响项目列表</value></data>
+  <data name="OW_FilterExpiry" xml:space="preserve"><value>期限筛选</value></data>
+  <data name="OW_FilterConfidentiality" xml:space="preserve"><value>保密级别筛选</value></data>
 </root>

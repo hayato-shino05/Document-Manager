@@ -58,7 +58,7 @@
                   AutomationProperties.Name="{loc:Localize Btn_Refresh}"
                   Content="{loc:Localize Btn_Refresh}"
                   Command="{Binding RefreshCommand}"
-                  Padding="12,5"
+                  Padding="{DynamicResource PaddingBtnMd}"
                   VerticalAlignment="Center"/>
         </Grid>
       </Border>

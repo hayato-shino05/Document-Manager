@@ -71,7 +71,7 @@
                               SelectedItem="{Binding SelectedExpiryFilter, Mode=TwoWay}"
                               HorizontalAlignment="Stretch" Margin="0,0,8,0"
                               automation:AutomationProperties.AutomationId="OfficeWorkspace_ExpiryFilter"
-                              automation:AutomationProperties.Name="ExpiryFilter">
+                              automation:AutomationProperties.Name="{loc:Localize OW_FilterExpiry}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Label}"/>
@@ -82,7 +82,7 @@
                               SelectedItem="{Binding SelectedConfidentialityFilter, Mode=TwoWay}"
                               HorizontalAlignment="Stretch" Margin="0,0,8,0"
                               automation:AutomationProperties.AutomationId="OfficeWorkspace_ConfidentialityFilter"
-                              automation:AutomationProperties.Name="ConfidentialityFilter">
+                              automation:AutomationProperties.Name="{loc:Localize OW_FilterConfidentiality}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Label}"/>
@@ -222,7 +222,7 @@
                                     <StackPanel Spacing="4">
                                         <TextBlock Text="{loc:Localize OW_EffectiveDate}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"/>
                                         <DatePicker SelectedDate="{Binding EditingEffectiveDate, Mode=TwoWay}"
-                                                    DayFormat="d" MonthFormat="MM" YearFormat="yy"
+                                                    DayFormat="{loc:Localize AddEdit_DateDayFormat}" MonthFormat="{loc:Localize AddEdit_DateMonthFormat}" YearFormat="{loc:Localize AddEdit_DateYearFormat}"
                                                     HorizontalAlignment="Stretch"
                                                     automation:AutomationProperties.AutomationId="OfficeWorkspace_EffectiveDate"
                                                     automation:AutomationProperties.Name="{loc:Localize OW_EffectiveDate}"/>
@@ -232,7 +232,7 @@
                                     <StackPanel Spacing="4">
                                         <TextBlock Text="{loc:Localize OW_ExpiryDate}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"/>
                                         <DatePicker SelectedDate="{Binding EditingExpiryDate, Mode=TwoWay}"
-                                                    DayFormat="d" MonthFormat="MM" YearFormat="yy"
+                                                    DayFormat="{loc:Localize AddEdit_DateDayFormat}" MonthFormat="{loc:Localize AddEdit_DateMonthFormat}" YearFormat="{loc:Localize AddEdit_DateYearFormat}"
                                                     HorizontalAlignment="Stretch"
                                                     automation:AutomationProperties.AutomationId="OfficeWorkspace_ExpiryDate"
                                                     automation:AutomationProperties.Name="{loc:Localize OW_ExpiryDate}"/>

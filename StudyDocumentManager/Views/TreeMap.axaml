@@ -64,10 +64,6 @@
 
             <!-- TreeMap grid card container -->
             <Border Classes="card"
-                    Background="{DynamicResource CardBackground}"
-                    CornerRadius="{DynamicResource RadiusMd}"
-                    BorderBrush="{DynamicResource CardBorder}"
-                    BorderThickness="1"
                     Padding="{DynamicResource PaddingCard}">
                 <Panel>
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled"
@@ -83,7 +79,6 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:TreeMapItem">
                                     <Border MinWidth="160" MaxWidth="280" MinHeight="96"
-                                            AutomationProperties.AutomationId="TreeMap_ItemTile"
                                             AutomationProperties.Name="{Binding DisplayText}"
                                             Margin="6" Padding="{DynamicResource PaddingCard}"
                                             CornerRadius="{DynamicResource RadiusMd}"

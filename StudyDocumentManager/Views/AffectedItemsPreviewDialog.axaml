@@ -38,7 +38,7 @@
                     BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" Padding="2">
                 <ListBox x:Name="ItemsList"
                          AutomationProperties.AutomationId="AffectedPreview_Items"
-                         AutomationProperties.Name="{loc:Localize Main_Menu_DuplicateDetection}"
+                         AutomationProperties.Name="{loc:Localize AffectedPreview_Items}"
                          MaxHeight="220"
                          Background="Transparent"
                          FontSize="{DynamicResource FontSizeSm}"

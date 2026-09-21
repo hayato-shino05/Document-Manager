@@ -60,8 +60,6 @@
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
         <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
     <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource DangerColorHover}"/>
@@ -72,8 +70,6 @@
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
         <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
     <Style Selector="Button.warning:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource WarningColorHover}"/>
@@ -84,8 +80,6 @@
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
         <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
     <Style Selector="Button.success:pointerover /template/ ContentPresenter">
         <Setter Property="Background" Value="{StaticResource SuccessColorHover}"/>
