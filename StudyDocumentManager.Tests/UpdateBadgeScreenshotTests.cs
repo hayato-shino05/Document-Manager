@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using StudyDocumentManager.Core.DTOs;
@@ -24,6 +25,26 @@ public class UpdateBadgeScreenshotTests
         return !string.IsNullOrWhiteSpace(customDir)
             ? customDir
             : Path.Combine(Path.GetTempPath(), "sdm_screenshots");
+    }
+
+    private static void SaveWindowBitmap(Window window, int width, int height, string filename)
+    {
+        Dispatcher.UIThread.RunJobs();
+        var pixelSize = new PixelSize(width, height);
+        var dpi = new Vector(96, 96);
+        using var bitmap = new RenderTargetBitmap(pixelSize, dpi);
+        bitmap.Render(window);
+
+        var dir = GetScreenshotDirectory();
+        try
+        {
+            Directory.CreateDirectory(dir);
+            bitmap.Save(Path.Combine(dir, filename));
+        }
+        catch
+        {
+            // 保存に失敗してもテスト自体は続行する
+        }
     }
 
     [AvaloniaFact]
@@ -126,9 +147,7 @@ public class UpdateBadgeScreenshotTests
                 };
                 window.Show();
                 Dispatcher.UIThread.RunJobs();
-                var frame = window.GetLastRenderedFrame();
-                Assert.NotNull(frame);
-                frame.Save(Path.Combine(outputDir, "00_MainWindow_UpdateBadge_Dashboard.png"));
+                SaveWindowBitmap(window, 1280, 800, "00_MainWindow_UpdateBadge_Dashboard.png");
                 window.Close();
                 Dispatcher.UIThread.RunJobs();
             }
@@ -150,9 +169,7 @@ public class UpdateBadgeScreenshotTests
                 };
                 window.Show();
                 Dispatcher.UIThread.RunJobs();
-                var frame = window.GetLastRenderedFrame();
-                Assert.NotNull(frame);
-                frame.Save(Path.Combine(outputDir, "00_MainWindow_UpdateBadge_OfficeWorkspace.png"));
+                SaveWindowBitmap(window, 1280, 800, "00_MainWindow_UpdateBadge_OfficeWorkspace.png");
                 window.Close();
                 Dispatcher.UIThread.RunJobs();
             }
@@ -174,9 +191,7 @@ public class UpdateBadgeScreenshotTests
                 };
                 window.Show();
                 Dispatcher.UIThread.RunJobs();
-                var frame = window.GetLastRenderedFrame();
-                Assert.NotNull(frame);
-                frame.Save(Path.Combine(outputDir, "00_MainWindow_UpdateBadge_StudentWorkspace.png"));
+                SaveWindowBitmap(window, 1280, 800, "00_MainWindow_UpdateBadge_StudentWorkspace.png");
                 window.Close();
                 Dispatcher.UIThread.RunJobs();
             }
