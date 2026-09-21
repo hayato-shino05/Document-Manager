@@ -42,15 +42,10 @@ public class ModernizedAllViewsScreenshotTests
         bitmap.Render(window);
 
         var dir = GetScreenshotDirectory();
-        try
-        {
-            Directory.CreateDirectory(dir);
-            bitmap.Save(Path.Combine(dir, filename));
-        }
-        catch
-        {
-            // 保存に失敗してもテスト自体は続行する
-        }
+        Directory.CreateDirectory(dir);
+        var filePath = Path.Combine(dir, filename);
+        bitmap.Save(filePath);
+        Assert.True(File.Exists(filePath), $"Screenshot artifact was not created at {filePath}");
 
         window.Close();
         Dispatcher.UIThread.RunJobs();
@@ -63,15 +58,10 @@ public class ModernizedAllViewsScreenshotTests
         bitmap.Render(window);
 
         var dir = GetScreenshotDirectory();
-        try
-        {
-            Directory.CreateDirectory(dir);
-            bitmap.Save(Path.Combine(dir, filename));
-        }
-        catch
-        {
-            // 保存に失敗してもテスト自体は続行する
-        }
+        Directory.CreateDirectory(dir);
+        var filePath = Path.Combine(dir, filename);
+        bitmap.Save(filePath);
+        Assert.True(File.Exists(filePath), $"Screenshot artifact was not created at {filePath}");
     }
 
     [AvaloniaFact]
