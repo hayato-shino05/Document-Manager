@@ -1,66 +1,73 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
-        xmlns:loc="using:StudyDocumentManager.Markup"
-                     x:Class="StudyDocumentManager.Views.Report"
+             xmlns:loc="using:StudyDocumentManager.Markup"
+             x:Class="StudyDocumentManager.Views.Report"
              x:DataType="vm:ReportModel"
              AutomationProperties.AutomationId="Screen_Report"
              AutomationProperties.AccessibilityView="Control">
 
-    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+    <Border Classes="page-wrapper" Background="{DynamicResource ContentBackground}" Padding="{DynamicResource PaddingPage}">
         <DockPanel>
+            <!-- Header Bar -->
             <DockPanel DockPanel.Dock="Top" Margin="0,0,0,16">
-                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                    <Image Source="{StaticResource IconReport}" Width="18" Height="18"/>
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Image Source="{DynamicResource IconReport}" Width="20" Height="20" VerticalAlignment="Center"/>
                     <TextBlock Text="{loc:Localize Report_Title}"
                                AutomationProperties.AutomationId="Title_Report"
-                               FontSize="{StaticResource FontSizeXl}" FontWeight="Bold"
-                               Foreground="{StaticResource TextPrimary}"/>
+                               FontSize="{DynamicResource FontSizeHeading}" FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimary}"
+                               VerticalAlignment="Center"/>
                 </StackPanel>
                 <Button DockPanel.Dock="Right" Classes="secondary"
                         AutomationProperties.AutomationId="Report_Refresh"
                         AutomationProperties.Name="{loc:Localize Report_BtnRefresh}"
-                        Command="{Binding LoadAllDataCommand}" Padding="{StaticResource PaddingBtnMd}"
-                        HorizontalAlignment="Right">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <Image Source="{StaticResource IconRefresh}" Width="16" Height="16"/>
-                        <TextBlock Text="{loc:Localize Report_BtnRefresh}" FontSize="{StaticResource FontSizeSm}"/>
+                        AutomationProperties.HelpText="{loc:Localize Report_BtnRefresh}"
+                        Command="{Binding LoadAllDataCommand}"
+                        Padding="{DynamicResource PaddingBtnMd}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <Image Source="{DynamicResource IconRefresh}" Width="15" Height="15" VerticalAlignment="Center"/>
+                        <TextBlock Text="{loc:Localize Report_BtnRefresh}" FontSize="{DynamicResource FontSizeSm}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
             </DockPanel>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel Spacing="20">
+            <!-- Scrollable Report Cards Container with Symmetrical Centering & generous bottom margin -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,32">
+                <StackPanel MaxWidth="1040" HorizontalAlignment="Center" Spacing="16" Margin="0,0,0,32">
 
-                    <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                            Padding="{StaticResource PaddingSection}">
-                        <StackPanel Spacing="10">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Image Source="{StaticResource IconCategory}" Width="14" Height="14"/>
-                                <TextBlock Text="{loc:Localize Report_TabSubject}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}"/>
+                    <!-- By Subject Card -->
+                    <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                            Padding="{DynamicResource PaddingSection}">
+                        <StackPanel Spacing="12">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Image Source="{DynamicResource IconCategory}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="{loc:Localize Report_TabSubject}" FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
                             <ItemsControl AutomationProperties.AutomationId="Report_BySubject"
                                           AutomationProperties.Name="{loc:Localize Report_TabSubject}"
                                           ItemsSource="{Binding BySubjectData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
-                                        <Grid ColumnDefinitions="140,*,60" Margin="0,2">
-                                            <TextBlock Text="{Binding Label}" FontSize="{StaticResource FontSizeSm}"
-                                                       Foreground="{StaticResource TextPrimary}"
+                                        <Grid ColumnDefinitions="160,*,70" Margin="0,4">
+                                            <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeSm}"
+                                                       Foreground="{DynamicResource TextPrimary}"
                                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                        ToolTip.Tip="{Binding Label}"/>
-                                            <Border Grid.Column="1" Height="18" CornerRadius="{StaticResource RadiusXs}"
-                                                    Background="{StaticResource SidebarBackground}" Margin="8,0">
-                                                <Border Height="18" CornerRadius="{StaticResource RadiusXs}"
-                                                        Background="{StaticResource AccentColor}"
+                                            <Border Grid.Column="1" Height="16" CornerRadius="{DynamicResource RadiusXs}"
+                                                    Background="{DynamicResource SidebarBackground}" Margin="10,0">
+                                                <Border Height="16" CornerRadius="{DynamicResource RadiusXs}"
+                                                        Background="{DynamicResource AccentBrush}"
                                                         HorizontalAlignment="Left"
                                                         MinWidth="4"
                                                         Width="{Binding BarWidth}"/>
                                             </Border>
-                                            <TextBlock Grid.Column="2" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource AccentColor}"
+                                            <TextBlock Grid.Column="2" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource AccentBrush}"
                                                        HorizontalAlignment="Right" VerticalAlignment="Center"
                                                        Text="{Binding Value}"/>
                                         </Grid>
@@ -68,40 +75,41 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <TextBlock AutomationProperties.LiveSetting="Polite"
-                                       Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                                       Text="{loc:Localize Report_NoData}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextMuted}"
                                        IsVisible="{Binding !BySubjectData.Count}" Margin="0,8"/>
                         </StackPanel>
                     </Border>
 
-                    <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                            Padding="{StaticResource PaddingSection}">
-                        <StackPanel Spacing="10">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Image Source="{StaticResource IconDocPage}" Width="14" Height="14"/>
-                                <TextBlock Text="{loc:Localize Report_ByTypeChart}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}"/>
+                    <!-- By Type Card -->
+                    <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                            Padding="{DynamicResource PaddingSection}">
+                        <StackPanel Spacing="12">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Image Source="{DynamicResource IconDocPage}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="{loc:Localize Report_ByTypeChart}" FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
                             <ItemsControl AutomationProperties.AutomationId="Report_ByType"
                                           AutomationProperties.Name="{loc:Localize Report_ByTypeChart}"
                                           ItemsSource="{Binding ByTypeData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
-                                        <Grid ColumnDefinitions="140,*,60" Margin="0,2">
-                                            <TextBlock Text="{Binding Label}" FontSize="{StaticResource FontSizeSm}"
-                                                       Foreground="{StaticResource TextPrimary}"
+                                        <Grid ColumnDefinitions="160,*,70" Margin="0,4">
+                                            <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeSm}"
+                                                       Foreground="{DynamicResource TextPrimary}"
                                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                        ToolTip.Tip="{Binding Label}"/>
-                                            <Border Grid.Column="1" Height="18" CornerRadius="{StaticResource RadiusXs}"
-                                                    Background="{StaticResource SidebarBackground}" Margin="8,0">
-                                                <Border Height="18" CornerRadius="{StaticResource RadiusXs}"
-                                                        Background="{StaticResource SuccessBrush}"
+                                            <Border Grid.Column="1" Height="16" CornerRadius="{DynamicResource RadiusXs}"
+                                                    Background="{DynamicResource SidebarBackground}" Margin="10,0">
+                                                <Border Height="16" CornerRadius="{DynamicResource RadiusXs}"
+                                                        Background="{DynamicResource SuccessBrush}"
                                                         HorizontalAlignment="Left"
                                                         MinWidth="4"
                                                         Width="{Binding BarWidth}"/>
                                             </Border>
-                                            <TextBlock Grid.Column="2" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource SuccessBrush}"
+                                            <TextBlock Grid.Column="2" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource SuccessBrush}"
                                                        HorizontalAlignment="Right" VerticalAlignment="Center"
                                                        Text="{Binding Value}"/>
                                         </Grid>
@@ -109,40 +117,41 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <TextBlock AutomationProperties.LiveSetting="Polite"
-                                       Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                                       Text="{loc:Localize Report_NoData}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextMuted}"
                                        IsVisible="{Binding !ByTypeData.Count}" Margin="0,8"/>
                         </StackPanel>
                     </Border>
 
-                    <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                            Padding="{StaticResource PaddingSection}">
-                        <StackPanel Spacing="10">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Image Source="{StaticResource IconCheck}" Width="14" Height="14"/>
-                                <TextBlock Text="{loc:Localize RS_StatusCounts_Title}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}"/>
+                    <!-- By Status Card -->
+                    <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                            Padding="{DynamicResource PaddingSection}">
+                        <StackPanel Spacing="12">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Image Source="{DynamicResource IconCheckSuccess}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="{loc:Localize RS_StatusCounts_Title}" FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
                             <ItemsControl AutomationProperties.AutomationId="Report_ByStatus"
                                           AutomationProperties.Name="{loc:Localize RS_StatusCounts_Title}"
                                           ItemsSource="{Binding ByStatusData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:StatusCountItem}">
-                                        <Grid ColumnDefinitions="140,*,60" Margin="0,2">
-                                            <TextBlock Text="{Binding Label}" FontSize="{StaticResource FontSizeSm}"
-                                                       Foreground="{StaticResource TextPrimary}"
+                                        <Grid ColumnDefinitions="160,*,70" Margin="0,4">
+                                            <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeSm}"
+                                                       Foreground="{DynamicResource TextPrimary}"
                                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                        ToolTip.Tip="{Binding Label}"/>
-                                            <Border Grid.Column="1" Height="18" CornerRadius="{StaticResource RadiusXs}"
-                                                    Background="{StaticResource SidebarBackground}" Margin="8,0">
-                                                <Border Height="18" CornerRadius="{StaticResource RadiusXs}"
-                                                        Background="{StaticResource BrushIconCyan}"
+                                            <Border Grid.Column="1" Height="16" CornerRadius="{DynamicResource RadiusXs}"
+                                                    Background="{DynamicResource SidebarBackground}" Margin="10,0">
+                                                <Border Height="16" CornerRadius="{DynamicResource RadiusXs}"
+                                                        Background="{DynamicResource BrushIconCyan}"
                                                         HorizontalAlignment="Left"
                                                         MinWidth="4"
                                                         Width="{Binding BarWidth}"/>
                                             </Border>
-                                            <TextBlock Grid.Column="2" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource BrushIconCyan}"
+                                            <TextBlock Grid.Column="2" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource BrushIconCyan}"
                                                        HorizontalAlignment="Right" VerticalAlignment="Center"
                                                        Text="{Binding Value}"/>
                                         </Grid>
@@ -152,35 +161,36 @@
                         </StackPanel>
                     </Border>
 
-                    <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                            Padding="{StaticResource PaddingSection}">
-                        <StackPanel Spacing="10">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Image Source="{StaticResource IconCalendar}" Width="14" Height="14"/>
-                                <TextBlock Text="{loc:Localize Report_Last7Days}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}"/>
+                    <!-- By Day (Last 7 Days) Card -->
+                    <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                            Padding="{DynamicResource PaddingSection}">
+                        <StackPanel Spacing="12">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Image Source="{DynamicResource IconCalendar}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="{loc:Localize Report_Last7Days}" FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
                             <ItemsControl AutomationProperties.AutomationId="Report_ByDay"
                                           AutomationProperties.Name="{loc:Localize Report_Last7Days}"
                                           ItemsSource="{Binding ByDayData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
-                                        <Grid ColumnDefinitions="100,*,60" Margin="0,2">
-                                            <TextBlock Text="{Binding Label}" FontSize="{StaticResource FontSizeSm}"
-                                                       Foreground="{StaticResource TextPrimary}"
+                                        <Grid ColumnDefinitions="120,*,70" Margin="0,4">
+                                            <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeSm}"
+                                                       Foreground="{DynamicResource TextPrimary}"
                                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                        ToolTip.Tip="{Binding Label}"/>
-                                            <Border Grid.Column="1" Height="18" CornerRadius="{StaticResource RadiusXs}"
-                                                    Background="{StaticResource SidebarBackground}" Margin="8,0">
-                                                <Border Height="18" CornerRadius="{StaticResource RadiusXs}"
-                                                        Background="{StaticResource WarningBrush}"
+                                            <Border Grid.Column="1" Height="16" CornerRadius="{DynamicResource RadiusXs}"
+                                                    Background="{DynamicResource SidebarBackground}" Margin="10,0">
+                                                <Border Height="16" CornerRadius="{DynamicResource RadiusXs}"
+                                                        Background="{DynamicResource WarningBrush}"
                                                         HorizontalAlignment="Left"
                                                         MinWidth="4"
                                                         Width="{Binding BarWidth}"/>
                                             </Border>
-                                            <TextBlock Grid.Column="2" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource WarningBrush}"
+                                            <TextBlock Grid.Column="2" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource WarningBrush}"
                                                        HorizontalAlignment="Right" VerticalAlignment="Center"
                                                        Text="{Binding Value}"/>
                                         </Grid>
@@ -188,40 +198,41 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <TextBlock AutomationProperties.LiveSetting="Polite"
-                                       Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                                       Text="{loc:Localize Report_NoData}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextMuted}"
                                        IsVisible="{Binding !HasDayData}" Margin="0,8"/>
                         </StackPanel>
                     </Border>
 
-                    <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
-                            BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
-                            Padding="{StaticResource PaddingSection}">
-                        <StackPanel Spacing="10">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Image Source="{StaticResource IconCalendar}" Width="14" Height="14"/>
-                                <TextBlock Text="{loc:Localize Report_Last12Months}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextPrimary}"/>
+                    <!-- By Month (Last 12 Months) Card -->
+                    <Border Background="{DynamicResource CardBackground}" CornerRadius="{DynamicResource RadiusMd}"
+                            BorderBrush="{DynamicResource CardBorder}" BorderThickness="1"
+                            Padding="{DynamicResource PaddingSection}">
+                        <StackPanel Spacing="12">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Image Source="{DynamicResource IconCalendar}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="{loc:Localize Report_Last12Months}" FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
                             <ItemsControl AutomationProperties.AutomationId="Report_ByMonth"
                                           AutomationProperties.Name="{loc:Localize Report_Last12Months}"
                                           ItemsSource="{Binding ByMonthData}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:ChartDataItem}">
-                                        <Grid ColumnDefinitions="100,*,60" Margin="0,2">
-                                            <TextBlock Text="{Binding Label}" FontSize="{StaticResource FontSizeSm}"
-                                                       Foreground="{StaticResource TextPrimary}"
+                                        <Grid ColumnDefinitions="120,*,70" Margin="0,4">
+                                            <TextBlock Text="{Binding Label}" FontSize="{DynamicResource FontSizeSm}"
+                                                       Foreground="{DynamicResource TextPrimary}"
                                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                                        ToolTip.Tip="{Binding Label}"/>
-                                            <Border Grid.Column="1" Height="18" CornerRadius="{StaticResource RadiusXs}"
-                                                    Background="{StaticResource SidebarBackground}" Margin="8,0">
-                                                <Border Height="18" CornerRadius="{StaticResource RadiusXs}"
-                                                        Background="{StaticResource BrushIconIndigo}"
+                                            <Border Grid.Column="1" Height="16" CornerRadius="{DynamicResource RadiusXs}"
+                                                    Background="{DynamicResource SidebarBackground}" Margin="10,0">
+                                                <Border Height="16" CornerRadius="{DynamicResource RadiusXs}"
+                                                        Background="{DynamicResource BrushIconIndigo}"
                                                         HorizontalAlignment="Left"
                                                         MinWidth="4"
                                                         Width="{Binding BarWidth}"/>
                                             </Border>
-                                            <TextBlock Grid.Column="2" FontSize="{StaticResource FontSizeSm}" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource BrushIconIndigo}"
+                                            <TextBlock Grid.Column="2" FontSize="{DynamicResource FontSizeSm}" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource BrushIconIndigo}"
                                                        HorizontalAlignment="Right" VerticalAlignment="Center"
                                                        Text="{Binding Value}"/>
                                         </Grid>
@@ -229,7 +240,7 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <TextBlock AutomationProperties.LiveSetting="Polite"
-                                       Text="{loc:Localize Report_NoData}" FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                                       Text="{loc:Localize Report_NoData}" FontSize="{DynamicResource FontSizeSm}" Foreground="{DynamicResource TextMuted}"
                                        IsVisible="{Binding !HasMonthData}" Margin="0,8"/>
                         </StackPanel>
                     </Border>

@@ -42,56 +42,100 @@ public sealed class ToastService : IToastService
         if (_container == null) return;
         _visibleCount++;
 
-        var (bg, fg, icon) = ResolveVisuals(type);
+        var (accentBrush, badgeBg, iconImage, titleText) = ResolveVisuals(type);
 
-        var iconBlock = new TextBlock
+        var grid = new Grid
         {
-            Text = icon,
-            FontSize = 14,
-            FontWeight = FontWeight.Bold,
-            Foreground = fg,
+            ColumnDefinitions = new ColumnDefinitions("4,Auto,*")
+        };
+
+        // Left accent strip
+        var accentStrip = new Border
+        {
+            Background = accentBrush,
+            CornerRadius = new CornerRadius(8, 0, 0, 8),
+            Width = 4,
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        };
+        Grid.SetColumn(accentStrip, 0);
+        grid.Children.Add(accentStrip);
+
+        // Icon badge
+        var iconElement = new Image
+        {
+            Width = 14,
+            Height = 14,
+            Source = iconImage,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+
+        var iconBadge = new Border
+        {
+            Background = badgeBg,
+            CornerRadius = new CornerRadius(14),
+            Width = 28,
+            Height = 28,
+            Margin = new Thickness(10, 10, 8, 10),
             VerticalAlignment = VerticalAlignment.Center,
-            Width = 20,
-            TextAlignment = TextAlignment.Center
+            Child = iconElement
+        };
+        Grid.SetColumn(iconBadge, 1);
+        grid.Children.Add(iconBadge);
+
+        // Text details (Title + Message)
+        var titleBlock = new TextBlock
+        {
+            Text = titleText,
+            Foreground = GetBrush("TextPrimary", Brushes.Black),
+            FontSize = 12,
+            FontWeight = FontWeight.SemiBold,
+            VerticalAlignment = VerticalAlignment.Center
         };
 
         var messageBlock = new TextBlock
         {
             Text = message,
-            Foreground = fg,
-            FontSize = 12.5,
-            FontWeight = FontWeight.Medium,
+            Foreground = GetBrush("TextSecondary", Brushes.DarkSlateGray),
+            FontSize = 12,
+            FontWeight = FontWeight.Normal,
             TextWrapping = TextWrapping.Wrap,
-            MaxWidth = 300,
+            MaxWidth = 280,
             VerticalAlignment = VerticalAlignment.Center
         };
 
-        var content = new StackPanel
+        var textPanel = new StackPanel
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 10,
-            Children = { iconBlock, messageBlock }
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 8, 14, 8),
+            Spacing = 2,
+            Children = { titleBlock, messageBlock }
         };
+        Grid.SetColumn(textPanel, 2);
+        grid.Children.Add(textPanel);
 
         var toast = new Border
         {
-            Background = bg,
-            CornerRadius = new CornerRadius(10),
-            Padding = new Thickness(14, 10, 16, 10),
-            Margin = new Thickness(0, 0, 0, 6),
+            Background = GetBrush("CardBackground", Brushes.White),
+            BorderBrush = GetBrush("CardBorder", new SolidColorBrush(Color.Parse("#E5E7EB"))),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(0),
+            Margin = new Thickness(0, 0, 0, 8),
             HorizontalAlignment = HorizontalAlignment.Right,
             BoxShadow = new BoxShadows(new BoxShadow
             {
                 OffsetX = 0,
-                OffsetY = 2,
-                Blur = 16,
+                OffsetY = 4,
+                Blur = 18,
                 Spread = -2,
-                Color = Color.FromArgb(40, 0, 0, 0)
+                Color = Color.FromArgb(35, 0, 0, 0)
             }),
+            MinWidth = 280,
             MaxWidth = 380,
             Opacity = 0,
             RenderTransform = new TranslateTransform(24, 0),
-            Child = content
+            Child = grid
         };
 
         _container.Children.Add(toast);
@@ -174,26 +218,58 @@ public sealed class ToastService : IToastService
         return fallback;
     }
 
-    private static (IBrush bg, IBrush fg, string icon) ResolveVisuals(ToastType type)
+    private static IImage? GetImage(string key)
+    {
+        if (Application.Current?.TryGetResource(key, Avalonia.Styling.ThemeVariant.Default, out var resource) == true
+            && resource is IImage img)
+        {
+            return img;
+        }
+
+        return null;
+    }
+
+    private static string GetLocalized(string key, string fallback)
+    {
+        try
+        {
+            if (Application.Current?.TryGetResource("Loc", Avalonia.Styling.ThemeVariant.Default, out var resource) == true
+                && resource is ILocalizationService loc)
+            {
+                return loc[key];
+            }
+        }
+        catch
+        {
+            // fallback if not available
+        }
+        return fallback;
+    }
+
+    private static (IBrush accent, IBrush badgeBg, IImage? icon, string title) ResolveVisuals(ToastType type)
     {
         return type switch
         {
             ToastType.Success => (
-                GetBrush("ToastSuccessBrush", Brushes.Transparent),
-                GetBrush("ToastSuccessForegroundBrush", Brushes.Black),
-                "✓"),
+                GetBrush("SuccessBrush", Brushes.ForestGreen),
+                GetBrush("ToastSuccessBrush", Brushes.LightGreen),
+                GetImage("IconCheckSuccess") ?? GetImage("IconCheck"),
+                GetLocalized("Toast_TitleSuccess", "Success")),
             ToastType.Error => (
-                GetBrush("ToastErrorBrush", Brushes.Transparent),
-                GetBrush("ToastErrorForegroundBrush", Brushes.Black),
-                "✕"),
+                GetBrush("DangerBrush", Brushes.Crimson),
+                GetBrush("ToastErrorBrush", Brushes.LightPink),
+                GetImage("IconClose") ?? GetImage("IconDeleteWhite"),
+                GetLocalized("Toast_TitleError", "Error")),
             ToastType.Warning => (
-                GetBrush("ToastWarningBrush", Brushes.Transparent),
-                GetBrush("ToastWarningForegroundBrush", Brushes.Black),
-                "⚠"),
+                GetBrush("WarningBrush", Brushes.DarkOrange),
+                GetBrush("ToastWarningBrush", Brushes.LightYellow),
+                GetImage("IconWarning"),
+                GetLocalized("Toast_TitleWarning", "Warning")),
             _ => (
-                GetBrush("ToastInfoBrush", Brushes.Transparent),
-                GetBrush("ToastInfoForegroundBrush", Brushes.Black),
-                "ℹ"),
+                GetBrush("AccentBrush", Brushes.RoyalBlue),
+                GetBrush("ToastInfoBrush", Brushes.LightBlue),
+                GetImage("IconInfo"),
+                GetLocalized("Toast_TitleInfo", "Info")),
         };
     }
 

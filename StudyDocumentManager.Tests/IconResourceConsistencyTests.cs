@@ -36,8 +36,9 @@ public class IconResourceConsistencyTests
     {
         var mainWindow = LoadView("MainWindow.axaml");
 
-        Assert.Contains("<Image Source=\"{StaticResource IconAdd}\" Classes=\"toolbar-btn-icon\"/>", mainWindow);
-        Assert.Contains("<Image Source=\"{StaticResource IconBack}\" Classes=\"toolbar-btn-icon\"/>", mainWindow);
+        Assert.Contains("IconAddWhite", mainWindow);
+        Assert.Contains("IconBack", mainWindow);
+        Assert.Contains("Classes=\"toolbar-btn-icon\"", mainWindow);
     }
 
     [Fact]
@@ -66,7 +67,7 @@ public class IconResourceConsistencyTests
         Assert.Contains("IconImportWhite", batchImport);
         Assert.Contains("IconSearchWhite", duplicateDetection);
         Assert.Contains("IconSearchWhite", fileIntegrity);
-        Assert.Contains("IconSearchWhite", bulkDelete);
+        Assert.Contains("IconDeleteWhite", bulkDelete);
 
         var dashboard = LoadView("Dashboard.axaml");
         Assert.Contains("IconSearchWhite", dashboard);

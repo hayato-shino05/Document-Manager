@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:StudyDocumentManager.Models"
              xmlns:loc="using:StudyDocumentManager.Markup"
@@ -11,7 +11,7 @@
             Padding="{StaticResource PaddingPage}">
         <Grid RowDefinitions="Auto,*,Auto"
               MaxWidth="1040"
-              HorizontalAlignment="Stretch">
+              HorizontalAlignment="Center">
             <StackPanel>
                 <StackPanel Orientation="Horizontal"
                             Spacing="{StaticResource Space1}">

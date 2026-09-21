@@ -198,3 +198,20 @@ public sealed class KeyLocalizationService : ILocalizationService
     public event EventHandler? LanguageChanged;
 #pragma warning restore CS0067
 }
+
+public sealed class StubLocalizationService(SupportedLanguage initial = SupportedLanguage.Japanese) : ILocalizationService
+{
+    public string this[string key] => key;
+
+    public SupportedLanguage CurrentLanguage { get; set; } = initial;
+
+    public void SetLanguage(SupportedLanguage language)
+    {
+        CurrentLanguage = language;
+        LanguageChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public IReadOnlyList<SupportedLanguage> AvailableLanguages { get; } = Enum.GetValues<SupportedLanguage>();
+
+    public event EventHandler? LanguageChanged;
+}

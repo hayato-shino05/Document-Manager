@@ -186,6 +186,6 @@ public sealed class DesktopQualityBatch3Tests
         var bulkDeleteXaml = File.ReadAllText(Path.Combine("..", "..", "..", "..", "StudyDocumentManager", "Views", "BulkDelete.axaml"));
         Assert.Contains("AutomationProperties.AutomationId=\"BulkDelete_MarkImportant\"", bulkDeleteXaml);
         Assert.Contains("AutomationProperties.AutomationId=\"BulkDelete_ChangeSubject\"", bulkDeleteXaml);
-        Assert.Contains("AutomationProperties.AutomationId=\"BulkDelete_Cancel\"", bulkDeleteXaml);
+        Assert.Contains("AutomationProperties.AutomationId=\"BulkDelete_DeleteSelected\"", bulkDeleteXaml);
     }
 }

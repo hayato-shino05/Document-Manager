@@ -111,7 +111,7 @@
                         Spacing="8" Margin="0,8,0,0">
                 <Button x:Name="MergeButton"
                         AutomationProperties.AutomationId="DuplicateReview_ConfirmMerge"
-                        Classes="danger"
+                        Classes="primary"
                         MinWidth="120"
                         HorizontalContentAlignment="Center"/>
                 <Button x:Name="CancelButton"

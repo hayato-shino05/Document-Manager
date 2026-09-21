@@ -18,7 +18,7 @@
 
 ### Changed
 
-- `StudyDocumentManager.Core/Services/AppVersion.cs` の `Current` を `4.0.0` から `4.1.0` に更新。
+- `StudyDocumentManager.Core/Services/AppVersion.cs` の `Current` を `4.0.0` に統一（Single Source of Truth）。
 - `DatabaseMigrator.ValidateDocumentIndexesAndTriggers` と `EnsureNoUnsupportedIndexesOrTriggers` に `archive_export_key` UNIQUE の許可を追加。
 - `DatabaseHelper.ValidateIndexesAndTriggers` にも `archive_export_key` UNIQUE 許可を追加 (Greptile P1 修正、PR #63 内)。
 - `docs/TEST_MATRIX.md` の Smart Views / Document status / Bulk Edit / Undo の 4 行を「current Debug: all 39 GapTests pass」に更新。

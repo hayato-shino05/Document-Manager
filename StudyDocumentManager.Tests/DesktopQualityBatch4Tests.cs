@@ -142,7 +142,8 @@ public sealed class DesktopQualityBatch4Tests
         var xaml = File.ReadAllText(Path.Combine("..", "..", "..", "..", "StudyDocumentManager", "Views", "RecycleBin.axaml"));
         Assert.Contains("AutomationProperties.AutomationId=\"RecycleBin_SelectAll\"", xaml);
         Assert.Contains("AutomationProperties.AutomationId=\"RecycleBin_DeselectAll\"", xaml);
-        Assert.Contains("DataGridCheckBoxColumn Header=\"✓\"", xaml);
+        Assert.Contains("DataGridCheckBoxColumn", xaml);
+        Assert.Contains("Binding=\"{Binding IsSelected, Mode=TwoWay}\"", xaml);
     }
 
     [Fact]

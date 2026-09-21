@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using StudyDocumentManager.Core;
 using StudyDocumentManager.Core.Interfaces;
 
 namespace StudyDocumentManager.Models;
@@ -10,6 +14,12 @@ public partial class OnboardingModel : ModelBase
     public const int TotalStepsCount = 5;
 
     private readonly ISettingsService _settingsService;
+    private readonly ILocalizationService? _loc;
+
+    [ObservableProperty]
+    private SupportedLanguage _selectedLanguage;
+
+    public IReadOnlyList<SupportedLanguage> AvailableLanguages => _loc?.AvailableLanguages ?? Enum.GetValues<SupportedLanguage>().ToList();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanGoPrevious))]
@@ -47,9 +57,17 @@ public partial class OnboardingModel : ModelBase
 
     public event EventHandler? Completed;
 
-    public OnboardingModel(ISettingsService settingsService)
+    public OnboardingModel(ISettingsService settingsService, ILocalizationService? loc = null)
     {
         _settingsService = settingsService;
+        _loc = loc;
+        SelectedLanguage = _loc?.CurrentLanguage ?? SupportedLanguage.Japanese;
+    }
+
+    partial void OnSelectedLanguageChanged(SupportedLanguage value)
+    {
+        _loc?.SetLanguage(value);
+        _settingsService.SetSetting("language", value.ToString());
     }
 
     [RelayCommand]

@@ -33,6 +33,16 @@ const reportRows = [
   { day: "2026-08-09", eventCount: 3, activeInstallations: 2 },
 ];
 
+function getRecentReportRows(): Array<{ day: string; eventCount: number; activeInstallations: number }> {
+  const now = new Date();
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+  return [
+    { day: yesterday.toISOString().slice(0, 10), eventCount: 2, activeInstallations: 1 },
+    { day: today.toISOString().slice(0, 10), eventCount: 3, activeInstallations: 2 },
+  ];
+}
+
 function request(path: string): Request {
   return new Request(`http://localhost${path}`);
 }
@@ -49,7 +59,8 @@ function reader(overrides: Partial<Reader> = {}): Reader {
       };
     },
     async getMonthlyReport(year, month) {
-      return year === 2026 && month === 8 ? reportRows : [];
+      const targetPrefix = `${year}-${String(month).padStart(2, "0")}`;
+      return getRecentReportRows().filter((row) => row.day.startsWith(targetPrefix));
     },
     ...overrides,
   };

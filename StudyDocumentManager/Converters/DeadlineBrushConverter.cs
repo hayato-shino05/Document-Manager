@@ -122,3 +122,27 @@ public sealed class DeadlineStatusConverter : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => Avalonia.Data.BindingOperations.DoNothing;
 }
+
+/// <summary>
+/// Converts a document status string to TextDecorations:
+/// - Strikethrough for "completed" documents (Directive 1)
+/// - null for all other statuses
+/// </summary>
+public sealed class CompletedTextDecorationConverter : IValueConverter
+{
+    public static readonly CompletedTextDecorationConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is string status && string.Equals(status, StudyDocumentManager.Core.Entities.DocumentStatus.Completed, StringComparison.OrdinalIgnoreCase))
+        {
+            return TextDecorations.Strikethrough;
+        }
+
+        return null;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => Avalonia.Data.BindingOperations.DoNothing;
+}
+
