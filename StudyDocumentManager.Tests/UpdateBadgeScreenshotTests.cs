@@ -47,19 +47,21 @@ public class UpdateBadgeScreenshotTests
         {
             if (docRepo.GetAll().Count == 0)
             {
-                docRepo.Add(new StudyDocument
+                var doc = new StudyDocument
                 {
                     Name = "契約書_ドラフト_v2.pdf",
-                    FilePath = @"C:\Sample\契約書_ドラフト_v2.pdf",
+                    FilePath = Path.Combine(Path.GetTempPath(), $"契約書_ドラフト_{Guid.NewGuid():N}.pdf"),
                     Subject = "法務",
                     Type = "PDF",
                     Status = DocumentStatus.InProgress,
                     CreatedAt = DateTime.UtcNow
-                });
+                };
+                docRepo.Add(doc);
                 var allDocs = docRepo.GetAll();
-                if (allDocs.Count > 0)
+                var createdDoc = allDocs.Find(d => d.Name == doc.Name && d.FilePath == doc.FilePath);
+                if (createdDoc != null)
                 {
-                    createdDocId = allDocs[0].Id;
+                    createdDocId = createdDoc.Id;
                     officeRepo.Save(new OfficeDocumentMetadata
                     {
                         DocumentId = createdDocId.Value,

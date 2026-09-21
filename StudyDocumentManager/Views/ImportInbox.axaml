@@ -112,14 +112,14 @@
               </StackPanel>
             </Button>
             <TextBox AutomationProperties.AutomationId="ImportInbox_Subject"
-                     Width="180"
+                     Width="120"
                      Text="{Binding BulkSubject}"
                      Watermark="{loc:Localize ImportInbox_Subject}"
                      FontSize="{DynamicResource FontSizeSm}"
                      Height="30"
                      VerticalAlignment="Center"/>
             <TextBox AutomationProperties.AutomationId="ImportInbox_Type"
-                     Width="180"
+                     Width="120"
                      Text="{Binding BulkType}"
                      Watermark="{loc:Localize ImportInbox_Type}"
                      FontSize="{DynamicResource FontSizeSm}"

@@ -60,9 +60,7 @@ function reader(overrides: Partial<Reader> = {}): Reader {
     },
     async getMonthlyReport(year, month) {
       const targetPrefix = `${year}-${String(month).padStart(2, "0")}`;
-      const recent = getRecentReportRows().filter((row) => row.day.startsWith(targetPrefix));
-      if (recent.length > 0) return recent;
-      return year === 2026 && month === 8 ? reportRows : [];
+      return getRecentReportRows().filter((row) => row.day.startsWith(targetPrefix));
     },
     ...overrides,
   };

@@ -39,8 +39,9 @@
             </Border>
 
             <!-- ═══ SYMMETRICAL 3-COLUMN WORKSPACE ═══ -->
-            <Grid ColumnDefinitions="0.85*,0.85*,2.3*" HorizontalAlignment="Stretch">
-                <!-- Column 1: Courses -->
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <Grid ColumnDefinitions="0.85*,0.85*,2.3*" MinWidth="900" HorizontalAlignment="Stretch">
+                    <!-- Column 1: Courses -->
                 <Border Grid.Column="0" Classes="card" Padding="12" Margin="0,0,8,0">
                     <DockPanel>
                         <!-- Header -->
@@ -355,6 +356,7 @@
                     </DockPanel>
                 </Border>
             </Grid>
-        </DockPanel>
-    </Border>
+        </ScrollViewer>
+    </DockPanel>
+</Border>
 </UserControl>

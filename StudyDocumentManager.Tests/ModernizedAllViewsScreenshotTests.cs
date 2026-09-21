@@ -15,14 +15,15 @@ namespace StudyDocumentManager.Tests;
 
 public class ModernizedAllViewsScreenshotTests
 {
-    private static readonly string[] ScreenshotDirs =
-    [
-        Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "screenshots"),
-        Path.Combine(Directory.GetCurrentDirectory(), "screenshots"),
-        @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\c4c022e8-7b3f-4664-ba3f-f2151f7b7645\screenshots",
-        @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\52f12f8f-7bf7-4eb1-87ac-d5a0904b69e0\screenshots",
-        @"C:\Users\ADMIN\.gemini\antigravity-cli\brain\51214019-22a3-476c-82aa-97efb6cafaf4\screenshots"
-    ];
+    // 環境変数 SDM_SCREENSHOT_DIR が設定されていればそちらを使用し、
+    // 未設定の場合はシステムの一時ディレクトリ配下に保存する
+    private static string GetScreenshotDirectory()
+    {
+        var customDir = Environment.GetEnvironmentVariable("SDM_SCREENSHOT_DIR");
+        return !string.IsNullOrWhiteSpace(customDir)
+            ? customDir
+            : Path.Combine(Path.GetTempPath(), "sdm_screenshots");
+    }
 
     private static void SaveRenderedView(Control control, int width, int height, string filename)
     {
@@ -40,17 +41,15 @@ public class ModernizedAllViewsScreenshotTests
         using var bitmap = new RenderTargetBitmap(pixelSize, dpi);
         bitmap.Render(window);
 
-        foreach (var dir in ScreenshotDirs)
+        var dir = GetScreenshotDirectory();
+        try
         {
-            try
-            {
-                Directory.CreateDirectory(dir);
-                var filePath = Path.Combine(dir, filename);
-                bitmap.Save(filePath);
-            }
-            catch
-            {
-            }
+            Directory.CreateDirectory(dir);
+            bitmap.Save(Path.Combine(dir, filename));
+        }
+        catch
+        {
+            // 保存に失敗してもテスト自体は続行する
         }
 
         window.Close();
@@ -63,17 +62,15 @@ public class ModernizedAllViewsScreenshotTests
         using var bitmap = new RenderTargetBitmap(pixelSize, dpi);
         bitmap.Render(window);
 
-        foreach (var dir in ScreenshotDirs)
+        var dir = GetScreenshotDirectory();
+        try
         {
-            try
-            {
-                Directory.CreateDirectory(dir);
-                var filePath = Path.Combine(dir, filename);
-                bitmap.Save(filePath);
-            }
-            catch
-            {
-            }
+            Directory.CreateDirectory(dir);
+            bitmap.Save(Path.Combine(dir, filename));
+        }
+        catch
+        {
+            // 保存に失敗してもテスト自体は続行する
         }
     }
 
@@ -158,34 +155,34 @@ public class ModernizedAllViewsScreenshotTests
         var pixelSize = new PixelSize(860, 640);
         var dpi = new Vector(96, 96);
 
-        // Quick Tour - Step 0 (1/5)
+        // クイックツアー - ステップ 0 (1/5)
         model.SelectedTabIndex = 0;
         model.CurrentStepIndex = 0;
         SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_step1.png");
         SaveWindowBitmap(dialog, pixelSize, dpi, "fresh_onboarding.png");
 
-        // Quick Tour - Step 1 (2/5)
+        // クイックツアー - ステップ 1 (2/5)
         model.CurrentStepIndex = 1;
         SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_step2.png");
 
-        // Quick Tour - Step 2 (3/5)
+        // クイックツアー - ステップ 2 (3/5)
         model.CurrentStepIndex = 2;
         SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_step3.png");
 
-        // Quick Tour - Step 3 (4/5)
+        // クイックツアー - ステップ 3 (4/5)
         model.CurrentStepIndex = 3;
         SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_step4.png");
 
-        // Quick Tour - Step 4 (5/5)
+        // クイックツアー - ステップ 4 (5/5)
         model.CurrentStepIndex = 4;
         SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_step5.png");
 
-        // Tab 2: Feature Guide (Catalog)
+        // タブ 2: 機能ガイド（カタログ）
         model.SelectedTabIndex = 1;
         SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_tab_catalog.png");
         SaveWindowBitmap(dialog, pixelSize, dpi, "fresh_onboarding_tab2.png");
 
-        // Tab 3: Shortcuts Cheatsheet
+        // タブ 3: ショートカット一覧
         model.SelectedTabIndex = 2;
         SaveWindowBitmap(dialog, pixelSize, dpi, "onboarding_tab_shortcuts.png");
         SaveWindowBitmap(dialog, pixelSize, dpi, "fresh_onboarding_tab3.png");
