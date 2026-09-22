@@ -21,6 +21,8 @@
 
 <img src="./StudyDocumentManager/Assets/Brand/banner.png" alt="Document Manager banner" width="100%" />
 
+<video src="./StudyDocumentManager/Assets/Brand/video/video.mp4" width="100%" controls></video>
+
 </div>
 
 ## 目次

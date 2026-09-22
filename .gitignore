@@ -211,7 +211,8 @@ publish/
 # in these scripts will be unencrypted
 PublishScripts/
 
-
+screenshots/
+promo-video/
 
 # Microsoft Azure Build Output
 csx/
