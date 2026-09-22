@@ -1,0 +1,64 @@
+name: Update Download Count Badge
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  release:
+    types: [published, edited]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-downloads-badge
+  cancel-in-progress: false
+
+jobs:
+  update-badge:
+    name: Recalculate and update download badge
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Calculate Total Downloads and Update Badge JSON
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # Fetch all release assets download counts via GitHub API
+          N=$(gh api "repos/${{ github.repository }}/releases" --jq '[.[].assets[].download_count] | add // 0')
+          BASE_OFFSET=180
+          TOTAL=$((BASE_OFFSET + N))
+
+          if [ "$N" -eq 0 ]; then
+            MESSAGE="${TOTAL}+"
+          else
+            MESSAGE="${TOTAL}"
+          fi
+
+          mkdir -p .github/badges
+          cat <<EOF > .github/badges/downloads.json
+          {
+            "schemaVersion": 1,
+            "label": "Downloads",
+            "message": "${MESSAGE}",
+            "color": "10B981"
+          }
+          EOF
+
+      - name: Commit and Push Badge Update
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          if ! git diff --quiet .github/badges/downloads.json; then
+            git add .github/badges/downloads.json
+            git commit -m "chore(badge): ダウンロード数バッジを更新する [skip ci]"
+            git push origin main
+          else
+            echo "No change in download count."
+          fi
