@@ -36,7 +36,7 @@ dpkg --validate-version "$version" || fail "Invalid Debian package version: $ver
 publish_dir="$repo_root/artifacts/publish/linux-x64"
 output_dir="$repo_root/artifacts/installer"
 template_dir="$repo_root/packaging/debian"
-output_file="$output_dir/document-manager_${version}_amd64.deb"
+output_file="$output_dir/document-manager.deb"
 
 mkdir -p "$output_dir"
 package_dir="$(mktemp -d "/tmp/.document-manager.XXXXXX")"

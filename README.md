@@ -115,13 +115,13 @@ bash ./scripts/build-debian-package.sh
 生成物は `artifacts/installer/` に作成されます。Debian/Ubuntu では生成した versioned package と SHA-256 checksum を取得して検証します。
 
 ```bash
-package="$(find artifacts/installer -maxdepth 1 -type f -name 'document-manager_*_amd64.deb' -print -quit)"
+package="artifacts/installer/document-manager.deb"
 test -n "$package"
 sha256sum "$package"
 sudo apt install "$package"
 ```
 
-タグ付き Release では `document-manager_<version>_amd64.deb` と対応する `.sha256` が release assets として公開されます。インストール後の lifecycle 検証は `.github/workflows/linux-deb-lifecycle.yml` を参照してください。workflow は versioned Release asset の URL と SHA-256 を `workflow_dispatch` で受け取り、checksum と package metadata を検証してから install、`xvfb-run` 下の launch/database initialization、purge、application files の消失、user database の存続を fail-closed で確認します。
+タグ付き Release では `document-manager.deb` と対応する `.sha256` が release assets として公開されます。インストール後の lifecycle 検証は `.github/workflows/linux-deb-lifecycle.yml` を参照してください。workflow は versioned Release asset の URL と SHA-256 を `workflow_dispatch` で受け取り、checksum と package metadata を検証してから install、`xvfb-run` 下の launch/database initialization、purge、application files の消失、user database の存続を fail-closed で確認します。
 
 アプリケーション本体は `/usr/lib/document-manager/`、起動コマンドは `/usr/bin/document-manager` に配置されます。ユーザーデータはパッケージ領域に書き込みません。データベースは `XDG_DATA_HOME` または `$HOME/.local/share` 配下の `StudyDocumentManager/data/study_documents.db` に保存されます。
 
