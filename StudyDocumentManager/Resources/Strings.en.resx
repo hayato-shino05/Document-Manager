@@ -1,0 +1,988 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root xmlns:ns1="urn:schemas-microsoft-com:xml-msdata" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:schema id="root">
+    <xs:element name="root" ns1:IsDataSet="true">
+      <xs:complexType>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+                <xs:element name="comment" type="xsd:string" minOccurs="0" ns1:Ordinal="2" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" ns1:Ordinal="0" />
+              <xs:attribute name="type" type="xsd:string" />
+              <xs:attribute name="mimetype" type="xsd:string" />
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="resheader">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="value" type="xsd:string" minOccurs="0" ns1:Ordinal="1" />
+              </xs:sequence>
+              <xs:attribute name="name" type="xsd:string" use="required" />
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter</value></resheader>
+
+  
+  <data name="Nav_Dashboard" xml:space="preserve"><value>Dashboard</value></data>
+  <data name="Nav_AddDocument" xml:space="preserve"><value>Add Document</value></data>
+  <data name="Nav_Categories" xml:space="preserve"><value>Category Management</value></data>
+  <data name="Nav_Collections" xml:space="preserve"><value>Collections</value></data>
+  <data name="Nav_RecycleBin" xml:space="preserve"><value>Recycle Bin</value></data>
+  <data name="Nav_Reports" xml:space="preserve"><value>Reports</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Settings</value></data>
+
+  
+  <data name="Action_Add" xml:space="preserve"><value>Add</value></data>
+  <data name="Action_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Action_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Action_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Action_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Action_Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Action_Filter" xml:space="preserve"><value>Filter</value></data>
+  <data name="Action_Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Action_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Action_Open" xml:space="preserve"><value>Open</value></data>
+  <data name="Action_Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Action_Import" xml:space="preserve"><value>Import</value></data>
+  <data name="Action_Restore" xml:space="preserve"><value>Restore</value></data>
+  <data name="Action_SelectAll" xml:space="preserve"><value>Select All</value></data>
+  <data name="Action_DeselectAll" xml:space="preserve"><value>Deselect All</value></data>
+
+  
+  <data name="Field_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Field_Subject" xml:space="preserve"><value>Subject</value></data>
+  <data name="Field_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Field_Author" xml:space="preserve"><value>Author</value></data>
+  <data name="Field_FilePath" xml:space="preserve"><value>File Path</value></data>
+  <data name="Field_FileSize" xml:space="preserve"><value>File Size</value></data>
+  <data name="Field_CreatedAt" xml:space="preserve"><value>Date Added</value></data>
+  <data name="Field_Notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="Field_Important" xml:space="preserve"><value>Important</value></data>
+  <data name="Field_Description" xml:space="preserve"><value>Description</value></data>
+
+  
+  <data name="Filter_All" xml:space="preserve"><value>All Items</value></data>
+  <data name="Filter_AllSubjects" xml:space="preserve"><value>All Categories</value></data>
+  <data name="Filter_AllTypes" xml:space="preserve"><value>All Document Types</value></data>
+  <data name="Filter_SearchPlaceholder" xml:space="preserve"><value>Search documents...</value></data>
+
+  
+  <data name="Msg_ConfirmDelete" xml:space="preserve"><value>Are you sure you want to delete?</value></data>
+  <data name="Msg_DeleteSuccess" xml:space="preserve"><value>Deleted successfully</value></data>
+  <data name="Msg_SaveSuccess" xml:space="preserve"><value>Saved successfully</value></data>
+  <data name="Msg_Error" xml:space="preserve"><value>An error occurred</value></data>
+  <data name="Msg_NoDocuments" xml:space="preserve"><value>No documents found</value></data>
+  <data name="Msg_FileNotFound" xml:space="preserve"><value>File not found</value></data>
+  <data name="Msg_RestoreSuccess" xml:space="preserve"><value>Restored successfully</value></data>
+  <data name="Msg_ImportSuccess" xml:space="preserve"><value>Imported successfully</value></data>
+
+  
+  <data name="Dashboard_TotalDocuments" xml:space="preserve"><value>Total Documents</value></data>
+  <data name="Dashboard_TotalSubjects" xml:space="preserve"><value>Total Subjects</value></data>
+  <data name="Dashboard_RecentFiles" xml:space="preserve"><value>Recent Files</value></data>
+  <data name="Dashboard_ImportantDocs" xml:space="preserve"><value>Important Documents</value></data>
+
+  
+  <data name="Report_BySubject" xml:space="preserve"><value>By Subject</value></data>
+  <data name="Report_ByType" xml:space="preserve"><value>By Type</value></data>
+  <data name="Report_Timeline" xml:space="preserve"><value>Timeline</value></data>
+  <data name="Report_Unknown" xml:space="preserve"><value>Unknown</value></data>
+
+  
+  <data name="Lang_Japanese" xml:space="preserve"><value>日本語</value></data>
+  <data name="Lang_English" xml:space="preserve"><value>English</value></data>
+  <data name="Lang_Vietnamese" xml:space="preserve"><value>Tiếng Việt</value></data>
+  <data name="Lang_Chinese" xml:space="preserve"><value>中文</value></data>
+
+  
+  <data name="Main_ChangeLanguage" xml:space="preserve"><value>Change Language</value></data>
+
+
+  
+  <data name="Dialog_Success" xml:space="preserve"><value>Success</value></data>
+  <data name="Dialog_Error" xml:space="preserve"><value>Error</value></data>
+  <data name="Dialog_Confirm" xml:space="preserve"><value>Confirm</value></data>
+  <data name="Dialog_Complete" xml:space="preserve"><value>Done</value></data>
+  <data name="Dialog_Notice" xml:space="preserve"><value>Notice</value></data>
+  <data name="Dialog_Deleted" xml:space="preserve"><value>Deleted</value></data>
+  <data name="Dialog_Result" xml:space="preserve"><value>Result</value></data>
+  <data name="Dialog_About" xml:space="preserve"><value>About</value></data>
+  <data name="Btn_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Btn_DeleteAll" xml:space="preserve"><value>Delete All</value></data>
+  <data name="Btn_PermanentDelete" xml:space="preserve"><value>Permanent Delete</value></data>
+  <data name="Btn_OverwriteRestore" xml:space="preserve"><value>Overwrite Restore</value></data>
+  <data name="Filter_AllItems" xml:space="preserve"><value>All</value></data>
+  <data name="Status_Ready" xml:space="preserve"><value>Ready</value></data>
+  <data name="Status_Loading" xml:space="preserve"><value>Loading...</value></data>
+  <data name="Status_TotalSummary" xml:space="preserve"><value>Total: {0} | Important: {1} | Overdue: {2}</value></data>
+  <data name="Status_Showing" xml:space="preserve"><value>Showing {0} items</value></data>
+  <data name="Status_CategorySummary" xml:space="preserve"><value>Total: {0} | Categories: {1} | Types: {2}</value></data>
+  <data name="Status_CheckingUpdate" xml:space="preserve"><value>Checking for updates...</value></data>
+  <data name="Status_UpToDate" xml:space="preserve"><value>You are using the latest version</value></data>
+  <data name="Status_CannotCheckUpdate" xml:space="preserve"><value>Cannot check for updates</value></data>
+  <data name="Status_NewVersionAvailable" xml:space="preserve"><value>New version {0} available</value></data>
+  <data name="Status_TotalDocs" xml:space="preserve"><value>Total: {0}</value></data>
+  <data name="Status_MissingFiles" xml:space="preserve"><value>Missing files: {0}</value></data>
+  <data name="Status_ScanPrompt" xml:space="preserve"><value>Press Scan to check file integrity</value></data>
+  <data name="Status_ScanComplete" xml:space="preserve"><value>Done! {0}/{1} files missing</value></data>
+  <data name="Status_UpcomingDeadlines" xml:space="preserve"><value>Upcoming deadline (7 days): {0}</value></data>
+  <data name="Status_Overdue" xml:space="preserve"><value>Overdue: {0}</value></data>
+  <data name="Recycle_ConfirmRestore" xml:space="preserve"><value>Restore '{0}'?</value></data>
+  <data name="Recycle_RestoreSuccess" xml:space="preserve"><value>Document restored</value></data>
+  <data name="Recycle_ConfirmPermanentDelete" xml:space="preserve"><value>Permanently delete '{0}'? This cannot be undone!</value></data>
+  <data name="Recycle_ConfirmEmptyTrash" xml:space="preserve"><value>Permanently delete {0} document(s)? This cannot be undone!</value></data>
+  <data name="Recycle_EmptyTrashDone" xml:space="preserve"><value>Permanently deleted {0} document(s)</value></data>
+  <data name="Operation_Partial" xml:space="preserve"><value>Processed {0} of {1} documents. The remaining items were kept. Please try again.</value></data>
+  <data name="Recycle_RestoreError" xml:space="preserve"><value>Could not restore document</value></data>
+  <data name="Recycle_PermanentDeleteError" xml:space="preserve"><value>Could not permanently delete document</value></data>
+  <data name="Recycle_PermanentDeleteSuccess" xml:space="preserve"><value>Document permanently deleted</value></data>
+  <data name="Note_SaveSuccess" xml:space="preserve"><value>Note saved</value></data>
+  <data name="Note_SaveError" xml:space="preserve"><value>Cannot save note</value></data>
+  <data name="Note_ConfirmDelete" xml:space="preserve"><value>Delete this note?</value></data>
+  <data name="Note_ConfirmDiscard" xml:space="preserve"><value>Discard unsaved changes?</value></data>
+  <data name="Note_Discard" xml:space="preserve"><value>Discard</value></data>
+  <data name="Note_DeleteSuccess" xml:space="preserve"><value>Note deleted</value></data>
+  <data name="Recent_ConfirmClear" xml:space="preserve"><value>Clear all browsing history?</value></data>
+  <data name="Recent_FileExists" xml:space="preserve"><value>✓</value></data>
+  <data name="Recent_FileMissing" xml:space="preserve"><value>File missing</value></data>
+  <data name="Import_SelectFolder" xml:space="preserve"><value>Select Document Folder</value></data>
+  <data name="Import_NoFileSelected" xml:space="preserve"><value>No files selected for import</value></data>
+  <data name="Import_Done" xml:space="preserve"><value>Imported {0}/{1} files</value></data>
+  <data name="Bulk_NoDocSelected" xml:space="preserve"><value>No documents selected</value></data>
+  <data name="Bulk_ConfirmDelete" xml:space="preserve"><value>Delete {0} document(s)? (Can be restored from recycle bin)</value></data>
+  <data name="Bulk_DeleteDone" xml:space="preserve"><value>Moved {0} item(s) to recycle bin</value></data>
+  <data name="Bulk_MarkImportantDone" xml:space="preserve"><value>Marked {0} item(s) as important</value></data>
+  <data name="Bulk_SelectNewSubject" xml:space="preserve"><value>Please select a new category from the dropdown</value></data>
+  <data name="Bulk_ConfirmChangeSubject" xml:space="preserve"><value>Change category of {0} document(s) to '{1}'?</value></data>
+  <data name="Bulk_ChangeSubjectTitle" xml:space="preserve"><value>Change Category</value></data>
+  <data name="Bulk_ChangeSubjectDone" xml:space="preserve"><value>Updated {0} categories</value></data>
+  <data name="Integrity_FileNotExist" xml:space="preserve"><value>File does not exist</value></data>
+  <data name="Integrity_AllFilesOk" xml:space="preserve"><value>Checked {0} documents. All files exist.</value></data>
+  <data name="Integrity_SelectNewFile" xml:space="preserve"><value>Select New File</value></data>
+  <data name="Integrity_FileFilter" xml:space="preserve"><value>All (*.*)|*.*|PDF (*.pdf)|*.pdf|Word (*.docx;*.doc)|*.docx;*.doc|Excel (*.xlsx)|*.xlsx</value></data>
+  <data name="Integrity_PathUpdated" xml:space="preserve"><value>File path updated</value></data>
+  <data name="Integrity_ConfirmClearPath" xml:space="preserve"><value>Clear the file path?
+The document metadata will be kept and the path will be empty.</value></data>
+  <data name="Integrity_ConfirmDeleteDoc" xml:space="preserve"><value>Delete this document:
+"{0}"?
+
+(It can be restored from the recycle bin)</value></data>
+  <data name="Integrity_ConfirmRemoveAll" xml:space="preserve"><value>Remove {0} document(s) with missing files from the database?
+(They can be restored from the recycle bin)</value></data>
+  <data name="Integrity_MovedToTrash" xml:space="preserve"><value>Moved {0} item(s) to recycle bin</value></data>
+  <data name="Category_RenameSubjectTitle" xml:space="preserve"><value>Rename Category</value></data>
+  <data name="Category_RenameTypeTitle" xml:space="preserve"><value>Rename Type</value></data>
+  <data name="Category_NewNameLabel" xml:space="preserve"><value>New name:</value></data>
+  <data name="Category_RenameSubjectDone" xml:space="preserve"><value>Renamed category to '{0}'</value></data>
+  <data name="Category_RenameTypeDone" xml:space="preserve"><value>Renamed type to '{0}'</value></data>
+  <data name="Category_ConfirmDeleteSubject" xml:space="preserve"><value>Delete Category</value></data>
+  <data name="Category_ConfirmDeleteType" xml:space="preserve"><value>Delete Type</value></data>
+  <data name="Category_DeleteConfirmMsg" xml:space="preserve"><value>Delete {0}?</value></data>
+  <data name="Category_DeleteWithDocsMsg" xml:space="preserve"><value>Delete {0}?
+
+The related {1} document(s) will be moved to the recycle bin.</value></data>
+  <data name="Category_SelectedCount" xml:space="preserve"><value>Selected {0} items</value></data>
+  <data name="Category_DeletedSubject" xml:space="preserve"><value>Deleted category '{0}'</value></data>
+  <data name="Category_DeletedSubjects" xml:space="preserve"><value>Deleted {0} categories</value></data>
+  <data name="Category_DeletedType" xml:space="preserve"><value>Deleted type '{0}'</value></data>
+  <data name="Category_DeletedTypes" xml:space="preserve"><value>Deleted {0} types</value></data>
+  <data name="Category_AddSubjectTitle" xml:space="preserve"><value>Add Category</value></data>
+  <data name="Category_AddSubjectLabel" xml:space="preserve"><value>New category name:</value></data>
+  <data name="Category_AddTypeTitle" xml:space="preserve"><value>Add Type</value></data>
+  <data name="Category_AddTypeLabel" xml:space="preserve"><value>New type name:</value></data>
+  <data name="Category_AlreadyExists" xml:space="preserve"><value>'{0}' already exists</value></data>
+  <data name="Category_AddedSubject" xml:space="preserve"><value>Added category '{0}'</value></data>
+  <data name="Category_AddedType" xml:space="preserve"><value>Added type '{0}'</value></data>
+  <data name="Collection_CreateTitle" xml:space="preserve"><value>Create Collection</value></data>
+  <data name="Collection_CreateLabel" xml:space="preserve"><value>Collection name:</value></data>
+  <data name="Collection_Created" xml:space="preserve"><value>Created collection '{0}'</value></data>
+  <data name="Collection_LoadError" xml:space="preserve"><value>Cannot load collections: {0}</value></data>
+  <data name="Collection_CreateError" xml:space="preserve"><value>Cannot create collection: {0}</value></data>
+  <data name="Collection_RenameTitle" xml:space="preserve"><value>Rename</value></data>
+  <data name="Collection_ConfirmDelete" xml:space="preserve"><value>Delete collection '{0}'?</value></data>
+  <data name="Collection_AllDocsAlreadyIn" xml:space="preserve"><value>All documents are already in this collection</value></data>
+  <data name="Collection_AddedDocs" xml:space="preserve"><value>Added {0} document(s) to '{1}'</value></data>
+  <data name="Collection_AddError" xml:space="preserve"><value>Cannot add documents: {0}</value></data>
+  <data name="Collection_ConfirmRemoveDoc" xml:space="preserve"><value>Remove '{0}' from collection?</value></data>
+  <data name="Collection_ConfirmRemoveDocs" xml:space="preserve"><value>Remove {0} document(s) from collection?</value></data>
+  <data name="Dashboard_ConfirmDelete" xml:space="preserve"><value>Move '{0}' to recycle bin?</value></data>
+  <data name="Dashboard_CannotUpdateCategory" xml:space="preserve"><value>Cannot update category</value></data>
+  <data name="Dashboard_BackupTitle" xml:space="preserve"><value>Backup</value></data>
+  <data name="Dashboard_BackupDone" xml:space="preserve"><value>Database backed up to:
+{0}</value></data>
+  <data name="Dashboard_BackupError" xml:space="preserve"><value>Cannot backup: {0}</value></data>
+  <data name="Dashboard_ExportTitle" xml:space="preserve"><value>CSV Export</value></data>
+  <data name="Dashboard_ExportDone" xml:space="preserve"><value>Exported {0} document(s) to:
+{1}</value></data>
+  <data name="Dashboard_ExportError" xml:space="preserve"><value>Cannot export CSV: {0}</value></data>
+  <data name="Dashboard_CsvYes" xml:space="preserve"><value>Yes</value></data>
+  <data name="Dashboard_CsvNo" xml:space="preserve"><value>No</value></data>
+  <data name="Dashboard_SelectBackup" xml:space="preserve"><value>Select Backup File</value></data>
+  <data name="Dashboard_BackupNotExist" xml:space="preserve"><value>Backup file does not exist</value></data>
+  <data name="Dashboard_ConfirmRestore" xml:space="preserve"><value>Confirm</value></data>
+  <data name="Dashboard_RestoreWarning" xml:space="preserve"><value>Restoring will overwrite all current data. Are you sure?</value></data>
+  <data name="Dashboard_RestoreDone" xml:space="preserve"><value>Database restore completed</value></data>
+  <data name="Dashboard_RestoreError" xml:space="preserve"><value>Cannot restore: {0}</value></data>
+  <data name="Dashboard_NoCollections" xml:space="preserve"><value>No collections. Please create one from the Collections menu first.</value></data>
+  <data name="Dashboard_AddedToCollection" xml:space="preserve"><value>Added '{0}' to collection '{1}'</value></data>
+  <data name="Dashboard_AlreadyInCollection" xml:space="preserve"><value>This document is already in collection '{0}'</value></data>
+  <data name="Dashboard_FileMissingMessage" xml:space="preserve"><value>This file is missing. Open File Integrity to relink the path or clear it?</value></data>
+  <data name="Dashboard_About" xml:space="preserve"><value>Document Manager v{0}
+
+A personal document management application
+Framework: Avalonia UI (.NET 9)
+Database: SQLite (local)
+
+© 2025 hayato-shino05
+GitHub: github.com/hayato-shino05/study-document-manager</value></data>
+  <data name="Main_UpdateTitle" xml:space="preserve"><value>Update</value></data>
+  <data name="Main_CannotConnect" xml:space="preserve"><value>Cannot connect to the server.
+Please check your network connection.</value></data>
+  <data name="Main_AlreadyLatest" xml:space="preserve"><value>You are using the latest version (v{0}).</value></data>
+  <data name="Main_About" xml:space="preserve"><value>Document Manager v{0}&#xA;&#xA;A personal document management application&#xA;Framework: Avalonia UI (.NET 9)&#xA;Database: SQLite (local)&#xA;&#xA;© 2025 hayato-shino05&#xA;GitHub: github.com/hayato-shino05/study-document-manager</value></data>
+  <data name="SelectCollection_None" xml:space="preserve"><value>No collection selected</value></data>
+  <data name="SelectCollection_Selected" xml:space="preserve"><value>Selected: {0}</value></data>
+  <data name="AddEdit_PageTitleAdd" xml:space="preserve"><value>Add Document</value></data>
+  <data name="AddEdit_PageTitleEdit" xml:space="preserve"><value>Edit Document</value></data>
+  <data name="AddEdit_NameRequired" xml:space="preserve"><value>Document name is required</value></data>
+  <data name="AddEdit_SaveUpdated" xml:space="preserve"><value>Document updated</value></data>
+  <data name="AddEdit_SaveAdded" xml:space="preserve"><value>Document added</value></data>
+  <data name="AddEdit_SaveError" xml:space="preserve"><value>Could not save the document. Please try again.</value></data>
+  <data name="AddEdit_BrowseFile" xml:space="preserve"><value>Select Document</value></data>
+  <data name="AddEdit_FileFilter" xml:space="preserve"><value>All Files|*.*|PDF|*.pdf|Word|*.doc;*.docx|Excel|*.xls;*.xlsx|Image|*.png;*.jpg;*.jpeg;*.gif;*.bmp</value></data>
+  <data name="Duplicate_NoDuplicates" xml:space="preserve"><value>No duplicate documents found</value></data>
+  <data name="Duplicate_ConfirmDelete" xml:space="preserve"><value>Delete document '{0}' (ID: {1})?</value></data>
+  <data name="Duplicate_Merge" xml:space="preserve"><value>Merge</value></data>
+  <data name="Duplicate_ConfirmMerge" xml:space="preserve"><value>Keep '{0}' and merge {1} duplicate document(s) into it?</value></data>
+  <data name="Duplicate_MergeSuccess" xml:space="preserve"><value>Merged {1} duplicate document(s) into '{0}'.</value></data>
+  <data name="Duplicate_MatchInfo" xml:space="preserve"><value>{0} documents</value></data>
+  <data name="Related_ConfirmRemove" xml:space="preserve"><value>Unlink from '{0}'?</value></data>
+  <data name="Related_TypeRelated" xml:space="preserve"><value>Related</value></data>
+  <data name="Related_TypeReference" xml:space="preserve"><value>Reference</value></data>
+  <data name="Related_TypeSupplement" xml:space="preserve"><value>Supplement</value></data>
+  <data name="Related_TypePrerequisite" xml:space="preserve"><value>Prerequisite</value></data>
+  <data name="Related_TypeSequel" xml:space="preserve"><value>Sequel</value></data>
+  <data name="Dashboard_QuickEditTagsTitle" xml:space="preserve"><value>Edit Tags</value></data>
+  <data name="Dashboard_QuickEditTagsLabel" xml:space="preserve"><value>Tags for "{0}":</value></data>
+  <data name="Dashboard_QuickEditTagsHint" xml:space="preserve"><value>e.g. Programming, Math, Physics</value></data>
+  <data name="Dashboard_QuickEditNotesTitle" xml:space="preserve"><value>Edit Notes</value></data>
+  <data name="Dashboard_QuickEditNotesLabel" xml:space="preserve"><value>Notes for "{0}":</value></data>
+  <data name="Dashboard_QuickEditNotesHint" xml:space="preserve"><value>Enter notes...</value></data>
+  <data name="CategoryTree_AllDocs" xml:space="preserve"><value>All Documents</value></data>
+  <data name="CategoryTree_Category" xml:space="preserve"><value>Category</value></data>
+  <data name="CategoryTree_FileType" xml:space="preserve"><value>File Type</value></data>
+  <data name="CategoryTree_Important" xml:space="preserve"><value>Important</value></data>
+  <data name="CategoryTree_Collection" xml:space="preserve"><value>Collections</value></data>
+  <data name="Dashboard_BackupFileFilter" xml:space="preserve"><value>Database|*.db|All Files|*.*</value></data>
+  <data name="Dashboard_CsvFileFilter" xml:space="preserve"><value>CSV|*.csv|All Files|*.*</value></data>
+  <data name="Dashboard_BackupOpenFilter" xml:space="preserve"><value>Database|*.db|All Files|*.*</value></data>
+  <data name="Menu_File" xml:space="preserve"><value>File</value></data>
+  <data name="Menu_Organize" xml:space="preserve"><value>Organize</value></data>
+  <data name="Menu_Import" xml:space="preserve"><value>Import</value></data>
+  <data name="Menu_Maintenance" xml:space="preserve"><value>Maintenance</value></data>
+  <data name="Menu_Analytics" xml:space="preserve"><value>Analytics</value></data>
+  <data name="Menu_AddNewDocument" xml:space="preserve"><value>Add New Document</value></data>
+  <data name="Menu_OpenDocument" xml:space="preserve"><value>Open Document</value></data>
+  <data name="Menu_ExportCsv" xml:space="preserve"><value>Export CSV</value></data>
+  <data name="Menu_ExportArchive" xml:space="preserve"><value>Export archive</value></data>
+  <data name="Menu_ImportArchive" xml:space="preserve"><value>Import archive</value></data>
+  <data name="Archive_ExportTitle" xml:space="preserve"><value>Export archive</value></data>
+  <data name="Archive_ImportTitle" xml:space="preserve"><value>Import archive</value></data>
+  <data name="Archive_ExportSuccess" xml:space="preserve"><value>Archive exported ({0} documents)</value></data>
+  <data name="Archive_ImportSuccess" xml:space="preserve"><value>Archive imported ({0} documents)</value></data>
+  <data name="Archive_FailureMessage" xml:space="preserve"><value>Archive operation failed</value></data>
+  <data name="Archive_NoZipSelected" xml:space="preserve"><value>No ZIP file selected</value></data>
+  <data name="Menu_BackupDb" xml:space="preserve"><value>Backup Database</value></data>
+  <data name="Menu_RestoreDb" xml:space="preserve"><value>Restore Database</value></data>
+  <data name="Menu_Exit" xml:space="preserve"><value>Exit</value></data>
+  <data name="Menu_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Menu_EditDocument" xml:space="preserve"><value>Edit Document</value></data>
+  <data name="Menu_DeleteDocument" xml:space="preserve"><value>Delete Document</value></data>
+  <data name="Menu_RefreshList" xml:space="preserve"><value>Refresh List</value></data>
+  <data name="Menu_Tools" xml:space="preserve"><value>Tools</value></data>
+  <data name="Menu_ManageCategories" xml:space="preserve"><value>Category Management</value></data>
+  <data name="Menu_Collections" xml:space="preserve"><value>Collections</value></data>
+  <data name="Menu_BatchImport" xml:space="preserve"><value>Batch Import</value></data>
+  <data name="ImportInbox_Title" xml:space="preserve"><value>Import Inbox</value></data>
+  <data name="ImportInbox_ShowProcessed" xml:space="preserve"><value>Show processed</value></data>
+  <data name="ImportInbox_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="ImportInbox_State" xml:space="preserve"><value>State</value></data>
+  <data name="ImportInbox_Source" xml:space="preserve"><value>Source</value></data>
+  <data name="ImportInbox_Retry" xml:space="preserve"><value>Retry</value></data>
+  <data name="ImportInbox_Reveal" xml:space="preserve"><value>Reveal</value></data>
+  <data name="ImportInbox_SourceMissing" xml:space="preserve"><value>Source file is missing.</value></data>
+  <data name="ImportInbox_Status" xml:space="preserve"><value>{0} inbox items</value></data>
+  <data name="ImportInbox_Empty" xml:space="preserve"><value>No items in the import inbox.</value></data>
+  <data name="ImportInbox_Subject" xml:space="preserve"><value>Subject</value></data>  <data name="ImportInbox_ApplyMetadata" xml:space="preserve"><value>Apply metadata</value></data>
+  <data name="ImportInbox_Type" xml:space="preserve"><value>Type</value></data>  <data name="ImportInbox_All" xml:space="preserve"><value>All</value></data>
+  <data name="ImportInbox_State_Pending" xml:space="preserve"><value>Pending</value></data>
+  <data name="ImportInbox_State_Held" xml:space="preserve"><value>Held</value></data>
+  <data name="ImportInbox_State_Failed" xml:space="preserve"><value>Failed</value></data>
+  <data name="ImportInbox_State_Processed" xml:space="preserve"><value>Processed</value></data>
+  <data name="ImportInbox_State_MissingMetadata" xml:space="preserve"><value>Missing Metadata</value></data>
+  <data name="ImportInbox_State_Ambiguous" xml:space="preserve"><value>Ambiguous Name</value></data>
+  <data name="ImportInbox_Failure" xml:space="preserve"><value>Failure</value></data>
+  <data name="ImportInbox_Duplicate" xml:space="preserve"><value>Duplicate candidate</value></data>
+  <data name="Menu_BulkDelete" xml:space="preserve"><value>Bulk Delete</value></data>
+  <data name="Menu_FindDuplicates" xml:space="preserve"><value>Find Duplicates</value></data>
+  <data name="Menu_FileCheck" xml:space="preserve"><value>File Integrity</value></data>
+  <data name="Menu_Statistics" xml:space="preserve"><value>Statistics</value></data>
+  <data name="Menu_RecycleBin" xml:space="preserve"><value>Recycle Bin</value></data>
+  <data name="Menu_Help" xml:space="preserve"><value>Help</value></data>
+  <data name="Menu_CheckUpdate" xml:space="preserve"><value>Check for Updates</value></data>
+  <data name="Menu_About" xml:space="preserve"><value>About</value></data>
+  <data name="Toolbar_Add" xml:space="preserve"><value>Add</value></data>
+  <data name="Toolbar_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Toolbar_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Toolbar_OpenFile" xml:space="preserve"><value>Open</value></data>
+  <data name="Toolbar_Export" xml:space="preserve"><value>Export</value></data>
+  <data name="Toolbar_RecycleBin" xml:space="preserve"><value>Recycle Bin</value></data>
+  <data name="Toolbar_Bulk" xml:space="preserve"><value>Bulk</value></data>
+  <data name="Toolbar_Recent" xml:space="preserve"><value>History</value></data>
+  <data name="Toolbar_Backup" xml:space="preserve"><value>Save</value></data>
+  <data name="Toolbar_Duplicates" xml:space="preserve"><value>Duplicates</value></data>
+  <data name="Toolbar_Statistics" xml:space="preserve"><value>Statistics</value></data>
+  <data name="Toolbar_GoBack" xml:space="preserve"><value>Go Back</value></data>
+  <data name="Dashboard_SearchWatermark" xml:space="preserve"><value>Search documents...</value></data>
+  <data name="Dashboard_ColName" xml:space="preserve"><value>Name</value></data>
+  <data name="Dashboard_ColSubject" xml:space="preserve"><value>Subject</value></data>
+  <data name="Dashboard_ColType" xml:space="preserve"><value>Type</value></data>
+  <data name="Dashboard_ColDate" xml:space="preserve"><value>Date Added</value></data>
+  <data name="Dashboard_ColSize" xml:space="preserve"><value>Size</value></data>
+  <data name="Dashboard_ColImportant" xml:space="preserve"><value>★</value></data>
+  <data name="Dashboard_ContextOpen" xml:space="preserve"><value>Open</value></data>
+  <data name="Dashboard_ContextEdit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Dashboard_ContextDelete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Dashboard_ContextToggleImportant" xml:space="preserve"><value>Toggle Important</value></data>
+  <data name="Dashboard_ContextCopyPath" xml:space="preserve"><value>Copy Path</value></data>
+  <data name="Dashboard_ContextRelated" xml:space="preserve"><value>Related Documents</value></data>
+  <data name="Dashboard_ContextNote" xml:space="preserve"><value>Notes</value></data>
+  <data name="Dashboard_ContextAddToCollection" xml:space="preserve"><value>Add to Collection</value></data>
+  <data name="Dashboard_ContextEditTags" xml:space="preserve"><value>Edit Tags</value></data>
+  <data name="Dashboard_ContextEditNotes" xml:space="preserve"><value>Edit Notes</value></data>
+  <data name="Dashboard_SearchPlaceholder" xml:space="preserve"><value>Search by name, notes, author, tags...</value></data>
+  <data name="Dashboard_BtnSearch" xml:space="preserve"><value>Search</value></data>
+  <data name="Dashboard_LblCategory" xml:space="preserve"><value>Category:</value></data>
+  <data name="Dashboard_LblType" xml:space="preserve"><value>Type:</value></data>
+  <data name="Dashboard_BtnAdvancedFilter" xml:space="preserve"><value>Advanced Filter</value></data>
+  <data name="Dashboard_LblDateRange" xml:space="preserve"><value>Date Range</value></data>
+  <data name="Dashboard_LblFrom" xml:space="preserve"><value>From:</value></data>
+  <data name="Dashboard_LblTo" xml:space="preserve"><value>To:</value></data>
+  <data name="Dashboard_LblFileSize" xml:space="preserve"><value>File Size</value></data>
+  <data name="Dashboard_LblSizeFrom" xml:space="preserve"><value>Min</value></data>
+  <data name="Dashboard_LblImportantOnly" xml:space="preserve"><value>Important Only</value></data>
+  <data name="Dashboard_BtnApplyFilter" xml:space="preserve"><value>Apply</value></data>
+  <data name="Dashboard_BtnClearFilter" xml:space="preserve"><value>Clear Filter</value></data>
+  <data name="Dashboard_LblClassification" xml:space="preserve"><value>Classification</value></data>
+  <data name="Dashboard_StatTotal" xml:space="preserve"><value>Total</value></data>
+  <data name="Dashboard_StatCategories" xml:space="preserve"><value>Category</value></data>
+  <data name="Dashboard_StatImportant" xml:space="preserve"><value>Important</value></data>
+  <data name="Dashboard_StatOverdue" xml:space="preserve"><value>Overdue</value></data>
+  <data name="Dashboard_StatNoFile" xml:space="preserve"><value>Missing Files</value></data>
+  <data name="Dashboard_StatRecycleBin" xml:space="preserve"><value>Recycle Bin</value></data>
+  <data name="Dashboard_CtxOpenFile" xml:space="preserve"><value>Open File</value></data>
+  <data name="Dashboard_CtxEditDoc" xml:space="preserve"><value>Edit Document</value></data>
+  <data name="Dashboard_CtxChangeCategory" xml:space="preserve"><value>Change Category...</value></data>
+  <data name="Dashboard_CtxDeleteToTrash" xml:space="preserve"><value>Delete (to Recycle Bin)</value></data>
+  <data name="Dashboard_CtxCopyName" xml:space="preserve"><value>Copy Document Name</value></data>
+  <data name="Dashboard_CtxCopyPath" xml:space="preserve"><value>Copy Path</value></data>
+  <data name="Dashboard_CtxOpenFolder" xml:space="preserve"><value>Open Folder</value></data>
+  <data name="Dashboard_CtxEditTags" xml:space="preserve"><value>Edit Tags...</value></data>
+  <data name="Dashboard_CtxEditNotes" xml:space="preserve"><value>Edit Notes...</value></data>
+  <data name="Dashboard_CtxMarkImportant" xml:space="preserve"><value>Mark Important</value></data>
+  <data name="Dashboard_CtxPersonalNote" xml:space="preserve"><value>Personal Note</value></data>
+  <data name="Dashboard_CtxAddToCollection" xml:space="preserve"><value>Add to Collection</value></data>
+  <data name="Dashboard_CtxRelatedDocs" xml:space="preserve"><value>Related Documents</value></data>
+  <data name="Dashboard_ColDocName" xml:space="preserve"><value>Document Name</value></data>
+  <data name="Dashboard_ColDeadline" xml:space="preserve"><value>Deadline</value></data>
+  <data name="Dashboard_BtnRefresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Dashboard_BtnUpcoming" xml:space="preserve"><value>Upcoming Deadline</value></data>
+  <data name="Dashboard_BtnOverdue" xml:space="preserve"><value>Overdue</value></data>
+  <data name="Dashboard_BtnOpenFolder" xml:space="preserve"><value>Folder</value></data>
+  <data name="Dashboard_PreviewImportant" xml:space="preserve"><value>Important</value></data>
+  <data name="AddDocDialog_Title" xml:space="preserve"><value>Add Document</value></data>
+  <data name="AddDocDialog_FileName" xml:space="preserve"><value>File Name:</value></data>
+  <data name="AddDocDialog_Subject" xml:space="preserve"><value>Subject:</value></data>
+  <data name="AddDocDialog_Type" xml:space="preserve"><value>Type:</value></data>
+  <data name="AddDocDialog_BtnAdd" xml:space="preserve"><value>Add</value></data>
+  <data name="AddDocDialog_BtnCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="AddToCollection_Title" xml:space="preserve"><value>Add to Collection</value></data>
+  <data name="AddToCollection_DocInfo" xml:space="preserve"><value>Document Info</value></data>
+  <data name="AddToCollection_SelectCollection" xml:space="preserve"><value>Select collection:</value></data>
+  <data name="AddToCollection_BtnAdd" xml:space="preserve"><value>Add</value></data>
+  <data name="AddToCollection_Subtitle" xml:space="preserve"><value>Select a collection to add the selected document</value></data>
+  <data name="AddToCollection_SearchPlaceholder" xml:space="preserve"><value>Search documents...</value></data>
+  <data name="Bulk_BtnSelectAll" xml:space="preserve"><value>Select All</value></data>
+  <data name="Bulk_Selected" xml:space="preserve"><value>Selected</value></data>
+  <data name="Bulk_Documents" xml:space="preserve"><value>documents</value></data>
+  <data name="ChangeCategory_Title" xml:space="preserve"><value>Change Category</value></data>
+  <data name="ChangeCategory_NewCategory" xml:space="preserve"><value>New category:</value></data>
+  <data name="ChangeCategory_BtnChange" xml:space="preserve"><value>Change</value></data>
+  <data name="ChangeCategory_BtnCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="SelectCollDialog_Title" xml:space="preserve"><value>Select Collection</value></data>
+  <data name="SelectCollDialog_SelectPrompt" xml:space="preserve"><value>Please select a collection:</value></data>
+  <data name="SelectCollDialog_BtnOk" xml:space="preserve"><value>OK</value></data>
+  <data name="SelectCollDialog_BtnCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Report_Title" xml:space="preserve"><value>Statistics Report</value></data>
+  <data name="Report_TabSubject" xml:space="preserve"><value>By Subject</value></data>
+  <data name="Report_TabType" xml:space="preserve"><value>By Type</value></data>
+  <data name="Report_TabTimeline" xml:space="preserve"><value>Timeline</value></data>
+  <data name="RecycleBin_Title" xml:space="preserve"><value>Recycle Bin</value></data>
+  <data name="RecycleBin_BtnRestore" xml:space="preserve"><value>Restore</value></data>
+  <data name="RecycleBin_BtnPermanentDelete" xml:space="preserve"><value>Permanent Delete</value></data>
+  <data name="RecycleBin_BtnEmptyTrash" xml:space="preserve"><value>Empty Recycle Bin</value></data>
+  <data name="RecycleBin_ColName" xml:space="preserve"><value>Name</value></data>
+  <data name="RecycleBin_ColDeletedAt" xml:space="preserve"><value>Deleted Date</value></data>
+  <data name="RecentFiles_Title" xml:space="preserve"><value>Browsing History</value></data>
+  <data name="RecentFiles_BtnRefresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="RecentFiles_BtnClear" xml:space="preserve"><value>Clear History</value></data>
+  <data name="RecentFiles_CountFormat" xml:space="preserve"><value>Total: {0}</value></data>
+  <data name="RecentFiles_ColName" xml:space="preserve"><value>Document Name</value></data>
+  <data name="RecentFiles_ColSubject" xml:space="preserve"><value>Category</value></data>
+  <data name="RecentFiles_ColType" xml:space="preserve"><value>Type</value></data>
+  <data name="RecentFiles_ColOpenedAt" xml:space="preserve"><value>Opened At</value></data>
+  <data name="RecentFiles_ColStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="RecentFiles_ColAction" xml:space="preserve"><value>Action</value></data>
+  <data name="RecentFiles_BtnOpen" xml:space="preserve"><value>Open</value></data>
+  <data name="Dashboard_EmptyState" xml:space="preserve"><value>No documents to display</value></data>
+  <data name="Dashboard_LoadError" xml:space="preserve"><value>Could not load documents. Please retry.</value></data>
+  <data name="Dashboard_BtnRetry" xml:space="preserve"><value>Retry</value></data>
+  <data name="RecentFiles_EmptyState" xml:space="preserve"><value>No recently opened files</value></data>
+  <data name="RecycleBin_EmptyState" xml:space="preserve"><value>Recycle bin is empty</value></data>
+  <data name="RecycleBin_ColSubject" xml:space="preserve"><value>Category</value></data>
+  <data name="RecycleBin_ColType" xml:space="preserve"><value>Type</value></data>
+  <data name="RecycleBin_ColDate" xml:space="preserve"><value>Date Added</value></data>
+  <data name="SelectCollDialog_SelectChips" xml:space="preserve"><value>Click a collection to select:</value></data>
+  <data name="SelectCollDialog_EmptyState" xml:space="preserve"><value>No collections - create one from the Collections menu</value></data>
+  <data name="SelectCollDialog_NoneSelected" xml:space="preserve"><value>No collection selected</value></data>
+  <data name="SelectCollDialog_BtnAdd" xml:space="preserve"><value>Add</value></data>
+  <data name="Dashboard_TipSearch" xml:space="preserve"><value>Start Search</value></data>
+  <data name="Dashboard_TipAdvancedFilter" xml:space="preserve"><value>Toggle Advanced Filter</value></data>
+  <data name="Dashboard_TipApplyFilter" xml:space="preserve"><value>Apply Filter</value></data>
+  <data name="Dashboard_TipClearFilter" xml:space="preserve"><value>Clear All Filters</value></data>
+  <data name="Dashboard_TipFilterByItem" xml:space="preserve"><value>Filter by this item</value></data>
+  <data name="Dashboard_TipEditTags" xml:space="preserve"><value>Tags are not shown in the table - edit here</value></data>
+  <data name="Dashboard_TipEditNotes" xml:space="preserve"><value>Notes are not shown in the table - edit here</value></data>
+  <data name="Dashboard_TipPersonalNote" xml:space="preserve"><value>Private note (saved separately from internal notes)</value></data>
+  <data name="Dashboard_TipRefresh" xml:space="preserve"><value>Refresh Document List (F5)</value></data>
+  <data name="Dashboard_TipUpcoming" xml:space="preserve"><value>Show Upcoming Deadlines</value></data>
+  <data name="Dashboard_TipOverdue" xml:space="preserve"><value>Show Overdue Documents</value></data>
+  <data name="Dashboard_DeadlineFormat" xml:space="preserve"><value>Deadline: {0:dd/MM/yyyy}</value></data>
+  <data name="Report_BtnRefresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Report_NoData" xml:space="preserve"><value>No data available</value></data>
+  <data name="Report_ByTypeChart" xml:space="preserve"><value>By Type</value></data>
+  <data name="Report_Last7Days" xml:space="preserve"><value>Last 7 Days</value></data>
+  <data name="Report_Last12Months" xml:space="preserve"><value>Last 12 Months</value></data>
+  <data name="BatchImport_Title" xml:space="preserve"><value>Batch Import</value></data>
+  <data name="BatchImport_BtnSelectFolder" xml:space="preserve"><value>Select Folder</value></data>
+  <data name="BatchImport_BtnImport" xml:space="preserve"><value>Import</value></data>
+  <data name="BatchImport_ColFileName" xml:space="preserve"><value>File Name</value></data>
+  <data name="BatchImport_ColFileType" xml:space="preserve"><value>Type</value></data>
+  <data name="BatchImport_ColFileSize" xml:space="preserve"><value>Size</value></data>
+  <data name="BatchImport_ColSubject" xml:space="preserve"><value>Category</value></data>
+  <data name="BatchImport_EmptyState" xml:space="preserve"><value>Select a folder to show importable files</value></data>
+  <data name="BatchImport_StatusImporting" xml:space="preserve"><value>Importing selected files...</value></data>
+  <data name="BatchImport_ScanError" xml:space="preserve"><value>Could not scan or import the selected files</value></data>
+  <data name="BatchImport_ResultSummary" xml:space="preserve"><value>Imported: {0}, skipped duplicates: {1}, failed: {2}</value></data>
+  <data name="BatchImport_FailuresRemain" xml:space="preserve"><value>{0} failed item(s) remain selected. Fix the issue and retry.</value></data>
+  <data name="BulkDelete_Title" xml:space="preserve"><value>Bulk Delete</value></data>
+  <data name="BulkDelete_BtnDelete" xml:space="preserve"><value>Delete</value></data>
+  <data name="BulkDelete_BtnMarkImportant" xml:space="preserve"><value>Mark Important</value></data>
+  <data name="BulkDelete_BtnChangeSubject" xml:space="preserve"><value>Change Category</value></data>
+  <data name="BulkDelete_ColName" xml:space="preserve"><value>Document Name</value></data>
+  <data name="BulkDelete_ColSubject" xml:space="preserve"><value>Category</value></data>
+  <data name="BulkDelete_ColType" xml:space="preserve"><value>Type</value></data>
+  <data name="BulkDelete_ColDate" xml:space="preserve"><value>Date Added</value></data>
+  <data name="BulkDelete_ColImportant" xml:space="preserve"><value>★</value></data>
+  <data name="BulkDelete_LblFilter" xml:space="preserve"><value>Filter:</value></data>
+  <data name="CategoryMgmt_Title" xml:space="preserve"><value>Category Management</value></data>
+  <data name="CategoryMgmt_TabSubjects" xml:space="preserve"><value>Category</value></data>
+  <data name="CategoryMgmt_TabTypes" xml:space="preserve"><value>Type</value></data>
+  <data name="CategoryMgmt_BtnAdd" xml:space="preserve"><value>Add</value></data>
+  <data name="CategoryMgmt_BtnRename" xml:space="preserve"><value>Rename</value></data>
+  <data name="CategoryMgmt_BtnDelete" xml:space="preserve"><value>Delete</value></data>
+  <data name="CategoryMgmt_ColName" xml:space="preserve"><value>Name</value></data>
+  <data name="CategoryMgmt_ColCount" xml:space="preserve"><value>Document Count</value></data>
+  <data name="CollectionMgmt_Title" xml:space="preserve"><value>Collection Management</value></data>
+  <data name="CollectionMgmt_BtnCreate" xml:space="preserve"><value>Create New</value></data>
+  <data name="CollectionMgmt_BtnRename" xml:space="preserve"><value>Rename</value></data>
+  <data name="CollectionMgmt_BtnDelete" xml:space="preserve"><value>Delete</value></data>
+  <data name="CollectionMgmt_BtnAddDoc" xml:space="preserve"><value>Add Document</value></data>
+  <data name="CollectionMgmt_BtnRemoveDoc" xml:space="preserve"><value>Remove</value></data>
+  <data name="Bulk_SelectedCount" xml:space="preserve"><value>Selected: {0}</value></data>
+  <data name="CollectionMgmt_EmptyState" xml:space="preserve"><value>No collections</value></data>
+  <data name="CollectionMgmt_ColDocName" xml:space="preserve"><value>Document Name</value></data>
+  <data name="CollectionMgmt_ColSubject" xml:space="preserve"><value>Category</value></data>
+  <data name="CollectionMgmt_ColType" xml:space="preserve"><value>Type</value></data>
+  <data name="DuplicateDetection_Title" xml:space="preserve"><value>Find Duplicates</value></data>
+  <data name="DuplicateDetection_BtnScan" xml:space="preserve"><value>Scan</value></data>
+  <data name="DuplicateDetection_BtnDelete" xml:space="preserve"><value>Delete</value></data>
+  <data name="DuplicateDetection_ColName" xml:space="preserve"><value>Document Name</value></data>
+  <data name="DuplicateDetection_ColSubject" xml:space="preserve"><value>Category</value></data>
+  <data name="DuplicateDetection_ColType" xml:space="preserve"><value>Type</value></data>
+  <data name="DuplicateDetection_ColPath" xml:space="preserve"><value>File Path</value></data>
+  <data name="DuplicateDetection_EmptyState" xml:space="preserve"><value>Run scan to detect duplicates</value></data>
+  <data name="FileIntegrity_Title" xml:space="preserve"><value>File Integrity Check</value></data>
+  <data name="FileIntegrity_BtnScan" xml:space="preserve"><value>Scan</value></data>
+  <data name="FileIntegrity_BtnRelink" xml:space="preserve"><value>Relink</value></data>
+  <data name="FileIntegrity_BtnClearPath" xml:space="preserve"><value>Clear Path</value></data>
+  <data name="FileIntegrity_BtnRemoveAll" xml:space="preserve"><value>Remove All</value></data>
+  <data name="FileIntegrity_ColName" xml:space="preserve"><value>Document Name</value></data>
+  <data name="FileIntegrity_ColPath" xml:space="preserve"><value>File Path</value></data>
+  <data name="FileIntegrity_ColStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="Context_CopyPath" xml:space="preserve"><value>Copy Path</value></data>
+  <data name="PersonalNote_Title" xml:space="preserve"><value>Personal Note</value></data>
+  <data name="PersonalNote_BtnSave" xml:space="preserve"><value>Save</value></data>
+  <data name="PersonalNote_BtnDelete" xml:space="preserve"><value>Delete</value></data>
+  <data name="PersonalNote_Placeholder" xml:space="preserve"><value>Enter notes...</value></data>
+  <data name="PersonalNote_Notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="PersonalNote_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="PersonalNote_Pinned" xml:space="preserve"><value>Pinned</value></data>
+  <data name="PersonalNote_BtnNew" xml:space="preserve"><value>New note</value></data>
+  <data name="PersonalNote_SearchPlaceholder" xml:space="preserve"><value>Search notes...</value></data>
+  <data name="PersonalNote_FilterAll" xml:space="preserve"><value>All</value></data>
+  <data name="PersonalNote_Stats" xml:space="preserve"><value>{0} chars • {1} words</value></data>
+  <data name="PersonalNote_BtnCopy" xml:space="preserve"><value>Copy Content</value></data>
+  <data name="PersonalNote_CopySuccess" xml:space="preserve"><value>Note content copied to clipboard.</value></data>
+  <data name="PersonalNote_EmptyTitle" xml:space="preserve"><value>No notes yet</value></data>
+  <data name="PersonalNote_EmptyDesc" xml:space="preserve"><value>Click 'New Note' to add important notes or summaries for this document.</value></data>
+  <data name="PersonalNote_Unsaved" xml:space="preserve"><value>Unsaved changes</value></data>
+  <data name="PersonalNote_Saved" xml:space="preserve"><value>Saved</value></data>
+  <data name="RelatedDocs_Title" xml:space="preserve"><value>Related Documents</value></data>
+  <data name="RelatedDocs_BtnAdd" xml:space="preserve"><value>Add</value></data>
+  <data name="RelatedDocs_BtnRemove" xml:space="preserve"><value>Remove</value></data>
+  <data name="RelatedDocs_ColName" xml:space="preserve"><value>Document Name</value></data>
+  <data name="RelatedDocs_ColRelationType" xml:space="preserve"><value>Relation</value></data>
+  <data name="RelatedDocs_EmptyState" xml:space="preserve"><value>No related documents</value></data>
+  <data name="TreeMap_Title" xml:space="preserve"><value>TreeMap</value></data>
+  <data name="AddEdit_LblName" xml:space="preserve"><value>Document Name:</value></data>
+  <data name="AddEdit_LblSubject" xml:space="preserve"><value>Subject:</value></data>
+  <data name="AddEdit_LblType" xml:space="preserve"><value>Type:</value></data>
+  <data name="AddEdit_LblAuthor" xml:space="preserve"><value>Author:</value></data>
+  <data name="AddEdit_LblFilePath" xml:space="preserve"><value>File Path:</value></data>
+  <data name="AddEdit_LblNotes" xml:space="preserve"><value>Notes:</value></data>
+  <data name="AddEdit_LblTags" xml:space="preserve"><value>Tags:</value></data>
+  <data name="AddEdit_LblDeadline" xml:space="preserve"><value>Deadline:</value></data>
+  <data name="AddEdit_DateYearFormat" xml:space="preserve"><value>yyyy</value></data>
+  <data name="AddEdit_DateMonthFormat" xml:space="preserve"><value>M</value></data>
+  <data name="AddEdit_DateDayFormat" xml:space="preserve"><value>d</value></data>
+  <data name="AddEdit_LblImportant" xml:space="preserve"><value>Important</value></data>
+  <data name="AddEdit_BtnBrowse" xml:space="preserve"><value>Browse</value></data>
+  <data name="AddEdit_BtnSave" xml:space="preserve"><value>Save</value></data>
+  <data name="AddEdit_BtnCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Update_NewVersionTitle" xml:space="preserve"><value>Update Available</value></data>
+  <data name="Update_NewVersionMsg" xml:space="preserve"><value>New version {0} is available!</value></data>
+  <data name="Update_OpenBrowserPrompt" xml:space="preserve"><value>Open download page?</value></data>
+  <data name="Update_CannotOpenBrowser" xml:space="preserve"><value>Could not open the browser.\nGo to: {0}</value></data>
+  <data name="Update_StatusNewVersion" xml:space="preserve"><value>New version {0} available! Help -&gt; Check for Updates</value></data>
+  <data name="AddToCollState_DocCount" xml:space="preserve"><value>Document count: {0}</value></data>
+  <data name="AddToCollState_DocCountFiltered" xml:space="preserve"><value>{0} / {1} documents</value></data>
+  <data name="AddToCollState_SelectAll" xml:space="preserve"><value>Select All</value></data>
+  <data name="AddToCollState_DeselectAll" xml:space="preserve"><value>Deselect All</value></data>
+  <data name="CategoryMgmt_InfoHint" xml:space="preserve"><value>Manage categories and types used for document classification.</value></data>
+  <data name="CollectionMgmt_ListHeader" xml:space="preserve"><value>Collection List</value></data>
+  <data name="CollectionMgmt_DetailHeader" xml:space="preserve"><value>Collection Details</value></data>
+  <data name="DuplicateDetection_InfoHint" xml:space="preserve"><value>Detect documents with identical file paths or names.</value></data>
+  <data name="DuplicateDetection_Scanning" xml:space="preserve"><value>Scanning...</value></data>
+  <data name="DuplicateDetection_ResultHeader" xml:space="preserve"><value>Detection Results</value></data>
+  <data name="DuplicateDetection_BtnView" xml:space="preserve"><value>View</value></data>
+  <data name="FileIntegrity_InfoHint" xml:space="preserve"><value>Check if registered document files actually exist.</value></data>
+  <data name="FileIntegrity_Checking" xml:space="preserve"><value>Checking...</value></data>
+  <data name="FileIntegrity_ResultHeader" xml:space="preserve"><value>Check Results</value></data>
+  <data name="FileIntegrity_EmptyState" xml:space="preserve"><value>Run scan to check file integrity</value></data>
+  <data name="FileIntegrity_StatValid" xml:space="preserve"><value>Valid</value></data>
+  <data name="FileIntegrity_StatMissing" xml:space="preserve"><value>Missing</value></data>
+  <data name="FileIntegrity_StatCorrupted" xml:space="preserve"><value>Corrupted</value></data>
+  <data name="FileIntegrity_BtnCancel" xml:space="preserve"><value>Cancel scan</value></data>
+  <data name="FileIntegrity_BtnRetryMissing" xml:space="preserve"><value>Recheck missing</value></data>
+  <data name="FileIntegrity_Cancelled" xml:space="preserve"><value>Scan cancelled after {0} of {1} files.</value></data>
+  <data name="AddEdit_LblDocName" xml:space="preserve"><value>Document Name *</value></data>
+  <data name="AddEdit_PlaceholderDocName" xml:space="preserve"><value>Enter document name...</value></data>
+  <data name="AddEdit_LblCategory" xml:space="preserve"><value>Category (Subject)</value></data>
+  <data name="AddEdit_PlaceholderCategory" xml:space="preserve"><value>Select category...</value></data>
+  <data name="AddEdit_LblDocType" xml:space="preserve"><value>Document Type</value></data>
+  <data name="AddEdit_PlaceholderDocType" xml:space="preserve"><value>Select type...</value></data>
+  <data name="AddEdit_PlaceholderFilePath" xml:space="preserve"><value>File path...</value></data>
+  <data name="AddEdit_PlaceholderAuthor" xml:space="preserve"><value>Author name...</value></data>
+  <data name="AddEdit_PlaceholderNotes" xml:space="preserve"><value>Enter notes...</value></data>
+  <data name="AddEdit_ChkImportant" xml:space="preserve"><value>Mark as Important</value></data>
+  <data name="AddEdit_TipSave" xml:space="preserve"><value>Save document (Ctrl+S)</value></data>
+  <data name="AddEdit_TipCancel" xml:space="preserve"><value>Cancel and go back (Escape)</value></data>
+  <data name="RelatedDocs_BtnBack" xml:space="preserve"><value>Go Back</value></data>
+  <data name="RelatedDocs_LblMainDoc" xml:space="preserve"><value>Main document:</value></data>
+  <data name="RelatedDocs_HeaderLinked" xml:space="preserve"><value>Linked</value></data>
+  <data name="RelatedDocs_HeaderAvailable" xml:space="preserve"><value>Available Documents</value></data>
+  <data name="RelatedDocs_LblRelationType" xml:space="preserve"><value>Type:</value></data>
+  <data name="RelatedDocs_BtnAddLink" xml:space="preserve"><value>Add Link</value></data>
+  <data name="TreeMap_LblGroupBy" xml:space="preserve"><value>Group by:</value></data>
+  <data name="TreeMap_BtnByCategory" xml:space="preserve"><value>By Category</value></data>
+  <data name="TreeMap_BtnByType" xml:space="preserve"><value>By Type</value></data>
+  <data name="TreeMap_StatTotal" xml:space="preserve"><value>Total: {0}</value></data>
+  <data name="TreeMap_ItemCount" xml:space="preserve"><value>{0} items</value></data>
+  <data name="Dashboard_TipCategoryItem" xml:space="preserve"><value>Filter by this item</value></data>
+  <data name="Dashboard_TipCopyPath" xml:space="preserve"><value>Copy selected document path</value></data>
+  <data name="Dashboard_TipOpenFolder" xml:space="preserve"><value>Open folder of selected document</value></data>
+  <data name="Dashboard_TipAbout" xml:space="preserve"><value>About this software</value></data>
+  <data name="Dashboard_A11yToggleImportant" xml:space="preserve"><value>Toggle important flag</value></data>
+  <data name="Dashboard_PreviewDeadline" xml:space="preserve"><value>Deadline: {0:dd/MM/yyyy}</value></data>
+  <data name="Update_NewVersionReady" xml:space="preserve"><value>New version {0} is available!</value></data>
+  <data name="Update_OpenDownloadPage" xml:space="preserve"><value>Open download page?</value></data>
+  <data name="Update_DialogTitle" xml:space="preserve"><value>Update Available</value></data>
+  <data name="Update_ErrorTitle" xml:space="preserve"><value>Error</value></data>
+  <data name="Update_BrowserError" xml:space="preserve"><value>Could not open the browser.\nGo to: {0}</value></data>
+  <data name="Update_ToastNewVersion" xml:space="preserve"><value>New version {0} available! Help -&gt; Check for Updates</value></data>
+  <data name="Collection_DocCount" xml:space="preserve"><value>Document count: {0}</value></data>
+  <data name="Collection_DocCountFiltered" xml:space="preserve"><value>{0} / {1} documents</value></data>
+  <data name="Collection_SelectAll" xml:space="preserve"><value>Select All</value></data>
+  <data name="Collection_DeselectAll" xml:space="preserve"><value>Deselect All</value></data>
+  <data name="Collection_AddToTitle" xml:space="preserve"><value>Add documents to "{0}"</value></data>
+  <data name="Dashboard_BackupFailed" xml:space="preserve"><value>Could not create the backup file</value></data>
+  <data name="Dashboard_BackupCancelled" xml:space="preserve"><value>Backup cancelled</value></data>
+  <data name="Dashboard_ConfirmOverwriteBackup" xml:space="preserve"><value>Overwrite backup</value></data>
+  <data name="Dashboard_OverwriteBackupWarning" xml:space="preserve"><value>The existing backup file will be overwritten. Continue?</value></data>
+  <data name="Dashboard_OverwriteBackup" xml:space="preserve"><value>Overwrite</value></data>
+  <data name="Dashboard_RestoreFailed" xml:space="preserve"><value>Could not validate or restore the backup file</value></data>
+  <data name="Dashboard_RestoreCancelled" xml:space="preserve"><value>Restore cancelled</value></data>
+  <data name="Dashboard_RestoreRestartRequired" xml:space="preserve"><value>The database was restored. Please reopen the application.</value></data>
+  <data name="Dashboard_ExportWriteFailed" xml:space="preserve"><value>Could not write the CSV file</value></data>
+  <data name="BatchImport_InvalidDrop" xml:space="preserve"><value>Files cannot be dropped on this screen</value></data>
+  <data name="MainWindow_Title" xml:space="preserve"><value>Document Manager - Professional Edition</value></data>
+  <data name="AddEdit_PlaceholderTags" xml:space="preserve"><value>tag1, tag2, tag3...</value></data>
+  <data name="ChangeCategory_DocumentLabel" xml:space="preserve"><value>Document: "{0}"</value></data>
+  <data name="ChangeCategory_ChipHint" xml:space="preserve"><value>Click an existing category to reuse it</value></data>
+  <data name="ChangeCategory_EmptyState" xml:space="preserve"><value>No available categories</value></data>
+  <data name="ChangeCategory_InputHint" xml:space="preserve"><value>New category name</value></data>
+  <data name="ChangeCategory_Placeholder" xml:space="preserve"><value>Enter category...</value></data>
+  <data name="ChangeCategory_BtnSave" xml:space="preserve"><value>Save</value></data>
+  <data name="RelatedDocs_RelationType_related" xml:space="preserve"><value>Related</value></data>
+  <data name="RelatedDocs_RelationType_reference" xml:space="preserve"><value>Reference</value></data>
+  <data name="RelatedDocs_RelationType_supplement" xml:space="preserve"><value>Supplement</value></data>
+  <data name="RelatedDocs_RelationType_prerequisite" xml:space="preserve"><value>Prerequisite</value></data>
+  <data name="RelatedDocs_RelationType_sequel" xml:space="preserve"><value>Sequel</value></data>
+  <data name="BatchImport_BtnBrowse" xml:space="preserve"><value>Browse</value></data>
+  <data name="BatchImport_BtnScan" xml:space="preserve"><value>Scan</value></data>
+  <data name="BatchImport_ColPath" xml:space="preserve"><value>Path</value></data>
+  <data name="BatchImport_ColSize" xml:space="preserve"><value>Size</value></data>
+  <data name="BatchImport_ColFailure" xml:space="preserve"><value>Failure reason</value></data>
+  <data name="BatchImport_ItemFailed" xml:space="preserve"><value>Import failed</value></data>
+  <data name="BatchImport_FileError" xml:space="preserve"><value>Could not read the file</value></data>
+  <data name="BatchImport_PermissionError" xml:space="preserve"><value>Access denied</value></data>
+  <data name="BatchImport_DatabaseError" xml:space="preserve"><value>A database error occurred</value></data>
+  <data name="BatchImport_LblDefaultSubject" xml:space="preserve"><value>Default Subject</value></data>
+  <data name="BatchImport_LblFolder" xml:space="preserve"><value>Folder</value></data>
+  <data name="BatchImport_BtnRetryFailed" xml:space="preserve"><value>Retry failed</value></data>
+  <data name="BatchImport_ProgressLabel" xml:space="preserve"><value>Progress:</value></data>
+  <data name="BatchImport_Cancelled" xml:space="preserve"><value>Import cancelled: {1} files total, {0} processed.</value></data>
+  <data name="Bulk_BtnDeselectAll" xml:space="preserve"><value>Deselect All</value></data>
+  <data name="BulkDelete_ColDateAdded" xml:space="preserve"><value>Date Added</value></data>
+  <data name="Menu_ChangeLanguage" xml:space="preserve"><value>Change Language</value></data>
+  <data name="Search_BtnSearch" xml:space="preserve"><value>Search</value></data>
+  <data name="Search_Label" xml:space="preserve"><value>Search:</value></data>
+  <data name="Dashboard_DeadlineStatusOverdue" xml:space="preserve"><value>Overdue</value></data>
+  <data name="Dashboard_DeadlineStatusUrgent" xml:space="preserve"><value>Due within 3 days</value></data>
+  <data name="Dashboard_DeadlineStatusUpcoming" xml:space="preserve"><value>Due within 7 days</value></data>
+  <data name="Dashboard_DeadlineStatusScheduled" xml:space="preserve"><value>No imminent deadline</value></data>
+  <data name="FileType_PDF" xml:space="preserve"><value>PDF</value></data>
+  <data name="FileType_Word" xml:space="preserve"><value>Word</value></data>
+  <data name="FileType_PowerPoint" xml:space="preserve"><value>PowerPoint</value></data>
+  <data name="FileType_Excel" xml:space="preserve"><value>Excel</value></data>
+  <data name="FileType_Document" xml:space="preserve"><value>Document</value></data>
+  <data name="FileType_Data" xml:space="preserve"><value>Data</value></data>
+  <data name="FileType_Code" xml:space="preserve"><value>Code</value></data>
+  <data name="FileType_Book" xml:space="preserve"><value>Book</value></data>
+  <data name="FileType_Image" xml:space="preserve"><value>Image</value></data>
+  <data name="FileType_Video" xml:space="preserve"><value>Video</value></data>
+  <data name="FileType_Audio" xml:space="preserve"><value>Audio</value></data>
+  <data name="FileType_Archive" xml:space="preserve"><value>Archive</value></data>
+  <data name="FileType_Design" xml:space="preserve"><value>Design</value></data>
+  <data name="FileType_Other" xml:space="preserve"><value>Other</value></data>
+
+  <!-- SmartViews View -->
+  <data name="Menu_SmartViews" xml:space="preserve"><value>Smart Views</value></data>
+  <data name="SV_Title" xml:space="preserve"><value>Smart Views</value></data>
+  <data name="SV_ListHeader" xml:space="preserve"><value>Saved Views</value></data>
+  <data name="SV_EmptyState" xml:space="preserve"><value>No saved searches yet. Create one with "New"</value></data>
+  <data name="SV_New" xml:space="preserve"><value>New</value></data>
+  <data name="SV_Open" xml:space="preserve"><value>Run</value></data>
+  <data name="SV_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="SV_Duplicate" xml:space="preserve"><value>Duplicate</value></data>
+  <data name="SV_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="SV_DeleteConfirm" xml:space="preserve"><value>Delete "{0}"?</value></data>
+  <data name="SV_NameRequired" xml:space="preserve"><value>Please enter a name</value></data>
+  <data name="SV_NameExists" xml:space="preserve"><value>A smart view with the same name already exists</value></data>
+  <data name="SV_Saved" xml:space="preserve"><value>Smart view saved</value></data>
+  <data name="SV_Deleted" xml:space="preserve"><value>Smart view deleted</value></data>
+  <data name="SV_LoadError" xml:space="preserve"><value>Failed to load smart views</value></data>
+  <data name="SV_Kind_Label" xml:space="preserve"><value>Criteria Kind</value></data>
+  <data name="SV_Kind_Standard" xml:space="preserve"><value>Standard criteria</value></data>
+  <data name="SV_Kind_Uncategorized" xml:space="preserve"><value>Uncategorized</value></data>
+  <data name="SV_Kind_MissingMetadata" xml:space="preserve"><value>Missing metadata</value></data>
+  <data name="SV_Kind_MissingFile" xml:space="preserve"><value>Missing file</value></data>
+  <data name="SV_Kind_RecentlyAdded" xml:space="preserve"><value>Recently added</value></data>
+  <data name="SV_Kind_Important" xml:space="preserve"><value>Important</value></data>
+  <data name="SV_Kind_DueSoon" xml:space="preserve"><value>Due soon</value></data>
+  <data name="SV_Field_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="SV_Field_Keyword" xml:space="preserve"><value>Keyword</value></data>
+  <data name="SV_Field_Subject" xml:space="preserve"><value>Subject</value></data>
+  <data name="SV_Field_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="SV_Field_FromDate" xml:space="preserve"><value>Added from</value></data>
+  <data name="SV_Field_ToDate" xml:space="preserve"><value>Added to</value></data>
+  <data name="SV_Field_MinSize" xml:space="preserve"><value>Min size (MB)</value></data>
+  <data name="SV_Field_MaxSize" xml:space="preserve"><value>Max size (MB)</value></data>
+  <data name="SV_Field_Important" xml:space="preserve"><value>Important only</value></data>
+  <data name="SV_Field_RecentDays" xml:space="preserve"><value>Period (days)</value></data>
+  <data name="SV_Field_DeadlineDays" xml:space="preserve"><value>Deadline window (days)</value></data>
+  <data name="SV_Status_Applied" xml:space="preserve"><value>Smart view "{0}" applied</value></data>
+
+  <!-- Document Status -->
+  <data name="DS_FilterAll" xml:space="preserve"><value>All Statuses</value></data>
+  <data name="DS_Label_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="DS_Kind_Unread" xml:space="preserve"><value>Unread</value></data>
+  <data name="DS_Kind_InProgress" xml:space="preserve"><value>In Progress</value></data>
+  <data name="DS_Kind_Read" xml:space="preserve"><value>Read</value></data>
+  <data name="DS_Kind_NeedsAction" xml:space="preserve"><value>Needs Action</value></data>
+  <data name="DS_Kind_Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="DS_Kind_Archived" xml:space="preserve"><value>Archived</value></data>
+  <data name="DS_Error_InvalidStatus" xml:space="preserve"><value>Please select a valid status</value></data>
+  <data name="RS_StatusCounts_Title" xml:space="preserve"><value>Reports by Status</value></data>
+
+  <!-- Bulk Edit -->
+  <data name="BE_SectionTitle" xml:space="preserve"><value>Bulk Edit</value></data>
+  <data name="BE_Field_Subject" xml:space="preserve"><value>Subject</value></data>
+  <data name="BE_Field_Type" xml:space="preserve"><value>Type</value></data>
+  <data name="BE_Field_Tags" xml:space="preserve"><value>Tags</value></data>
+  <data name="BE_Field_Important" xml:space="preserve"><value>Important</value></data>
+  <data name="BE_Field_Deadline" xml:space="preserve"><value>Deadline</value></data>
+  <data name="BE_Field_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="BE_Field_CollectionAdd" xml:space="preserve"><value>Add to Collection</value></data>
+  <data name="BE_PreviewTitle" xml:space="preserve"><value>Confirm Bulk Edit</value></data>
+  <data name="BE_PreviewAffected" xml:space="preserve"><value>This will update {0} documents</value></data>
+  <data name="BE_ConfirmApply" xml:space="preserve"><value>Apply</value></data>
+  <data name="BE_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="BE_Result_AllSuccess" xml:space="preserve"><value>Updated {0}/{1} documents</value></data>
+  <data name="BE_Result_Partial" xml:space="preserve"><value>Only {0}/{1} documents were updated. Some failed</value></data>
+  <data name="BE_FailedItemsHeader" xml:space="preserve"><value>Failed documents:</value></data>
+  <data name="BE_Undo" xml:space="preserve"><value>Undo</value></data>
+  <data name="BE_UndoDescription" xml:space="preserve"><value>Bulk edit of {0} documents</value></data>
+  <data name="BE_Undone" xml:space="preserve"><value>Bulk edit undone</value></data>
+  <data name="BE_NoSelectionHint" xml:space="preserve"><value>Select at least one document</value></data>
+  <data name="BE_NoFieldsEnabledHint" xml:space="preserve"><value>Enable at least one field and enter a value</value></data>
+  <data name="BE_CollectionNone" xml:space="preserve"><value>(No collection)</value></data>
+
+  <!-- Undo / Affected preview -->
+  <data name="Menu_Undo" xml:space="preserve"><value>Undo</value></data>
+  <data name="UN_Applied" xml:space="preserve"><value>Undone: {0}</value></data>
+  <data name="UN_DeletedDocuments" xml:space="preserve"><value>Deleted {0} documents</value></data>
+  <data name="UN_CollectionRestorable" xml:space="preserve"><value>Deleted collection '{0}' (restorable)</value></data>
+  <data name="UN_Renamed" xml:space="preserve"><value>Renamed '{0}' to '{1}'</value></data>
+  <data name="PV_DeleteCollection" xml:space="preserve"><value>Delete this collection?</value></data>
+  <data name="PV_CascadeTitle" xml:space="preserve"><value>Delete {0}?</value></data>
+  <data name="PV_MembershipNote" xml:space="preserve"><value>The collection and its members can be restored afterwards with Undo. The documents themselves are not deleted.</value></data>
+  <data name="PV_RecycleBinNote" xml:space="preserve"><value>Deleted documents can be restored from the Recycle Bin or with Undo.</value></data>
+  <data name="RC_Title" xml:space="preserve"><value>Recovery Center</value></data>
+  <data name="RC_LatestBackup" xml:space="preserve"><value>Latest backup:</value></data>
+  <data name="RC_LatestNone" xml:space="preserve"><value>No backup yet</value></data>
+  <data name="RC_StatusNone" xml:space="preserve"><value>—</value></data>
+  <data name="RC_StatusValid" xml:space="preserve"><value>Valid</value></data>
+  <data name="RC_StatusInvalid" xml:space="preserve"><value>Invalid</value></data>
+  <data name="RC_Location" xml:space="preserve"><value>Location:</value></data>
+  <data name="RC_Retention" xml:space="preserve"><value>Versions to keep:</value></data>
+  <data name="RC_SaveRetention" xml:space="preserve"><value>Save retention</value></data>
+  <data name="RC_CreateBackup" xml:space="preserve"><value>Create backup</value></data>
+  <data name="RC_Restore" xml:space="preserve"><value>Restore</value></data>
+  <data name="RC_OpenFolder" xml:space="preserve"><value>Open folder</value></data>
+  <data name="RC_RestoreFromFile" xml:space="preserve"><value>Restore from file…</value></data>
+  <data name="RC_ColName" xml:space="preserve"><value>Backup file</value></data>
+  <data name="RC_ColCreated" xml:space="preserve"><value>Created</value></data>
+  <data name="RC_ColSize" xml:space="preserve"><value>Size</value></data>
+  <data name="RC_ColStatus" xml:space="preserve"><value>Status</value></data>
+  <data name="RC_EmptyState" xml:space="preserve"><value>No backup versions yet. Create your first backup.</value></data>
+  <data name="RC_ConfirmRestoreTitle" xml:space="preserve"><value>Confirm restore</value></data>
+  <data name="RC_ConfirmRestoreMessage" xml:space="preserve"><value>Restore the backup created at {0}?&#10;&#10;The current database ({2}) with {1} documents will be replaced. This cannot be undone.</value></data>
+  <data name="RC_RestoreRestartMessage" xml:space="preserve"><value>Restore completed.&#10;&#10;The application must restart to finish the restore.&#10;Steps:&#10;1. Save your work and close this window if it does not close automatically.&#10;2. Start Study Document Manager again.&#10;3. Verify your documents on the Dashboard.</value></data>
+  <data name="RC_BackupCreated" xml:space="preserve"><value>Backup created successfully.</value></data>
+  <data name="RC_BackupFailed" xml:space="preserve"><value>Backup failed.</value></data>
+  <data name="RC_RetentionSaved" xml:space="preserve"><value>Retention setting saved.</value></data>
+  <data name="RC_ErrorInvalidVersion" xml:space="preserve"><value>This file is not a valid backup version.</value></data>
+  <data name="RC_ErrorRestoreFailed" xml:space="preserve"><value>Restore failed. The current database was not changed.</value></data>
+  <data name="RC_RecoveryPaths" xml:space="preserve"><value>Related recovery tools:</value></data>
+  <data name="FileState_AccessDenied" xml:space="preserve"><value>No permission to access this file</value></data>
+  <data name="FileState_DriveDisconnected" xml:space="preserve"><value>The drive is not connected</value></data>
+  <data name="FileState_InvalidPath" xml:space="preserve"><value>Invalid path</value></data>
+  <data name="Integrity_DatabaseLocation" xml:space="preserve"><value>Database location:</value></data>
+  <data name="Integrity_OpenContainingFolder" xml:space="preserve"><value>Open containing folder</value></data>
+  <data name="Integrity_PathCopied" xml:space="preserve"><value>Path copied to clipboard.</value></data>
+  <data name="RC_Loading" xml:space="preserve"><value>Loading…</value></data>
+  <data name="SW_Title" xml:space="preserve"><value>Student workspace</value></data>
+  <data name="SW_AcademicYear" xml:space="preserve"><value>Academic year</value></data>
+  <data name="SW_ContextSemester" xml:space="preserve"><value>Semester</value></data>
+  <data name="SW_ContextCourse" xml:space="preserve"><value>Course</value></data>
+  <data name="SW_ContextModule" xml:space="preserve"><value>Module</value></data>
+  <data name="SW_ContextOwner" xml:space="preserve"><value>Owner</value></data>
+  <data name="SW_SaveContext" xml:space="preserve"><value>Save context</value></data>
+  <data name="SW_ContextSaved" xml:space="preserve"><value>Learning context saved</value></data>
+  <data name="SW_StatusReady" xml:space="preserve"><value>{0} assignments</value></data>
+  <data name="SW_Courses" xml:space="preserve"><value>Courses</value></data>
+  <data name="SW_Semesters" xml:space="preserve"><value>Semesters</value></data>
+  <data name="SW_Assignments" xml:space="preserve"><value>Assignments</value></data>
+  <data name="SW_AddCourse" xml:space="preserve"><value>Add course</value></data>
+  <data name="SW_AddSemester" xml:space="preserve"><value>Add semester</value></data>
+  <data name="SW_CourseName" xml:space="preserve"><value>Course name</value></data>
+  <data name="SW_SemesterName" xml:space="preserve"><value>Semester name</value></data>
+  <data name="SW_DeleteCourseConfirm" xml:space="preserve"><value>Delete course “{0}”?</value></data>
+  <data name="SW_DeleteSemesterConfirm" xml:space="preserve"><value>Delete semester “{0}”?</value></data>
+  <data name="SW_ShowHistory" xml:space="preserve"><value>Show history</value></data>
+  <data name="SW_NewAssignment" xml:space="preserve"><value>New assignment</value></data>
+  <data name="SW_AssignmentEditor" xml:space="preserve"><value>Assignment editor</value></data>
+  <data name="SW_AssignmentTitle" xml:space="preserve"><value>Assignment title</value></data>
+  <data name="SW_OfficialDeadline" xml:space="preserve"><value>Official deadline</value></data>
+  <data name="SW_PersonalDeadline" xml:space="preserve"><value>Personal deadline</value></data>
+  <data name="SW_Status" xml:space="preserve"><value>Status</value></data>
+  <data name="SW_Priority" xml:space="preserve"><value>Priority</value></data>
+  <data name="SW_Milestone" xml:space="preserve"><value>Milestone</value></data>
+  <data name="SW_Notes" xml:space="preserve"><value>Notes</value></data>
+  <data name="SW_DeleteAssignmentConfirm" xml:space="preserve"><value>Delete assignment “{0}”?</value></data>
+  <data name="SW_TitleRequired" xml:space="preserve"><value>Assignment title is required</value></data>
+  <data name="SW_OpenRelatedDocument" xml:space="preserve"><value>Open related document</value></data>
+  <data name="SW_NoRelatedDocument" xml:space="preserve"><value>No related document</value></data>
+  <data name="SW_RelatedDocumentMissing" xml:space="preserve"><value>Related document file is missing</value></data>
+  <data name="SW_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="SW_Status_Planned" xml:space="preserve"><value>Planned</value></data>
+  <data name="SW_Status_InProgress" xml:space="preserve"><value>In progress</value></data>
+  <data name="SW_Status_Completed" xml:space="preserve"><value>Completed</value></data>
+  <data name="SW_Priority_Low" xml:space="preserve"><value>Low</value></data>
+  <data name="SW_Priority_Normal" xml:space="preserve"><value>Normal</value></data>
+  <data name="SW_Priority_High" xml:space="preserve"><value>High</value></data>
+  <data name="SW_Deadline_NoDate" xml:space="preserve"><value>No deadline</value></data>
+  <data name="SW_Deadline_Overdue" xml:space="preserve"><value>Overdue</value></data>
+  <data name="SW_Deadline_DueSoon" xml:space="preserve"><value>Due soon</value></data>
+  <data name="SW_Deadline_Scheduled" xml:space="preserve"><value>Scheduled</value></data>
+  <data name="Btn_Back" xml:space="preserve"><value>Back</value></data>
+  <data name="Btn_Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="WF_Title" xml:space="preserve"><value>Watched Folders</value></data>
+  <data name="WF_Add" xml:space="preserve"><value>Add</value></data>
+  <data name="WF_Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="WF_Enable" xml:space="preserve"><value>Enable</value></data>
+  <data name="WF_Start" xml:space="preserve"><value>Start Watching</value></data>
+  <data name="WF_Stop" xml:space="preserve"><value>Stop Watching</value></data>
+  <data name="WF_FolderPath" xml:space="preserve"><value>Folder Path</value></data>
+  <data name="WF_NoFolders" xml:space="preserve"><value>No folders are being watched.</value></data>
+  <data name="WF_Status_Watching" xml:space="preserve"><value>Watching {0} folder(s).</value></data>
+  <data name="WF_Status_Stopped" xml:space="preserve"><value>Watcher stopped.</value></data>
+  <data name="WF_Status_NoFolders" xml:space="preserve"><value>No folders are watched.</value></data>
+  <data name="WF_Error_PathRequired" xml:space="preserve"><value>Folder path is required.</value></data>
+  <data name="WF_Error_NotFound" xml:space="preserve"><value>Folder does not exist.</value></data>
+  <data name="WF_Error_StartFailed" xml:space="preserve"><value>Could not start the watcher.</value></data>
+  <data name="WF_ItemStatus_Running" xml:space="preserve"><value>Watching</value></data>
+  <data name="WF_ItemStatus_Disabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="WF_ItemStatus_Error" xml:space="preserve"><value>Error</value></data>
+  <data name="WF_ItemStatus_Stopped" xml:space="preserve"><value>Stopped</value></data>
+  <data name="WF_ItemStatus_Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="WF_Error_WatcherFault" xml:space="preserve"><value>A fatal error occurred while watching the folder.</value></data>
+  <data name="WF_IncludeSub" xml:space="preserve"><value>Include subfolders</value></data>
+  <data name="Onboarding_Title" xml:space="preserve"><value>First-time Setup</value></data>
+  <data name="Onboarding_Welcome" xml:space="preserve"><value>Welcome to Document Manager</value></data>
+  <data name="Onboarding_Intro" xml:space="preserve"><value>This short guide covers the basics of managing your documents.</value></data>
+  <data name="Onboarding_StepStorage" xml:space="preserve"><value>Storage: Documents and settings are stored in a local database on this device.</value></data>
+  <data name="Onboarding_StepAdd" xml:space="preserve"><value>Add documents: Add files and record their name, subject, type, and more.</value></data>
+  <data name="Onboarding_StepOrganize" xml:space="preserve"><value>Organize: Use categories, collections, search, and filters to organize documents.</value></data>
+  <data name="Onboarding_StepBackup" xml:space="preserve"><value>Backup: Use the File menu to create a database backup.</value></data>
+  <data name="Onboarding_StepRecovery" xml:space="preserve"><value>Recovery: Use Recovery Center to check or restore backups and relink files.</value></data>
+  <data name="Onboarding_StepLanguage" xml:space="preserve"><value>Language: Change the display language from the language menu in the upper right.</value></data>
+  <data name="Onboarding_Skip" xml:space="preserve"><value>Skip</value></data>
+  <data name="Onboarding_Finish" xml:space="preserve"><value>Get started</value></data>
+  <data name="Onboarding_MenuItem" xml:space="preserve"><value>Getting Started</value></data>
+  <data name="OW_Title" xml:space="preserve"><value>Business &amp; Contracts</value></data>
+  <data name="OW_ExpiryState_Overdue" xml:space="preserve"><value>Overdue</value></data>
+  <data name="OW_ExpiryState_DueSoon" xml:space="preserve"><value>Due Soon</value></data>
+  <data name="OW_ExpiryState_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="OW_ExpiryState_None" xml:space="preserve"><value>No Expiry</value></data>
+  <data name="OW_DocumentNumber" xml:space="preserve"><value>Document No.</value></data>
+  <data name="OW_ContactName" xml:space="preserve"><value>Contact</value></data>
+  <data name="OW_OrganizationOrProject" xml:space="preserve"><value>Company / Project</value></data>
+  <data name="OW_EffectiveDate" xml:space="preserve"><value>Effective Date</value></data>
+  <data name="OW_ExpiryDate" xml:space="preserve"><value>Expiry Date</value></data>
+  <data name="OW_Confidentiality" xml:space="preserve"><value>Confidentiality</value></data>
+  <data name="OW_Reminder" xml:space="preserve"><value>Enable reminder notification</value></data>
+  <data name="OW_DaysRemaining" xml:space="preserve"><value>Days in advance for notification</value></data>
+  <data name="OW_DocNoPrefix" xml:space="preserve"><value>No: </value></data>
+  <data name="OW_Conf_Public" xml:space="preserve"><value>Public</value></data>
+  <data name="OW_Conf_Internal" xml:space="preserve"><value>Internal</value></data>
+  <data name="OW_Conf_Confidential" xml:space="preserve"><value>Confidential</value></data>
+  <data name="OW_Conf_Restricted" xml:space="preserve"><value>Restricted</value></data>
+  <data name="Common_All" xml:space="preserve"><value>All</value></data>
+  <data name="Action_Back" xml:space="preserve"><value>Back</value></data>
+  <data name="Search_Watermark" xml:space="preserve"><value>Search by name, doc number, organization...</value></data>
+  <data name="Details_Title" xml:space="preserve"><value>Office Metadata</value></data>
+  <data name="OW_EmptySelection" xml:space="preserve"><value>Select a document</value></data>
+  <data name="OW_EmptySelectionDesc" xml:space="preserve"><value>Select a document from the list to edit its details.</value></data>
+  <data name="SW_AcademicContext" xml:space="preserve"><value>Academic Context</value></data>
+  <data name="SW_EmptyCourses" xml:space="preserve"><value>No courses registered</value></data>
+  <data name="SW_EmptySemesters" xml:space="preserve"><value>No semesters registered</value></data>
+  <data name="SW_EmptyAssignments" xml:space="preserve"><value>No assignments found</value></data>
+  <data name="SW_EmptyAssignmentSelect" xml:space="preserve"><value>Select an assignment or create one with 'New Assignment'</value></data>
+  <data name="OW_Error_FileNotFound" xml:space="preserve"><value>File not found: {0}</value></data>
+  <data name="Onboarding_TabTour" xml:space="preserve"><value>Quick Tour (5 Steps)</value></data>
+  <data name="Onboarding_TabCatalog" xml:space="preserve"><value>Feature Guide</value></data>
+  <data name="Onboarding_TabShortcuts" xml:space="preserve"><value>Shortcuts</value></data>
+  <data name="Onboarding_Step1_Title" xml:space="preserve"><value>1. Search &amp; Quick Filters</value></data>
+  <data name="Onboarding_Step1_Desc" xml:space="preserve"><value>The Dashboard welcomes you with contextual greetings and smart summaries of urgent items, plus 1-click Quick Access to recent files. Search by keyword, filter by status, and navigate effortlessly.</value></data>
+  <data name="Onboarding_Step1_Tip" xml:space="preserve"><value>Tip: On the document list, use Enter (Open), Space (Toggle Important), and Delete (Trash) for fast keyboard navigation.</value></data>
+  <data name="Onboarding_Step2_Title" xml:space="preserve"><value>2. Add Documents &amp; Drag &amp; Drop</value></data>
+  <data name="Onboarding_Step2_Desc" xml:space="preserve"><value>Click 'Add Document' (Ctrl+N) or simply drag and drop files (PDF, Word, Excel, images) directly from your file manager onto the app window (supported on both Windows and Linux).</value></data>
+  <data name="Onboarding_Step2_Tip" xml:space="preserve"><value>Tip: To import multiple files at once, use 'Batch Import' (Ctrl+Shift+I).</value></data>
+  <data name="Onboarding_Step3_Title" xml:space="preserve"><value>3. Dedicated Workspaces (Office &amp; Student)</value></data>
+  <data name="Onboarding_Step3_Desc" xml:space="preserve"><value>Switch between two specialized workspaces tailored to your needs:&#x0a;- Office Workspace: Manage confidentiality classifications (Public, Internal, Confidential, Restricted) and expiration reminders.&#x0a;- Student Workspace: Track courses, semesters, assignments, and submission deadlines.</value></data>
+  <data name="Onboarding_Step3_Tip" xml:space="preserve"><value>Tip: Switch easily from the Workspaces menu.</value></data>
+  <data name="Onboarding_Step4_Title" xml:space="preserve"><value>4. Duplicate Detection &amp; File Integrity</value></data>
+  <data name="Onboarding_Step4_Desc" xml:space="preserve"><value>Use 'Duplicate Detection' (Ctrl+D) to find and merge duplicate documents. Use 'File Integrity Check' (Ctrl+H) with SHA-256 hashing to detect missing or altered files instantly.</value></data>
+  <data name="Onboarding_Step4_Tip" xml:space="preserve"><value>Tip: Keep your workspace organized and save storage safely.</value></data>
+  <data name="Onboarding_Step5_Title" xml:space="preserve"><value>5. Recycle Bin, Recovery &amp; ZIP Archive</value></data>
+  <data name="Onboarding_Step5_Desc" xml:space="preserve"><value>Deleted documents are safely kept in the 'Recycle Bin' (Ctrl+Shift+R) with multi-select batch restore. 'Recovery Center' provides SQLite backups, and 'Personal Document Archive' allows full ZIP export/import.</value></data>
+  <data name="Onboarding_Step5_Tip" xml:space="preserve"><value>Tip: Regularly create database snapshots in Recovery Center for peace of mind.</value></data>
+  <data name="Onboarding_Next" xml:space="preserve"><value>Next</value></data>
+  <data name="Onboarding_Prev" xml:space="preserve"><value>Back</value></data>
+  <data name="Onboarding_Start" xml:space="preserve"><value>Get Started</value></data>
+  <data name="Onboarding_Cat_WatchedFolder_Title" xml:space="preserve"><value>Folder Watcher (Watched Folder)</value></data>
+  <data name="Onboarding_Cat_WatchedFolder_Desc" xml:space="preserve"><value>Monitors chosen folders in background, detecting and importing new files automatically.</value></data>
+  <data name="Onboarding_Cat_Inbox_Title" xml:space="preserve"><value>Import Inbox (Staging Area)</value></data>
+  <data name="Onboarding_Cat_Inbox_Desc" xml:space="preserve"><value>A dedicated space to review and tag newly ingested documents before organizing them.</value></data>
+  <data name="Onboarding_Cat_Reports_Title" xml:space="preserve"><value>Reports &amp; TreeMap Analytics</value></data>
+  <data name="Onboarding_Cat_Reports_Desc" xml:space="preserve"><value>Visual graphs and color TreeMap displaying storage usage and document distribution.</value></data>
+  <data name="Onboarding_Cat_Notes_Title" xml:space="preserve"><value>Personal Notes &amp; Document Relations</value></data>
+  <data name="Onboarding_Cat_Notes_Desc" xml:space="preserve"><value>Attach private notes to any document and establish direct bidirectional relationships.</value></data>
+  <data name="Onboarding_Cat_Archive_Title" xml:space="preserve"><value>Personal Document ZIP Archive</value></data>
+  <data name="Onboarding_Cat_Archive_Desc" xml:space="preserve"><value>Fully packages documents and JSON manifest into a portable ZIP for backup or transfer.</value></data>
+  <data name="Onboarding_Cat_Lang_Title" xml:space="preserve"><value>Multi-Language Switching</value></data>
+  <data name="Onboarding_Cat_Lang_Desc" xml:space="preserve"><value>Instantly switch between Japanese, English, Vietnamese, and Chinese from the top menu.</value></data>
+  <data name="Onboarding_Shortcuts_Title" xml:space="preserve"><value>Global Keyboard Shortcuts</value></data>
+  <data name="Onboarding_Shortcuts_Desc" xml:space="preserve"><value>Boost your daily productivity with instant keyboard access to all major features.</value></data>
+  <data name="Onboarding_Shortcuts_Nav" xml:space="preserve"><value>Navigation &amp; System</value></data>
+  <data name="Onboarding_Shortcuts_Doc" xml:space="preserve"><value>Document &amp; Workspaces</value></data>
+  <data name="Onboarding_Shortcuts_Tools" xml:space="preserve"><value>Search &amp; Maintenance</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Display Language</value></data>
+  <data name="Dashboard_GreetingMorning" xml:space="preserve"><value>Good morning</value></data>
+  <data name="Dashboard_GreetingAfternoon" xml:space="preserve"><value>Good afternoon</value></data>
+  <data name="Dashboard_GreetingEvening" xml:space="preserve"><value>Good evening</value></data>
+  <data name="Dashboard_GreetingSummary" xml:space="preserve"><value>You have {0} important documents and {1} upcoming deadlines.</value></data>
+  <data name="Dashboard_RecentQuickAccess" xml:space="preserve"><value>Recent Documents</value></data>
+  <data name="Dashboard_DragDropToastSingle" xml:space="preserve"><value>Document added: {0}</value></data>
+  <data name="Dashboard_DragDropToastMultiple" xml:space="preserve"><value>Successfully added {0} documents</value></data>
+  <data name="Toast_TitleSuccess" xml:space="preserve"><value>Success</value></data>
+  <data name="Toast_TitleError" xml:space="preserve"><value>Error</value></data>
+  <data name="Toast_TitleWarning" xml:space="preserve"><value>Warning</value></data>
+  <data name="Toast_TitleInfo" xml:space="preserve"><value>Information</value></data>
+  <data name="AffectedPreview_Items" xml:space="preserve"><value>Affected items list</value></data>
+  <data name="OW_FilterExpiry" xml:space="preserve"><value>Expiry filter</value></data>
+  <data name="OW_FilterConfidentiality" xml:space="preserve"><value>Confidentiality filter</value></data>
+</root>

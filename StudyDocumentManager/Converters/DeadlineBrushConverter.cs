@@ -1,0 +1,148 @@
+using System;
+using System.Globalization;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Data.Converters;
+using Avalonia.Media;
+using StudyDocumentManager.Core.Interfaces;
+
+namespace StudyDocumentManager.Converters;
+
+internal static class DeadlineBrushResources
+{
+    public static IBrush? GetBrush(string key)
+    {
+        if (Application.Current?.Resources.TryGetResource(key, null, out var value) == true)
+            return value as IBrush;
+
+        return null;
+    }
+}
+
+/// <summary>
+/// Converts a DateTime? deadline to a colored brush:
+/// - Red (#DC2626) if overdue (past due date)
+/// - Orange (#F59E0B) if due within 3 days
+/// - Yellow (#EAB308) if due within 7 days
+/// - Transparent otherwise
+/// Matches legacy WinForms Dashboard behavior.
+/// </summary>
+public class DeadlineBrushConverter : IValueConverter
+{
+    public const string DeadlineOverdueBrushKey = "DeadlineOverdueBrush";
+    public const string DeadlineUrgentBrushKey = "DeadlineUrgentBrush";
+    public const string DeadlineUpcomingBrushKey = "DeadlineUpcomingBrush";
+
+    public static readonly DeadlineBrushConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not DateTime deadline)
+            return Brushes.Transparent;
+
+        var daysLeft = (deadline.Date - DateTime.Today).TotalDays;
+
+        if (daysLeft < 0)
+            return DeadlineBrushResources.GetBrush(DeadlineOverdueBrushKey) ?? Brushes.Transparent;
+        if (daysLeft < 3)
+            return DeadlineBrushResources.GetBrush(DeadlineUrgentBrushKey) ?? Brushes.Transparent;
+        if (daysLeft < 7)
+            return DeadlineBrushResources.GetBrush(DeadlineUpcomingBrushKey) ?? Brushes.Transparent;
+
+        return Brushes.Transparent;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => Avalonia.Data.BindingOperations.DoNothing;
+}
+
+/// <summary>
+/// Converts a DateTime? deadline to foreground text color:
+/// - White text for overdue/urgent (dark backgrounds)
+/// - Original color otherwise
+/// </summary>
+public class DeadlineTextConverter : IValueConverter
+{
+    public const string DeadlineOverdueTextBrushKey = "DeadlineOverdueTextBrush";
+    public const string DeadlineUrgentTextBrushKey = "DeadlineUrgentTextBrush";
+    public const string DeadlineUpcomingTextBrushKey = "DeadlineUpcomingTextBrush";
+
+    public static readonly DeadlineTextConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not DateTime deadline)
+            return null; // use default
+
+        var daysLeft = (deadline.Date - DateTime.Today).TotalDays;
+
+        if (daysLeft < 0)
+            return DeadlineBrushResources.GetBrush(DeadlineOverdueTextBrushKey);
+        if (daysLeft < 3)
+            return DeadlineBrushResources.GetBrush(DeadlineUrgentTextBrushKey);
+        if (daysLeft < 7)
+            return DeadlineBrushResources.GetBrush(DeadlineUpcomingTextBrushKey);
+
+        return null;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => Avalonia.Data.BindingOperations.DoNothing;
+}
+
+public sealed class DeadlineStatusConverter : IValueConverter
+{
+    public const string OverdueKey = "Dashboard_DeadlineStatusOverdue";
+    public const string UrgentKey = "Dashboard_DeadlineStatusUrgent";
+    public const string UpcomingKey = "Dashboard_DeadlineStatusUpcoming";
+    public const string ScheduledKey = "Dashboard_DeadlineStatusScheduled";
+
+    public static readonly DeadlineStatusConverter Instance = new();
+
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        var key = GetStatusKey(value);
+        return Application.Current?.Resources["Loc"] is ILocalizationService localization
+            ? localization[key]
+            : key;
+    }
+
+    public static string GetStatusKey(object? value)
+    {
+        if (value is not DateTime deadline)
+            return ScheduledKey;
+
+        var daysLeft = (deadline.Date - DateTime.Today).TotalDays;
+        if (daysLeft < 0) return OverdueKey;
+        if (daysLeft < 3) return UrgentKey;
+        if (daysLeft < 7) return UpcomingKey;
+        return ScheduledKey;
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => Avalonia.Data.BindingOperations.DoNothing;
+}
+
+/// <summary>
+/// Converts a document status string to TextDecorations:
+/// - Strikethrough for "completed" documents (Directive 1)
+/// - null for all other statuses
+/// </summary>
+public sealed class CompletedTextDecorationConverter : IValueConverter
+{
+    public static readonly CompletedTextDecorationConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is string status && string.Equals(status, StudyDocumentManager.Core.Entities.DocumentStatus.Completed, StringComparison.OrdinalIgnoreCase))
+        {
+            return TextDecorations.Strikethrough;
+        }
+
+        return null;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => Avalonia.Data.BindingOperations.DoNothing;
+}
+

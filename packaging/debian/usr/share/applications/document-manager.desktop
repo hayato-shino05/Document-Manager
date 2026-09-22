@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Document Manager
+Comment=Organize study documents
+Exec=document-manager %U
+Icon=document-manager
+Terminal=false
+Categories=Education;Office;
+StartupNotify=true

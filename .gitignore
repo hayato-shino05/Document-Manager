@@ -10,16 +10,27 @@
 *.env
 .claude/
 rule/
+.codegraph/
+.agents/
+gemini.md
+.harness-core/
+docs/
+docs/TEST_MATRIX.md
+codegrove.sqlite
+.superpowers/
 # User-specific files
 *.rsuser
 *.suo
+.artifacts/
 *.user
 *.userosscache
 *.sln.docstates
-.kiro/
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 nul
+.serena/
+rule/
+.better-context
 # Mono auto generated files
 mono_crash.*
 AGENTS.md
@@ -40,7 +51,7 @@ bld/
 [Oo]ut/
 [Ll]og/
 [Ll]ogs/
-
+claude.md
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
@@ -360,3 +371,11 @@ FodyWeavers.xsd
 
 # Redistributable installers (binary, do not commit)
 redist/
+.gitnexus
+.harness-backup/
+docs/
+scripts/
+!scripts/
+scripts/*
+!scripts/build-windows-setup.ps1
+!scripts/verify-windows-installer.ps1

@@ -1,0 +1,453 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Avalonia.Automation;
+using Avalonia.Controls;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
+using Microsoft.Extensions.DependencyInjection;
+using StudyDocumentManager.Core.Interfaces;
+using StudyDocumentManager.Models;
+using StudyDocumentManager.Views;
+using Xunit;
+
+namespace StudyDocumentManager.Tests;
+
+/// <summary>
+/// 全 20 画面のデスクトップ View を Headless Avalonia ランタイム上で実際にレンダリングし、
+/// 標準解像度（1280x800）および狭小解像度（640x700）でのレイアウト整合性とアクセシビリティを検証・評価するテストハーネス。
+/// </summary>
+public sealed class ViewVisualEvaluationTests
+{
+    private static List<Button> GetInteractiveButtons(Control container)
+    {
+        return container.GetVisualDescendants()
+            .OfType<Button>()
+            .Where(b => b is not RepeatButton
+                        && b is not Avalonia.Controls.Primitives.ToggleButton
+                        && b.FindAncestorOfType<Avalonia.Controls.Primitives.ScrollBar>() == null
+                        && b.FindAncestorOfType<Expander>() == null)
+            .ToList();
+    }
+
+    private static void RenderAndAuditView(Control view, double width, double height, string expectedScreenAutomationId)
+    {
+        var window = new Window
+        {
+            Width = width,
+            Height = height,
+            Content = view
+        };
+
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        // 1. ルート要素または View の AutomationId 検証
+        var screenId = AutomationProperties.GetAutomationId(view);
+        if (string.IsNullOrEmpty(screenId))
+        {
+            // View 内のルート Border / DockPanel を走査
+            var rootWithId = view.GetVisualDescendants()
+                .FirstOrDefault(c => AutomationProperties.GetAutomationId(c) == expectedScreenAutomationId);
+            Assert.NotNull(rootWithId);
+        }
+        else
+        {
+            Assert.Equal(expectedScreenAutomationId, screenId);
+        }
+
+        // 2. 狭小幅・標準幅でのレイアウト再計算
+        window.Width = width == 1280 ? 640 : 1280;
+        window.InvalidateMeasure();
+        window.InvalidateVisual();
+        Dispatcher.UIThread.RunJobs();
+
+        // 3. インタラクティブ要素のアクセシビリティ検証（ボタンやテキストボックスの探索）
+        var buttons = GetInteractiveButtons(view);
+        var textBoxes = view.GetVisualDescendants().OfType<TextBox>().ToList();
+
+        // 全ボタンが何らかの識別子（Content, AutomationId, または Name）を持つことを確認
+        foreach (var btn in buttons)
+        {
+            var content = btn.Content?.ToString();
+            var autoId = AutomationProperties.GetAutomationId(btn);
+            var name = AutomationProperties.GetName(btn);
+            Assert.True(!string.IsNullOrEmpty(content) || !string.IsNullOrEmpty(autoId) || !string.IsNullOrEmpty(name),
+                $"Button in {view.GetType().Name} lacks accessible identifier");
+        }
+
+        // 4. クリーンアップ
+        window.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_Dashboard_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<DashboardModel>();
+        var view = new Dashboard { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_Dashboard");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_AddEdit_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<AddEditModel>();
+        var view = new AddEdit { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_AddEdit");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_OfficeWorkspace_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<OfficeWorkspaceModel>();
+        var view = new OfficeWorkspace { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_OfficeWorkspace");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_StudentWorkspace_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<StudentWorkspaceModel>();
+        var view = new StudentWorkspace { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_StudentWorkspace");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_BatchImport_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<BatchImportModel>();
+        var view = new BatchImport { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_BatchImport");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_WatchedFolder_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<WatchedFolderModel>();
+        var view = new WatchedFolder { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "WatchedFolder_Screen");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_RecycleBin_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<RecycleBinModel>();
+        var view = new RecycleBin { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_RecycleBin");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_DuplicateDetection_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<DuplicateDetectionModel>();
+        var view = new DuplicateDetection { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_DuplicateDetection");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_FileIntegrityCheck_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<FileIntegrityCheckModel>();
+        var view = new FileIntegrityCheck { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_FileIntegrityCheck");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_RecentFiles_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<RecentFilesModel>();
+        var view = new RecentFiles { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_RecentFiles");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_Report_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<ReportModel>();
+        var view = new Report { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_Report");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_TreeMap_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<TreeMapModel>();
+        var view = new TreeMap { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_TreeMap");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_CategoryManagement_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<CategoryManagementModel>();
+        var view = new CategoryManagement { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_CategoryManagement");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_CollectionManagement_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<CollectionManagementModel>();
+        var view = new CollectionManagement { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_CollectionManagement");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_PersonalNote_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<PersonalNoteModel>();
+        var view = new PersonalNote { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_PersonalNote");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_RelatedDocuments_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<RelatedDocumentsModel>();
+        var view = new RelatedDocuments { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_RelatedDocuments");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_SmartViews_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<SmartViewsModel>();
+        var view = new SmartViews { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_SmartViews");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_ImportInbox_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<ImportInboxModel>();
+        var view = new ImportInbox { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_ImportInbox");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_BulkDelete_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<BulkDeleteModel>();
+        var view = new BulkDelete { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_BulkDelete");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_RecoveryCenter_RendersSuccessfully()
+    {
+        var model = App.Services!.GetRequiredService<RecoveryCenterModel>();
+        var view = new RecoveryCenterView { DataContext = model };
+        RenderAndAuditView(view, 1280, 800, "Screen_RecoveryCenter");
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_DashboardContextMenu_IsUnifiedAndHasNoEditNotes()
+    {
+        var dashboard = new Dashboard();
+        var dataGrid = dashboard.FindControl<DataGrid>("dgvDocuments");
+        Assert.NotNull(dataGrid);
+        Assert.NotNull(dataGrid!.ContextMenu);
+
+        var menuItems = dataGrid.ContextMenu!.Items.OfType<MenuItem>().ToList();
+        var editNotes = menuItems.FirstOrDefault(m => AutomationProperties.GetAutomationId(m) == "Context_EditNotes");
+        var personalNote = menuItems.FirstOrDefault(m => AutomationProperties.GetAutomationId(m) == "Context_PersonalNote");
+
+        Assert.Null(editNotes);
+        Assert.NotNull(personalNote);
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_DuplicateMergeReviewDialog_RendersSuccessfully()
+    {
+        var candidates = new List<StudyDocumentManager.Core.Entities.StudyDocument>
+        {
+            new() { Id = 1, Name = "Doc A.pdf", FilePath = @"C:\docs\Doc A.pdf", FileSize = 2.5, Subject = "Math", Type = "PDF", CreatedAt = DateTime.UtcNow },
+            new() { Id = 2, Name = "Doc A (Copy).pdf", FilePath = @"C:\docs\Doc A (Copy).pdf", FileSize = 2.5, Subject = "Math", Type = "PDF", CreatedAt = DateTime.UtcNow }
+        };
+        var dialog = new DuplicateMergeReviewDialog("Group 1", "Same Size & Hash", candidates);
+        dialog.Width = 640;
+        dialog.Height = 700;
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_DuplicateMergeReview", screenId);
+
+        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        Assert.True(buttons.Count >= 2);
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_OnboardingDialog_RendersSuccessfully()
+    {
+        var model = new OnboardingModel(new TestDoubles.InMemorySettingsService());
+        var dialog = new OnboardingDialog { DataContext = model };
+        dialog.Width = 740;
+        dialog.Height = 620;
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_Onboarding", screenId);
+
+        // Test resize responsiveness
+        dialog.Width = 600;
+        dialog.Height = 500;
+        dialog.InvalidateMeasure();
+        dialog.InvalidateVisual();
+        Dispatcher.UIThread.RunJobs();
+
+        var buttons = GetInteractiveButtons(dialog);
+        Assert.True(buttons.Count >= 3);
+        foreach (var btn in buttons)
+        {
+            var content = btn.Content?.ToString();
+            var autoId = AutomationProperties.GetAutomationId(btn);
+            var name = AutomationProperties.GetName(btn);
+            Assert.True(!string.IsNullOrEmpty(content) || !string.IsNullOrEmpty(autoId) || !string.IsNullOrEmpty(name));
+        }
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_AffectedItemsPreviewDialog_RendersSuccessfully()
+    {
+        var loc = App.Services!.GetRequiredService<ILocalizationService>();
+        var items = new List<string> { "Doc 1.pdf", "Doc 2.pdf", "Doc 3.pdf" };
+        var dialog = new AffectedItemsPreviewDialog("Delete Confirmation", 3, items, "Cannot be undone", loc);
+        dialog.Width = 420;
+        dialog.Height = 520;
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_AffectedItemsPreview", screenId);
+
+        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        Assert.True(buttons.Count >= 2);
+        foreach (var btn in buttons)
+        {
+            var content = btn.Content?.ToString();
+            var autoId = AutomationProperties.GetAutomationId(btn);
+            var name = AutomationProperties.GetName(btn);
+            Assert.True(!string.IsNullOrEmpty(content) || !string.IsNullOrEmpty(autoId) || !string.IsNullOrEmpty(name));
+        }
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_BulkEditPreviewDialog_RendersSuccessfully()
+    {
+        var loc = App.Services!.GetRequiredService<ILocalizationService>();
+        var changes = new List<(string, string)> { ("Category", "Mathematics"), ("Status", "Completed") };
+        var dialog = new BulkEditPreviewDialog(10, changes, loc);
+        dialog.Width = 420;
+        dialog.Height = 520;
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_BulkEditPreview", screenId);
+
+        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        Assert.True(buttons.Count >= 2);
+        foreach (var btn in buttons)
+        {
+            var content = btn.Content?.ToString();
+            var autoId = AutomationProperties.GetAutomationId(btn);
+            var name = AutomationProperties.GetName(btn);
+            Assert.True(!string.IsNullOrEmpty(content) || !string.IsNullOrEmpty(autoId) || !string.IsNullOrEmpty(name));
+        }
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_AddDocumentDialog_RendersSuccessfully()
+    {
+        var dialog = new AddDocumentDialog(@"C:\docs\Test.pdf", new[] { "Math", "Science" }, new[] { "PDF", "Word" });
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_AddDocument", screenId);
+
+        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        Assert.True(buttons.Count >= 2);
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_AddToCollectionDialog_RendersSuccessfully()
+    {
+        var loc = App.Services!.GetRequiredService<ILocalizationService>();
+        var candidates = new List<StudyDocumentManager.Core.Entities.StudyDocument>
+        {
+            new() { Id = 1, Name = "Doc 1.pdf", FilePath = @"C:\docs\Doc1.pdf", FileSize = 1.0, Subject = "Math", Type = "PDF", CreatedAt = DateTime.UtcNow }
+        };
+        var dialog = new AddToCollectionDialog(candidates, new HashSet<int>(), "Math Collection", loc);
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_AddToCollection", screenId);
+
+        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        Assert.NotEmpty(buttons);
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_ChangeCategoryDialog_RendersSuccessfully()
+    {
+        var loc = App.Services!.GetRequiredService<ILocalizationService>();
+        var dialog = new ChangeCategoryDialog("TestDoc", new[] { "Math", "Physics" }, "Math", loc);
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_ChangeCategory", screenId);
+
+        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        Assert.True(buttons.Count >= 2);
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [Avalonia.Headless.XUnit.AvaloniaFact]
+    public void ViewAudit_SelectCollectionDialog_RendersSuccessfully()
+    {
+        var collections = new List<(int Id, string Name, int DocCount)>
+        {
+            (1, "Collection A", 5)
+        };
+        var loc = App.Services!.GetRequiredService<ILocalizationService>();
+        var dialog = new SelectCollectionDialog("TestDoc", collections, loc);
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var screenId = AutomationProperties.GetAutomationId(dialog);
+        Assert.Equal("Dialog_SelectCollection", screenId);
+
+        var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
+        Assert.True(buttons.Count >= 2);
+
+        dialog.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+}
+

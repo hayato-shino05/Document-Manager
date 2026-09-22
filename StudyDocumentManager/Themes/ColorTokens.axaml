@@ -1,0 +1,249 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+
+    <Styles.Resources>
+
+
+        <Color x:Key="MicaBase">#F3F3F3</Color>
+        <Color x:Key="MicaSoft">#EEEEEE</Color>
+        <Color x:Key="CardWhite">#FFFFFF</Color>
+        <Color x:Key="SidebarBg">#FAFAFA</Color>
+
+        <Color x:Key="TextDark">#1C1C1C</Color>
+        <Color x:Key="TextMedium">#606060</Color>
+        <Color x:Key="TextLight">#6B7280</Color>
+
+        <Color x:Key="BorderSubtle">#E5E5E5</Color>
+        <Color x:Key="BorderMedium">#D2D2D2</Color>
+
+
+        <Color x:Key="AccentBlue">#0067C0</Color>
+        <Color x:Key="AccentBlueDark">#0054A6</Color>
+        <Color x:Key="AccentBlueLight">#60A5FA</Color>
+        <Color x:Key="AccentBlueBg">#DBEAFE</Color>
+
+
+        <Color x:Key="StatusGreen">#107C10</Color>
+        <Color x:Key="StatusAmber">#9A6300</Color>
+        <Color x:Key="StatusRed">#C42B1C</Color>
+        <Color x:Key="StatusYellow">#EAB308</Color>
+
+
+        <Color x:Key="SelectionBlueBg">#E1EFFF</Color>
+        <Color x:Key="HoverBg">#0A000000</Color>
+
+
+        <Color x:Key="OnColorPrimary">#FFFFFF</Color>
+        <Color x:Key="OnColorSecondary">#FFFFFF</Color>
+
+
+        <Color x:Key="IconNeutral">#606060</Color>
+        <Color x:Key="IconNeutralLight">#949494</Color>
+        <Color x:Key="IconAccent">#0067C0</Color>
+        <Color x:Key="IconSuccess">#107C10</Color>
+        <Color x:Key="IconDanger">#C42B1C</Color>
+        <Color x:Key="IconUrgent">#E65100</Color>
+        <Color x:Key="IconStarFill">#E8A317</Color>
+        <Color x:Key="IconFolderBase">#DCA01D</Color>
+        <Color x:Key="IconFolderFlap">#EAC050</Color>
+        <Color x:Key="IconIndigo">#5C6BC0</Color>
+        <Color x:Key="IconCyan">#0891B2</Color>
+        <Color x:Key="IconAmberDark">#9A6300</Color>
+
+
+        <SolidColorBrush x:Key="BrushIconNeutral"      Color="{StaticResource IconNeutral}"/>
+        <SolidColorBrush x:Key="BrushIconNeutralLight" Color="{StaticResource IconNeutralLight}"/>
+        <SolidColorBrush x:Key="BrushIconAccent"       Color="{StaticResource IconAccent}"/>
+        <SolidColorBrush x:Key="BrushIconSuccess"      Color="{StaticResource IconSuccess}"/>
+        <SolidColorBrush x:Key="BrushIconDanger"       Color="{StaticResource IconDanger}"/>
+        <SolidColorBrush x:Key="BrushIconUrgent"       Color="{StaticResource IconUrgent}"/>
+        <SolidColorBrush x:Key="BrushIconStarFill"     Color="{StaticResource IconStarFill}"/>
+        <SolidColorBrush x:Key="BrushIconFolderBase"   Color="{StaticResource IconFolderBase}"/>
+        <SolidColorBrush x:Key="BrushIconFolderFlap"   Color="{StaticResource IconFolderFlap}"/>
+        <SolidColorBrush x:Key="BrushIconIndigo"       Color="{StaticResource IconIndigo}"/>
+        <SolidColorBrush x:Key="BrushIconCyan"         Color="{StaticResource IconCyan}"/>
+        <SolidColorBrush x:Key="BrushIconAmberDark"   Color="{StaticResource IconAmberDark}"/>
+
+
+        <SolidColorBrush x:Key="SidebarBackground"   Color="{StaticResource SidebarBg}"/>
+        <SolidColorBrush x:Key="SidebarHover"        Color="{StaticResource MicaSoft}"/>
+        <SolidColorBrush x:Key="ContentBackground"   Color="{StaticResource MicaBase}"/>
+        <SolidColorBrush x:Key="CardBackground"      Color="{StaticResource CardWhite}"/>
+        <SolidColorBrush x:Key="CardBorder"          Color="{StaticResource BorderSubtle}"/>
+        <SolidColorBrush x:Key="TextPrimary"         Color="{StaticResource TextDark}"/>
+        <SolidColorBrush x:Key="TextSecondary"       Color="{StaticResource TextMedium}"/>
+        <SolidColorBrush x:Key="TextMuted"           Color="{StaticResource TextLight}"/>
+        <SolidColorBrush x:Key="AccentBrush"         Color="{StaticResource AccentBlue}"/>
+        <SolidColorBrush x:Key="AccentColor"         Color="{StaticResource AccentBlue}"/>
+        <SolidColorBrush x:Key="AccentBrushHover"    Color="{StaticResource AccentBlueDark}"/>
+        <SolidColorBrush x:Key="SuccessBrush"        Color="{StaticResource StatusGreen}"/>
+        <SolidColorBrush x:Key="WarningBrush"        Color="{StaticResource StatusAmber}"/>
+        <SolidColorBrush x:Key="DangerBrush"         Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="DangerText"          Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="WarningText"         Color="{StaticResource StatusAmber}"/>
+        <SolidColorBrush x:Key="SuccessText"         Color="{StaticResource StatusGreen}"/>
+        <SolidColorBrush x:Key="Accent"              Color="{StaticResource AccentBlue}"/>
+        <SolidColorBrush x:Key="OnColorPrimaryBrush"  Color="{StaticResource OnColorPrimary}"/>
+        <SolidColorBrush x:Key="OnColorSecondaryBrush" Color="{StaticResource OnColorSecondary}"/>
+
+        <SolidColorBrush x:Key="DeadlineOverdueBrush"      Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="DeadlineUrgentBrush"       Color="{StaticResource StatusAmber}"/>
+        <SolidColorBrush x:Key="DeadlineUpcomingBrush"     Color="{StaticResource StatusYellow}"/>
+        <SolidColorBrush x:Key="DeadlineOverdueTextBrush"  Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="DeadlineUrgentTextBrush"   Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="DeadlineUpcomingTextBrush" Color="#1F2937"/>
+
+        <SolidColorBrush x:Key="ToastSuccessBrush"             Color="#DCFCE7"/>
+        <SolidColorBrush x:Key="ToastErrorBrush"               Color="#FEE2E2"/>
+        <SolidColorBrush x:Key="ToastWarningBrush"             Color="#FEF3C7"/>
+        <SolidColorBrush x:Key="ToastInfoBrush"                Color="#DBEAFE"/>
+        <SolidColorBrush x:Key="ToastSuccessForegroundBrush"  Color="{StaticResource StatusGreen}"/>
+        <SolidColorBrush x:Key="ToastErrorForegroundBrush"    Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="ToastWarningForegroundBrush"  Color="{StaticResource StatusAmber}"/>
+        <SolidColorBrush x:Key="ToastInfoForegroundBrush"     Color="{StaticResource AccentBlueDark}"/>
+        <SolidColorBrush x:Key="ToastForegroundBrush"         Color="{StaticResource TextDark}"/>
+        <SolidColorBrush x:Key="IconPaperFoldBrush" Color="{StaticResource BorderSubtle}"/>
+
+
+
+
+        <Color x:Key="ColorDanger">      #DC2626</Color>
+        <Color x:Key="ColorDangerHover"> #B91C1C</Color>
+        <Color x:Key="ColorWarningBtn">  #9A6300</Color>
+        <Color x:Key="ColorWarningHover">#7A4F00</Color>
+        <Color x:Key="ColorSuccess">     #047857</Color>
+        <Color x:Key="ColorSuccessHover">#065F46</Color>
+
+        <Color x:Key="ChipBg">          #F0F4FF</Color>
+        <Color x:Key="ChipFg">          #3B4EB8</Color>
+        <Color x:Key="ChipBorder">      #C7D2FE</Color>
+        <Color x:Key="ChipHoverBg">     #DBEAFE</Color>
+        <Color x:Key="ChipSelectedBg">  #4F46E5</Color>
+        <Color x:Key="ChipSelectedBorder">#4338CA</Color>
+
+        <SolidColorBrush x:Key="DangerColor"         Color="{StaticResource ColorDanger}"/>
+        <SolidColorBrush x:Key="DangerColorHover"    Color="{StaticResource ColorDangerHover}"/>
+        <SolidColorBrush x:Key="WarningColor"        Color="{StaticResource ColorWarningBtn}"/>
+        <SolidColorBrush x:Key="WarningColorHover"   Color="{StaticResource ColorWarningHover}"/>
+        <SolidColorBrush x:Key="SuccessColor"        Color="{StaticResource ColorSuccess}"/>
+        <SolidColorBrush x:Key="SuccessColorHover"   Color="{StaticResource ColorSuccessHover}"/>
+        <SolidColorBrush x:Key="DangerBorder"        Color="{StaticResource ColorDanger}"/>
+        <SolidColorBrush x:Key="WarningBorder"       Color="{StaticResource ColorWarningBtn}"/>
+        <SolidColorBrush x:Key="SuccessBorder"       Color="{StaticResource ColorSuccess}"/>
+
+        <SolidColorBrush x:Key="ChipBgBrush"           Color="{StaticResource ChipBg}"/>
+        <SolidColorBrush x:Key="ChipFgBrush"           Color="{StaticResource ChipFg}"/>
+        <SolidColorBrush x:Key="ChipBorderBrush"       Color="{StaticResource ChipBorder}"/>
+        <SolidColorBrush x:Key="ChipHoverBgBrush"      Color="{StaticResource ChipHoverBg}"/>
+        <SolidColorBrush x:Key="ChipSelectedBgBrush"   Color="{StaticResource ChipSelectedBg}"/>
+        <SolidColorBrush x:Key="ChipSelectedBorderBrush" Color="{StaticResource ChipSelectedBorder}"/>
+
+        <SolidColorBrush x:Key="TextPrimaryBrush"    Color="{StaticResource TextDark}"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush"  Color="{StaticResource TextMedium}"/>
+        <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardWhite}"/>
+        <SolidColorBrush x:Key="BorderBrush"         Color="{StaticResource BorderSubtle}"/>
+
+
+        <SolidColorBrush x:Key="StatBlueBg"   Color="{StaticResource AccentBlueBg}"/>
+        <SolidColorBrush x:Key="StatBlueFg"   Color="{StaticResource AccentBlue}"/>
+        <SolidColorBrush x:Key="StatGreenBg"  Color="#DCFCE7"/>
+        <SolidColorBrush x:Key="StatGreenFg"  Color="{StaticResource StatusGreen}"/>
+        <SolidColorBrush x:Key="StatAmberBg"  Color="#FEF3C7"/>
+        <SolidColorBrush x:Key="StatAmberFg"  Color="{StaticResource StatusAmber}"/>
+        <SolidColorBrush x:Key="StatRedBg"    Color="#FEE2E2"/>
+        <SolidColorBrush x:Key="StatRedFg"    Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="StatPurpleBg" Color="#F3E8FF"/>
+        <SolidColorBrush x:Key="StatPurpleFg" Color="#7E22CE"/>
+        <SolidColorBrush x:Key="StatOrangeBg" Color="#FFEDD5"/>
+        <SolidColorBrush x:Key="StatOrangeFg" Color="#C2410C"/>
+
+
+        <SolidColorBrush x:Key="GradientIndigo"  Color="{StaticResource AccentBlue}"/>
+        <SolidColorBrush x:Key="GradientEmerald" Color="{StaticResource StatusGreen}"/>
+        <SolidColorBrush x:Key="GradientAmber"   Color="{StaticResource StatusAmber}"/>
+        <SolidColorBrush x:Key="GradientRose"    Color="{StaticResource StatusRed}"/>
+        <SolidColorBrush x:Key="GradientCyan"    Color="{StaticResource IconCyan}"/>
+
+
+        <LinearGradientBrush x:Key="GradientStatBlue"  StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#DBEAFE" Offset="0"/>
+            <GradientStop Color="#EFF6FF" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradientStatAmber" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#FEF3C7" Offset="0"/>
+            <GradientStop Color="#FFFBEB" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradientStatRed"   StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#FEE2E2" Offset="0"/>
+            <GradientStop Color="#FFF1F2" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GradientStatTeal"  StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#DCFCE7" Offset="0"/>
+            <GradientStop Color="#F0FDF4" Offset="1"/>
+        </LinearGradientBrush>
+
+
+        <CornerRadius x:Key="RadiusXs">3</CornerRadius>
+        <CornerRadius x:Key="RadiusSm">4</CornerRadius>
+        <CornerRadius x:Key="RadiusMd">6</CornerRadius>
+        <CornerRadius x:Key="RadiusLg">8</CornerRadius>
+        <CornerRadius x:Key="RadiusXl">12</CornerRadius>
+        <CornerRadius x:Key="RadiusPill">10</CornerRadius>
+        <CornerRadius x:Key="RadiusFull">9999</CornerRadius>
+
+
+        <x:Double x:Key="Space1">4</x:Double>
+        <x:Double x:Key="Space2">6</x:Double>
+        <Thickness x:Key="MarginSpace2">6,0,0,0</Thickness>
+        <x:Double x:Key="Space3">8</x:Double>
+        <x:Double x:Key="Space4">12</x:Double>
+        <x:Double x:Key="Space5">16</x:Double>
+        <x:Double x:Key="Space6">20</x:Double>
+        <x:Double x:Key="Space8">24</x:Double>
+
+
+
+        <Thickness x:Key="PaddingXs">4,2</Thickness>
+        <Thickness x:Key="PaddingSm">8,4</Thickness>
+        <Thickness x:Key="PaddingMd">12,6</Thickness>
+        <Thickness x:Key="PaddingLg">16,8</Thickness>
+        <Thickness x:Key="PaddingXl">20,12</Thickness>
+        <Thickness x:Key="PaddingPage">20</Thickness>
+        <Thickness x:Key="PaddingRow">12,5</Thickness>
+        <Thickness x:Key="PaddingSearchBar">12,6</Thickness>
+        <Thickness x:Key="PaddingCard">16,12</Thickness>
+        <Thickness x:Key="PaddingCardLg">16,10</Thickness>
+        <Thickness x:Key="PaddingStatCard">14,10</Thickness>
+        <Thickness x:Key="PaddingSidebar">10,6</Thickness>
+        <Thickness x:Key="PaddingNavItem">10,7</Thickness>
+
+        <Thickness x:Key="PaddingBtn">14,4</Thickness>
+        <Thickness x:Key="PaddingBtnSm">10,4</Thickness>
+        <Thickness x:Key="PaddingBtnLg">16,6</Thickness>
+
+        <Thickness x:Key="PaddingChip">8,3</Thickness>
+        <Thickness x:Key="PaddingBadge">5,2</Thickness>
+        <Thickness x:Key="PaddingBadgeMd">7,2</Thickness>
+        <Thickness x:Key="PaddingIcon">4</Thickness>
+        <Thickness x:Key="PaddingBtnMd">10,5</Thickness>
+        <Thickness x:Key="PaddingBtnPrimary">14,6</Thickness>
+        <Thickness x:Key="PaddingSection">16</Thickness>
+
+
+        <x:Double x:Key="HeightControl">28</x:Double>
+        <x:Double x:Key="HeightButton">30</x:Double>
+        <x:Double x:Key="HeightButtonLg">34</x:Double>
+
+
+        <x:Double x:Key="FontSizeXs">12</x:Double>
+        <x:Double x:Key="FontSizeSm">13</x:Double>
+        <x:Double x:Key="FontSizeMd">14</x:Double>
+        <x:Double x:Key="FontSizeLg">15</x:Double>
+        <x:Double x:Key="FontSizeXl">18</x:Double>
+        <x:Double x:Key="FontSizeHeading">22</x:Double>
+
+    </Styles.Resources>
+
+</Styles>

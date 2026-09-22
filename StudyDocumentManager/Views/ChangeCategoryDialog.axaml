@@ -1,0 +1,97 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+                x:Class="StudyDocumentManager.Views.ChangeCategoryDialog"
+        AutomationProperties.AutomationId="Dialog_ChangeCategory"
+        Title="{loc:Localize ChangeCategory_Title}"
+        Width="420" MaxHeight="520" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="{StaticResource ContentBackground}">
+    <Window.Styles>
+
+        <Style Selector="AutoCompleteBox">
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24" Spacing="12">
+
+
+        <TextBlock x:Name="DocNameLabel"
+                   FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
+                   Foreground="{StaticResource TextPrimary}"
+                   TextWrapping="Wrap"/>
+
+
+        <StackPanel>
+            <TextBlock Text="{loc:Localize ChangeCategory_ChipHint}"
+                       FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,6"/>
+
+
+            <TextBlock x:Name="EmptyStateText"
+                       AutomationProperties.AutomationId="ChangeCategory_EmptyState"
+                       AutomationProperties.LiveSetting="Polite"
+                       Text="{loc:Localize ChangeCategory_EmptyState}"
+                       FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextMuted}"
+                       IsVisible="False"/>
+
+
+            <ItemsControl x:Name="ChipsPanel">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding}"
+                                AutomationProperties.Name="{Binding}"
+                                Classes="chip"
+                                Margin="0,0,6,6"
+                                Click="OnChipClicked"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+
+
+        <StackPanel Spacing="4">
+            <TextBlock Text="{loc:Localize ChangeCategory_InputHint}"
+                       FontSize="{StaticResource FontSizeXs}" Foreground="{StaticResource TextSecondary}"/>
+            <AutoCompleteBox x:Name="CategoryInput"
+                             AutomationProperties.AutomationId="ChangeCategory_Input"
+                             AutomationProperties.Name="{loc:Localize ChangeCategory_InputHint}"
+                             Watermark="{loc:Localize ChangeCategory_Placeholder}"
+                             MinimumPrefixLength="0"
+                             FilterMode="Contains"
+                             Height="36"/>
+        </StackPanel>
+
+
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8" Margin="0,8,0,0">
+            <Button x:Name="OkButton"
+                    AutomationProperties.AutomationId="ChangeCategory_Save"
+                    AutomationProperties.Name="{loc:Localize ChangeCategory_BtnSave}"
+                    Content="{loc:Localize ChangeCategory_BtnSave}"
+                    Classes="primary"
+                    IsDefault="True"
+                    MinWidth="110"
+                    HorizontalContentAlignment="Center"/>
+            <Button x:Name="CancelButton"
+                    AutomationProperties.AutomationId="ChangeCategory_Cancel"
+                    AutomationProperties.Name="{loc:Localize AddEdit_BtnCancel}"
+                    Content="{loc:Localize AddEdit_BtnCancel}"
+                    Classes="secondary"
+                    IsCancel="True"
+                    MinWidth="80"
+                    HorizontalContentAlignment="Center"/>
+        </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

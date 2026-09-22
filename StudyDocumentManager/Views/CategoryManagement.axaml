@@ -1,0 +1,174 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:StudyDocumentManager.Models"
+        xmlns:loc="using:StudyDocumentManager.Markup"
+                     x:Class="StudyDocumentManager.Views.CategoryManagement"
+             x:DataType="vm:CategoryManagementModel"
+             AutomationProperties.AutomationId="Screen_CategoryManagement">
+
+    <Border Background="{StaticResource ContentBackground}" Padding="{StaticResource PaddingPage}">
+        <DockPanel>
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
+                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Image Source="{StaticResource IconCategory}" Width="18" Height="18"/>
+                    <TextBlock AutomationProperties.AutomationId="Title_CategoryManagement"
+                               Text="{loc:Localize CategoryMgmt_Title}" FontSize="{StaticResource FontSizeXl}"
+                               FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                </StackPanel>
+            </DockPanel>
+
+            <Border DockPanel.Dock="Top" Background="{StaticResource StatBlueBg}"
+                    CornerRadius="{StaticResource RadiusMd}" Padding="{StaticResource PaddingSidebar}" Margin="0,0,0,12"
+                    BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Image Source="{StaticResource IconInfo}" Width="13" Height="13"/>
+                    <TextBlock Text="{loc:Localize CategoryMgmt_InfoHint}"
+                               FontSize="{StaticResource FontSizeSm}" Foreground="{StaticResource TextSecondary}"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Grid ColumnDefinitions="*,20,*">
+
+                <Border Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
+                                CornerRadius="6,6,0,0" Padding="{StaticResource PaddingMd}">
+                            <DockPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <Image Source="{StaticResource IconCategory}" Width="13" Height="13"/>
+                                    <TextBlock Text="{loc:Localize CategoryMgmt_TabSubjects}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimary}"/>
+                                </StackPanel>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Button Classes="primary" AutomationProperties.AutomationId="CategoryManagement_AddSubject"
+                                            AutomationProperties.Name="{loc:Localize CategoryMgmt_BtnAdd}"
+                                            Command="{Binding AddSubjectCommand}" Padding="{StaticResource PaddingSm}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
+                                            <Image Source="{StaticResource IconAddWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize CategoryMgmt_BtnAdd}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Classes="secondary" AutomationProperties.AutomationId="CategoryManagement_RenameSubject"
+                                            AutomationProperties.Name="{loc:Localize CategoryMgmt_BtnRename}"
+                                            Command="{Binding RenameSubjectCommand}" Padding="{StaticResource PaddingSm}"
+                                            IsEnabled="{Binding SelectedSubject, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
+                                            <Image Source="{StaticResource IconEdit}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize CategoryMgmt_BtnRename}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Classes="danger" AutomationProperties.AutomationId="CategoryManagement_DeleteSubject"
+                                            AutomationProperties.Name="{loc:Localize CategoryMgmt_BtnDelete}"
+                                            Command="{Binding DeleteSubjectCommand}" Padding="{StaticResource PaddingSm}"
+                                            IsEnabled="{Binding SelectedSubject, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
+                                            <Image Source="{StaticResource IconDeleteWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize CategoryMgmt_BtnDelete}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+
+                        <Panel>
+                            <ListBox ItemsSource="{Binding Subjects}"
+                                     SelectedItem="{Binding SelectedSubject}"
+                                     SelectionMode="Multiple"
+                                     SelectedItems="{Binding SelectedSubjects}"
+                                     Padding="{StaticResource PaddingIcon}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,8">
+                                            <Image Source="{StaticResource IconCategory}" Width="13" Height="13"/>
+                                            <TextBlock Text="{Binding Display}" FontSize="{StaticResource FontSizeMd}"
+                                                       Foreground="{StaticResource TextPrimary}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <StackPanel Classes="empty-state" IsVisible="{Binding !Subjects.Count}" Margin="16">
+                                <Image Classes="empty-state-icon" Source="{StaticResource IconCategory}"/>
+                                <TextBlock Classes="empty-state-text" Text="{loc:Localize Common_NoData}"/>
+                            </StackPanel>
+                        </Panel>
+                    </DockPanel>
+                </Border>
+
+                <Border Grid.Column="2" Background="{StaticResource CardBackground}" CornerRadius="{StaticResource RadiusMd}"
+                        BorderBrush="{StaticResource CardBorder}" BorderThickness="1">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Background="{StaticResource SidebarBackground}"
+                                CornerRadius="6,6,0,0" Padding="{StaticResource PaddingMd}">
+                            <DockPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <Image Source="{StaticResource IconDocPage}" Width="13" Height="13"/>
+                                    <TextBlock Text="{loc:Localize CategoryMgmt_TabTypes}" FontSize="{StaticResource FontSizeLg}" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextPrimary}"/>
+                                </StackPanel>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Button Classes="primary" AutomationProperties.AutomationId="CategoryManagement_AddType"
+                                            AutomationProperties.Name="{loc:Localize CategoryMgmt_BtnAdd}"
+                                            Command="{Binding AddTypeCommand}" Padding="{StaticResource PaddingSm}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
+                                            <Image Source="{StaticResource IconAddWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize CategoryMgmt_BtnAdd}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Classes="secondary" AutomationProperties.AutomationId="CategoryManagement_RenameType"
+                                            AutomationProperties.Name="{loc:Localize CategoryMgmt_BtnRename}"
+                                            Command="{Binding RenameTypeCommand}" Padding="{StaticResource PaddingSm}"
+                                            IsEnabled="{Binding SelectedType, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
+                                            <Image Source="{StaticResource IconEdit}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize CategoryMgmt_BtnRename}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Classes="danger" AutomationProperties.AutomationId="CategoryManagement_DeleteType"
+                                            AutomationProperties.Name="{loc:Localize CategoryMgmt_BtnDelete}"
+                                            Command="{Binding DeleteTypeCommand}" Padding="{StaticResource PaddingSm}"
+                                            IsEnabled="{Binding SelectedType, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                        <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
+                                            <Image Source="{StaticResource IconDeleteWhite}" Width="16" Height="16" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{loc:Localize CategoryMgmt_BtnDelete}" FontSize="{StaticResource FontSizeSm}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+
+                        <Panel>
+                            <ListBox ItemsSource="{Binding Types}"
+                                     SelectedItem="{Binding SelectedType}"
+                                     SelectionMode="Multiple"
+                                     SelectedItems="{Binding SelectedTypes}"
+                                     Padding="{StaticResource PaddingIcon}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,8">
+                                            <Image Source="{StaticResource IconDocPage}" Width="13" Height="13"/>
+                                            <TextBlock Text="{Binding Display}" FontSize="{StaticResource FontSizeMd}"
+                                                       Foreground="{StaticResource TextPrimary}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <StackPanel Classes="empty-state" IsVisible="{Binding !Types.Count}" Margin="16">
+                                <Image Classes="empty-state-icon" Source="{StaticResource IconDocPage}"/>
+                                <TextBlock Classes="empty-state-text" Text="{loc:Localize Common_NoData}"/>
+                            </StackPanel>
+                        </Panel>
+                    </DockPanel>
+                </Border>
+                </Grid>
+            </ScrollViewer>
+        </DockPanel>
+    </Border>
+
+</UserControl>

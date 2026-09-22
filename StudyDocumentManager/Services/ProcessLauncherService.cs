@@ -1,0 +1,128 @@
+using System.Diagnostics;
+using StudyDocumentManager.Core.Interfaces;
+
+namespace StudyDocumentManager.Services;
+
+public class ProcessLauncherService : IProcessLauncherService
+{
+    private readonly IPlatformInfo _platformInfo;
+    private readonly Action<ProcessStartInfo> _startProcess;
+
+    public ProcessLauncherService(IPlatformInfo platformInfo)
+        : this(platformInfo, processStartInfo => Process.Start(processStartInfo))
+    {
+    }
+
+    internal ProcessLauncherService(IPlatformInfo platformInfo, Action<ProcessStartInfo> startProcess)
+    {
+        _platformInfo = platformInfo ?? throw new ArgumentNullException(nameof(platformInfo));
+        _startProcess = startProcess ?? throw new ArgumentNullException(nameof(startProcess));
+    }
+
+    public void OpenFile(string filePath)
+    {
+        if (_platformInfo.IsLinux)
+        {
+            if (File.Exists(filePath))
+                StartLinuxTarget(filePath);
+            return;
+        }
+
+        if (File.Exists(filePath))
+        {
+            _startProcess(new ProcessStartInfo
+            {
+                FileName = filePath,
+                UseShellExecute = true
+            });
+        }
+    }
+
+    public void RevealInExplorer(string filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+            return;
+
+        if (_platformInfo.IsLinux)
+        {
+            var directory = Directory.Exists(filePath) ? filePath : Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory) && Directory.Exists(directory))
+                StartLinuxTarget(directory);
+            return;
+        }
+
+        if (Directory.Exists(filePath))
+        {
+            _startProcess(new ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = $"\"{filePath}\""
+            });
+            return;
+        }
+
+        if (File.Exists(filePath))
+        {
+            _startProcess(new ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = $"/select,\"{filePath}\""
+            });
+        }
+        else
+        {
+            var dir = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
+                _startProcess(new ProcessStartInfo
+                {
+                    FileName = "explorer.exe",
+                    Arguments = $"\"{dir}\""
+                });
+        }
+    }
+
+    public void OpenFolder(string folderPath)
+    {
+        if (_platformInfo.IsLinux)
+        {
+            if (Directory.Exists(folderPath))
+                StartLinuxTarget(folderPath);
+            return;
+        }
+
+        if (Directory.Exists(folderPath))
+        {
+            _startProcess(new ProcessStartInfo
+            {
+                FileName = folderPath,
+                UseShellExecute = true
+            });
+        }
+    }
+
+    public void OpenUrl(string url)
+    {
+        if (_platformInfo.IsLinux)
+        {
+            StartLinuxTarget(url);
+            return;
+        }
+
+        _startProcess(new ProcessStartInfo
+        {
+            FileName = url,
+            UseShellExecute = true
+        });
+    }
+
+    private void StartLinuxTarget(string target)
+    {
+        var processStartInfo = new ProcessStartInfo
+        {
+            FileName = "xdg-open",
+            UseShellExecute = false
+        };
+        processStartInfo.ArgumentList.Add(target);
+        _startProcess(processStartInfo);
+    }
+}

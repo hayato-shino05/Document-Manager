@@ -1,128 +1,123 @@
-# Đóng góp cho Study Document Manager
+# Document Manager への貢献
 
-Chào mừng bạn đến với dự án **Study Document Manager**! Chúng tôi rất vui vì bạn quan tâm và muốn đóng góp để làm cho ứng dụng quản lý tài liệu cá nhân này trở nên tốt hơn. Dù là sửa lỗi nhỏ, bổ sung tính năng hay cải thiện tài liệu, mọi đóng góp đều được trân trọng.
+Document Manager への貢献を歓迎します。このガイドでは、Avalonia と .NET 9 で構成された現在の開発フローを説明します。
 
-## Mục lục
+## 目次
 
-- [Chuẩn bị môi trường](#chuẩn-bị-môi-trường)
-- [Quy trình đóng góp](#quy-trình-đóng-góp)
-- [Quy ước Code](#quy-ước-code)
-- [Báo cáo lỗi](#báo-cáo-lỗi)
-- [Đề xuất tính năng](#đề-xuất-tính-năng)
-- [Liên hệ](#liên-hệ)
+- [前提条件](#前提条件)
+- [リポジトリのセットアップ](#リポジトリのセットアップ)
+- [ビルドとテスト](#ビルドとテスト)
+- [開発時の注意](#開発時の注意)
+- [プルリクエスト](#プルリクエスト)
+- [バグ報告と機能提案](#バグ報告と機能提案)
+- [関連ドキュメント](#関連ドキュメント)
 
----
+## 前提条件
 
-## Chuẩn bị môi trường
+- .NET 9 SDK
+- Git
+- .NET デスクトップ開発に対応したエディターまたは IDE
 
-Để bắt đầu phát triển, bạn cần chuẩn bị môi trường như sau:
+SQLite のデータベースはアプリケーションがローカルに作成します。別途データベースサーバーを用意する必要はありません。
 
-1.  **IDE**: Cài đặt [Visual Studio 2019](https://visualstudio.microsoft.com/vs/older-downloads/) hoặc [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) (Khuyên dùng bản 2022 Community).
-2.  **Workload**: Khi cài đặt Visual Studio, hãy chọn workload **.NET Desktop Development**.
-3.  **Runtime**: Đảm bảo đã cài đặt **.NET Framework 4.8** Developer Pack.
-4.  **Database**: Dự án sử dụng **SQLite** (Local DB) nên bạn **KHÔNG** cần cài đặt SQL Server. Database sẽ được tự động khởi tạo khi chạy ứng dụng lần đầu.
-
----
-
-## Quy trình đóng góp
-
-Chúng tôi tuân theo quy trình GitHub Flow cơ bản:
-
-### 1. Fork và Clone
-Fork repository này về tài khoản GitHub của bạn, sau đó clone về máy:
+## リポジトリのセットアップ
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/study-document-manager.git
+git clone https://github.com/hayato-shino05/study-document-manager.git
 cd study-document-manager
 ```
 
-### 2. Tạo Branch
-Luôn tạo branch mới cho mỗi tính năng hoặc bản sửa lỗi. Đặt tên branch rõ ràng theo quy ước:
+変更ごとに目的を絞ったブランチを作成してください。
 
-- Tính năng mới: `feature/ten-tinh-nang` (ví dụ: `feature/dark-mode`, `feature/export-pdf`)
-- Sửa lỗi: `fix/ten-loi` (ví dụ: `fix/login-crash`, `fix/typo-readme`)
+- 新機能: `feature/short-description`
+- バグ修正: `fix/short-description`
+- ドキュメント: `docs/short-description`
 
-```bash
-git checkout -b feature/them-chuc-nang-moi
-```
-
-### 3. Code và Commit
-- Viết code rõ ràng, tuân thủ [Quy ước Code](#quy-ước-code).
-- Commit message cần ngắn gọn nhưng đầy đủ ý nghĩa (khuyên dùng tiếng Anh theo chuẩn Conventional Commits):
-  - `feat: Add dark mode toggle`
-  - `fix: Resolve database connection issue`
-  - `docs: Update installation guide`
-
-### 4. Push và tạo Pull Request (PR)
-Đẩy branch của bạn lên GitHub:
+例:
 
 ```bash
-git push origin feature/them-chuc-nang-moi
+git checkout -b feature/language-menu-polish
 ```
 
-Sau đó truy cập repository gốc và tạo Pull Request. Vui lòng mô tả chi tiết những thay đổi bạn đã thực hiện trong PR.
+## ビルドとテスト
 
----
+次のコマンドでローカル確認を行います。
 
-## Quy ước Code
-
-### Code Style (Clean Code)
-- **Giữ code sạch sẽ**: Xóa các đoạn code thừa, code bị comment không dùng đến.
-- **Comment**: Thêm comment cho các đoạn logic phức tạp để người khác dễ hiểu.
-- **Naming**:
-  - Class, Method, Property: `PascalCase` (ví dụ: `UserManager`, `GetData`)
-  - Variable, Parameter: `camelCase` (ví dụ: `userList`, `documentId`)
-  - Private field: `_camelCase` (ví dụ: `_connectionString`)
-
-### UI Theme (Quan trọng)
-Dự án sử dụng bộ màu sắc hiện đại (Teal/Emerald) được định nghĩa tập trung trong `UI/AppTheme.cs`. **Tuyệt đối không hardcode màu sắc** trong Form designer trừ khi cần thiết. Hãy sử dụng các biến từ `AppTheme`.
-
-Ví dụ các màu chủ đạo:
-
-```csharp
-// Sử dụng AppTheme để đảm bảo tính nhất quán
-btnSave.BackColor = AppTheme.Primary;        // Teal (#14b8a6)
-btnCancel.BackColor = AppTheme.Secondary;    // Emerald (#10b981)
-lblError.ForeColor = AppTheme.StatusError;   // Red (#ef4444)
-this.BackColor = AppTheme.BackgroundMain;    // White (#ffffff)
+```powershell
+dotnet build "StudyDocumentManager.sln" -c Debug
+dotnet test "StudyDocumentManager.Tests\StudyDocumentManager.Tests.csproj" -c Debug
 ```
 
-Một số màu thường dùng:
-- **Primary**: Teal (`#14b8a6`) - Dùng cho nút chính, highlight.
-- **Secondary**: Emerald (`#10b981`) - Dùng cho các hành động phụ hoặc trạng thái thành công.
-- **Background**: White (`#ffffff`) hoặc Soft Gray (`#f8fafc`).
-- **Text**: Primary Dark (`#0f172a`) cho nội dung chính.
+起動、ルーティング、スキーマ、ローカライズ、テーマリソースに関わる変更では、編集前にプロジェクトのガイドラインを確認してください。
 
----
+## 開発時の注意
 
-## Báo cáo lỗi
+### アーキテクチャの境界
 
-Nếu bạn phát hiện lỗi, hãy tạo Issue trên GitHub với các thông tin sau:
+- `StudyDocumentManager` は Avalonia の view、model、service、theme を含みます。
+- `StudyDocumentManager.Core` は entity、DTO、service と repository の contract を含みます。
+- `StudyDocumentManager.Data` は SQLite の schema、migration、repository implementation を含みます。
+- `StudyDocumentManager.Tests` は xUnit のテストを含みます。
 
-1.  **Mô tả lỗi**: Chuyện gì đã xảy ra?
-2.  **Môi trường**: Windows version (10/11), .NET Framework version.
-3.  **Các bước tái hiện**: Làm thế nào để gặp lỗi này?
-4.  **Kết quả mong đợi**: Điều gì nên xảy ra?
-5.  **Screenshot**: Ảnh chụp màn hình lỗi (nếu có).
+### UI とテーマの変更
 
----
+view に共有の色や brush を直接記述しないでください。既存の theme resource を使用してください。
 
-## Đề xuất tính năng
+- `StudyDocumentManager/Themes/ColorTokens.axaml`
+- `StudyDocumentManager/Themes/AppTheme.axaml`
+- `StudyDocumentManager/Themes/SharedStyles.axaml`
 
-Bạn có ý tưởng hay? Hãy kiểm tra xem tính năng đó đã có trong [Roadmap](FEATURES.md) chưa. Nếu chưa, hãy tạo Issue mới với nhãn `enhancement` và mô tả:
+view の状態は `Models/*Model.cs` で管理します。code-behind は Avalonia の event bridge または control lifecycle に対応する必要がある場合だけ使用してください。
 
-- Tính năng này giải quyết vấn đề gì?
-- Nó hoạt động như thế nào?
-- Tại sao nó hữu ích cho người dùng cá nhân?
+### データとスキーマの変更
 
----
+schema や repository の動作を変更する場合は、次の範囲を同時に更新してください。
 
-## Liên hệ
+- `StudyDocumentManager.Data/Helpers/DatabaseHelper.cs`
+- `StudyDocumentManager.Data/Helpers/DatabaseMigrator.cs`
+- `StudyDocumentManager.Core/Interfaces/*.cs`
+- `StudyDocumentManager.Data/Repositories/*.cs`
+- `DATABASE.md`
+- `StudyDocumentManager.Tests` の関連テスト
 
-Nếu cần hỗ trợ thêm, bạn có thể liên hệ với maintainer:
+`documents.file_path` の空でない完全一致を対象とする部分一意インデックス、soft delete、restore、`app_settings.language` の保存と復元を変更する場合は、schema、migration、contract、mapping、テストを確認してください。
 
-- **Maintainer**: hayato-shino05
-- **Email**: hayatoshino05@gmail.com
-- **GitHub**: [@hayato-shino05](https://github.com/hayato-shino05)
+### ローカライズの変更
 
-Cảm ơn bạn đã đóng góp cho cộng đồng!
+現在のローカライズは `.resx` resource、`LocalizationService`、`LocalizeExtension` で実装しています。label、menu、dialog に触れる場合は、resource key の整合性と実行中の言語切り替えを確認してください。日本語が既定ロケールで、未翻訳の key は日本語へフォールバックします。
+
+### Dashboard とデスクトップ実行
+
+Dashboard は `Dashboard.axaml.cs` で初期化を遅延させ、DataGrid と layout の binding loop を避けています。欠損ファイル、launcher 失敗、空の collection は復旧フローを持ちます。deferred lifecycle、drag/drop の event bridge、native dialog、restore 後の再オープンは、モデル／SQLite の自動テストに加えてデスクトップ実行で確認してください。
+
+## プルリクエスト
+
+プルリクエストを作成する前に、次を確認してください。
+
+1. 変更範囲を 1 つの目的に絞る。
+2. 関連する build と test コマンドを実行する。
+3. contract または workflow が変わる場合はドキュメントを更新する。
+4. 変更内容、確認方法、残っている制限を説明する。
+
+推奨する commit message の形式:
+
+- `feat: add collection filter shortcut`
+- `fix: preserve selection after dashboard refresh`
+- `docs: rewrite readme for avalonia app`
+
+## バグ報告と機能提案
+
+Issue を作成するときは、次の情報を含めてください。
+
+- 簡潔な概要
+- 影響する画面、service、workflow
+- 再現手順
+- 期待される動作
+- 実際の動作
+- 必要に応じたスクリーンショットまたはログ
+
+機能提案では、最初に解決したい利用者の問題を説明し、その後に提案する動作を記載してください。
+
+## 関連ドキュメント
+
+- [DATABASE.md](./DATABASE.md)
