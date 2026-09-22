@@ -9,10 +9,15 @@
 [![SQLite](https://img.shields.io/badge/SQLite-Local_DB-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Desktop](https://img.shields.io/badge/Platform-Desktop-0F172A?style=for-the-badge)](https://github.com/hayato-shino05/study-document-manager)
 
-[![Version](https://img.shields.io/badge/Version-4.0.0-14B8A6?style=for-the-badge)](https://github.com/hayato-shino05/study-document-manager/releases)
-[![Downloads](https://img.shields.io/github/downloads/hayato-shino05/study-document-manager/total?style=for-the-badge&color=10B981&logo=github&logoColor=white&label=Downloads)](https://github.com/hayato-shino05/study-document-manager/releases)
+[![Version](https://img.shields.io/badge/Version-4.0.0-14B8A6?style=for-the-badge)](https://github.com/hayato-shino05/Document-Manager/releases)
+<!--
+  【ダウンロード実績の注記】
+  旧バージョン（v2.x / v3.x）のリリースアセット整理に伴い GitHub API の累計カウンターがリセットされたため、
+  過去のダウンロード実績（180 回以上）をベースとした「180+」表記を設定しています。
+-->
+[![Downloads](https://img.shields.io/badge/Downloads-180%2B-10B981?style=for-the-badge&color=10B981&logo=github&logoColor=white&label=Downloads)](https://github.com/hayato-shino05/Document-Manager/releases)
 [![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/hayato-shino05/study-document-manager?style=for-the-badge&color=EF4444&logo=github&logoColor=white)](https://github.com/hayato-shino05/study-document-manager)
+[![Stars](https://img.shields.io/github/stars/hayato-shino05/Document-Manager?style=for-the-badge&color=EF4444&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager)
 
 <img src="./StudyDocumentManager/Assets/Brand/banner.png" alt="Document Manager banner" width="100%" />
 
