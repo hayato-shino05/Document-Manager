@@ -4,7 +4,7 @@
 
 学習資料と業務文書をローカルで整理する Avalonia デスクトップアプリケーションです。
 
-[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![Avalonia](https://img.shields.io/badge/Avalonia-11.2.7-7C3AED?style=for-the-badge)](https://avaloniaui.net/)
 [![SQLite](https://img.shields.io/badge/SQLite-Local_DB-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Desktop](https://img.shields.io/badge/Platform-Desktop-0F172A?style=for-the-badge)](https://github.com/hayato-shino05/study-document-manager)
@@ -14,7 +14,7 @@
 [![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/hayato-shino05/study-document-manager?style=for-the-badge&color=EF4444&logo=github&logoColor=white)](https://github.com/hayato-shino05/study-document-manager)
 
-<img src="./StudyDocumentManager/Assets/Brand/banner.svg" alt="Document Manager banner" width="800" />
+<img src="./StudyDocumentManager/Assets/Brand/banner.png" alt="Document Manager banner" width="100%" />
 
 </div>
 
