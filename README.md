@@ -15,7 +15,7 @@
   旧バージョン（v2.x / v3.x）のリリースアセット整理に伴い GitHub API の累計カウンターがリセットされたため、
   過去のダウンロード実績（180 回以上）をベースとした「180+」表記を設定しています。
 -->
-[![Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhayato-shino05%2FDocument-Manager%2Fmain%2F.github%2Fbadges%2Fdownloads.json&style=for-the-badge&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager/releases)
+[![Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhayato-shino05%2FDocument-Manager%2Fmain%2F.github%2Fbadges%2Fdownloads.json%3Fv%3D1&style=for-the-badge&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager/releases)
 [![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/hayato-shino05/Document-Manager?style=for-the-badge&color=EF4444&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager)
 
