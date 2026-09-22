@@ -34,11 +34,7 @@ jobs:
           BASE_OFFSET=180
           TOTAL=$((BASE_OFFSET + N))
 
-          if [ "$N" -eq 0 ]; then
-            MESSAGE="${TOTAL}+"
-          else
-            MESSAGE="${TOTAL}"
-          fi
+          MESSAGE="${TOTAL}"
 
           mkdir -p .github/badges
           cat <<EOF > .github/badges/downloads.json
