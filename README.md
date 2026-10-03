@@ -16,7 +16,7 @@
   過去のダウンロード実績（180 回）をベースとした「180」を初期値に設定しています。
 -->
 [![Downloads before v4.0.0](https://img.shields.io/badge/Downloads%20before%20v4.0.0-180-64748B?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager/releases)
-[![Downloads](https://img.shields.io/github/downloads/hayato-shino05/Document-Manager/total.svg?style=for-the-badge&label=Total%20Downloads&color=14B8A6&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager/releases)
+[![Downloads](https://img.shields.io/github/downloads/hayato-shino05/Document-Manager/total.svg?style=for-the-badge&label=Downloads&color=14B8A6&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager/releases)
 [![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/hayato-shino05/Document-Manager?style=for-the-badge&color=EF4444&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager)
 
