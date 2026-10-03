@@ -15,7 +15,9 @@
   旧バージョン（v2.x / v3.x）のリリースアセット整理に伴い GitHub API の累計カウンターがリセットされたため、
   過去のダウンロード実績（180 回）をベースとした「180」を初期値に設定しています。
 -->
-[![Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fhayato-shino05%2FDocument-Manager%2Fmain%2F.github%2Fbadges%2Fdownloads.json%3Fv%3D2&style=for-the-badge&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager/releases)
+[![Downloads before v4.0.0](https://img.shields.io/badge/Downloads%20before%20v4.0.0-180-64748B?style=for-the-badge&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager/releases)
+[![v4.0.0 Downloads](https://img.shields.io/github/downloads/hayato-shino05/Document-Manager/v4.0.0/total.svg?style=for-the-badge&label=v4.0.0%20Downloads&color=10B981&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager/releases/tag/v4.0.0)
+[![Total Downloads](https://img.shields.io/github/downloads/hayato-shino05/Document-Manager/total.svg?style=for-the-badge&label=Total%20Downloads&color=14B8A6&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager/releases)
 [![License](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge&logo=opensourceinitiative&logoColor=white)](LICENSE)
 [![Stars](https://img.shields.io/github/stars/hayato-shino05/Document-Manager?style=for-the-badge&color=EF4444&logo=github&logoColor=white)](https://github.com/hayato-shino05/Document-Manager)
 
